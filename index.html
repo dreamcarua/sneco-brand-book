@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>snEco Brand Guide</title>
+<title>snEco — Brand Bible</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -618,22 +618,56 @@ h3.block-title:first-of-type { margin-top: 0; }
 /* QUICK REF */
 .quick-ref {
   background: var(--yellow);
-  padding: 10px 64px;
-  display: flex; gap: 24px; align-items: center; flex-wrap: wrap;
-  border-bottom: 1px solid rgba(30,30,30,0.12);
+  padding: 14px 64px;
+  display: flex; gap: 24px; align-items: center;
+  border-bottom: 2px solid rgba(30,30,30,0.12);
+  position: relative;
+  min-height: 52px;
 }
-.quick-ref-item {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 12px; font-weight: 600;
+.qr-mark {
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: var(--black);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
-.quick-ref-swatch {
-  width: 16px; height: 16px; border-radius: 4px;
-  border: 1.5px solid rgba(0,0,0,0.15);
+.qr-mark-sub {
+  font-weight: 600;
+  font-size: 11px;
+  color: rgba(30,30,30,0.55);
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  margin-left: 8px;
 }
-.quick-ref-label { color: rgba(30,30,30,0.6); font-size: 10px; }
-.quick-ref-fonts {
-  margin-left: auto; font-size: 12px; font-weight: 600;
-  color: rgba(30,30,30,0.5);
+.qr-northstar {
+  flex: 1;
+  text-align: center;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.3;
+  color: var(--black);
+  letter-spacing: -0.01em;
+  padding: 0 16px;
+}
+.qr-northstar .qr-ns-accent {
+  color: var(--black);
+  font-style: italic;
+  font-weight: 700;
+}
+.qr-meta {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(30,30,30,0.55);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+@media (max-width: 900px) {
+  .quick-ref { padding: 12px 20px; flex-wrap: wrap; gap: 8px; }
+  .qr-northstar { font-size: 12px; flex-basis: 100%; order: 3; padding: 4px 0 0; }
+  .qr-meta { display: none; }
 }
 
 /* CHECKLIST */
@@ -889,31 +923,20 @@ h3.block-title:first-of-type { margin-top: 0; }
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Guide v2.7 · 2026
+    Brand Bible v2.7 · 2026
   </div>
 </nav>
 
 <main class="main">
 
-<!-- QUICK REF BAR -->
+<!-- NORTH STAR HEADER -->
 <div class="quick-ref">
-  <div class="quick-ref-item">
-    <div class="quick-ref-swatch" style="background:#FEBF27"></div>
-    <span class="quick-ref-label">Yellow</span><strong>#FEBF27</strong>
+  <div class="qr-mark">SNÉCO<span class="qr-mark-sub" data-lang="uk">Біблія бренду</span><span class="qr-mark-sub" data-lang="en">Brand Bible</span></div>
+  <div class="qr-northstar">
+    <span data-lang="uk">Один інгредієнт. <span class="qr-ns-accent">Жодних компромісів.</span> Сирний снек XXI століття.</span>
+    <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
   </div>
-  <div class="quick-ref-item">
-    <div class="quick-ref-swatch" style="background:#1E1E1E"></div>
-    <span class="quick-ref-label">Black</span><strong>#1E1E1E</strong>
-  </div>
-  <div class="quick-ref-item">
-    <div class="quick-ref-swatch" style="background:#96C11F"></div>
-    <span class="quick-ref-label">Green</span><strong>#96C11F</strong>
-  </div>
-  <div class="quick-ref-item">
-    <div class="quick-ref-swatch" style="background:#FFFFFF"></div>
-    <span class="quick-ref-label">White</span><strong>#FFFFFF</strong>
-  </div>
-  <div class="quick-ref-fonts">Qanelas · HighVoltage Rough</div>
+  <div class="qr-meta">v2.7 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -956,7 +979,7 @@ h3.block-title:first-of-type { margin-top: 0; }
           <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--yellow);padding-top:4px">02</div>
           <div>
             <div style="font-size:18px;font-weight:800;letter-spacing:-0.3px;margin-bottom:6px"><span data-lang="uk">Холодна технологія</span><span data-lang="en">Cold technology</span></div>
-            <div style="font-size:14px;line-height:1.6;color:var(--text-muted)"><span data-lang="uk">Сушка при 24–26°C — не маркетинг. Це різниця між сиром і сирним порошком.</span><span data-lang="en">Drying at 24–26°C isn't marketing. It's the difference between cheese and cheese powder.</span></div>
+            <div style="font-size:14px;line-height:1.6;color:var(--text-muted)"><span data-lang="uk">Сушка при 36-38°C — не маркетинг. Це різниця між сиром і сирним порошком.</span><span data-lang="en">Drying at 36-38°C isn't marketing. It's the difference between cheese and cheese powder.</span></div>
           </div>
         </div>
 
@@ -1029,8 +1052,8 @@ h3.block-title:first-of-type { margin-top: 0; }
         <div style="font-size:28px;margin-bottom:10px">🧬</div>
         <div class="pkg-name"><span data-lang="uk">Технологія</span><span data-lang="en">Technology</span></div>
         <div class="pkg-sku" style="margin-top:6px;line-height:1.5">
-          <span data-lang="uk">VacWave Bio Nutrition — мікрохвильово-вакуумна сушка при 24–26°C. Власний патент №139035.</span>
-          <span data-lang="en">VacWave Bio Nutrition — microwave-vacuum drying at 24–26°C. Proprietary patent No. 139035.</span>
+          <span data-lang="uk">VacWave Bio Nutrition — мікрохвильово-вакуумна сушка при 36-38°C. Власний патент №139035.</span>
+          <span data-lang="en">VacWave Bio Nutrition — microwave-vacuum drying at 36-38°C. Proprietary patent No. 139035.</span>
         </div>
       </div>
       <div class="card card-sm">
@@ -1183,8 +1206,8 @@ h3.block-title:first-of-type { margin-top: 0; }
     <div class="card">
       <div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px"><span data-lang="uk">Принцип</span><span data-lang="en">How it works</span></div>
       <div style="font-size:13px;line-height:1.65;color:var(--text)">
-        <span data-lang="uk">Мікрохвильово-вакуумна сушка при <strong>24–26°C</strong> прибирає майже всю воду з сиру, зберігаючи поживні речовини. Без високих температур, без масла, без смаження. Один інгредієнт — сир.</span>
-        <span data-lang="en">Microwave-vacuum drying at <strong>24–26°C</strong> removes almost all water from the cheese while keeping its nutrients. No high heat, no oil, no frying. One ingredient — cheese.</span>
+        <span data-lang="uk">Мікрохвильово-вакуумна сушка при <strong>36-38°C</strong> прибирає майже всю воду з сиру, зберігаючи поживні речовини. Без високих температур, без масла, без смаження. Один інгредієнт — сир.</span>
+        <span data-lang="en">Microwave-vacuum drying at <strong>36-38°C</strong> removes almost all water from the cheese while keeping its nutrients. No high heat, no oil, no frying. One ingredient — cheese.</span>
       </div>
     </div>
     <div class="card">
@@ -1202,7 +1225,7 @@ h3.block-title:first-of-type { margin-top: 0; }
       <div class="do-block-title">✓ snEco</div>
       <ul>
         <li data-lang="uk">100% натуральний сир, один інгредієнт</li><li data-lang="en">100% natural cheese, single ingredient</li>
-        <li data-lang="uk">Низькотемпературна сушка (24–26°C) — поживні речовини зберігаються</li><li data-lang="en">Low-temp drying (24–26°C) — nutrients preserved</li>
+        <li data-lang="uk">Низькотемпературна сушка (36-38°C) — поживні речовини зберігаються</li><li data-lang="en">Low-temp drying (36-38°C) — nutrients preserved</li>
         <li data-lang="uk">Кулькова форма — finger food, без жирних рук</li><li data-lang="en">Ball shape — true finger food, no greasy hands</li>
         <li data-lang="uk">До 60% протеїну, без цукру, без глютену</li><li data-lang="en">Up to 60% protein, no sugar, gluten-free</li>
         <li data-lang="uk">KETO-friendly, виробництво на сонячній енергії</li><li data-lang="en">KETO-friendly, solar-powered production</li>
@@ -1250,7 +1273,7 @@ h3.block-title:first-of-type { margin-top: 0; }
           <td>USA</td>
           <td><span data-lang="uk">Пласкі чипси</span><span data-lang="en">Flat crisps</span></td>
           <td><span data-lang="uk">Запечений сир. ~12 SKU. Лідер US-категорії cheese-snack.</span><span data-lang="en">Baked cheese. ~12 SKUs. US category leader.</span></td>
-          <td><span data-lang="uk">У них високі температури (втрата нутрієнтів). У нас — 24–26°C і кулькова форма (finger food).</span><span data-lang="en">They use high heat (nutrient loss). We use 24–26°C and a ball shape (finger food).</span></td>
+          <td><span data-lang="uk">У них високі температури (втрата нутрієнтів). У нас — 36-38°C і кулькова форма (finger food).</span><span data-lang="en">They use high heat (nutrient loss). We use 36-38°C and a ball shape (finger food).</span></td>
         </tr>
         <tr>
           <td><strong>ParmCrisps</strong></td>
@@ -1291,8 +1314,8 @@ h3.block-title:first-of-type { margin-top: 0; }
     </table>
     <div style="margin-top:14px;padding:12px 14px;background:var(--yellow-10);border-radius:6px;font-size:12px;line-height:1.55">
       <strong><span data-lang="uk">Категорійний інсайт:</span><span data-lang="en">Category insight:</span></strong>
-      <span data-lang="uk">Усі ключові конкуренти — це <strong>випечений / запечений сир у пласкій формі</strong>. Жоден з них не використовує мікрохвильово-вакуумну сушку при 24–26°C. Кулькова форма + низькі температури — це не варіант продукту, це окрема субкатегорія.</span>
-      <span data-lang="en">Every key competitor is <strong>baked / oven-cooked cheese in flat form</strong>. None uses microwave-vacuum drying at 24–26°C. Ball shape + low temperatures — that's not a product variant, it's a sub-category of its own.</span>
+      <span data-lang="uk">Усі ключові конкуренти — це <strong>випечений / запечений сир у пласкій формі</strong>. Жоден з них не використовує мікрохвильово-вакуумну сушку при 36-38°C. Кулькова форма + низькі температури — це не варіант продукту, це окрема субкатегорія.</span>
+      <span data-lang="en">Every key competitor is <strong>baked / oven-cooked cheese in flat form</strong>. None uses microwave-vacuum drying at 36-38°C. Ball shape + low temperatures — that's not a product variant, it's a sub-category of its own.</span>
     </div>
   </div>
 
@@ -1392,7 +1415,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         </tr>
         <tr>
           <td><span data-lang="uk">Технологія</span><span data-lang="en">Technology</span></td>
-          <td>VacWave Bio Nutrition · patented · microwave-vacuum drying at 24–26°C</td>
+          <td>VacWave Bio Nutrition · patented · microwave-vacuum drying at 36-38°C</td>
           <td><span data-lang="uk">Патент №139035</span><span data-lang="en">Patent No. 139035</span></td>
         </tr>
         <tr>
@@ -2053,8 +2076,8 @@ h3.block-title:first-of-type { margin-top: 0; }
       <div style="border-bottom:1px solid var(--border);padding-bottom:16px">
         <div style="font-size:10px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px">Body · <span data-lang="uk">Основний текст</span><span data-lang="en">Body copy</span></div>
         <div style="font-size:15px;font-weight:400;line-height:1.65;color:var(--text-muted)">
-          <span data-lang="uk">Мікрохвильово-вакуумна сушка при 24–26°C зберігає всі поживні речовини сиру, надаючи йому хрустку текстуру без жодних добавок.</span>
-          <span data-lang="en">Microwave-vacuum drying at 24–26°C preserves all the nutrients of the cheese while giving it a crunchy texture — with no additives at all.</span>
+          <span data-lang="uk">Мікрохвильово-вакуумна сушка при 36-38°C зберігає всі поживні речовини сиру, надаючи йому хрустку текстуру без жодних добавок.</span>
+          <span data-lang="en">Microwave-vacuum drying at 36-38°C preserves all the nutrients of the cheese while giving it a crunchy texture — with no additives at all.</span>
         </div>
         <div style="font-size:11px;color:var(--text-muted);margin-top:4px;font-family:var(--font-mono)">Qanelas Regular · 14–16px · line-height 1.6–1.7</div>
       </div>
@@ -2696,15 +2719,15 @@ h3.block-title:first-of-type { margin-top: 0; }
     <div class="card">
       <div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--yellow);margin-bottom:10px">100 <span data-lang="uk">слів</span><span data-lang="en">words</span></div>
       <div style="font-size:13px;line-height:1.65">
-        <span data-lang="uk">snEco — український food-tech бренд, що створює перший сертифікований еко-снек зі 100% натурального сиру. За власною патентованою технологією VacWave Bio Nutrition (мікрохвильово-вакуумна сушка при 24–26°C) сир перетворюється на хрусткі кульки з терміном зберігання до 24 місяців без холодильника, до 60% протеїну і одним інгредієнтом на етикетці. Виробництво у Мукачево (UA) і Гуменне (SK) працює на 100% сонячній енергії. Лауреат SIAL Innovation Grand Prix 2024 (Париж), Forbes Next 250, Gulfood Innovation 2025 shortlist.</span>
-        <span data-lang="en">snEco is a Ukrainian food-tech brand making the first certified eco-snack from 100% natural cheese. Our patented VacWave Bio Nutrition technology (microwave-vacuum drying at 24–26°C) turns cheese into crunchy balls with up to 24 months shelf life without refrigeration, up to 60% protein, and a single ingredient on the label. Production in Mukachevo (UA) and Humenné (SK) runs on 100% solar power. Winner of the SIAL Innovation Grand Prix 2024 (Paris), Forbes Next 250, Gulfood Innovation 2025 shortlist.</span>
+        <span data-lang="uk">snEco — український food-tech бренд, що створює перший сертифікований еко-снек зі 100% натурального сиру. За власною патентованою технологією VacWave Bio Nutrition (мікрохвильово-вакуумна сушка при 36-38°C) сир перетворюється на хрусткі кульки з терміном зберігання до 24 місяців без холодильника, до 60% протеїну і одним інгредієнтом на етикетці. Виробництво у Мукачево (UA) і Гуменне (SK) працює на 100% сонячній енергії. Лауреат SIAL Innovation Grand Prix 2024 (Париж), Forbes Next 250, Gulfood Innovation 2025 shortlist.</span>
+        <span data-lang="en">snEco is a Ukrainian food-tech brand making the first certified eco-snack from 100% natural cheese. Our patented VacWave Bio Nutrition technology (microwave-vacuum drying at 36-38°C) turns cheese into crunchy balls with up to 24 months shelf life without refrigeration, up to 60% protein, and a single ingredient on the label. Production in Mukachevo (UA) and Humenné (SK) runs on 100% solar power. Winner of the SIAL Innovation Grand Prix 2024 (Paris), Forbes Next 250, Gulfood Innovation 2025 shortlist.</span>
       </div>
     </div>
     <div class="card">
       <div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--yellow);margin-bottom:10px">200 <span data-lang="uk">слів</span><span data-lang="en">words</span></div>
       <div style="font-size:12px;line-height:1.6">
-        <span data-lang="uk">snEco — український food-tech бренд, заснований 2016 року братами Вадимом і Пилипом Гришиними. Створює перший сертифікований еко-снек зі 100% натурального сиру за власною запатентованою технологією VacWave Bio Nutrition. Мікрохвильово-вакуумна сушка при 24–26°C прибирає воду без високих температур — і результат: хрустка кулькова форма, до 24 місяців зберігання без холодильника, до 60% протеїну, без цукру і глютену. Виробництво розгорнуто на двох заводах: Мукачево (Україна) і Гуменне (Словаччина) — обидва працюють на 100% сонячній енергії. Сертифікації: FSSC 22000, IFS Food v8, HACCP, ISO 22000, EU TRACES, FDA. Доступний у 25+ ритейл-мережах України та активно експортується в EU, US, Asia, Middle East. Лауреат SIAL Innovation Grand Prix 2024, Forbes Next 250, Gulfood Innovation 2025 shortlist. Ціль — зробити для сиру те, що йогурт зробив для молока: перетворити натуральний продукт на сучасний, зручний снек XXI століття без компромісів.</span>
-        <span data-lang="en">snEco is a Ukrainian food-tech brand founded in 2016 by brothers Vadym and Pylyp Gryshyn. It produces the first certified eco-snack from 100% natural cheese using its own patented VacWave Bio Nutrition technology. Microwave-vacuum drying at 24–26°C removes water without high heat, yielding crunchy balls with up to 24 months shelf life without refrigeration, up to 60% protein, no sugar and gluten-free. Production runs across two plants: Mukachevo (Ukraine) and Humenné (Slovakia) — both fully solar-powered. Certifications: FSSC 22000, IFS Food v8, HACCP, ISO 22000, EU TRACES, FDA. Available in 25+ retail chains across Ukraine and actively exported to the EU, US, Asia and the Middle East. Winner of the SIAL Innovation Grand Prix 2024, Forbes Next 250, Gulfood Innovation 2025 shortlist. The mission: do for cheese what yogurt did for milk — turn a natural product into a modern, convenient 21st-century snack with no compromises.</span>
+        <span data-lang="uk">snEco — український food-tech бренд, заснований 2016 року братами Вадимом і Пилипом Гришиними. Створює перший сертифікований еко-снек зі 100% натурального сиру за власною запатентованою технологією VacWave Bio Nutrition. Мікрохвильово-вакуумна сушка при 36-38°C прибирає воду без високих температур — і результат: хрустка кулькова форма, до 24 місяців зберігання без холодильника, до 60% протеїну, без цукру і глютену. Виробництво розгорнуто на двох заводах: Мукачево (Україна) і Гуменне (Словаччина) — обидва працюють на 100% сонячній енергії. Сертифікації: FSSC 22000, IFS Food v8, HACCP, ISO 22000, EU TRACES, FDA. Доступний у 25+ ритейл-мережах України та активно експортується в EU, US, Asia, Middle East. Лауреат SIAL Innovation Grand Prix 2024, Forbes Next 250, Gulfood Innovation 2025 shortlist. Ціль — зробити для сиру те, що йогурт зробив для молока: перетворити натуральний продукт на сучасний, зручний снек XXI століття без компромісів.</span>
+        <span data-lang="en">snEco is a Ukrainian food-tech brand founded in 2016 by brothers Vadym and Pylyp Gryshyn. It produces the first certified eco-snack from 100% natural cheese using its own patented VacWave Bio Nutrition technology. Microwave-vacuum drying at 36-38°C removes water without high heat, yielding crunchy balls with up to 24 months shelf life without refrigeration, up to 60% protein, no sugar and gluten-free. Production runs across two plants: Mukachevo (Ukraine) and Humenné (Slovakia) — both fully solar-powered. Certifications: FSSC 22000, IFS Food v8, HACCP, ISO 22000, EU TRACES, FDA. Available in 25+ retail chains across Ukraine and actively exported to the EU, US, Asia and the Middle East. Winner of the SIAL Innovation Grand Prix 2024, Forbes Next 250, Gulfood Innovation 2025 shortlist. The mission: do for cheese what yogurt did for milk — turn a natural product into a modern, convenient 21st-century snack with no compromises.</span>
       </div>
     </div>
   </div>
@@ -3256,7 +3279,7 @@ h3.block-title:first-of-type { margin-top: 0; }
       <tbody>
         <tr>
           <td><strong><span data-lang="uk">Патент №139035</span><span data-lang="en">Patent No. 139035</span></strong></td>
-          <td><span data-lang="uk">Патент на технологію виробництва спіненого сиру VacWave Bio Nutrition (мікрохвильово-вакуумна сушка при 24–26°C).</span><span data-lang="en">Patent on the spun-cheese production technology — VacWave Bio Nutrition (microwave-vacuum drying at 24–26°C).</span></td>
+          <td><span data-lang="uk">Патент на технологію виробництва спіненого сиру VacWave Bio Nutrition (мікрохвильово-вакуумна сушка при 36-38°C).</span><span data-lang="en">Patent on the spun-cheese production technology — VacWave Bio Nutrition (microwave-vacuum drying at 36-38°C).</span></td>
           <td>✅ <span data-lang="uk">чинний</span><span data-lang="en">in force</span></td>
           <td><a href="documents/legal/Patent_UA_139035.pdf" target="_blank" style="text-decoration:underline">PDF</a></td>
         </tr>
@@ -3895,6 +3918,12 @@ h3.block-title:first-of-type { margin-top: 0; }
       <li data-lang="en">Separate "Confidential documents" block — list of items provided only on request (contracts, financials, corporate, RÚVZ permits)</li>
       <li data-lang="uk">Виправлено застарілий заголовок у footer: <code>Brand Guide v2.1 → v2.7</code></li>
       <li data-lang="en">Fixed stale footer label: <code>Brand Guide v2.1 → v2.7</code></li>
+      <li data-lang="uk"><strong>Header переосмислено</strong>: замість кольорового бару зі свотчами і шрифтами — тепер North Star (позиціонна заява), маленький wordmark і метадані. Кольори/шрифти і так мають окремі повноцінні секції.</li>
+      <li data-lang="en"><strong>Header redesigned</strong>: replaced the color/font swatch strip with a North Star (positioning statement), small wordmark and metadata. Colors and fonts already have their own full-fledged sections.</li>
+      <li data-lang="uk"><strong>Перейменовано «Brand Guide» → «Brand Bible»</strong> у title і footer — документ еволюціонує в повноцінну операційну біблію snEco, не просто бренд-довідник.</li>
+      <li data-lang="en"><strong>Renamed "Brand Guide" → "Brand Bible"</strong> in title and footer — the document is evolving into a full operating bible for snEco, not just a brand reference.</li>
+      <li data-lang="uk"><strong>Виправлено температуру сушки VacWave Bio Nutrition: <code>24-26°C → 36-38°C</code></strong> у всіх 17 згадках. Стара цифра була типографічною помилкою з ранніх ітерацій.</li>
+      <li data-lang="en"><strong>Fixed VacWave Bio Nutrition drying temperature: <code>24-26°C → 36-38°C</code></strong> across all 17 mentions. The old figure was a typographical error from earlier iterations.</li>
     </ul>
   </div>
 
