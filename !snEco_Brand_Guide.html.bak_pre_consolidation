@@ -822,14 +822,26 @@ h3.block-title:first-of-type { margin-top: 0; }
       <span class="dot"></span>
       <span data-lang="uk">Меседжі &amp; слогани</span><span data-lang="en">Claims &amp; slogans</span>
     </button>
+    <button class="nav-link" data-target="architecture" type="button">
+      <span class="dot"></span>
+      <span data-lang="uk">Архітектура бренду</span><span data-lang="en">Brand architecture</span>
+    </button>
   </div>
 
   <div class="nav-group">
     <div class="nav-group-label" data-lang="uk">Ідентичність</div>
     <div class="nav-group-label" data-lang="en">Identity</div>
-    <button class="nav-link" data-target="visual" type="button">
+    <button class="nav-link" data-target="logo" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Візуальна система</span><span data-lang="en">Visual system</span>
+      <span data-lang="uk">Логотип</span><span data-lang="en">Logo</span>
+    </button>
+    <button class="nav-link" data-target="colors" type="button">
+      <span class="dot"></span>
+      <span data-lang="uk">Кольори</span><span data-lang="en">Colors</span>
+    </button>
+    <button class="nav-link" data-target="typography" type="button">
+      <span class="dot"></span>
+      <span data-lang="uk">Шрифти</span><span data-lang="en">Typography</span>
     </button>
     <button class="nav-link" data-target="voice" type="button">
       <span class="dot"></span>
@@ -852,13 +864,21 @@ h3.block-title:first-of-type { margin-top: 0; }
       <span class="dot"></span>
       <span data-lang="uk">Упаковка</span><span data-lang="en">Packaging</span>
     </button>
+    <button class="nav-link" data-target="print" type="button">
+      <span class="dot"></span>
+      <span data-lang="uk">Друк &amp; носії</span><span data-lang="en">Print &amp; collateral</span>
+    </button>
+    <button class="nav-link" data-target="touchpoints" type="button">
+      <span class="dot"></span>
+      <span data-lang="uk">Точки контакту</span><span data-lang="en">Touchpoints</span>
+    </button>
     <button class="nav-link" data-target="international" type="button">
       <span class="dot"></span>
       <span data-lang="uk">Міжнародна версія</span><span data-lang="en">International</span>
     </button>
-    <button class="nav-link" data-target="externals" type="button">
+    <button class="nav-link" data-target="press" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Зовнішні комунікації</span><span data-lang="en">External communications</span>
+      <span data-lang="uk">PR &amp; press kit</span><span data-lang="en">PR &amp; press kit</span>
     </button>
     <button class="nav-link" data-target="sales" type="button">
       <span class="dot"></span>
@@ -868,9 +888,9 @@ h3.block-title:first-of-type { margin-top: 0; }
       <span class="dot"></span>
       <span data-lang="uk">Legal &amp; substantiation</span><span data-lang="en">Legal &amp; substantiation</span>
     </button>
-    <button class="nav-link" data-target="touchpoints" type="button">
+    <button class="nav-link" data-target="crisis" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Точки контакту</span><span data-lang="en">Touchpoints</span>
+      <span data-lang="uk">Кризові комунікації</span><span data-lang="en">Crisis communications</span>
     </button>
   </div>
 
@@ -881,13 +901,21 @@ h3.block-title:first-of-type { margin-top: 0; }
       <span class="dot"></span>
       <span data-lang="uk">Документи</span><span data-lang="en">Documents</span>
     </button>
+    <button class="nav-link" data-target="checklist" type="button">
+      <span class="dot"></span>
+      <span data-lang="uk">Чеклист</span><span data-lang="en">Compliance checklist</span>
+    </button>
     <button class="nav-link" data-target="roadmap" type="button">
       <span class="dot"></span>
       <span data-lang="uk">Стратегічний roadmap</span><span data-lang="en">Strategic roadmap</span>
     </button>
-    <button class="nav-link" data-target="maintenance" type="button">
+    <button class="nav-link" data-target="recommendations" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Maintenance</span><span data-lang="en">Maintenance</span>
+      <span data-lang="uk">Рекомендації</span><span data-lang="en">Roadmap</span>
+    </button>
+    <button class="nav-link" data-target="changelog" type="button">
+      <span class="dot"></span>
+      <span data-lang="uk">Версії</span><span data-lang="en">Changelog</span>
     </button>
   </div>
 
@@ -895,7 +923,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Bible v2.8 · 2026
+    Brand Bible v2.7 · 2026
   </div>
 </nav>
 
@@ -908,7 +936,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <span data-lang="uk">Один інгредієнт. <span class="qr-ns-accent">Жодних компромісів.</span> Сирний снек XXI століття.</span>
     <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
   </div>
-  <div class="qr-meta">v2.8 · 2026</div>
+  <div class="qr-meta">v2.7 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -1112,88 +1140,6 @@ h3.block-title:first-of-type { margin-top: 0; }
           <span data-lang="en">EU, USA, Asia, Middle East. Looking for an innovative European food product.</span>
         </div>
       </div>
-    </div>
-  </div>
-
-
-  <!-- Architecture (merged from sec-architecture in v2.8) -->
-  <h3 class="block-title"><span data-lang="uk">Архітектура бренду</span><span data-lang="en">Brand architecture</span></h3>
-  <div style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:24px"><span data-lang="uk">snEco — єдиний споживчий бренд. За ним стоять дві юридичні особи: українська (Prime Snack LLC, завод у Мукачево) та словацька (Sneco SK s.r.o., завод у Гуменне). Бренд єдиний, юр-дані відрізняються залежно від ринку.</span>
-    <span data-lang="en">snEco is a single consumer brand backed by two legal entities: Ukrainian (Prime Snack LLC, Mukachevo plant) and Slovak (Sneco SK s.r.o., Humenné plant). One brand, different legal entities depending on the market.</span></div>
-
-  <div class="arch-diagram">
-    <div class="arch-brand">
-      <img src="logo/SNECO%20logo%20MB.svg" alt="snEco" style="width:180px;height:auto;display:block;margin:0 auto 8px">
-      <div class="arch-brand-sub"><span data-lang="uk">Єдиний споживчий бренд</span><span data-lang="en">Single consumer brand</span></div>
-    </div>
-    <div class="arch-arrow">↓</div>
-    <div class="arch-entities">
-      <div class="arch-entity">
-        <div class="arch-entity-flag">🇺🇦</div>
-        <div class="arch-entity-name">Prime Snack LLC</div>
-        <div class="arch-entity-role"><span data-lang="uk">UA · виробництво · UA-ринок</span><span data-lang="en">UA · production · UA market</span></div>
-        <div class="arch-entity-desc">
-          <span data-lang="uk">Завод: Мукачево, Україна.<br>Маркування: «Made in Ukraine».<br>Сертифікати: FSSC 22000 v6.0, HACCP / ISO 22000.<br>Регулятор: Держпродспоживслужба України.</span>
-          <span data-lang="en">Plant: Mukachevo, Ukraine.<br>Origin label: "Made in Ukraine".<br>Certifications: FSSC 22000 v6.0, HACCP / ISO 22000.<br>Regulator: State Service for Food Safety (Ukraine).</span>
-        </div>
-      </div>
-      <div class="arch-entity">
-        <div class="arch-entity-flag">🇸🇰</div>
-        <div class="arch-entity-name">Sneco SK s.r.o.</div>
-        <div class="arch-entity-role"><span data-lang="uk">EU · виробництво · EU-ринок</span><span data-lang="en">EU · production · EU market</span></div>
-        <div class="arch-entity-desc">
-          <span data-lang="uk">Завод: Гуменне, Словаччина.<br>Маркування: «Made in EU».<br>Сертифікати: IFS Food v8, HACCP, EU TRACES.<br>Регулятор: ÚVZ SR (Slovakia) + EU Reg. 1169/2011.</span>
-          <span data-lang="en">Plant: Humenné, Slovakia.<br>Origin label: "Made in EU".<br>Certifications: IFS Food v8, HACCP, EU TRACES.<br>Regulator: Public Health Authority of Slovakia + EU Reg. 1169/2011.</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <h3 class="block-title"><span data-lang="uk">Правила вживання назв</span><span data-lang="en">Naming rules</span></h3>
-  <div class="card">
-    <table class="spec-table">
-      <thead>
-        <tr>
-          <th><span data-lang="uk">Контекст</span><span data-lang="en">Context</span></th>
-          <th><span data-lang="uk">Що писати</span><span data-lang="en">Use</span></th>
-          <th><span data-lang="uk">Не писати</span><span data-lang="en">Avoid</span></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><span data-lang="uk">Маркетингова комунікація</span><span data-lang="en">Marketing communication</span></td>
-          <td><span class="mono-val">snEco</span></td>
-          <td><span class="mono-val">Sneco · SNECO · SnEco</span></td>
-        </tr>
-        <tr>
-          <td><span data-lang="uk">Логотип / упаковка (графічна форма)</span><span data-lang="en">Logo / pack (graphic form)</span></td>
-          <td><span class="mono-val">SNÉCO</span></td>
-          <td><span data-lang="uk">Інше нарисування</span><span data-lang="en">Other lettering</span></td>
-        </tr>
-        <tr>
-          <td><span data-lang="uk">Юр-документи UA-ринку</span><span data-lang="en">Legal docs · UA market</span></td>
-          <td><span class="mono-val">ТОВ «Прайм Снек» / Prime Snack LLC</span></td>
-          <td><span data-lang="uk">snEco як юр-особа</span><span data-lang="en">snEco as legal entity</span></td>
-        </tr>
-        <tr>
-          <td><span data-lang="uk">Юр-документи EU-ринку</span><span data-lang="en">Legal docs · EU market</span></td>
-          <td><span class="mono-val">Sneco SK s.r.o.</span></td>
-          <td><span data-lang="uk">snEco SK · SNECO SK</span><span data-lang="en">snEco SK · SNECO SK</span></td>
-        </tr>
-        <tr>
-          <td><span data-lang="uk">Технологія</span><span data-lang="en">Technology</span></td>
-          <td><span class="mono-val">VacWave Bio Nutrition</span></td>
-          <td><span data-lang="uk">«NASA-технологія»</span><span data-lang="en">"NASA technology"</span></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="accent-section">
-    <div style="font-size:13px;font-weight:700;margin-bottom:6px">⚠️ <span data-lang="uk">Технологія: завжди свій бренд</span><span data-lang="en">Technology: always our own brand</span></div>
-    <div style="font-size:13px;color:var(--text-muted);line-height:1.6">
-      <span data-lang="uk">У snEco — власна запатентована технологія VacWave Bio Nutrition (патент №139035). У комунікації акцент завжди на власній інновації. Не використовуйте «NASA-технологія» як визначення продукту — це некоректно і підважує власне IP.</span>
-      <span data-lang="en">snEco uses its own patented VacWave Bio Nutrition technology (patent No. 139035). Communications must always lead with this proprietary innovation. Do not describe the product as "NASA technology" — it's inaccurate and undermines our own IP.</span>
     </div>
   </div>
 </section>
@@ -1577,17 +1523,104 @@ h3.block-title:first-of-type { margin-top: 0; }
 </section>
 
 <!-- ============================================================
-     VISUAL SYSTEM (Logo + Colors + Typography, merged in v2.8)
+     ARCHITECTURE
      ============================================================ -->
-<section class="section" id="sec-visual" style="padding:56px 64px">
-  <div class="section-eyebrow"><span data-lang="uk">Візуальна система</span><span data-lang="en">Visual system</span></div>
-  <h2 class="section-title"><span data-lang="uk">Логотип, кольори, типографіка</span><span data-lang="en">Logo, colors, typography</span></h2>
+<section class="section" id="sec-architecture" style="padding:56px 64px">
+  <div class="section-eyebrow"><span data-lang="uk">Архітектура</span><span data-lang="en">Architecture</span></div>
+  <h2 class="section-title"><span data-lang="uk">Архітектура бренду</span><span data-lang="en">Brand architecture</span></h2>
   <div class="section-lead">
-    <span data-lang="uk">Три стовпи візуальної ідентичності snEco. Логотип — графічна форма SNÉCO у 4 варіантах. Кольори — жовтий / чорний / зелений / білий. Типографіка — Qanelas + HighVoltage Rough.</span>
-    <span data-lang="en">The three pillars of snEco's visual identity. Logo — the SNÉCO mark in 4 variants. Colors — yellow / black / green / white. Typography — Qanelas + HighVoltage Rough.</span>
+    <span data-lang="uk">snEco — єдиний споживчий бренд. За ним стоять дві юридичні особи: українська (Prime Snack LLC, завод у Мукачево) та словацька (Sneco SK s.r.o., завод у Гуменне). Бренд єдиний, юр-дані відрізняються залежно від ринку.</span>
+    <span data-lang="en">snEco is a single consumer brand backed by two legal entities: Ukrainian (Prime Snack LLC, Mukachevo plant) and Slovak (Sneco SK s.r.o., Humenné plant). One brand, different legal entities depending on the market.</span>
   </div>
 
-  <h3 class="block-title">🅻 <span data-lang="uk">Логотип</span><span data-lang="en">Logo</span></h3>
+  <div class="arch-diagram">
+    <div class="arch-brand">
+      <img src="logo/SNECO%20logo%20MB.svg" alt="snEco" style="width:180px;height:auto;display:block;margin:0 auto 8px">
+      <div class="arch-brand-sub"><span data-lang="uk">Єдиний споживчий бренд</span><span data-lang="en">Single consumer brand</span></div>
+    </div>
+    <div class="arch-arrow">↓</div>
+    <div class="arch-entities">
+      <div class="arch-entity">
+        <div class="arch-entity-flag">🇺🇦</div>
+        <div class="arch-entity-name">Prime Snack LLC</div>
+        <div class="arch-entity-role"><span data-lang="uk">UA · виробництво · UA-ринок</span><span data-lang="en">UA · production · UA market</span></div>
+        <div class="arch-entity-desc">
+          <span data-lang="uk">Завод: Мукачево, Україна.<br>Маркування: «Made in Ukraine».<br>Сертифікати: FSSC 22000 v6.0, HACCP / ISO 22000.<br>Регулятор: Держпродспоживслужба України.</span>
+          <span data-lang="en">Plant: Mukachevo, Ukraine.<br>Origin label: "Made in Ukraine".<br>Certifications: FSSC 22000 v6.0, HACCP / ISO 22000.<br>Regulator: State Service for Food Safety (Ukraine).</span>
+        </div>
+      </div>
+      <div class="arch-entity">
+        <div class="arch-entity-flag">🇸🇰</div>
+        <div class="arch-entity-name">Sneco SK s.r.o.</div>
+        <div class="arch-entity-role"><span data-lang="uk">EU · виробництво · EU-ринок</span><span data-lang="en">EU · production · EU market</span></div>
+        <div class="arch-entity-desc">
+          <span data-lang="uk">Завод: Гуменне, Словаччина.<br>Маркування: «Made in EU».<br>Сертифікати: IFS Food v8, HACCP, EU TRACES.<br>Регулятор: ÚVZ SR (Slovakia) + EU Reg. 1169/2011.</span>
+          <span data-lang="en">Plant: Humenné, Slovakia.<br>Origin label: "Made in EU".<br>Certifications: IFS Food v8, HACCP, EU TRACES.<br>Regulator: Public Health Authority of Slovakia + EU Reg. 1169/2011.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="block-title"><span data-lang="uk">Правила вживання назв</span><span data-lang="en">Naming rules</span></h3>
+  <div class="card">
+    <table class="spec-table">
+      <thead>
+        <tr>
+          <th><span data-lang="uk">Контекст</span><span data-lang="en">Context</span></th>
+          <th><span data-lang="uk">Що писати</span><span data-lang="en">Use</span></th>
+          <th><span data-lang="uk">Не писати</span><span data-lang="en">Avoid</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span data-lang="uk">Маркетингова комунікація</span><span data-lang="en">Marketing communication</span></td>
+          <td><span class="mono-val">snEco</span></td>
+          <td><span class="mono-val">Sneco · SNECO · SnEco</span></td>
+        </tr>
+        <tr>
+          <td><span data-lang="uk">Логотип / упаковка (графічна форма)</span><span data-lang="en">Logo / pack (graphic form)</span></td>
+          <td><span class="mono-val">SNÉCO</span></td>
+          <td><span data-lang="uk">Інше нарисування</span><span data-lang="en">Other lettering</span></td>
+        </tr>
+        <tr>
+          <td><span data-lang="uk">Юр-документи UA-ринку</span><span data-lang="en">Legal docs · UA market</span></td>
+          <td><span class="mono-val">ТОВ «Прайм Снек» / Prime Snack LLC</span></td>
+          <td><span data-lang="uk">snEco як юр-особа</span><span data-lang="en">snEco as legal entity</span></td>
+        </tr>
+        <tr>
+          <td><span data-lang="uk">Юр-документи EU-ринку</span><span data-lang="en">Legal docs · EU market</span></td>
+          <td><span class="mono-val">Sneco SK s.r.o.</span></td>
+          <td><span data-lang="uk">snEco SK · SNECO SK</span><span data-lang="en">snEco SK · SNECO SK</span></td>
+        </tr>
+        <tr>
+          <td><span data-lang="uk">Технологія</span><span data-lang="en">Technology</span></td>
+          <td><span class="mono-val">VacWave Bio Nutrition</span></td>
+          <td><span data-lang="uk">«NASA-технологія»</span><span data-lang="en">"NASA technology"</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="accent-section">
+    <div style="font-size:13px;font-weight:700;margin-bottom:6px">⚠️ <span data-lang="uk">Технологія: завжди свій бренд</span><span data-lang="en">Technology: always our own brand</span></div>
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.6">
+      <span data-lang="uk">У snEco — власна запатентована технологія VacWave Bio Nutrition (патент №139035). У комунікації акцент завжди на власній інновації. Не використовуйте «NASA-технологія» як визначення продукту — це некоректно і підважує власне IP.</span>
+      <span data-lang="en">snEco uses its own patented VacWave Bio Nutrition technology (patent No. 139035). Communications must always lead with this proprietary innovation. Do not describe the product as "NASA technology" — it's inaccurate and undermines our own IP.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     LOGO
+     ============================================================ -->
+<section class="section" id="sec-logo" style="padding:56px 64px">
+  <div class="section-eyebrow"><span data-lang="uk">Логотип</span><span data-lang="en">Logo</span></div>
+  <h2 class="section-title"><span data-lang="uk">Використання логотипу</span><span data-lang="en">Logo usage</span></h2>
+  <div class="section-lead">
+    <span data-lang="uk">Логотип — основний ідентифікатор бренду. Завжди використовуйте оригінальні файли. Не перемальовуйте, не відтворюйте вручну.</span>
+    <span data-lang="en">The logo is the brand's primary identifier. Always use the original artwork. Never recreate or redraw it.</span>
+  </div>
+
   <h3 class="block-title"><span data-lang="uk">Варіанти</span><span data-lang="en">Variants</span></h3>
   <div class="logo-showcase">
     <div class="logo-variant on-dark">
@@ -1861,8 +1894,19 @@ h3.block-title:first-of-type { margin-top: 0; }
       <span data-lang="en">The logo is a graphic mark (the <strong>SNÉCO</strong> spelling with an acute is the logotype only). In any textual context, the brand name is always written <strong>snEco</strong> — lowercase "sn", capital "E", lowercase "co". Never SnEco, SNECO, Sneco, or SNEco.</span>
     </div>
   </div>
+</section>
 
-  <h3 class="block-title" style="margin-top:48px">🎨 <span data-lang="uk">Кольори</span><span data-lang="en">Colors</span></h3>
+<!-- ============================================================
+     COLORS
+     ============================================================ -->
+<section class="section" id="sec-colors" style="padding:56px 64px">
+  <div class="section-eyebrow"><span data-lang="uk">Фірмові кольори</span><span data-lang="en">Brand colors</span></div>
+  <h2 class="section-title"><span data-lang="uk">Кольорова система</span><span data-lang="en">Color system</span></h2>
+  <div class="section-lead">
+    <span data-lang="uk">Три кольори + білий. Жовтий домінує. Чорний структурує. Зелений — ідентифікує еко-позиціонування. Ніяких інших кольорів без погодження.</span>
+    <span data-lang="en">Three colors plus white. Yellow leads. Black structures. Green signals our eco positioning. No other colors without prior approval.</span>
+  </div>
+
   <div class="color-grid">
     <div class="swatch" data-copy="#FEBF27">
       <div class="swatch-color" style="background:#FEBF27"><div class="swatch-copy-hint">Copy HEX</div></div>
@@ -1957,8 +2001,19 @@ h3.block-title:first-of-type { margin-top: 0; }
       </ul>
     </div>
   </div>
+</section>
 
-  <h3 class="block-title" style="margin-top:48px">🔤 <span data-lang="uk">Типографіка</span><span data-lang="en">Typography</span></h3>
+<!-- ============================================================
+     TYPOGRAPHY
+     ============================================================ -->
+<section class="section" id="sec-typography" style="padding:56px 64px">
+  <div class="section-eyebrow"><span data-lang="uk">Шрифти</span><span data-lang="en">Typography</span></div>
+  <h2 class="section-title"><span data-lang="uk">Типографічна система</span><span data-lang="en">Type system</span></h2>
+  <div class="section-lead">
+    <span data-lang="uk">Два шрифти з чіткими ролями. HighVoltage Rough — для акцентів і заголовків. Qanelas — для всього іншого. Не змішувати з іншими шрифтами без погодження.</span>
+    <span data-lang="en">Two typefaces with clearly defined roles. HighVoltage Rough — for headlines and accents. Qanelas — for everything else. Do not mix with other typefaces without approval.</span>
+  </div>
+
   <div class="font-notice" style="background:rgba(150,193,31,0.12);border-color:rgba(150,193,31,0.4)">
     <div style="font-size:18px">✅</div>
     <div>
@@ -2409,12 +2464,18 @@ h3.block-title:first-of-type { margin-top: 0; }
       <span data-lang="en">A multilayer BOPP / ALU / PE structure delivers up to 24 months shelf life without refrigeration. Any pack change must be cleared with the technologist — barrier properties depend on it.</span>
     </div>
   </div>
+</section>
 
-
-  <!-- Print &amp; collateral (merged from sec-print in v2.8) -->
-  <h3 class="block-title"><span data-lang="uk">Фірмові носії</span><span data-lang="en">Brand collateral</span></h3>
-  <div style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:24px"><span data-lang="uk">Візитівки, бланки, пакети, скотч, кепки, футболки, худі. Усі носії — в єдиній чорно-жовтій системі. Зелений тільки як елемент логотипу.</span>
-    <span data-lang="en">Business cards, letterheads, bags, tape, caps, t-shirts, hoodies. All collateral lives in the same black-and-yellow system. Green is reserved for the logo accent only.</span></div>
+<!-- ============================================================
+     PRINT
+     ============================================================ -->
+<section class="section" id="sec-print" style="padding:56px 64px">
+  <div class="section-eyebrow"><span data-lang="uk">Друк та носії</span><span data-lang="en">Print &amp; collateral</span></div>
+  <h2 class="section-title"><span data-lang="uk">Фірмові носії</span><span data-lang="en">Brand collateral</span></h2>
+  <div class="section-lead">
+    <span data-lang="uk">Візитівки, бланки, пакети, скотч, кепки, футболки, худі. Усі носії — в єдиній чорно-жовтій системі. Зелений тільки як елемент логотипу.</span>
+    <span data-lang="en">Business cards, letterheads, bags, tape, caps, t-shirts, hoodies. All collateral lives in the same black-and-yellow system. Green is reserved for the logo accent only.</span>
+  </div>
 
   <h3 class="block-title"><span data-lang="uk">Затверджені носії</span><span data-lang="en">Approved items</span></h3>
   <div class="grid-2">
@@ -2606,17 +2667,16 @@ h3.block-title:first-of-type { margin-top: 0; }
 </section>
 
 <!-- ============================================================
-     EXTERNAL COMMUNICATIONS (PR + Crisis, merged in v2.8)
+     PRESS / PR
      ============================================================ -->
-<section class="section" id="sec-externals" style="padding:56px 64px">
-  <div class="section-eyebrow"><span data-lang="uk">Зовнішні комунікації</span><span data-lang="en">External communications</span></div>
-  <h2 class="section-title"><span data-lang="uk">Як ми говоримо зі світом</span><span data-lang="en">How we speak to the world</span></h2>
+<section class="section" id="sec-press" style="padding:56px 64px">
+  <div class="section-eyebrow">PR &amp; press</div>
+  <h2 class="section-title"><span data-lang="uk">Прес-кіт &amp; історія для медіа</span><span data-lang="en">Press kit &amp; story for media</span></h2>
   <div class="section-lead">
-    <span data-lang="uk">Усе, що виходить за межі snEco до журналістів, інвесторів, регуляторів, споживачів. Дві дисципліни: проактивна (прес-кіт, історії, цитати) і реактивна (кризові комунікації — recall, скарга, війна, SMM-помилка).</span>
-    <span data-lang="en">Everything that leaves snEco for journalists, investors, regulators and consumers. Two disciplines: proactive (press kit, story angles, founder quotes) and reactive (crisis comms — recall, complaint, war, SMM mistake).</span>
+    <span data-lang="uk">Все, що потрібно журналісту, ритейл-байеру або інвестору, щоб написати про snEco без додаткових дзвінків. Готові цитати, кути сторі і факти.</span>
+    <span data-lang="en">Everything a journalist, retail buyer or investor needs to write about snEco without making extra calls. Ready quotes, story angles and facts.</span>
   </div>
 
-  <h3 class="block-title">📰 <span data-lang="uk">Проактивні комунікації &amp; PR</span><span data-lang="en">Proactive communications &amp; PR</span></h3>
   <h3 class="block-title"><span data-lang="uk">Засновники</span><span data-lang="en">Founders</span></h3>
   <div class="grid-2">
     <div class="card">
@@ -2730,88 +2790,6 @@ h3.block-title:first-of-type { margin-top: 0; }
         <div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px">Q: <span data-lang="uk">Скільки коштує запустити SKU в новій країні?</span><span data-lang="en">How much does it cost to launch a SKU in a new country?</span></div>
         <div style="font-size:13px;line-height:1.6;padding:10px 14px;background:var(--black-05);border-radius:6px"><span data-lang="uk">«Це конфіденційна комерційна інформація. Готові обговорити моделі співпраці окремо з кожним партнером.»</span><span data-lang="en">"That's confidential commercial information. We're happy to discuss cooperation models with each partner directly."</span></div>
       </div>
-    </div>
-  </div>
-
-  <h3 class="block-title" style="margin-top:48px">🚨 <span data-lang="uk">Кризові комунікації</span><span data-lang="en">Crisis communications</span></h3>
-  <h3 class="block-title"><span data-lang="uk">Принципи реакції</span><span data-lang="en">Response principles</span></h3>
-  <div class="grid-3">
-    <div class="card card-sm">
-      <div style="font-size:24px;margin-bottom:8px">⏱</div>
-      <div style="font-weight:700;font-size:13px;margin-bottom:4px"><span data-lang="uk">Швидкість важливіша за досконалість</span><span data-lang="en">Speed beats perfection</span></div>
-      <div style="font-size:12px;color:var(--text-muted);line-height:1.5"><span data-lang="uk">Перша офіційна реакція — у межах 3 годин з моменту виявлення.</span><span data-lang="en">First official response within 3 hours of detection.</span></div>
-    </div>
-    <div class="card card-sm">
-      <div style="font-size:24px;margin-bottom:8px">🤝</div>
-      <div style="font-weight:700;font-size:13px;margin-bottom:4px"><span data-lang="uk">Чесність важливіша за виправдання</span><span data-lang="en">Honesty beats excuses</span></div>
-      <div style="font-size:12px;color:var(--text-muted);line-height:1.5"><span data-lang="uk">Якщо помилились — визнаємо. Виправляємо. Не уникаємо.</span><span data-lang="en">If we erred, we admit it. Fix it. Don't dodge.</span></div>
-    </div>
-    <div class="card card-sm">
-      <div style="font-size:24px;margin-bottom:8px">📞</div>
-      <div style="font-weight:700;font-size:13px;margin-bottom:4px"><span data-lang="uk">Один голос — один speaker</span><span data-lang="en">One voice — one speaker</span></div>
-      <div style="font-size:12px;color:var(--text-muted);line-height:1.5"><span data-lang="uk">У кризі говорить тільки CEO або уповноважений PR. Команда не коментує самостійно.</span><span data-lang="en">In a crisis, only the CEO or an authorized PR speaks. The team does not comment on its own.</span></div>
-    </div>
-  </div>
-
-  <h3 class="block-title"><span data-lang="uk">Сценарій 1: Скарга на якість продукту</span><span data-lang="en">Scenario 1: Product quality complaint</span></h3>
-  <div class="card">
-    <div style="font-size:13px;line-height:1.7">
-      <strong><span data-lang="uk">Тригер:</span><span data-lang="en">Trigger:</span></strong> <span data-lang="uk">споживач знайшов сторонній предмет, неприємний запах, або заявляє про харчове отруєння.</span><span data-lang="en">consumer finds a foreign object, off odor, or claims food poisoning.</span><br><br>
-      <strong><span data-lang="uk">0–3 години:</span><span data-lang="en">0–3 hours:</span></strong> <span data-lang="uk">QA-менеджер запитує номер партії, фото, дату покупки. Без визнання провини на цьому етапі.</span><span data-lang="en">QA manager asks for batch number, photo, purchase date. No admission of fault at this stage.</span><br>
-      <strong><span data-lang="uk">3–24 години:</span><span data-lang="en">3–24 hours:</span></strong> <span data-lang="uk">аналіз контр-зразка партії в лабораторії. Якщо підтверджено — підготовка до рекол партії.</span><span data-lang="en">batch counter-sample analyzed in lab. If confirmed, prepare batch recall.</span><br>
-      <strong><span data-lang="uk">24–72 години:</span><span data-lang="en">24–72 hours:</span></strong> <span data-lang="uk">офіційна відповідь споживачу. Заміна продукту або повернення коштів. Внутрішнє розслідування.</span><span data-lang="en">official response to consumer. Replacement or refund. Internal investigation.</span><br><br>
-      <strong><span data-lang="uk">Готова відповідь споживачу (UA):</span><span data-lang="en">Ready response to consumer (UA):</span></strong>
-      <div style="margin-top:8px;padding:14px 16px;background:var(--black-05);border-radius:6px;font-style:italic"><span data-lang="uk">«Дякуємо, що повідомили. Ваша безпека — наш пріоритет. Будь ласка, надішліть номер партії з пакування і фото — ми перевіримо контр-зразок цієї партії і відповімо вам протягом 24 годин. Зразок на ваше прохання можемо замінити або повернути кошти негайно.»</span><span data-lang="en">"Thank you for reaching out. Your safety is our priority. Please send the batch number from the pack and a photo — we'll check the batch counter-sample and reply within 24 hours. We can replace the product or refund you right away on request."</span></div>
-    </div>
-  </div>
-
-  <h3 class="block-title"><span data-lang="uk">Сценарій 2: Recall партії</span><span data-lang="en">Scenario 2: Batch recall</span></h3>
-  <div class="card">
-    <div style="font-size:13px;line-height:1.7">
-      <strong><span data-lang="uk">Тригер:</span><span data-lang="en">Trigger:</span></strong> <span data-lang="uk">внутрішнє QA або зовнішній орган виявив відхилення в партії.</span><span data-lang="en">internal QA or an external body finds a batch deviation.</span><br><br>
-      <strong><span data-lang="uk">Кроки:</span><span data-lang="en">Steps:</span></strong>
-      <ol style="margin:8px 0 0 22px;padding:0">
-        <li><span data-lang="uk">CEO + Operations + QA + Legal — кризовий call протягом 1 години.</span><span data-lang="en">CEO + Operations + QA + Legal — crisis call within 1 hour.</span></li>
-        <li><span data-lang="uk">Зупинка відвантажень партії. Лист дистриб'юторам із номерами партій і інструкцією.</span><span data-lang="en">Halt shipments of the batch. Letter to distributors with batch numbers and instructions.</span></li>
-        <li><span data-lang="uk">Інформування регулятора (Держпродспоживслужба для UA, ÚVZ SR для SK) у строки, передбачені законом.</span><span data-lang="en">Notify the regulator (State Service for Food Safety in UA, ÚVZ SR in SK) within statutory deadlines.</span></li>
-        <li><span data-lang="uk">Публічна заява, якщо партія потрапила до споживача. Прозорість ВИЩА за тимчасовий ризик репутації.</span><span data-lang="en">Public statement if the batch reached consumers. Transparency BEATS short-term reputation risk.</span></li>
-      </ol>
-      <br>
-      <strong><span data-lang="uk">Шаблон публічної заяви:</span><span data-lang="en">Public statement template:</span></strong>
-      <div style="margin-top:8px;padding:14px 16px;background:var(--black-05);border-radius:6px;font-style:italic"><span data-lang="uk">«[Дата]. snEco добровільно відкликає партію [номер] продукту [сорт, вага, дата виробництва]. Причина: [коротко і чесно]. Жодних повідомлень про шкоду здоров'ю станом на [дата] не надходило. Якщо у вас є продукт із цієї партії — поверніть його у місце купівлі для повного повернення коштів. Питання: [контакт]. Безпека наших споживачів — наш беззаперечний пріоритет.»</span><span data-lang="en">"[Date]. snEco is voluntarily recalling batch [number] of [variety, weight, production date]. Reason: [brief and honest]. No reports of health harm have been received as of [date]. If you have product from this batch, please return it to the point of purchase for a full refund. Questions: [contact]. The safety of our consumers is our non-negotiable priority."</span></div>
-    </div>
-  </div>
-
-  <h3 class="block-title"><span data-lang="uk">Сценарій 3: Журналістський запит про війну</span><span data-lang="en">Scenario 3: Journalist asking about the war</span></h3>
-  <div class="card">
-    <div style="font-size:13px;line-height:1.65">
-      <span data-lang="uk">Питання типу: «Як на вас вплинула війна?», «Чи продаєте на російському ринку?», «Як обходитесь без сировини з UA?»</span><span data-lang="en">Questions like: "How has the war affected you?", "Do you sell in the Russian market?", "How do you cope without UA raw materials?"</span><br><br>
-      <strong><span data-lang="uk">Готова відповідь:</span><span data-lang="en">Ready answer:</span></strong>
-      <div style="margin-top:8px;padding:14px 16px;background:var(--black-05);border-radius:6px;font-style:italic"><span data-lang="uk">«snEco не продає на російському ринку і не співпрацює з російськими постачальниками з 2022 року. Виручка подвоюється кожен рік — навіть під час війни. Завод у Гуменне (Словаччина) — частина стратегії диверсифікації, а не евакуації: ми посилюємо EU-присутність і нарощуємо потужності для ритейл-партнерів у ЄС. UA-команда продовжує працювати в Мукачево.»</span><span data-lang="en">"snEco does not sell in the Russian market and has not worked with Russian suppliers since 2022. Revenue doubles every year — even through the war. The Humenné plant in Slovakia is part of a diversification strategy, not an evacuation: we're strengthening EU presence and scaling capacity for EU retail partners. The UA team continues to operate in Mukachevo."</span></div>
-    </div>
-  </div>
-
-  <h3 class="block-title"><span data-lang="uk">Сценарій 4: Хайп / помилка в SMM</span><span data-lang="en">Scenario 4: Social media hype / mistake</span></h3>
-  <div class="card">
-    <div style="font-size:13px;line-height:1.65">
-      <span data-lang="uk">Якщо пост викликав негатив, помилковий claim, або образливий контекст:</span><span data-lang="en">If a post sparked backlash, a wrong claim, or offensive context:</span>
-      <ol style="margin:8px 0 0 22px;padding:0">
-        <li><span data-lang="uk">Пост не видаляємо, якщо є ризик «Streisand effect». Натомість — публічне виправлення під ним.</span><span data-lang="en">Don't delete the post if there's a Streisand-effect risk. Add a public correction beneath it instead.</span></li>
-        <li><span data-lang="uk">Якщо контент шкідливий чи травматичний — видаляємо з публічним поясненням, чому.</span><span data-lang="en">If the content is harmful or traumatic, take it down with a public explanation of why.</span></li>
-        <li><span data-lang="uk">Без захисту і без виправдань. Просте «помилились — виправили — рухаємось далі».</span><span data-lang="en">No defensiveness, no excuses. Simple: "we erred — fixed — moving on".</span></li>
-      </ol>
-    </div>
-  </div>
-
-  <h3 class="block-title"><span data-lang="uk">Кризова команда — хто кому дзвонить</span><span data-lang="en">Crisis team — who calls whom</span></h3>
-  <div class="card" style="background:var(--black);color:var(--white)">
-    <div style="font-size:13px;line-height:1.8">
-      <strong style="color:var(--yellow)">CEO / Lead spokesperson:</strong> Vadym Gryshyn · <a href="mailto:vg@sneco.ua" style="color:var(--yellow)">vg@sneco.ua</a><br>
-      <strong style="color:var(--yellow)">Operations / Production:</strong> Pylyp Gryshyn<br>
-      <strong style="color:var(--yellow)">QA / Quality:</strong> <span data-lang="uk">Технічний директор</span><span data-lang="en">Technical director</span><br>
-      <strong style="color:var(--yellow)">Legal:</strong> <span data-lang="uk">Зовнішній юрист (контакт у CRM)</span><span data-lang="en">External counsel (contact in CRM)</span><br>
-      <strong style="color:var(--yellow)">PR / SMM:</strong> <span data-lang="uk">SMM-менеджер · резервний канал @snEco</span><span data-lang="en">SMM manager · backup channel @snEco</span><br><br>
-      <span style="color:rgba(255,255,255,0.5);font-size:12px;line-height:1.5"><span data-lang="uk">Якщо CEO недоступний — speaker'ом тимчасово стає Pylyp Gryshyn. Жоден інший співробітник публічно не коментує до окремої вказівки.</span><span data-lang="en">If the CEO is unavailable, Pylyp Gryshyn becomes the temporary spokesperson. No other employee may comment publicly until otherwise instructed.</span></span>
     </div>
   </div>
 </section>
@@ -3141,6 +3119,99 @@ h3.block-title:first-of-type { margin-top: 0; }
         <tr><td><span data-lang="uk">Голосове повідомлення</span><span data-lang="en">Voice message</span></td><td><span data-lang="uk">Коротко, по справі. Не «привіт, як справи» з 2 хвилинами тиші.</span><span data-lang="en">Short, on point. Not "hi, how are you" with two minutes of silence.</span></td></tr>
       </tbody>
     </table>
+  </div>
+</section>
+
+<!-- ============================================================
+     CRISIS COMMUNICATIONS
+     ============================================================ -->
+<section class="section" id="sec-crisis" style="padding:56px 64px">
+  <div class="section-eyebrow"><span data-lang="uk">Кризові комунікації</span><span data-lang="en">Crisis comms</span></div>
+  <h2 class="section-title"><span data-lang="uk">Як ми реагуємо в кризі</span><span data-lang="en">How we respond in crisis</span></h2>
+  <div class="section-lead">
+    <span data-lang="uk">Готові скрипти, протоколи і люди для типових сценаріїв. Перші 3 години в кризі — найважливіші. Якщо є цей документ — паніки не буде.</span>
+    <span data-lang="en">Ready scripts, protocols and people for typical scenarios. The first 3 hours of a crisis are the most important. With this document in hand, panic is off the table.</span>
+  </div>
+
+  <h3 class="block-title"><span data-lang="uk">Принципи реакції</span><span data-lang="en">Response principles</span></h3>
+  <div class="grid-3">
+    <div class="card card-sm">
+      <div style="font-size:24px;margin-bottom:8px">⏱</div>
+      <div style="font-weight:700;font-size:13px;margin-bottom:4px"><span data-lang="uk">Швидкість важливіша за досконалість</span><span data-lang="en">Speed beats perfection</span></div>
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.5"><span data-lang="uk">Перша офіційна реакція — у межах 3 годин з моменту виявлення.</span><span data-lang="en">First official response within 3 hours of detection.</span></div>
+    </div>
+    <div class="card card-sm">
+      <div style="font-size:24px;margin-bottom:8px">🤝</div>
+      <div style="font-weight:700;font-size:13px;margin-bottom:4px"><span data-lang="uk">Чесність важливіша за виправдання</span><span data-lang="en">Honesty beats excuses</span></div>
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.5"><span data-lang="uk">Якщо помилились — визнаємо. Виправляємо. Не уникаємо.</span><span data-lang="en">If we erred, we admit it. Fix it. Don't dodge.</span></div>
+    </div>
+    <div class="card card-sm">
+      <div style="font-size:24px;margin-bottom:8px">📞</div>
+      <div style="font-weight:700;font-size:13px;margin-bottom:4px"><span data-lang="uk">Один голос — один speaker</span><span data-lang="en">One voice — one speaker</span></div>
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.5"><span data-lang="uk">У кризі говорить тільки CEO або уповноважений PR. Команда не коментує самостійно.</span><span data-lang="en">In a crisis, only the CEO or an authorized PR speaks. The team does not comment on its own.</span></div>
+    </div>
+  </div>
+
+  <h3 class="block-title"><span data-lang="uk">Сценарій 1: Скарга на якість продукту</span><span data-lang="en">Scenario 1: Product quality complaint</span></h3>
+  <div class="card">
+    <div style="font-size:13px;line-height:1.7">
+      <strong><span data-lang="uk">Тригер:</span><span data-lang="en">Trigger:</span></strong> <span data-lang="uk">споживач знайшов сторонній предмет, неприємний запах, або заявляє про харчове отруєння.</span><span data-lang="en">consumer finds a foreign object, off odor, or claims food poisoning.</span><br><br>
+      <strong><span data-lang="uk">0–3 години:</span><span data-lang="en">0–3 hours:</span></strong> <span data-lang="uk">QA-менеджер запитує номер партії, фото, дату покупки. Без визнання провини на цьому етапі.</span><span data-lang="en">QA manager asks for batch number, photo, purchase date. No admission of fault at this stage.</span><br>
+      <strong><span data-lang="uk">3–24 години:</span><span data-lang="en">3–24 hours:</span></strong> <span data-lang="uk">аналіз контр-зразка партії в лабораторії. Якщо підтверджено — підготовка до рекол партії.</span><span data-lang="en">batch counter-sample analyzed in lab. If confirmed, prepare batch recall.</span><br>
+      <strong><span data-lang="uk">24–72 години:</span><span data-lang="en">24–72 hours:</span></strong> <span data-lang="uk">офіційна відповідь споживачу. Заміна продукту або повернення коштів. Внутрішнє розслідування.</span><span data-lang="en">official response to consumer. Replacement or refund. Internal investigation.</span><br><br>
+      <strong><span data-lang="uk">Готова відповідь споживачу (UA):</span><span data-lang="en">Ready response to consumer (UA):</span></strong>
+      <div style="margin-top:8px;padding:14px 16px;background:var(--black-05);border-radius:6px;font-style:italic"><span data-lang="uk">«Дякуємо, що повідомили. Ваша безпека — наш пріоритет. Будь ласка, надішліть номер партії з пакування і фото — ми перевіримо контр-зразок цієї партії і відповімо вам протягом 24 годин. Зразок на ваше прохання можемо замінити або повернути кошти негайно.»</span><span data-lang="en">"Thank you for reaching out. Your safety is our priority. Please send the batch number from the pack and a photo — we'll check the batch counter-sample and reply within 24 hours. We can replace the product or refund you right away on request."</span></div>
+    </div>
+  </div>
+
+  <h3 class="block-title"><span data-lang="uk">Сценарій 2: Recall партії</span><span data-lang="en">Scenario 2: Batch recall</span></h3>
+  <div class="card">
+    <div style="font-size:13px;line-height:1.7">
+      <strong><span data-lang="uk">Тригер:</span><span data-lang="en">Trigger:</span></strong> <span data-lang="uk">внутрішнє QA або зовнішній орган виявив відхилення в партії.</span><span data-lang="en">internal QA or an external body finds a batch deviation.</span><br><br>
+      <strong><span data-lang="uk">Кроки:</span><span data-lang="en">Steps:</span></strong>
+      <ol style="margin:8px 0 0 22px;padding:0">
+        <li><span data-lang="uk">CEO + Operations + QA + Legal — кризовий call протягом 1 години.</span><span data-lang="en">CEO + Operations + QA + Legal — crisis call within 1 hour.</span></li>
+        <li><span data-lang="uk">Зупинка відвантажень партії. Лист дистриб'юторам із номерами партій і інструкцією.</span><span data-lang="en">Halt shipments of the batch. Letter to distributors with batch numbers and instructions.</span></li>
+        <li><span data-lang="uk">Інформування регулятора (Держпродспоживслужба для UA, ÚVZ SR для SK) у строки, передбачені законом.</span><span data-lang="en">Notify the regulator (State Service for Food Safety in UA, ÚVZ SR in SK) within statutory deadlines.</span></li>
+        <li><span data-lang="uk">Публічна заява, якщо партія потрапила до споживача. Прозорість ВИЩА за тимчасовий ризик репутації.</span><span data-lang="en">Public statement if the batch reached consumers. Transparency BEATS short-term reputation risk.</span></li>
+      </ol>
+      <br>
+      <strong><span data-lang="uk">Шаблон публічної заяви:</span><span data-lang="en">Public statement template:</span></strong>
+      <div style="margin-top:8px;padding:14px 16px;background:var(--black-05);border-radius:6px;font-style:italic"><span data-lang="uk">«[Дата]. snEco добровільно відкликає партію [номер] продукту [сорт, вага, дата виробництва]. Причина: [коротко і чесно]. Жодних повідомлень про шкоду здоров'ю станом на [дата] не надходило. Якщо у вас є продукт із цієї партії — поверніть його у місце купівлі для повного повернення коштів. Питання: [контакт]. Безпека наших споживачів — наш беззаперечний пріоритет.»</span><span data-lang="en">"[Date]. snEco is voluntarily recalling batch [number] of [variety, weight, production date]. Reason: [brief and honest]. No reports of health harm have been received as of [date]. If you have product from this batch, please return it to the point of purchase for a full refund. Questions: [contact]. The safety of our consumers is our non-negotiable priority."</span></div>
+    </div>
+  </div>
+
+  <h3 class="block-title"><span data-lang="uk">Сценарій 3: Журналістський запит про війну</span><span data-lang="en">Scenario 3: Journalist asking about the war</span></h3>
+  <div class="card">
+    <div style="font-size:13px;line-height:1.65">
+      <span data-lang="uk">Питання типу: «Як на вас вплинула війна?», «Чи продаєте на російському ринку?», «Як обходитесь без сировини з UA?»</span><span data-lang="en">Questions like: "How has the war affected you?", "Do you sell in the Russian market?", "How do you cope without UA raw materials?"</span><br><br>
+      <strong><span data-lang="uk">Готова відповідь:</span><span data-lang="en">Ready answer:</span></strong>
+      <div style="margin-top:8px;padding:14px 16px;background:var(--black-05);border-radius:6px;font-style:italic"><span data-lang="uk">«snEco не продає на російському ринку і не співпрацює з російськими постачальниками з 2022 року. Виручка подвоюється кожен рік — навіть під час війни. Завод у Гуменне (Словаччина) — частина стратегії диверсифікації, а не евакуації: ми посилюємо EU-присутність і нарощуємо потужності для ритейл-партнерів у ЄС. UA-команда продовжує працювати в Мукачево.»</span><span data-lang="en">"snEco does not sell in the Russian market and has not worked with Russian suppliers since 2022. Revenue doubles every year — even through the war. The Humenné plant in Slovakia is part of a diversification strategy, not an evacuation: we're strengthening EU presence and scaling capacity for EU retail partners. The UA team continues to operate in Mukachevo."</span></div>
+    </div>
+  </div>
+
+  <h3 class="block-title"><span data-lang="uk">Сценарій 4: Хайп / помилка в SMM</span><span data-lang="en">Scenario 4: Social media hype / mistake</span></h3>
+  <div class="card">
+    <div style="font-size:13px;line-height:1.65">
+      <span data-lang="uk">Якщо пост викликав негатив, помилковий claim, або образливий контекст:</span><span data-lang="en">If a post sparked backlash, a wrong claim, or offensive context:</span>
+      <ol style="margin:8px 0 0 22px;padding:0">
+        <li><span data-lang="uk">Пост не видаляємо, якщо є ризик «Streisand effect». Натомість — публічне виправлення під ним.</span><span data-lang="en">Don't delete the post if there's a Streisand-effect risk. Add a public correction beneath it instead.</span></li>
+        <li><span data-lang="uk">Якщо контент шкідливий чи травматичний — видаляємо з публічним поясненням, чому.</span><span data-lang="en">If the content is harmful or traumatic, take it down with a public explanation of why.</span></li>
+        <li><span data-lang="uk">Без захисту і без виправдань. Просте «помилились — виправили — рухаємось далі».</span><span data-lang="en">No defensiveness, no excuses. Simple: "we erred — fixed — moving on".</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <h3 class="block-title"><span data-lang="uk">Кризова команда — хто кому дзвонить</span><span data-lang="en">Crisis team — who calls whom</span></h3>
+  <div class="card" style="background:var(--black);color:var(--white)">
+    <div style="font-size:13px;line-height:1.8">
+      <strong style="color:var(--yellow)">CEO / Lead spokesperson:</strong> Vadym Gryshyn · <a href="mailto:vg@sneco.ua" style="color:var(--yellow)">vg@sneco.ua</a><br>
+      <strong style="color:var(--yellow)">Operations / Production:</strong> Pylyp Gryshyn<br>
+      <strong style="color:var(--yellow)">QA / Quality:</strong> <span data-lang="uk">Технічний директор</span><span data-lang="en">Technical director</span><br>
+      <strong style="color:var(--yellow)">Legal:</strong> <span data-lang="uk">Зовнішній юрист (контакт у CRM)</span><span data-lang="en">External counsel (contact in CRM)</span><br>
+      <strong style="color:var(--yellow)">PR / SMM:</strong> <span data-lang="uk">SMM-менеджер · резервний канал @snEco</span><span data-lang="en">SMM manager · backup channel @snEco</span><br><br>
+      <span style="color:rgba(255,255,255,0.5);font-size:12px;line-height:1.5"><span data-lang="uk">Якщо CEO недоступний — speaker'ом тимчасово стає Pylyp Gryshyn. Жоден інший співробітник публічно не коментує до окремої вказівки.</span><span data-lang="en">If the CEO is unavailable, Pylyp Gryshyn becomes the temporary spokesperson. No other employee may comment publicly until otherwise instructed.</span></span>
+    </div>
   </div>
 </section>
 
@@ -3483,6 +3554,52 @@ h3.block-title:first-of-type { margin-top: 0; }
 </section>
 
 <!-- ============================================================
+     CHECKLIST
+     ============================================================ -->
+<section class="section" id="sec-checklist" style="padding:56px 64px">
+  <div class="section-eyebrow"><span data-lang="uk">Чеклист</span><span data-lang="en">Checklist</span></div>
+  <h2 class="section-title">Brand Compliance</h2>
+  <div class="section-lead">
+    <span data-lang="uk">Перевірте будь-який матеріал перед випуском. Хоча б одне «✕» — повертати на доопрацювання.</span>
+    <span data-lang="en">Run any asset through this list before release. A single "✕" sends it back for rework.</span>
+  </div>
+
+  <h3 class="block-title"><span data-lang="uk">Логотип і кольори</span><span data-lang="en">Logo &amp; colors</span></h3>
+  <div class="checklist">
+    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Використано оригінальний файл логотипу (не перемальований)</span><span data-lang="en">Original logo file used (not redrawn)</span></div>
+    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Логотип не повернутий, не розтягнутий, без тіні / контуру / градієнту</span><span data-lang="en">Logo not rotated, stretched, shadowed, outlined or gradient-filled</span></div>
+    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Охоронне поле навколо логотипу дотримано</span><span data-lang="en">Clear space around the logo respected</span></div>
+    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Кольори тільки з палітри: #FEBF27, #1E1E1E, #96C11F, #FFFFFF</span><span data-lang="en">Only palette colors used: #FEBF27, #1E1E1E, #96C11F, #FFFFFF</span></div>
+    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Варіант логотипу відповідає фону (темний / світлий / жовтий)</span><span data-lang="en">Logo variant matches the background (dark / light / yellow)</span></div>
+  </div>
+
+  <h3 class="block-title"><span data-lang="uk">Шрифти і текст</span><span data-lang="en">Type &amp; text</span></h3>
+  <div class="checklist">
+    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Тільки Qanelas і HighVoltage Rough (не Arial, не Roboto, не системні шрифти)</span><span data-lang="en">Qanelas + HighVoltage Rough only (no Arial, Roboto or system fonts)</span></div>
+    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">HighVoltage Rough — лише заголовки / акценти, не великий масив тексту</span><span data-lang="en">HighVoltage Rough used for headlines only — never for body copy</span></div>
+    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">У текстовому контексті бренд: <strong>snEco</strong> (не SNECO, не Sneco, не SnEco)</span><span data-lang="en">In text, the brand is written <strong>snEco</strong> (never SNECO, Sneco or SnEco)</span></div>
+    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Ієрархія розмірів дотримана: H1 &gt; H2 &gt; body &gt; caption</span><span data-lang="en">Type hierarchy respected: H1 &gt; H2 &gt; body &gt; caption</span></div>
+  </div>
+
+  <h3 class="block-title"><span data-lang="uk">Контент і тон</span><span data-lang="en">Content &amp; tone</span></h3>
+  <div class="checklist">
+    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Тон: чесний, впевнений, без кліше («революційний», «унікальний»)</span><span data-lang="en">Tone: honest, confident, no clichés ("revolutionary", "unique")</span></div>
+    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Факти перевірені (показники, нагороди, сертифікати)</span><span data-lang="en">Facts verified (metrics, awards, certifications)</span></div>
+    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Без стокових фото з «ідеальними» людьми</span><span data-lang="en">No stock photos with "perfect" people</span></div>
+    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Фото відповідає фірмовому стилю (темний / нейтральний фон, текстура)</span><span data-lang="en">Photography matches brand style (dark / neutral background, texture)</span></div>
+    <div class="check-item"><span class="check-icon check-miss">✕</span><span data-lang="uk">Без згадок «NASA-технологія» — лише «VacWave Bio Nutrition / власна запатентована технологія»</span><span data-lang="en">No "NASA technology" wording — use "VacWave Bio Nutrition / our patented technology"</span></div>
+  </div>
+
+  <h3 class="block-title"><span data-lang="uk">Для міжнародних матеріалів</span><span data-lang="en">For international assets</span></h3>
+  <div class="checklist">
+    <div class="check-item"><span class="check-icon check-warn">!</span><span data-lang="uk">EU-матеріали: юр-дані Sneco SK s.r.o., «Made in EU»</span><span data-lang="en">EU assets: Sneco SK s.r.o. legal details, "Made in EU"</span></div>
+    <div class="check-item"><span class="check-icon check-warn">!</span><span data-lang="uk">Мова відповідає цільовому ринку</span><span data-lang="en">Language matches target market</span></div>
+    <div class="check-item"><span class="check-icon check-warn">!</span><span data-lang="uk">Відповідність місцевим харчовим регуляціям (маркування, алергени)</span><span data-lang="en">Compliant with local food regulations (labeling, allergens)</span></div>
+    <div class="check-item"><span class="check-icon check-miss">✕</span><span data-lang="uk">Не змішуйте UA та EU юр-дані на одному носії</span><span data-lang="en">Never mix UA and EU legal details on the same asset</span></div>
+  </div>
+</section>
+
+<!-- ============================================================
      STRATEGIC ROADMAP
      ============================================================ -->
 <section class="section" id="sec-roadmap" style="padding:56px 64px">
@@ -3603,76 +3720,193 @@ h3.block-title:first-of-type { margin-top: 0; }
 </section>
 
 <!-- ============================================================
-     MAINTENANCE (Checklist + Versioning, merged in v2.8)
+     RECOMMENDATIONS / ROADMAP
      ============================================================ -->
-<section class="section" id="sec-maintenance" style="padding:56px 64px">
-  <div class="section-eyebrow"><span data-lang="uk">Maintenance</span><span data-lang="en">Maintenance</span></div>
-  <h2 class="section-title"><span data-lang="uk">Підтримка документа</span><span data-lang="en">Document maintenance</span></h2>
+<section class="section" id="sec-recommendations" style="padding:56px 64px">
+  <div class="section-eyebrow"><span data-lang="uk">Рекомендації</span><span data-lang="en">Roadmap</span></div>
+  <h2 class="section-title"><span data-lang="uk">Що розвивати далі</span><span data-lang="en">What to build next</span></h2>
   <div class="section-lead">
-    <span data-lang="uk">Як перевіряти і як вести цей документ. Compliance-чеклист (для будь-якого матеріалу перед випуском) і повна історія версій.</span>
-    <span data-lang="en">How to check materials against this document and how to maintain it. Compliance checklist (for any asset before release) and full version history.</span>
+    <span data-lang="uk">Що ще варто додати до брендової системи. Пріоритизовано за критичністю для міжнародного масштабування.</span>
+    <span data-lang="en">Items still missing from the brand system. Prioritized by impact on international scaling.</span>
   </div>
 
-  <h3 class="block-title">✅ <span data-lang="uk">Brand compliance — чеклист</span><span data-lang="en">Brand compliance checklist</span></h3>
-  <h3 class="block-title"><span data-lang="uk">Логотип і кольори</span><span data-lang="en">Logo &amp; colors</span></h3>
-  <div class="checklist">
-    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Використано оригінальний файл логотипу (не перемальований)</span><span data-lang="en">Original logo file used (not redrawn)</span></div>
-    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Логотип не повернутий, не розтягнутий, без тіні / контуру / градієнту</span><span data-lang="en">Logo not rotated, stretched, shadowed, outlined or gradient-filled</span></div>
-    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Охоронне поле навколо логотипу дотримано</span><span data-lang="en">Clear space around the logo respected</span></div>
-    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Кольори тільки з палітри: #FEBF27, #1E1E1E, #96C11F, #FFFFFF</span><span data-lang="en">Only palette colors used: #FEBF27, #1E1E1E, #96C11F, #FFFFFF</span></div>
-    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Варіант логотипу відповідає фону (темний / світлий / жовтий)</span><span data-lang="en">Logo variant matches the background (dark / light / yellow)</span></div>
+  <h3 class="block-title">✅ <span data-lang="uk">Зроблено в v2.1–v2.2</span><span data-lang="en">Shipped in v2.1–v2.2</span></h3>
+  <div class="card" style="margin-bottom:16px">
+    <div class="rec-item">
+      <div class="rec-priority prio-done">✓</div>
+      <div>
+        <div class="rec-title"><span data-lang="uk">UA + EN перемикач у самому документі</span><span data-lang="en">UA + EN toggle in the document itself</span></div>
+        <div class="rec-desc"><span data-lang="uk">Дві паралельні версії в одному файлі.</span><span data-lang="en">Two parallel versions in one file.</span></div>
+      </div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-priority prio-done">✓</div>
+      <div>
+        <div class="rec-title"><span data-lang="uk">Архітектура бренду + правила вживання назв</span><span data-lang="en">Brand architecture + naming rules</span></div>
+      </div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-priority prio-done">✓</div>
+      <div>
+        <div class="rec-title"><span data-lang="uk">Актуальна мапа ринків (UA, SK, SE, EE / PL, DE, US)</span><span data-lang="en">Up-to-date market map (UA, SK, SE, EE / PL, DE, US)</span></div>
+      </div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-priority prio-done">✓</div>
+      <div>
+        <div class="rec-title"><span data-lang="uk">Історія &amp; технологія: timeline + цитата засновників + sustainability</span><span data-lang="en">Story &amp; technology: timeline + founders' narrative + sustainability</span></div>
+      </div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-priority prio-done">✓</div>
+      <div>
+        <div class="rec-title"><span data-lang="uk">Меседжі &amp; слогани: claims library з підтвердженням</span><span data-lang="en">Messaging &amp; slogans: claims library with substantiation</span></div>
+      </div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-priority prio-done">✓</div>
+      <div>
+        <div class="rec-title">PR &amp; press kit (boilerplate, <span data-lang="uk">3 кути сторі, цитати засновників</span><span data-lang="en">3 story angles, founders' quotes</span>)</div>
+      </div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-priority prio-done">✓</div>
+      <div>
+        <div class="rec-title">Sales playbook (<span data-lang="uk">дерево заперечень, MOQ, що пропонувати</span><span data-lang="en">objection tree, MOQ, what to offer</span>)</div>
+      </div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-priority prio-done">✓</div>
+      <div>
+        <div class="rec-title">Legal &amp; substantiation (claim→<span data-lang="uk">доказ</span><span data-lang="en">proof</span>, EU health claims, <span data-lang="uk">алергени, ™/®, NASA reconciliation</span><span data-lang="en">allergens, ™/®, NASA reconciliation</span>)</div>
+      </div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-priority prio-done">✓</div>
+      <div>
+        <div class="rec-title"><span data-lang="uk">Кольорова система сортів (10 SKU)</span><span data-lang="en">Variety color system (10 SKUs)</span></div>
+      </div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-priority prio-done">✓</div>
+      <div>
+        <div class="rec-title"><span data-lang="uk">Brand Assets Pack: 4 варіанти × 3 формати у <code>brand/logo/</code></span><span data-lang="en">Brand Assets Pack: 4 variants × 3 formats in <code>brand/logo/</code></span></div>
+      </div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-priority prio-done">✓</div>
+      <div>
+        <div class="rec-title"><span data-lang="uk">Шрифти Qanelas (10 ваг + Italic) і HighVoltage Rough у <code>brand/fonts/</code></span><span data-lang="en">Qanelas (10 weights + Italic) and HighVoltage Rough in <code>brand/fonts/</code></span></div>
+      </div>
+    </div>
   </div>
 
-  <h3 class="block-title"><span data-lang="uk">Шрифти і текст</span><span data-lang="en">Type &amp; text</span></h3>
-  <div class="checklist">
-    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Тільки Qanelas і HighVoltage Rough (не Arial, не Roboto, не системні шрифти)</span><span data-lang="en">Qanelas + HighVoltage Rough only (no Arial, Roboto or system fonts)</span></div>
-    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">HighVoltage Rough — лише заголовки / акценти, не великий масив тексту</span><span data-lang="en">HighVoltage Rough used for headlines only — never for body copy</span></div>
-    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">У текстовому контексті бренд: <strong>snEco</strong> (не SNECO, не Sneco, не SnEco)</span><span data-lang="en">In text, the brand is written <strong>snEco</strong> (never SNECO, Sneco or SnEco)</span></div>
-    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Ієрархія розмірів дотримана: H1 &gt; H2 &gt; body &gt; caption</span><span data-lang="en">Type hierarchy respected: H1 &gt; H2 &gt; body &gt; caption</span></div>
+  <h3 class="block-title">🔴 <span data-lang="uk">Критично — потрібно зараз</span><span data-lang="en">Critical — needed now</span></h3>
+  <div class="card" style="margin-bottom:16px">
+    <div class="rec-item">
+      <div class="rec-priority prio-critical">1</div>
+      <div>
+        <div class="rec-title"><span data-lang="uk">EU-комплект носіїв (Sneco SK)</span><span data-lang="en">EU collateral set (Sneco SK)</span></div>
+        <div class="rec-desc"><span data-lang="uk">Візитівка, бланк, шаблон email з юр-даними Sneco SK s.r.o. і «Made in EU». Без цього будь-яка EU-зустріч — з некоректними матеріалами.</span><span data-lang="en">Business card, letterhead and email template with Sneco SK s.r.o. details and "Made in EU". Without it, every EU meeting goes out with the wrong paperwork.</span></div>
+        <div class="rec-who"><span>BD</span><span>Print</span></div>
+      </div>
+    </div>
   </div>
 
-  <h3 class="block-title"><span data-lang="uk">Контент і тон</span><span data-lang="en">Content &amp; tone</span></h3>
-  <div class="checklist">
-    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Тон: чесний, впевнений, без кліше («революційний», «унікальний»)</span><span data-lang="en">Tone: honest, confident, no clichés ("revolutionary", "unique")</span></div>
-    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Факти перевірені (показники, нагороди, сертифікати)</span><span data-lang="en">Facts verified (metrics, awards, certifications)</span></div>
-    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Без стокових фото з «ідеальними» людьми</span><span data-lang="en">No stock photos with "perfect" people</span></div>
-    <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Фото відповідає фірмовому стилю (темний / нейтральний фон, текстура)</span><span data-lang="en">Photography matches brand style (dark / neutral background, texture)</span></div>
-    <div class="check-item"><span class="check-icon check-miss">✕</span><span data-lang="uk">Без згадок «NASA-технологія» — лише «VacWave Bio Nutrition / власна запатентована технологія»</span><span data-lang="en">No "NASA technology" wording — use "VacWave Bio Nutrition / our patented technology"</span></div>
+  <h3 class="block-title">🟠 <span data-lang="uk">Важливо — найближчим часом</span><span data-lang="en">Important — soon</span></h3>
+  <div class="card" style="margin-bottom:16px">
+    <div class="rec-item">
+      <div class="rec-priority prio-high">4</div>
+      <div>
+        <div class="rec-title"><span data-lang="uk">Tone of Voice — розширений документ</span><span data-lang="en">Tone of Voice — extended doc</span></div>
+        <div class="rec-desc"><span data-lang="uk">SMM, PR, продажі, партнерська комунікація — окремий документ з прикладами для Instagram, LinkedIn, email і прес-релізів.</span><span data-lang="en">A standalone document with examples for Instagram, LinkedIn, email and press, covering SMM, PR, sales and partner communication.</span></div>
+        <div class="rec-who"><span>SMM</span><span>PR</span><span>Sales</span></div>
+      </div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-priority prio-high">5</div>
+      <div>
+        <div class="rec-title"><span data-lang="uk">Digital Template Pack (Canva / Figma)</span><span data-lang="en">Digital Template Pack (Canva / Figma)</span></div>
+        <div class="rec-desc"><span data-lang="uk">Шаблони для Instagram (пост, Stories, Reels), LinkedIn, email-підпис, презентаційні слайди.</span><span data-lang="en">Templates for Instagram (post, Stories, Reels), LinkedIn, email signatures and presentation slides.</span></div>
+        <div class="rec-who"><span>SMM</span><span>Design</span></div>
+      </div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-priority prio-high">6</div>
+      <div>
+        <div class="rec-title"><span data-lang="uk">Packaging Style Guide</span><span data-lang="en">Packaging Style Guide</span></div>
+        <div class="rec-desc"><span data-lang="uk">Окремий документ із сіткою, ієрархією і правилами для 20+ SKU. Узгоджені «варіантні» кольори сортів.</span><span data-lang="en">A dedicated document with grid, hierarchy and rules for the 20+ SKU range. Locked variety accent colors.</span></div>
+        <div class="rec-who"><span>Packaging</span><span>Print</span></div>
+      </div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-priority prio-high">7</div>
+      <div>
+        <div class="rec-title"><span data-lang="uk">Grid-система</span><span data-lang="en">Grid system</span></div>
+        <div class="rec-desc"><span data-lang="uk">Модульний грід для сторінок, слайдів, постерів. Без нього кожен дизайнер компонує по-своєму.</span><span data-lang="en">A modular grid for pages, slides and posters. Without it, every designer composes their own way.</span></div>
+        <div class="rec-who"><span>Design</span><span>Agency</span></div>
+      </div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-priority prio-high">8</div>
+      <div>
+        <div class="rec-title"><span data-lang="uk">Co-branding rules</span><span data-lang="en">Co-branding rules</span></div>
+        <div class="rec-desc"><span data-lang="uk">Як показувати лого партнерів, ритейлерів, дистриб'юторів поряд із snEco — масштаб, охоронне поле, ієрархія.</span><span data-lang="en">How to lock up partner, retailer and distributor logos with snEco — scale, clear space, hierarchy.</span></div>
+        <div class="rec-who"><span>BD</span><span>Design</span></div>
+      </div>
+    </div>
   </div>
 
-  <h3 class="block-title"><span data-lang="uk">Для міжнародних матеріалів</span><span data-lang="en">For international assets</span></h3>
-  <div class="checklist">
-    <div class="check-item"><span class="check-icon check-warn">!</span><span data-lang="uk">EU-матеріали: юр-дані Sneco SK s.r.o., «Made in EU»</span><span data-lang="en">EU assets: Sneco SK s.r.o. legal details, "Made in EU"</span></div>
-    <div class="check-item"><span class="check-icon check-warn">!</span><span data-lang="uk">Мова відповідає цільовому ринку</span><span data-lang="en">Language matches target market</span></div>
-    <div class="check-item"><span class="check-icon check-warn">!</span><span data-lang="uk">Відповідність місцевим харчовим регуляціям (маркування, алергени)</span><span data-lang="en">Compliant with local food regulations (labeling, allergens)</span></div>
-    <div class="check-item"><span class="check-icon check-miss">✕</span><span data-lang="uk">Не змішуйте UA та EU юр-дані на одному носії</span><span data-lang="en">Never mix UA and EU legal details on the same asset</span></div>
+  <h3 class="block-title">🟡 <span data-lang="uk">Бажано — для системної роботи</span><span data-lang="en">Nice to have — operational</span></h3>
+  <div class="card">
+    <div class="rec-item">
+      <div class="rec-priority prio-medium">9</div>
+      <div>
+        <div class="rec-title"><span data-lang="uk">Photo library з правилами</span><span data-lang="en">Photo library with rules</span></div>
+        <div class="rec-desc"><span data-lang="uk">Що знімати, як, з якими реквізитами. Мінімальний набір: продуктові на темному фоні, lifestyle, деталі текстури, «кульки в польоті».</span><span data-lang="en">What to shoot, how, with what props. Minimum set: product on dark background, lifestyle, texture details, "balls in motion".</span></div>
+        <div class="rec-who"><span>Photographer</span><span>Content</span></div>
+      </div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-priority prio-medium">10</div>
+      <div>
+        <div class="rec-title"><span data-lang="uk">Іконографія</span><span data-lang="en">Iconography</span></div>
+        <div class="rec-desc"><span data-lang="uk">Єдиний стиль іконок «без цукру / без глютену / без консервантів / 100% сир» для упаковки і digital.</span><span data-lang="en">A single icon style for "no sugar / gluten-free / no preservatives / 100% cheese" across pack and digital.</span></div>
+        <div class="rec-who"><span>Design</span></div>
+      </div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-priority prio-medium">11</div>
+      <div>
+        <div class="rec-title"><span data-lang="uk">Motion / animation guide</span><span data-lang="en">Motion / animation guide</span></div>
+        <div class="rec-desc"><span data-lang="uk">Принципи руху для відео, Reels, моушн-графіки: типографіка в русі, transitions, темп.</span><span data-lang="en">Motion principles for video, Reels and motion graphics: kinetic typography, transitions, pace.</span></div>
+        <div class="rec-who"><span>Motion</span><span>SMM</span></div>
+      </div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-priority prio-medium">12</div>
+      <div>
+        <div class="rec-title"><span data-lang="uk">®/™ та правила ліцензування</span><span data-lang="en">®/™ &amp; licensing rules</span></div>
+        <div class="rec-desc"><span data-lang="uk">Юридична сноска про реєстрацію ТМ і правила ліцензування бренду партнерами/дистриб'юторами.</span><span data-lang="en">A legal note on TM registration and licensing rules for partners and distributors.</span></div>
+        <div class="rec-who"><span>Legal</span><span>IP</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CHANGELOG
+     ============================================================ -->
+<section class="section" id="sec-changelog" style="padding:56px 64px">
+  <div class="section-eyebrow">Changelog</div>
+  <h2 class="section-title"><span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span></h2>
+  <div class="section-lead">
+    <span data-lang="uk">Що змінювалось у документі. Усі правки за датами і версіями.</span>
+    <span data-lang="en">What changed in this document, by date and version.</span>
   </div>
 
-  <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span></h3>
   <div class="changelog-entry">
-    <span class="changelog-version">v2.8</span><span class="changelog-date">29.04.2026</span>
-    <ul class="changelog-list">
-      <li data-lang="uk"><strong>Структурне «схлопування» 24 → 17 розділів.</strong> Видалено надлишкову фрагментацію, документ став компактнішим без втрати змісту.</li>
-      <li data-lang="en"><strong>Structural consolidation: 24 → 17 sections.</strong> Eliminated overlap and made the document more compact without losing content.</li>
-      <li data-lang="uk">«Архітектура бренду» → інтегровано в «Про бренд» як sub-блок</li>
-      <li data-lang="en">"Brand architecture" → integrated into "About the brand" as a sub-block</li>
-      <li data-lang="uk">«Друк &amp; носії» → інтегровано в «Упаковку» як sub-блок</li>
-      <li data-lang="en">"Print &amp; collateral" → integrated into "Packaging" as a sub-block</li>
-      <li data-lang="uk">«PR &amp; press» + «Кризові комунікації» → об'єднано в одну секцію <strong>«Зовнішні комунікації»</strong> (proactive + reactive sub-блоки)</li>
-      <li data-lang="en">"PR &amp; press" + "Crisis communications" → merged into <strong>"External communications"</strong> (proactive + reactive sub-blocks)</li>
-      <li data-lang="uk">«Чеклист» + «Versioning» → об'єднано в <strong>«Maintenance»</strong> (compliance check + історія версій)</li>
-      <li data-lang="en">"Checklist" + "Versioning" → merged into <strong>"Maintenance"</strong> (compliance check + version history)</li>
-      <li data-lang="uk">«Логотип» + «Кольори» + «Шрифти» → об'єднано в <strong>«Візуальну систему»</strong> з трьома sub-блоками</li>
-      <li data-lang="en">"Logo" + "Colors" + "Typography" → merged into <strong>"Visual system"</strong> with three sub-blocks</li>
-      <li data-lang="uk">«Рекомендації» (внутрішнє todo для самого документа) — винесено у <code>BACKLOG.md</code> у репо. Не місце у публічному документі.</li>
-      <li data-lang="en">"Recommendations" (internal to-do for the document itself) — moved to <code>BACKLOG.md</code> in the repo. Not appropriate for the public document.</li>
-      <li data-lang="uk">Sidebar порядок упорядковано: «Точки контакту» переміщено в кінець «Застосування» — відповідає реальному порядку секцій у документі</li>
-      <li data-lang="en">Sidebar order tidied: "Touchpoints" moved to the end of "Application" group — matches the actual section order in the document</li>
-    </ul>
-  </div>
-
-  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
-    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.7</span><span class="changelog-date">29.04.2026</span>
+    <span class="changelog-version">v2.7</span><span class="changelog-date">29.04.2026</span>
     <ul class="changelog-list">
       <li data-lang="uk">Нова секція <strong>Документи</strong> — публічні сертифікати, нагороди, патенти, ТМ, lab tests доступні для прямого завантаження (35 PDF, 11 MB)</li>
       <li data-lang="en">New <strong>Documents</strong> section — public certificates, awards, patents, trademarks and lab tests available for direct download (35 PDFs, 11 MB)</li>
