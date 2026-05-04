@@ -806,27 +806,29 @@ h3.block-title:first-of-type { margin-top: 0; }
   display: flex; gap: 16px; justify-content: center; align-items: stretch;
   flex-wrap: wrap;
 }
-.org-row.row-departments { gap: 24px; align-items: flex-start; }
+.org-row.row-departments {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  align-items: flex-start;
+  min-width: 800px;
+}
 .org-column {
-  display: flex; flex-direction: column; gap: 12px; min-width: 200px; flex: 1;
-  position: relative; max-width: 260px;
+  display: flex; flex-direction: column; gap: 10px; min-width: 0;
+  position: relative;
 }
 .org-column::before {
-  content: ''; position: absolute; top: -32px; left: 50%;
-  width: 1.5px; height: 32px; background: var(--border);
+  content: ''; position: absolute; top: -22px; left: 50%;
+  width: 1.5px; height: 22px; background: var(--border);
   transform: translateX(-50%);
 }
-.org-row.row-coo::before {
-  content: ''; display: block; width: 1.5px; height: 32px; background: var(--border);
-  position: absolute; transform: translateY(-32px);
-}
+.org-card { width: 100%; box-sizing: border-box; }
 .org-card {
   background: var(--white);
   border: 1.5px solid var(--border);
   border-left: 4px solid var(--green);
   border-radius: 8px;
-  padding: 12px 14px;
-  min-width: 180px;
+  padding: 10px 12px;
   position: relative;
   transition: box-shadow 0.15s, border-color 0.15s;
 }
@@ -853,15 +855,8 @@ h3.block-title:first-of-type { margin-top: 0; }
 .org-card.is-editable [contenteditable="true"]:focus {
   background: var(--yellow); outline: 2px solid var(--black);
 }
-.org-vadim-warning {
-  margin-top: 24px; padding: 16px 20px; border-radius: 8px;
-  background: rgba(254,191,39,0.10); border: 1px solid var(--yellow);
-  font-size: 13px; line-height: 1.55;
-}
-.org-vadim-warning strong { color: var(--black); }
 @media (max-width: 800px) {
-  .org-row.row-departments { flex-direction: column; }
-  .org-column { min-width: 100%; max-width: 100%; }
+  .org-row.row-departments { grid-template-columns: 1fr; min-width: 0; }
   .org-column::before { display: none; }
   .org-note { max-width: 100%; margin-left: 0; }
 }
@@ -1430,11 +1425,6 @@ h3.block-title:first-of-type { margin-top: 0; }
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="org-vadim-warning">
-    <span data-lang="uk"><strong>⚠️ Спостереження.</strong> Вадим зараз закріплений за <strong>5 ролями</strong> (Засновник, Маркетинг, Онлайн, Офлайн, Продажі). Це найочевидніший вектор делегування. Ключові вакансії на 2026: <strong>Head of Marketing</strong> або хоча б Marketing Manager + <strong>SMM Manager</strong> (вже відсутній); у середньостроковій перспективі — <strong>Head of Sales</strong> для UA. Це звільнить Вадима для стратегії, експорту і ключових партнерств.</span>
-    <span data-lang="en"><strong>⚠️ Observation.</strong> Vadym currently wears <strong>5 hats</strong> (Founder, Marketing, Online, Offline, Sales). This is the most obvious delegation vector. Key 2026 hires: <strong>Head of Marketing</strong> or at least a Marketing Manager + <strong>SMM Manager</strong> (currently vacant); medium-term — <strong>Head of Sales</strong> for UA. This frees Vadym for strategy, export and key partnerships.</span>
   </div>
 
   <h3 class="block-title" style="margin-top:48px">🇸🇰 <span data-lang="uk">Sneco SK (Словаччина)</span><span data-lang="en">Sneco SK (Slovakia)</span></h3>
