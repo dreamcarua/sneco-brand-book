@@ -880,6 +880,10 @@ h3.block-title:first-of-type { margin-top: 0; }
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(30,30,30,0.10);
 }
+.pkg-ua-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(30,30,30,0.12);
+}
 .pkg-card-image {
   background: linear-gradient(135deg, #f8f8f8, #ececec);
   padding: 8px;
@@ -2723,85 +2727,132 @@ h3.block-title:first-of-type { margin-top: 0; }
   </div>
 
 
-  <h3 class="block-title" style="margin-top:48px">📦 <span data-lang="uk">Пакування 90×160 мм · 14 г + 28 г</span><span data-lang="en">Pack 90×160 mm · 14 g + 28 g</span></h3>
+  <h3 class="block-title" style="margin-top:48px">🌍 <span data-lang="uk">Експортна лінійка · 28 г · 9 мов</span><span data-lang="en">Export line · 28 g · 9 languages</span></h3>
   <div class="card">
-    <div style="font-size:13px;color:var(--text-muted);line-height:1.65;margin-bottom:16px">
-      <span data-lang="uk">Сімейство дизайнів маленьких пачок (формат 90×160 мм). Один спільний layout, варіюються: акцентний колір сорту, фото продукту, назва. <strong>11 SKU</strong> — 6 чистих сирів + 5 міксів сир+горіх. Натисни на картку щоб подивитися увесь дизайн крупно.</span>
-      <span data-lang="en">Small-pack design family (90×160 mm format). One shared layout, varying by: variant accent color, product photo, name. <strong>11 SKUs</strong> — 6 pure cheeses + 5 cheese+nut mixes. Tap a card to view the full design.</span>
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.65;margin-bottom:20px">
+      <span data-lang="uk">Експортний дизайн — формат <strong>28 г</strong>, 9 мов на пачці (EN/DE/FR/IT/ES/PL/CZ/SK/HU), повна відповідність EU-регуляціям (allergen highlight, BBE, nutrition table). <strong>8 SKU</strong>. Кожна картка — лицева й зворотна сторона разом.</span>
+      <span data-lang="en">Export design — <strong>28 g</strong> format, 9 languages on pack (EN/DE/FR/IT/ES/PL/CZ/SK/HU), full EU-regulation compliance (allergen highlight, BBE, nutrition table). <strong>8 SKUs</strong>. Each card shows front + back side by side.</span>
     </div>
 
-    <div class="pkg-cat-header">
-      <span class="pkg-cat-title"><span data-lang="uk">Чисті сири</span><span data-lang="en">Pure cheese</span></span>
-      <span class="pkg-cat-count">6</span>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px">
+      <!-- Cheddar -->
+      <div style="background:#1E1E1E;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:14px 14px 6px"><img src="packaging/preview/cheddar-front.jpg" loading="lazy" alt="Cheddar front" style="width:100%;height:auto;border-radius:6px"><img src="packaging/preview/cheddar-back.jpg" loading="lazy" alt="Cheddar back" style="width:100%;height:auto;border-radius:6px"></div>
+        <div style="padding:12px 16px 16px;color:#fff"><div style="font-weight:700;font-size:14px">Cheddar</div><div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px">28 g · Export · UK flag</div></div>
+      </div>
+      <!-- Gouda -->
+      <div style="background:#1E1E1E;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:14px 14px 6px"><img src="packaging/preview/gouda-front.jpg" loading="lazy" alt="Gouda front" style="width:100%;height:auto;border-radius:6px"><img src="packaging/preview/gouda-back.jpg" loading="lazy" alt="Gouda back" style="width:100%;height:auto;border-radius:6px"></div>
+        <div style="padding:12px 16px 16px;color:#fff"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><div style="font-weight:700;font-size:14px">Gouda</div><div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px">28 g · Export · NL flag</div></div><a href="packaging/print/EN-28g/SNECO%20GOUDA_eng%20v13_final.pdf" download style="background:var(--yellow);color:var(--black);padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;text-decoration:none;letter-spacing:0.04em">⬇ PDF</a></div></div>
+      </div>
+      <!-- Mozzarella -->
+      <div style="background:#1E1E1E;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:14px 14px 6px"><img src="packaging/preview/mozzarella-front.jpg" loading="lazy" alt="Mozzarella front" style="width:100%;height:auto;border-radius:6px"><img src="packaging/preview/mozzarella-back.jpg" loading="lazy" alt="Mozzarella back" style="width:100%;height:auto;border-radius:6px"></div>
+        <div style="padding:12px 16px 16px;color:#fff"><div style="font-weight:700;font-size:14px">Mozzarella</div><div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px">28 g · Export · IT flag</div></div>
+      </div>
+      <!-- Primaggio -->
+      <div style="background:#1E1E1E;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:14px 14px 6px"><img src="packaging/preview/primagio-front.jpg" loading="lazy" alt="Primaggio front" style="width:100%;height:auto;border-radius:6px"><img src="packaging/preview/primagio-back.jpg" loading="lazy" alt="Primaggio back" style="width:100%;height:auto;border-radius:6px"></div>
+        <div style="padding:12px 16px 16px;color:#fff"><div style="font-weight:700;font-size:14px">Primaggio</div><div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px">28 g · Export · IT flag</div></div>
+      </div>
+      <!-- Suluguni -->
+      <div style="background:#1E1E1E;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:14px 14px 6px"><img src="packaging/preview/suluguni-front.jpg" loading="lazy" alt="Suluguni front" style="width:100%;height:auto;border-radius:6px"><img src="packaging/preview/suluguni-back.jpg" loading="lazy" alt="Suluguni back" style="width:100%;height:auto;border-radius:6px"></div>
+        <div style="padding:12px 16px 16px;color:#fff"><div style="font-weight:700;font-size:14px">Smoked Suluguni</div><div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px">28 g · Export · GE flag</div></div>
+      </div>
+      <!-- Emmental -->
+      <div style="background:#1E1E1E;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:14px 14px 6px"><img src="packaging/preview/emmental-front.jpg" loading="lazy" alt="Emmental front" style="width:100%;height:auto;border-radius:6px"><img src="packaging/preview/emmental-back.jpg" loading="lazy" alt="Emmental back" style="width:100%;height:auto;border-radius:6px"></div>
+        <div style="padding:12px 16px 16px;color:#fff"><div style="font-weight:700;font-size:14px">Smoked Emmental</div><div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px">28 g · Export · CH flag</div></div>
+      </div>
+      <!-- Superfood -->
+      <div style="background:#1E1E1E;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:14px 14px 6px"><img src="packaging/preview/superfood-front.jpg" loading="lazy" alt="Superfood front" style="width:100%;height:auto;border-radius:6px"><img src="packaging/preview/superfood-back.jpg" loading="lazy" alt="Superfood back" style="width:100%;height:auto;border-radius:6px"></div>
+        <div style="padding:12px 16px 16px;color:#fff"><div style="font-weight:700;font-size:14px">Fitness · Superfood</div><div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px">28 g · Export · low fat · 60% protein</div></div>
+      </div>
+      <!-- Kids -->
+      <div style="background:#1E1E1E;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:14px 14px 6px"><img src="packaging/preview/kids-front.jpg" loading="lazy" alt="Kids Cosmic front" style="width:100%;height:auto;border-radius:6px"><img src="packaging/preview/kids-back.jpg" loading="lazy" alt="Kids Cosmic back" style="width:100%;height:auto;border-radius:6px"></div>
+        <div style="padding:12px 16px 16px;color:#fff"><div style="font-weight:700;font-size:14px">Kids «Cosmic»</div><div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px">28 g · Export · kids line</div></div>
+      </div>
     </div>
-    <div class="pkg-gallery">
-      <a href="documents/packaging/small/preview/SNECO_CED.jpg" target="_blank" class="pkg-card">
-        <div class="pkg-card-image"><img src="documents/packaging/small/preview/SNECO_CED.jpg" alt="snEco Cheddar" loading="lazy"></div>
-        <div class="pkg-card-meta"><div class="pkg-card-name">Cheddar</div><div class="pkg-card-sub" data-lang="uk">Чеддер · CED</div><div class="pkg-card-sub" data-lang="en">Cheddar · CED</div></div>
+
+    <div style="margin-top:18px;padding:12px 14px;background:var(--yellow-10);border-radius:6px;font-size:12px;line-height:1.55">
+      <span data-lang="uk">📂 <strong>Друкарський PDF (оригінал)</strong> — наразі готовий <a href="packaging/print/EN-28g/SNECO%20GOUDA_eng%20v13_final.pdf" download><strong>Gouda EN v13</strong></a>. Решта 7 SKU — .ai сирці за запитом: <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>. Превью на сторінці — стиснуті JPG 800px для швидкого завантаження.</span>
+      <span data-lang="en">📂 <strong>Print PDF (original)</strong> — currently available: <a href="packaging/print/EN-28g/SNECO%20GOUDA_eng%20v13_final.pdf" download><strong>Gouda EN v13</strong></a>. The other 7 SKUs — .ai source on request: <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>. Previews on this page are compressed 800px JPGs for fast loading.</span>
+    </div>
+  </div>
+
+  <h3 class="block-title" style="margin-top:48px">📦 <span data-lang="uk">Малий формат · 90×160 мм · 14 / 20 г · UA</span><span data-lang="en">Small format · 90×160 mm · 14 / 20 g · UA</span></h3>
+  <div class="card">
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.65;margin-bottom:20px">
+      <span data-lang="uk">Український внутрішній ринок. Один спільний layout, варіюються: акцентний колір сорту, назва, фото. <strong>12 SKU</strong> — 6 чистих сирів + 5 міксів сир+горіх + 1 веган-стик. Натисни на картку — завантажиться оригінальний CMYK PDF, готовий до друку.</span>
+      <span data-lang="en">Ukrainian domestic market. One shared layout, varying by accent color, name, photo. <strong>12 SKUs</strong> — 6 pure cheeses + 5 cheese+nut mixes + 1 vegan stick. Tap a card to download the original print-ready CMYK PDF.</span>
+    </div>
+
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--text-muted);margin:14px 0 10px"><span data-lang="uk">Чисті сири · 6</span><span data-lang="en">Pure cheese · 6</span></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20CED%20crv.pdf" download class="pkg-ua-card" style="display:flex;flex-direction:column;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s">
+        <div style="height:88px;background:linear-gradient(135deg,#1E1E1E 0%,#E89B2A 100%);display:flex;align-items:center;justify-content:center;color:#FEBF27;font-weight:900;font-size:28px;letter-spacing:1px">CED</div>
+        <div style="padding:12px 14px;background:var(--surface)"><div style="font-weight:700;font-size:13px">Cheddar</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">⬇ Print PDF · 14 / 20 г</div></div>
       </a>
-      <a href="documents/packaging/small/preview/SNECO_GOU.jpg" target="_blank" class="pkg-card">
-        <div class="pkg-card-image"><img src="documents/packaging/small/preview/SNECO_GOU.jpg" alt="snEco Gouda" loading="lazy"></div>
-        <div class="pkg-card-meta"><div class="pkg-card-name">Gouda</div><div class="pkg-card-sub" data-lang="uk">Гауда · GOU</div><div class="pkg-card-sub" data-lang="en">Gouda · GOU</div></div>
+      <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20GOU%20crv.pdf" download class="pkg-ua-card" style="display:flex;flex-direction:column;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s">
+        <div style="height:88px;background:linear-gradient(135deg,#1E1E1E 0%,#F2D14E 100%);display:flex;align-items:center;justify-content:center;color:#FEBF27;font-weight:900;font-size:28px;letter-spacing:1px">GOU</div>
+        <div style="padding:12px 14px;background:var(--surface)"><div style="font-weight:700;font-size:13px">Gouda</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">⬇ Print PDF · 14 / 20 г</div></div>
       </a>
-      <a href="documents/packaging/small/preview/SNECO_MOZ.jpg" target="_blank" class="pkg-card">
-        <div class="pkg-card-image"><img src="documents/packaging/small/preview/SNECO_MOZ.jpg" alt="snEco Mozzarella" loading="lazy"></div>
-        <div class="pkg-card-meta"><div class="pkg-card-name">Mozzarella</div><div class="pkg-card-sub" data-lang="uk">Моцарела · MOZ</div><div class="pkg-card-sub" data-lang="en">Mozzarella · MOZ</div></div>
+      <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20MOZ%20crv.pdf" download class="pkg-ua-card" style="display:flex;flex-direction:column;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s">
+        <div style="height:88px;background:linear-gradient(135deg,#1E1E1E 0%,#F5E9D4 100%);display:flex;align-items:center;justify-content:center;color:#FEBF27;font-weight:900;font-size:28px;letter-spacing:1px">MOZ</div>
+        <div style="padding:12px 14px;background:var(--surface)"><div style="font-weight:700;font-size:13px">Mozzarella</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">⬇ Print PDF · 14 / 20 г</div></div>
       </a>
-      <a href="documents/packaging/small/preview/SNECO_PRIM.jpg" target="_blank" class="pkg-card">
-        <div class="pkg-card-image"><img src="documents/packaging/small/preview/SNECO_PRIM.jpg" alt="snEco Primaggio" loading="lazy"></div>
-        <div class="pkg-card-meta"><div class="pkg-card-name">Primaggio</div><div class="pkg-card-sub" data-lang="uk">Прімаджо · PRIM</div><div class="pkg-card-sub" data-lang="en">Primaggio · PRIM</div></div>
+      <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20PRIM%20crv.pdf" download class="pkg-ua-card" style="display:flex;flex-direction:column;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s">
+        <div style="height:88px;background:linear-gradient(135deg,#1E1E1E 0%,#C9A876 100%);display:flex;align-items:center;justify-content:center;color:#FEBF27;font-weight:900;font-size:28px;letter-spacing:1px">PRIM</div>
+        <div style="padding:12px 14px;background:var(--surface)"><div style="font-weight:700;font-size:13px">Primaggio</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">⬇ Print PDF · 14 / 20 г</div></div>
       </a>
-      <a href="documents/packaging/small/preview/SNECO_SULU.jpg" target="_blank" class="pkg-card">
-        <div class="pkg-card-image"><img src="documents/packaging/small/preview/SNECO_SULU.jpg" alt="snEco Smoked Suluguni" loading="lazy"></div>
-        <div class="pkg-card-meta"><div class="pkg-card-name">Smoked Suluguni</div><div class="pkg-card-sub" data-lang="uk">Копчений Сулугуні · SULU</div><div class="pkg-card-sub" data-lang="en">Smoked Suluguni · SULU</div></div>
+      <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20SULU%20crv.pdf" download class="pkg-ua-card" style="display:flex;flex-direction:column;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s">
+        <div style="height:88px;background:linear-gradient(135deg,#1E1E1E 0%,#8C5A3C 100%);display:flex;align-items:center;justify-content:center;color:#FEBF27;font-weight:900;font-size:28px;letter-spacing:1px">SULU</div>
+        <div style="padding:12px 14px;background:var(--surface)"><div style="font-weight:700;font-size:13px">Smoked Suluguni</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">⬇ Print PDF · 14 / 20 г</div></div>
       </a>
-      <a href="documents/packaging/small/preview/SNECO_BR.jpg" target="_blank" class="pkg-card">
-        <div class="pkg-card-image"><img src="documents/packaging/small/preview/SNECO_BR.jpg" alt="snEco Blue Royale" loading="lazy"></div>
-        <div class="pkg-card-meta"><div class="pkg-card-name">Blue Royale</div><div class="pkg-card-sub" data-lang="uk">Блю Рояль · BR</div><div class="pkg-card-sub" data-lang="en">Blue Royale · BR</div></div>
+      <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20BR%20crv.pdf" download class="pkg-ua-card" style="display:flex;flex-direction:column;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s">
+        <div style="height:88px;background:linear-gradient(135deg,#1E1E1E 0%,#3B5A8C 100%);display:flex;align-items:center;justify-content:center;color:#FEBF27;font-weight:900;font-size:28px;letter-spacing:1px">BR</div>
+        <div style="padding:12px 14px;background:var(--surface)"><div style="font-weight:700;font-size:13px">Blue Royale</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">⬇ Print PDF · 14 / 20 г</div></div>
       </a>
     </div>
 
-    <div class="pkg-cat-header">
-      <span class="pkg-cat-title"><span data-lang="uk">Мікси сир + горіх</span><span data-lang="en">Cheese + nut mixes</span></span>
-      <span class="pkg-cat-count">5</span>
-    </div>
-    <div class="pkg-gallery">
-      <a href="documents/packaging/small/preview/SNECO_CED_MIGD.jpg" target="_blank" class="pkg-card">
-        <div class="pkg-card-image"><img src="documents/packaging/small/preview/SNECO_CED_MIGD.jpg" alt="snEco Cheddar + Almond" loading="lazy"></div>
-        <div class="pkg-card-meta"><div class="pkg-card-name">Cheddar + Almond</div><div class="pkg-card-sub" data-lang="uk">Чеддер + Мигдаль · CED_MIGD</div><div class="pkg-card-sub" data-lang="en">Cheddar + Almond · CED_MIGD</div></div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--text-muted);margin:24px 0 10px"><span data-lang="uk">Мікси сир + горіх · 5</span><span data-lang="en">Cheese + nut mixes · 5</span></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20CED_MIGD%20crv.pdf" download class="pkg-ua-card" style="display:flex;flex-direction:column;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s">
+        <div style="height:88px;background:linear-gradient(135deg,#E89B2A 0%,#E8C9A0 100%);display:flex;align-items:center;justify-content:center;color:#1E1E1E;font-weight:900;font-size:18px;letter-spacing:0.5px;text-align:center;line-height:1.2;padding:0 8px">CED<br>+ MIGD</div>
+        <div style="padding:12px 14px;background:var(--surface)"><div style="font-weight:700;font-size:13px">Cheddar + Almond</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">⬇ Print PDF · 14 / 20 г</div></div>
       </a>
-      <a href="documents/packaging/small/preview/SNECO_GOU_FUND.jpg" target="_blank" class="pkg-card">
-        <div class="pkg-card-image"><img src="documents/packaging/small/preview/SNECO_GOU_FUND.jpg" alt="snEco Gouda + Hazelnut" loading="lazy"></div>
-        <div class="pkg-card-meta"><div class="pkg-card-name">Gouda + Hazelnut</div><div class="pkg-card-sub" data-lang="uk">Гауда + Фундук · GOU_FUND</div><div class="pkg-card-sub" data-lang="en">Gouda + Hazelnut · GOU_FUND</div></div>
+      <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20GOU_FUND%20crv.pdf" download class="pkg-ua-card" style="display:flex;flex-direction:column;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s">
+        <div style="height:88px;background:linear-gradient(135deg,#F2D14E 0%,#A06A2D 100%);display:flex;align-items:center;justify-content:center;color:#1E1E1E;font-weight:900;font-size:18px;letter-spacing:0.5px;text-align:center;line-height:1.2;padding:0 8px">GOU<br>+ FUND</div>
+        <div style="padding:12px 14px;background:var(--surface)"><div style="font-weight:700;font-size:13px">Gouda + Hazelnut</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">⬇ Print PDF · 14 / 20 г</div></div>
       </a>
-      <a href="documents/packaging/small/preview/SNECO_MOZ_KESH.jpg" target="_blank" class="pkg-card">
-        <div class="pkg-card-image"><img src="documents/packaging/small/preview/SNECO_MOZ_KESH.jpg" alt="snEco Mozzarella + Cashew" loading="lazy"></div>
-        <div class="pkg-card-meta"><div class="pkg-card-name">Mozzarella + Cashew</div><div class="pkg-card-sub" data-lang="uk">Моцарела + Кеш'ю · MOZ_KESH</div><div class="pkg-card-sub" data-lang="en">Mozzarella + Cashew · MOZ_KESH</div></div>
+      <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20MOZ_KESH%20crv.pdf" download class="pkg-ua-card" style="display:flex;flex-direction:column;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s">
+        <div style="height:88px;background:linear-gradient(135deg,#F5E9D4 0%,#C9A063 100%);display:flex;align-items:center;justify-content:center;color:#1E1E1E;font-weight:900;font-size:18px;letter-spacing:0.5px;text-align:center;line-height:1.2;padding:0 8px">MOZ<br>+ KESH</div>
+        <div style="padding:12px 14px;background:var(--surface)"><div style="font-weight:700;font-size:13px">Mozzarella + Cashew</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">⬇ Print PDF · 14 / 20 г</div></div>
       </a>
-      <a href="documents/packaging/small/preview/SNECO_PRIM_VOL.jpg" target="_blank" class="pkg-card">
-        <div class="pkg-card-image"><img src="documents/packaging/small/preview/SNECO_PRIM_VOL.jpg" alt="snEco Primaggio + Walnut" loading="lazy"></div>
-        <div class="pkg-card-meta"><div class="pkg-card-name">Primaggio + Walnut</div><div class="pkg-card-sub" data-lang="uk">Прімаджо + Волоський · PRIM_VOL</div><div class="pkg-card-sub" data-lang="en">Primaggio + Walnut · PRIM_VOL</div></div>
+      <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20PRIM_VOL%20crv.pdf" download class="pkg-ua-card" style="display:flex;flex-direction:column;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s">
+        <div style="height:88px;background:linear-gradient(135deg,#C9A876 0%,#5A3B1F 100%);display:flex;align-items:center;justify-content:center;color:#FEBF27;font-weight:900;font-size:18px;letter-spacing:0.5px;text-align:center;line-height:1.2;padding:0 8px">PRIM<br>+ VOL</div>
+        <div style="padding:12px 14px;background:var(--surface)"><div style="font-weight:700;font-size:13px">Primaggio + Walnut</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">⬇ Print PDF · 14 / 20 г</div></div>
       </a>
-      <a href="documents/packaging/small/preview/SNECO_SUL_AR.jpg" target="_blank" class="pkg-card">
-        <div class="pkg-card-image"><img src="documents/packaging/small/preview/SNECO_SUL_AR.jpg" alt="snEco Suluguni + Peanut" loading="lazy"></div>
-        <div class="pkg-card-meta"><div class="pkg-card-name">Suluguni + Peanut</div><div class="pkg-card-sub" data-lang="uk">Сулугуні + Арахіс · SUL_AR</div><div class="pkg-card-sub" data-lang="en">Suluguni + Peanut · SUL_AR</div></div>
+      <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20SUL_AR%20crv.pdf" download class="pkg-ua-card" style="display:flex;flex-direction:column;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s">
+        <div style="height:88px;background:linear-gradient(135deg,#8C5A3C 0%,#D4A05C 100%);display:flex;align-items:center;justify-content:center;color:#FEBF27;font-weight:900;font-size:18px;letter-spacing:0.5px;text-align:center;line-height:1.2;padding:0 8px">SUL<br>+ AR</div>
+        <div style="padding:12px 14px;background:var(--surface)"><div style="font-weight:700;font-size:13px">Suluguni + Peanut</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">⬇ Print PDF · 14 / 20 г</div></div>
       </a>
     </div>
 
-    <div class="pkg-cat-header">
-      <span class="pkg-cat-title"><span data-lang="uk">Веган-серія (без сиру)</span><span data-lang="en">Vegan series (cheese-free)</span></span>
-      <span class="pkg-cat-count">1</span>
-    </div>
-    <div class="pkg-gallery">
-      <a href="documents/packaging/small/preview/SNECO_OLIV_STICK.jpg" target="_blank" class="pkg-card">
-        <div class="pkg-card-image"><img src="documents/packaging/small/preview/SNECO_OLIV_STICK.jpg" alt="snEco Crispy Olives" loading="lazy"></div>
-        <div class="pkg-card-meta"><div class="pkg-card-name">Crispy Olives</div><div class="pkg-card-sub" data-lang="uk">Хрусткі оливки · 14 г · KETO + VEGAN</div><div class="pkg-card-sub" data-lang="en">Crispy Olives · 14 g · KETO + VEGAN</div></div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--text-muted);margin:24px 0 10px"><span data-lang="uk">Веган-серія (без сиру) · 1</span><span data-lang="en">Vegan series (cheese-free) · 1</span></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      <a href="packaging/print/UA-14-20g/SNECO%20Olives_stick%2090x160%20%282%29.pdf" download class="pkg-ua-card" style="display:flex;flex-direction:column;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s">
+        <div style="height:88px;background:linear-gradient(135deg,#1E1E1E 0%,#5C7A2D 100%);display:flex;align-items:center;justify-content:center;color:#7CB342;font-weight:900;font-size:18px;letter-spacing:0.5px;text-align:center;line-height:1.2;padding:0 8px">OLIV<br>STICK</div>
+        <div style="padding:12px 14px;background:var(--surface)"><div style="font-weight:700;font-size:13px">Crispy Olives</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">⬇ Print PDF · 14 г · KETO + VEGAN</div></div>
       </a>
     </div>
 
-    <div style="margin-top:24px;padding:14px 18px;background:var(--black-05);border-radius:8px;font-size:12px;color:var(--text-muted);line-height:1.6">
-      <span data-lang="uk">📁 <strong>Друкарські файли (CMYK PDF + .ai джерело)</strong> — за запитом для дистриб'юторів, ритейлу і друкарень: <a href="mailto:vg@sneco.ua" style="color:var(--text)">vg@sneco.ua</a>. Превью в галереї — JPG 600px для перегляду; не для друку.</span>
-      <span data-lang="en">📁 <strong>Print files (CMYK PDF + .ai source)</strong> — available on request for distributors, retail and printers: <a href="mailto:vg@sneco.ua" style="color:var(--text)">vg@sneco.ua</a>. Gallery previews are JPG 600px for screen; not for print.</span>
+    <div style="margin-top:24px;padding:14px 18px;background:var(--yellow-10);border-radius:8px;font-size:12px;line-height:1.6">
+      <span data-lang="uk">📂 <strong>Усі 12 PDF — оригінали (CMYK, готові до друку)</strong>. Натисни на картку — завантажиться файл напряму. Розмір кожного: 10–15 МБ. .ai сирці — за запитом: <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>.</span>
+      <span data-lang="en">📂 <strong>All 12 PDFs — originals (CMYK, print-ready)</strong>. Click a card to download directly. Each file: 10–15 MB. .ai sources on request: <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>.</span>
     </div>
   </div>
 
@@ -4044,7 +4095,21 @@ h3.block-title:first-of-type { margin-top: 0; }
 
   <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span></h3>
   <div class="changelog-entry">
-    <span class="changelog-version">v2.10</span><span class="changelog-date">04.05.2026</span>
+    <span class="changelog-version">v2.11</span><span class="changelog-date">04.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>Нова галерея «Експортна лінійка 28 г»</strong> — 8 SKU (Cheddar, Gouda, Mozzarella, Primaggio, Smoked Suluguni, Smoked Emmental, Fitness/Superfood, Kids Cosmic). На кожній картці — лицева й зворотна сторона разом, JPG 800px (~100 KB кожен).</li>
+      <li data-lang="en"><strong>New "Export line 28 g" gallery</strong> — 8 SKUs (Cheddar, Gouda, Mozzarella, Primaggio, Smoked Suluguni, Smoked Emmental, Fitness/Superfood, Kids Cosmic). Each card shows front + back side by side, JPG 800px (~100 KB each).</li>
+      <li data-lang="uk"><strong>UA галерея 90×160 мм перероблена з прямими download-лінками</strong> — клік на картку завантажує оригінальний CMYK print-ready PDF. Всі 12 SKU доступні (6 чистих + 5 міксів + 1 веган-стик).</li>
+      <li data-lang="en"><strong>UA 90×160 mm gallery rebuilt with direct download links</strong> — clicking a card downloads the original CMYK print-ready PDF. All 12 SKUs available (6 pure + 5 mixes + 1 vegan stick).</li>
+      <li data-lang="uk">Виправлено посилання на неіснуючі JPG (`documents/packaging/small/preview/...`) — тепер кожна картка показує градієнтний placeholder з SKU-кодом і зразу веде на PDF.</li>
+      <li data-lang="en">Fixed broken JPG references (`documents/packaging/small/preview/...`) — each card now shows a gradient placeholder with the SKU code and links straight to PDF.</li>
+      <li data-lang="uk"><strong>Friction-less workflow для друкарень і дистриб'юторів</strong>: PDF-оригінали лежать у repo (`packaging/print/`), друкарня заходить на сайт → клік → готовий до друку файл.</li>
+      <li data-lang="en"><strong>Friction-less workflow for printers and distributors</strong>: PDF originals live in the repo (`packaging/print/`), printer visits site → clicks → ready-to-print file.</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.10</span><span class="changelog-date">04.05.2026</span>
     <ul class="changelog-list">
       <li data-lang="uk"><strong>Галерея пакування 90×160 мм</strong> у секції «Упаковка» — 11 SKU (6 чистих сирів + 5 міксів сир+горіх): Cheddar, Gouda, Mozzarella, Primaggio, Smoked Suluguni, Blue Royale + Cheddar/Almond, Gouda/Hazelnut, Mozzarella/Cashew, Primaggio/Walnut, Suluguni/Peanut.</li>
       <li data-lang="en"><strong>Packaging gallery 90×160 mm</strong> in the "Packaging" section — 11 SKUs (6 pure cheeses + 5 cheese+nut mixes): Cheddar, Gouda, Mozzarella, Primaggio, Smoked Suluguni, Blue Royale + Cheddar/Almond, Gouda/Hazelnut, Mozzarella/Cashew, Primaggio/Walnut, Suluguni/Peanut.</li>
