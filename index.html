@@ -920,6 +920,26 @@ h3.block-title:first-of-type { margin-top: 0; }
   transform: translateY(-1px);
   box-shadow: 0 4px 10px rgba(254,191,39,0.35);
 }
+.pricing-dl {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+}
+.pricing-dl strong { font-size: 13px; font-weight: 700; }
+.pricing-dl span { font-size: 11px; color: var(--text-muted); }
+.pricing-dl:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30,30,30,0.08);
+  border-color: var(--yellow);
+}
+.pricing-dl::before {
+  content: "⬇ "; color: var(--yellow); font-weight: 800;
+}
 .pkg-cat-header {
   display: flex; align-items: baseline; gap: 12px;
   margin: 32px 0 12px;
@@ -3360,6 +3380,185 @@ h3.block-title:first-of-type { margin-top: 0; }
     </table>
   </div>
 
+  <h3 class="block-title">🔒 <span data-lang="uk">Прайс-листи · UA · 02.03.2026</span><span data-lang="en">Price lists · UA · Mar 2, 2026</span></h3>
+
+  <!-- Locked state -->
+  <div id="pricing-locked" class="card" style="text-align:center;padding:40px 24px;background:linear-gradient(135deg,#1E1E1E,#2a2a2a);color:#fff;border:1px solid var(--border)">
+    <div style="font-size:48px;margin-bottom:14px">🔒</div>
+    <div style="font-size:17px;font-weight:700;margin-bottom:8px">
+      <span data-lang="uk">Розділ захищено</span><span data-lang="en">Section is locked</span>
+    </div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.6);max-width:480px;margin:0 auto 22px;line-height:1.55">
+      <span data-lang="uk">Прайс-листи доступні тільки авторизованим партнерам. Запит на пароль — <a href="mailto:vg@sneco.ua" style="color:var(--yellow)">vg@sneco.ua</a>.</span>
+      <span data-lang="en">Price lists are available to authorized partners only. Request access — <a href="mailto:vg@sneco.ua" style="color:var(--yellow)">vg@sneco.ua</a>.</span>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      <input type="password" id="pricing-pwd" placeholder="Password" onkeydown="if(event.key==='Enter')unlockPricing()" style="padding:11px 16px;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:14px;background:rgba(255,255,255,0.06);color:#fff;width:220px;font-family:var(--font-body)">
+      <button onclick="unlockPricing()" style="background:var(--yellow);color:var(--black);border:none;padding:11px 22px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;letter-spacing:0.04em;font-family:var(--font-body)"><span data-lang="uk">Розблокувати</span><span data-lang="en">Unlock</span></button>
+    </div>
+    <div id="pricing-error" style="color:#fca5a5;font-size:12px;margin-top:14px;display:none">
+      <span data-lang="uk">Невірний пароль</span><span data-lang="en">Wrong password</span>
+    </div>
+  </div>
+
+  <!-- Unlocked content -->
+  <div id="pricing-content" style="display:none">
+
+    <div style="margin-bottom:18px;padding:12px 16px;background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.25);border-radius:8px;font-size:12px;line-height:1.55;display:flex;gap:10px;align-items:flex-start">
+      <div style="font-size:16px">⚠️</div>
+      <div>
+        <strong><span data-lang="uk">Конфіденційно</span><span data-lang="en">Confidential</span></strong> ·
+        <span data-lang="uk">ціни Дист / Гурт — комерційна таємниця. Не пересилати конкурентам, ритейлерам інших країн, у відкриті групи. Ціни в гривнях, з ПДВ, дійсні з 02.03.2026 до окремих змін.</span>
+        <span data-lang="en">Dist / Wholesale prices are commercial secrets. Don't forward to competitors, foreign retailers or open groups. Prices in UAH, VAT included, valid from Mar 2, 2026 until further notice.</span>
+      </div>
+    </div>
+
+    <!-- Download grid -->
+    <div style="margin-bottom:24px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px">
+        <span data-lang="uk">Завантажити PDF</span><span data-lang="en">Download PDF</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
+        <a href="pricing/snEco-price-28g-dist.pdf" download class="pricing-dl"><strong>28 г · Дистр</strong><span>Розширений — Dist + Гурт + РРЦ</span></a>
+        <a href="pricing/snEco-price-28g-wholesale.pdf" download class="pricing-dl"><strong>28 г · Гурт</strong><span>Гурт + РРЦ</span></a>
+        <a href="pricing/snEco-price-14-20g-dist.pdf" download class="pricing-dl"><strong>14/20 г · Дистр</strong><span>Розширений — Dist + Гурт + РРЦ</span></a>
+        <a href="pricing/snEco-price-14-20g-wholesale.pdf" download class="pricing-dl"><strong>14/20 г · Гурт</strong><span>Гурт + РРЦ + Crispy Olives</span></a>
+        <a href="pricing/snEco-price-b2b-dist.pdf" download class="pricing-dl"><strong>B2B · 500 г · Дистр</strong><span>Dist + Гурт</span></a>
+        <a href="pricing/snEco-price-b2b-wholesale.pdf" download class="pricing-dl"><strong>B2B · 500 г · Гурт</strong><span>Тільки Гурт</span></a>
+      </div>
+    </div>
+
+    <!-- Tab 1: Retail 28г -->
+    <h4 style="font-size:13px;font-weight:700;letter-spacing:0.04em;margin:28px 0 12px"><span data-lang="uk">📦 Роздріб · 28 г · 8 SKU</span><span data-lang="en">📦 Retail · 28 g · 8 SKUs</span></h4>
+    <div class="card" style="padding:0;overflow:hidden">
+      <table class="spec-table" style="width:100%">
+        <thead>
+          <tr>
+            <th>EAN-13</th>
+            <th><span data-lang="uk">Сорт</span><span data-lang="en">Variety</span></th>
+            <th style="text-align:right"><span data-lang="uk">Дист</span><span data-lang="en">Dist</span></th>
+            <th style="text-align:right"><span data-lang="uk">Гурт</span><span data-lang="en">Wholesale</span></th>
+            <th style="text-align:right">РРЦ / RRP</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="mono-val">4823095809206</span></td><td>Гауда / Gouda</td><td style="text-align:right">55,98</td><td style="text-align:right">72,72</td><td style="text-align:right;font-weight:700">94,49</td></tr>
+          <tr><td><span class="mono-val">4823095809947</span></td><td>Сулугуні / Suluguni</td><td style="text-align:right">55,98</td><td style="text-align:right">72,72</td><td style="text-align:right;font-weight:700">94,49</td></tr>
+          <tr><td><span class="mono-val">4823095816976</span></td><td>Прімаджіо / Primaggio</td><td style="text-align:right">58,98</td><td style="text-align:right">76,74</td><td style="text-align:right;font-weight:700">99,49</td></tr>
+          <tr><td><span class="mono-val">4823095814347</span></td><td>Чеддер / Cheddar</td><td style="text-align:right">58,98</td><td style="text-align:right">76,74</td><td style="text-align:right;font-weight:700">99,49</td></tr>
+          <tr><td><span class="mono-val">4823095809190</span></td><td>Моцарелла / Mozzarella</td><td style="text-align:right">58,98</td><td style="text-align:right">76,74</td><td style="text-align:right;font-weight:700">99,49</td></tr>
+          <tr><td><span class="mono-val">4823095816983</span></td><td>Емменталь / Emmental</td><td style="text-align:right">58,98</td><td style="text-align:right">76,74</td><td style="text-align:right;font-weight:700">99,49</td></tr>
+          <tr><td><span class="mono-val">4823095814873</span></td><td>Суперфуд / Superfood</td><td style="text-align:right">58,98</td><td style="text-align:right">76,74</td><td style="text-align:right;font-weight:700">99,49</td></tr>
+          <tr><td><span class="mono-val">4823095805932</span></td><td>Космічний / Cosmic kids</td><td style="text-align:right">58,98</td><td style="text-align:right">76,74</td><td style="text-align:right;font-weight:700">99,49</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tab 2: Retail 14/20г -->
+    <h4 style="font-size:13px;font-weight:700;letter-spacing:0.04em;margin:28px 0 12px"><span data-lang="uk">📦 Малий формат · 14 / 20 г · 12 SKU</span><span data-lang="en">📦 Small format · 14 / 20 g · 12 SKUs</span></h4>
+    <div class="card" style="padding:0;overflow:hidden">
+      <table class="spec-table" style="width:100%">
+        <thead>
+          <tr>
+            <th>EAN-13</th>
+            <th><span data-lang="uk">Сорт</span><span data-lang="en">Variety</span></th>
+            <th><span data-lang="uk">Вага</span><span data-lang="en">Weight</span></th>
+            <th style="text-align:right"><span data-lang="uk">Дист</span><span data-lang="en">Dist</span></th>
+            <th style="text-align:right"><span data-lang="uk">Гурт</span><span data-lang="en">Wholesale</span></th>
+            <th style="text-align:right">РРЦ / RRP</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="mono-val">4823095816303</span></td><td>Гауда / Gouda</td><td>14 г</td><td style="text-align:right">35,46</td><td style="text-align:right">46,08</td><td style="text-align:right;font-weight:700">59,99</td></tr>
+          <tr><td><span class="mono-val">4823095816709</span></td><td>Прімаджіо / Primaggio</td><td>14 г</td><td style="text-align:right">35,46</td><td style="text-align:right">46,08</td><td style="text-align:right;font-weight:700">59,99</td></tr>
+          <tr><td><span class="mono-val">4823095816273</span></td><td>Чеддер / Cheddar</td><td>14 г</td><td style="text-align:right">35,46</td><td style="text-align:right">46,08</td><td style="text-align:right;font-weight:700">59,99</td></tr>
+          <tr><td><span class="mono-val">4823095816297</span></td><td>Моцарелла / Mozzarella</td><td>14 г</td><td style="text-align:right">35,46</td><td style="text-align:right">46,08</td><td style="text-align:right;font-weight:700">59,99</td></tr>
+          <tr><td><span class="mono-val">4823095816266</span></td><td>Сулугуні / Suluguni</td><td>14 г</td><td style="text-align:right">35,46</td><td style="text-align:right">46,08</td><td style="text-align:right;font-weight:700">59,99</td></tr>
+          <tr><td><span class="mono-val">4823095817423</span></td><td>Blue Royale</td><td>14 г</td><td style="text-align:right">44,40</td><td style="text-align:right">57,66</td><td style="text-align:right;font-weight:700">74,99</td></tr>
+          <tr><td><span class="mono-val">4823095818253</span></td><td>Оливка хрустка зелена / Crispy Olives</td><td>14 г</td><td style="text-align:right;color:var(--text-muted)">—</td><td style="text-align:right">68,46</td><td style="text-align:right;font-weight:700">89,00</td></tr>
+          <tr><td><span class="mono-val">4823095816716</span></td><td>Прімаджіо + Волоський / Primaggio + Walnut</td><td>20 г</td><td style="text-align:right">35,46</td><td style="text-align:right">46,08</td><td style="text-align:right;font-weight:700">59,99</td></tr>
+          <tr><td><span class="mono-val">4823095816358</span></td><td>Моцарелла + Кеш'ю / Mozzarella + Cashew</td><td>20 г</td><td style="text-align:right">35,46</td><td style="text-align:right">46,08</td><td style="text-align:right;font-weight:700">59,99</td></tr>
+          <tr><td><span class="mono-val">4823095816341</span></td><td>Гауда + Фундук / Gouda + Hazelnut</td><td>20 г</td><td style="text-align:right">35,46</td><td style="text-align:right">46,08</td><td style="text-align:right;font-weight:700">59,99</td></tr>
+          <tr><td><span class="mono-val">4823095816327</span></td><td>Чеддер + Мигдаль / Cheddar + Almond</td><td>20 г</td><td style="text-align:right">35,46</td><td style="text-align:right">46,08</td><td style="text-align:right;font-weight:700">59,99</td></tr>
+          <tr><td><span class="mono-val">4823095816310</span></td><td>Сулугуні + Арахіс / Suluguni + Peanut</td><td>20 г</td><td style="text-align:right">35,46</td><td style="text-align:right">46,08</td><td style="text-align:right;font-weight:700">59,99</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tab 3: B2B 500g -->
+    <h4 style="font-size:13px;font-weight:700;letter-spacing:0.04em;margin:28px 0 12px"><span data-lang="uk">📦 B2B / HoReCa · 500 г · 8 SKU</span><span data-lang="en">📦 B2B / HoReCa · 500 g · 8 SKUs</span></h4>
+    <div class="card" style="padding:0;overflow:hidden">
+      <table class="spec-table" style="width:100%">
+        <thead>
+          <tr>
+            <th>EAN-13</th>
+            <th><span data-lang="uk">Сорт</span><span data-lang="en">Variety</span></th>
+            <th style="text-align:right"><span data-lang="uk">Дист</span><span data-lang="en">Dist</span></th>
+            <th style="text-align:right"><span data-lang="uk">Гурт</span><span data-lang="en">Wholesale</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="mono-val">4823095805147</span></td><td>Гауда / Gouda</td><td style="text-align:right">591,78</td><td style="text-align:right;font-weight:700">768,48</td></tr>
+          <tr><td><span class="mono-val">4823095805123</span></td><td>Сулугуні / Suluguni</td><td style="text-align:right">591,78</td><td style="text-align:right;font-weight:700">768,48</td></tr>
+          <tr><td><span class="mono-val">4823095805154</span></td><td>Моцарелла / Mozzarella</td><td style="text-align:right">651,30</td><td style="text-align:right;font-weight:700">845,82</td></tr>
+          <tr><td><span class="mono-val">4823095817508</span></td><td>Прімаджіо / Primaggio</td><td style="text-align:right">651,30</td><td style="text-align:right;font-weight:700">845,82</td></tr>
+          <tr><td><span class="mono-val">4823095814354</span></td><td>Чеддер / Cheddar</td><td style="text-align:right">651,30</td><td style="text-align:right;font-weight:700">845,82</td></tr>
+          <tr><td><span class="mono-val">4823095817492</span></td><td>Емменталь / Emmental</td><td style="text-align:right">651,30</td><td style="text-align:right;font-weight:700">845,82</td></tr>
+          <tr><td><span class="mono-val">4823095814880</span></td><td>Суперфуд / Superfood</td><td style="text-align:right">651,30</td><td style="text-align:right;font-weight:700">845,82</td></tr>
+          <tr><td><span class="mono-val">4823095818000</span></td><td>Blue Royale</td><td style="text-align:right">1 076,46</td><td style="text-align:right;font-weight:700">1 398,00</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:18px;padding:12px 14px;background:var(--black-05);border-radius:6px;font-size:11px;color:var(--text-muted);line-height:1.55">
+      <span data-lang="uk">Усі ціни — у гривнях, з ПДВ. Строк придатності: 18 міс (чисті сири), 8 міс (мікси з горіхами та B2B 500 г), 12 міс (оливка). Зберігання: 0–30 °C. Прайс затверджено: Гришин Пилип Валерійович, Директор ТОВ «Прайм Снек». Версія від 02.03.2026.</span>
+      <span data-lang="en">All prices in UAH, VAT included. Shelf life: 18 months (pure cheese), 8 months (nut mixes &amp; B2B 500 g), 12 months (olive). Storage: 0–30 °C. Approved by Pylyp Gryshyn, Director, Prime Snack LLC. Version of Mar 2, 2026.</span>
+    </div>
+
+    <div style="text-align:right;margin-top:18px">
+      <button onclick="lockPricing()" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:7px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-family:var(--font-body)">🔒 <span data-lang="uk">Заблокувати знову</span><span data-lang="en">Lock again</span></button>
+    </div>
+  </div>
+
+  <script>
+  // Soft password gate (base64-obfuscated). To change password: open console and run btoa("новий_пароль"), replace string below.
+  // Поточний пароль: sneco2026
+  (function(){
+    var KEY = atob("c25lY28yMDI2");
+    window.unlockPricing = function() {
+      var input = document.getElementById('pricing-pwd').value;
+      if (input === KEY) {
+        document.getElementById('pricing-locked').style.display = 'none';
+        document.getElementById('pricing-content').style.display = 'block';
+        try { localStorage.setItem('sneco-pricing-unlocked','1'); } catch(e){}
+      } else {
+        var err = document.getElementById('pricing-error');
+        err.style.display = 'block';
+        setTimeout(function(){ err.style.display = 'none'; }, 3000);
+      }
+    };
+    window.lockPricing = function() {
+      document.getElementById('pricing-locked').style.display = 'block';
+      document.getElementById('pricing-content').style.display = 'none';
+      try { localStorage.removeItem('sneco-pricing-unlocked'); } catch(e){}
+      window.scrollTo({ top: document.getElementById('pricing-locked').offsetTop - 100, behavior: 'smooth' });
+    };
+    // Auto-unlock if previously authenticated
+    document.addEventListener('DOMContentLoaded', function(){
+      try {
+        if (localStorage.getItem('sneco-pricing-unlocked') === '1') {
+          var locked = document.getElementById('pricing-locked');
+          var content = document.getElementById('pricing-content');
+          if (locked && content) {
+            locked.style.display = 'none';
+            content.style.display = 'block';
+          }
+        }
+      } catch(e){}
+    });
+  })();
+  </script>
+
   <h3 class="block-title"><span data-lang="uk">Що sales-команда може запропонувати «з коробки»</span><span data-lang="en">What sales can offer out of the box</span></h3>
   <div class="grid-2">
     <div class="card card-sm">
@@ -4124,7 +4323,21 @@ h3.block-title:first-of-type { margin-top: 0; }
 
   <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span></h3>
   <div class="changelog-entry">
-    <span class="changelog-version">v2.12</span><span class="changelog-date">04.05.2026</span>
+    <span class="changelog-version">v2.13</span><span class="changelog-date">04.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>Sales playbook · Прайс-листи (UA · 02.03.2026)</strong> — новий блок із password-gate. 3 повні таблиці: 28 г (8 SKU), 14/20 г (12 SKU), B2B 500 г (8 SKU). Усі EAN коди + Дист / Гурт / РРЦ.</li>
+      <li data-lang="en"><strong>Sales playbook · Price lists (UA · Mar 2, 2026)</strong> — new block behind a password gate. Three full tables: 28 g (8 SKUs), 14/20 g (12 SKUs), B2B 500 g (8 SKUs). All EAN codes + Dist / Wholesale / RRP.</li>
+      <li data-lang="uk">Прямі завантаження 6 PDF (3 формати × 2 канали Дист/Гурт). Усі файли в <code>pricing/</code>, оригінали від директора Прайм Снек.</li>
+      <li data-lang="en">Direct download of 6 PDFs (3 formats × 2 channels Dist/Wholesale). All files in <code>pricing/</code>, originals signed by Prime Snack director.</li>
+      <li data-lang="uk">Soft password-gate на JS (base64-обфускація + localStorage). Поточний пароль: <strong>sneco2026</strong>. Зміна: відкрити консоль, обчислити <code>btoa("новий")</code>, замінити рядок у скрипті.</li>
+      <li data-lang="en">Soft JS password gate (base64 obfuscation + localStorage). Current password: <strong>sneco2026</strong>. To change: open console, run <code>btoa("new")</code>, replace the string in the script.</li>
+      <li data-lang="uk">Прибрано блок «Кольори сортів (variety system)» — фантазійні HEX без узгодження з друкарськими PANTONE. Якщо знадобиться у v3 — додамо з реальними значеннями з паків.</li>
+      <li data-lang="en">Removed the "Variety color system" block — fictional HEX values without alignment to actual print PANTONE. If needed in v3, we'll add real values from packs.</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.12</span><span class="changelog-date">04.05.2026</span>
     <ul class="changelog-list">
       <li data-lang="uk"><strong>Sales playbook · Shelf positioning переписано</strong> з 3 спрощених карток → повна матриця з трьома рівнями: <strong>Primary</strong> (Snacks / Savoury Snacks), 9 <strong>Secondary placements</strong> (premium snacks, nuts, protein/fitness, wine snacks, beer snacks, healthy snacks, impulse/checkout, petrol, HoReCa) і блок <strong>NOT target</strong> (молочна полиця, refrigerated cheese, traditional cheese).</li>
       <li data-lang="en"><strong>Sales playbook · Shelf positioning rewritten</strong> from 3 simplified cards → full three-tier matrix: <strong>Primary</strong> (Snacks / Savoury Snacks), 9 <strong>Secondary placements</strong> (premium snacks, nuts, protein/fitness, wine, beer, healthy, impulse/checkout, petrol, HoReCa), and a <strong>NOT target</strong> block (dairy shelf, refrigerated cheese, traditional cheese).</li>
