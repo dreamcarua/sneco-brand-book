@@ -770,6 +770,102 @@ h3.block-title:first-of-type { margin-top: 0; }
   .arch-entities { grid-template-columns: 1fr; }
 }
 
+/* ORG CHART (TEAM section, v2.9) */
+.org-controls {
+  display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  padding: 14px 18px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  margin-bottom: 24px;
+}
+.org-mode-badge {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; padding: 4px 10px; border-radius: 12px;
+  background: var(--black-05); color: var(--text-muted);
+}
+.org-mode-badge.is-edit { background: var(--yellow); color: var(--black); }
+.org-btn {
+  font-family: inherit; font-size: 12px; font-weight: 600;
+  padding: 8px 14px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  transition: background 0.15s ease;
+}
+.org-btn:hover { background: var(--black-05); }
+.org-btn.primary { background: var(--black); color: var(--white); border-color: var(--black); }
+.org-btn.primary:hover { background: #000; }
+.org-note {
+  font-size: 11px; color: var(--text-muted);
+  line-height: 1.4; margin-left: auto; max-width: 380px;
+}
+.org-tree {
+  display: flex; flex-direction: column; gap: 32px;
+  padding: 32px 16px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  overflow-x: auto;
+}
+.org-row {
+  display: flex; gap: 16px; justify-content: center; align-items: stretch;
+  flex-wrap: wrap;
+}
+.org-row.row-departments { gap: 24px; align-items: flex-start; }
+.org-column {
+  display: flex; flex-direction: column; gap: 12px; min-width: 200px; flex: 1;
+  position: relative; max-width: 260px;
+}
+.org-column::before {
+  content: ''; position: absolute; top: -32px; left: 50%;
+  width: 1.5px; height: 32px; background: var(--border);
+  transform: translateX(-50%);
+}
+.org-row.row-coo::before {
+  content: ''; display: block; width: 1.5px; height: 32px; background: var(--border);
+  position: absolute; transform: translateY(-32px);
+}
+.org-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-left: 4px solid var(--green);
+  border-radius: 8px;
+  padding: 12px 14px;
+  min-width: 180px;
+  position: relative;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.org-card.is-coo { border-left-color: var(--black); border-width: 2px; background: var(--yellow); }
+.org-card.is-founder { border-left-color: var(--yellow); }
+.org-card.is-vacant { border-left-color: #dc2626; background: rgba(220,38,38,0.04); border-style: dashed; }
+.org-card.is-outsource { border-left-color: var(--text-muted); background: var(--black-05); }
+.org-card.is-cross { border-left-color: var(--black); background: rgba(150,193,31,0.10); }
+.org-role {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;
+}
+.org-name {
+  font-size: 14px; font-weight: 700; color: var(--black); line-height: 1.3;
+}
+.org-meta {
+  font-size: 11px; color: var(--text-muted); line-height: 1.4; margin-top: 4px;
+}
+[contenteditable="true"] { outline: none; cursor: text; }
+.org-card.is-editable [contenteditable="true"] {
+  background: rgba(254,191,39,0.18); padding: 1px 4px; border-radius: 3px;
+  border-bottom: 1px dashed rgba(30,30,30,0.25);
+}
+.org-card.is-editable [contenteditable="true"]:focus {
+  background: var(--yellow); outline: 2px solid var(--black);
+}
+.org-vadim-warning {
+  margin-top: 24px; padding: 16px 20px; border-radius: 8px;
+  background: rgba(254,191,39,0.10); border: 1px solid var(--yellow);
+  font-size: 13px; line-height: 1.55;
+}
+.org-vadim-warning strong { color: var(--black); }
+@media (max-width: 800px) {
+  .org-row.row-departments { flex-direction: column; }
+  .org-column { min-width: 100%; max-width: 100%; }
+  .org-column::before { display: none; }
+  .org-note { max-width: 100%; margin-left: 0; }
+}
+
 /* PRINT */
 @media print {
   body { background: var(--white); }
@@ -813,6 +909,10 @@ h3.block-title:first-of-type { margin-top: 0; }
     <button class="nav-link" data-target="intro" type="button">
       <span class="dot"></span>
       <span data-lang="uk">Про бренд</span><span data-lang="en">About</span>
+    </button>
+    <button class="nav-link" data-target="team" type="button">
+      <span class="dot"></span>
+      <span data-lang="uk">Команда &amp; орг-структура</span><span data-lang="en">Team &amp; org structure</span>
     </button>
     <button class="nav-link" data-target="story" type="button">
       <span class="dot"></span>
@@ -895,7 +995,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Bible v2.8 · 2026
+    Brand Bible v2.9 · 2026
   </div>
 </nav>
 
@@ -908,7 +1008,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <span data-lang="uk">Один інгредієнт. <span class="qr-ns-accent">Жодних компромісів.</span> Сирний снек XXI століття.</span>
     <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
   </div>
-  <div class="qr-meta">v2.8 · 2026</div>
+  <div class="qr-meta">v2.9 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -1195,6 +1295,173 @@ h3.block-title:first-of-type { margin-top: 0; }
       <span data-lang="uk">У snEco — власна запатентована технологія VacWave Bio Nutrition (патент №139035). У комунікації акцент завжди на власній інновації. Не використовуйте «NASA-технологія» як визначення продукту — це некоректно і підважує власне IP.</span>
       <span data-lang="en">snEco uses its own patented VacWave Bio Nutrition technology (patent No. 139035). Communications must always lead with this proprietary innovation. Do not describe the product as "NASA technology" — it's inaccurate and undermines our own IP.</span>
     </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TEAM & ORG STRUCTURE (added in v2.9)
+     ============================================================ -->
+<section class="section" id="sec-team" style="padding:56px 64px">
+  <div class="section-eyebrow"><span data-lang="uk">Команда</span><span data-lang="en">Team</span></div>
+  <h2 class="section-title"><span data-lang="uk">Команда &amp; орг-структура</span><span data-lang="en">Team &amp; org structure</span></h2>
+  <div class="section-lead">
+    <span data-lang="uk">Хто за що відповідає в snEco UA. Інтерактивна структура: можна редагувати імена, ролі та функції — зміни зберігаються у вашому браузері. Для постійного оновлення документа — натисніть «Експорт JSON» і надішліть Вадиму.</span>
+    <span data-lang="en">Who owns what at snEco UA. Interactive structure — names, roles and functions are editable; changes are saved in your browser. For permanent updates, click "Export JSON" and send the snapshot to Vadym.</span>
+  </div>
+
+  <h3 class="block-title">🏢 <span data-lang="uk">Орг-структура snEco UA</span><span data-lang="en">snEco UA org structure</span></h3>
+
+  <div class="org-controls">
+    <span class="org-mode-badge" id="org-mode-badge"><span data-lang="uk">Режим: перегляд</span><span data-lang="en">Mode: view</span></span>
+    <button class="org-btn primary" id="org-mode-toggle"><span data-lang="uk">Увімкнути редагування</span><span data-lang="en">Enable editing</span></button>
+    <button class="org-btn" id="org-reset"><span data-lang="uk">Скинути до канонічної версії</span><span data-lang="en">Reset to canonical</span></button>
+    <button class="org-btn" id="org-export"><span data-lang="uk">Експорт JSON</span><span data-lang="en">Export JSON</span></button>
+    <span class="org-note">
+      <span data-lang="uk">⚠ Зміни — лише локально (browser localStorage). Для оновлення документа надішліть JSON Вадиму на vg@sneco.ua.</span>
+      <span data-lang="en">⚠ Edits live in your browser only (localStorage). Send the JSON to vg@sneco.ua to update the document permanently.</span>
+    </span>
+  </div>
+
+  <div class="org-tree" id="org-tree">
+    <div class="org-row row-founders">
+      <div class="org-card is-founder" data-node="founder-1">
+        <div class="org-role" data-field="role">Засновник · Founder</div>
+        <div class="org-name" data-field="name">Пилип Гришин</div>
+        <div class="org-meta" data-field="meta">Виробництво · фінанси · операційка</div>
+      </div>
+      <div class="org-card is-founder" data-node="founder-2">
+        <div class="org-role" data-field="role">Засновник · Founder</div>
+        <div class="org-name" data-field="name">Вадим Гришин</div>
+        <div class="org-meta" data-field="meta">Стратегія · маркетинг · продажі · партнерства</div>
+      </div>
+    </div>
+
+    <div class="org-row row-coo">
+      <div class="org-card is-coo" data-node="coo">
+        <div class="org-role" data-field="role">Операційний директор · COO</div>
+        <div class="org-name" data-field="name">Богдан</div>
+        <div class="org-meta" data-field="meta">Координація всіх відділів</div>
+      </div>
+    </div>
+
+    <div class="org-row row-departments">
+      <div class="org-column">
+        <div class="org-card" data-node="dept-prod">
+          <div class="org-role" data-field="role">Виробництво · Production</div>
+          <div class="org-name" data-field="name">Валерія</div>
+        </div>
+        <div class="org-card" data-node="prod-1">
+          <div class="org-role" data-field="role">Цех · Workshop</div>
+          <div class="org-name" data-field="name">Цех порізки</div>
+        </div>
+        <div class="org-card" data-node="prod-2">
+          <div class="org-role" data-field="role">Цех · Workshop</div>
+          <div class="org-name" data-field="name">Цех сушки</div>
+        </div>
+        <div class="org-card" data-node="prod-3">
+          <div class="org-role" data-field="role">Цех · Workshop</div>
+          <div class="org-name" data-field="name">Цех пакування</div>
+        </div>
+        <div class="org-card" data-node="prod-4">
+          <div class="org-role" data-field="role">Підрозділ · Unit</div>
+          <div class="org-name" data-field="name">Ремонт та обслуговування</div>
+        </div>
+      </div>
+
+      <div class="org-column">
+        <div class="org-card" data-node="dept-ops">
+          <div class="org-role" data-field="role">Operations · під Богданом</div>
+          <div class="org-name" data-field="name">Бек-офіс</div>
+        </div>
+        <div class="org-card" data-node="ops-1">
+          <div class="org-role" data-field="role">Фінанси · Finance</div>
+          <div class="org-name" data-field="name">Пилип Гришин</div>
+        </div>
+        <div class="org-card" data-node="ops-2">
+          <div class="org-role" data-field="role">Закупки · логістика</div>
+          <div class="org-name" data-field="name">—</div>
+        </div>
+        <div class="org-card" data-node="ops-3">
+          <div class="org-role" data-field="role">Склад · Warehouse</div>
+          <div class="org-name" data-field="name">—</div>
+        </div>
+        <div class="org-card is-outsource" data-node="ops-4">
+          <div class="org-role" data-field="role">Бухгалтерія · Accounting</div>
+          <div class="org-name" data-field="name">Аутсорс</div>
+        </div>
+      </div>
+
+      <div class="org-column">
+        <div class="org-card" data-node="dept-mkt">
+          <div class="org-role" data-field="role">Маркетинг · Marketing</div>
+          <div class="org-name" data-field="name">Вадим</div>
+        </div>
+        <div class="org-card" data-node="mkt-online">
+          <div class="org-role" data-field="role">Онлайн · Online</div>
+          <div class="org-name" data-field="name">Вадим</div>
+        </div>
+        <div class="org-card is-vacant" data-node="mkt-smm">
+          <div class="org-role" data-field="role">SMM</div>
+          <div class="org-name" data-field="name">Вакансія</div>
+        </div>
+        <div class="org-card" data-node="mkt-offline">
+          <div class="org-role" data-field="role">Офлайн · Offline</div>
+          <div class="org-name" data-field="name">Вадим</div>
+        </div>
+        <div class="org-card is-cross" data-node="mkt-rd">
+          <div class="org-role" data-field="role">R&amp;D · крос-функція</div>
+          <div class="org-name" data-field="name">—</div>
+          <div class="org-meta" data-field="meta">Маркетинг + Виробництво</div>
+        </div>
+      </div>
+
+      <div class="org-column">
+        <div class="org-card" data-node="dept-sales">
+          <div class="org-role" data-field="role">Продажі · Sales</div>
+          <div class="org-name" data-field="name">Вадим</div>
+        </div>
+        <div class="org-card" data-node="sales-1">
+          <div class="org-role" data-field="role">Мережі України · UA chains</div>
+          <div class="org-name" data-field="name">Ярослав</div>
+        </div>
+        <div class="org-card" data-node="sales-2">
+          <div class="org-role" data-field="role">Решта України · Rest of UA</div>
+          <div class="org-name" data-field="name">Валентина</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="org-vadim-warning">
+    <span data-lang="uk"><strong>⚠️ Спостереження.</strong> Вадим зараз закріплений за <strong>5 ролями</strong> (Засновник, Маркетинг, Онлайн, Офлайн, Продажі). Це найочевидніший вектор делегування. Ключові вакансії на 2026: <strong>Head of Marketing</strong> або хоча б Marketing Manager + <strong>SMM Manager</strong> (вже відсутній); у середньостроковій перспективі — <strong>Head of Sales</strong> для UA. Це звільнить Вадима для стратегії, експорту і ключових партнерств.</span>
+    <span data-lang="en"><strong>⚠️ Observation.</strong> Vadym currently wears <strong>5 hats</strong> (Founder, Marketing, Online, Offline, Sales). This is the most obvious delegation vector. Key 2026 hires: <strong>Head of Marketing</strong> or at least a Marketing Manager + <strong>SMM Manager</strong> (currently vacant); medium-term — <strong>Head of Sales</strong> for UA. This frees Vadym for strategy, export and key partnerships.</span>
+  </div>
+
+  <h3 class="block-title" style="margin-top:48px">🇸🇰 <span data-lang="uk">Sneco SK (Словаччина)</span><span data-lang="en">Sneco SK (Slovakia)</span></h3>
+  <div class="card">
+    <div style="font-size:13px;line-height:1.7;color:var(--text-muted)">
+      <span data-lang="uk">Sneco SK s.r.o. — окрема юридична особа з власною структурою власності: <strong>Andrela 37.5%</strong>, Pylyp Gryshyn 25%, Vadym Gryshyn 25%, Levko 12.5%. Завод — Гуменне (Myslina). Операційне керівництво — спільно з UA-командою; виробничі ролі формуються по мірі росту замовлень NVC GmbH (DE / UK / FR / AT / CH).</span>
+      <span data-lang="en">Sneco SK s.r.o. is a separate legal entity with its own ownership: <strong>Andrela 37.5%</strong>, Pylyp Gryshyn 25%, Vadym Gryshyn 25%, Levko 12.5%. Plant: Humenné (Myslina). Operational leadership is shared with the UA team; production roles are scaling with NVC GmbH order growth (DE / UK / FR / AT / CH).</span>
+    </div>
+  </div>
+
+  <h3 class="block-title" style="margin-top:48px">📞 <span data-lang="uk">Ключові контакти</span><span data-lang="en">Key contacts</span></h3>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table class="spec-table">
+      <thead><tr>
+        <th><span data-lang="uk">Питання</span><span data-lang="en">Topic</span></th>
+        <th><span data-lang="uk">Хто</span><span data-lang="en">Owner</span></th>
+        <th><span data-lang="uk">Контакт</span><span data-lang="en">Contact</span></th>
+      </tr></thead>
+      <tbody>
+        <tr><td><span data-lang="uk">Стратегія, партнерства, експорт, преса</span><span data-lang="en">Strategy, partnerships, export, press</span></td><td>Vadym Gryshyn</td><td><a href="mailto:vg@sneco.ua">vg@sneco.ua</a></td></tr>
+        <tr><td><span data-lang="uk">Виробництво, фінанси, операційка</span><span data-lang="en">Production, finance, operations</span></td><td>Pylyp Gryshyn</td><td><span data-lang="uk">через CRM</span><span data-lang="en">via CRM</span></td></tr>
+        <tr><td><span data-lang="uk">Координація відділів, операційні питання</span><span data-lang="en">Department coordination, operations</span></td><td>Богдан (COO)</td><td><span data-lang="uk">через CRM</span><span data-lang="en">via CRM</span></td></tr>
+        <tr><td><span data-lang="uk">Виробничі питання, цехи</span><span data-lang="en">Production matters, workshops</span></td><td>Валерія</td><td><span data-lang="uk">через CRM</span><span data-lang="en">via CRM</span></td></tr>
+        <tr><td><span data-lang="uk">Ритейл-мережі України (KAM)</span><span data-lang="en">UA retail chains (KAM)</span></td><td>Ярослав</td><td><span data-lang="uk">через CRM</span><span data-lang="en">via CRM</span></td></tr>
+        <tr><td><span data-lang="uk">Решта України (продажі)</span><span data-lang="en">Rest of UA (sales)</span></td><td>Валентина</td><td><span data-lang="uk">через CRM</span><span data-lang="en">via CRM</span></td></tr>
+      </tbody>
+    </table>
   </div>
 </section>
 
@@ -3650,7 +3917,23 @@ h3.block-title:first-of-type { margin-top: 0; }
 
   <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span></h3>
   <div class="changelog-entry">
-    <span class="changelog-version">v2.8</span><span class="changelog-date">29.04.2026</span>
+    <span class="changelog-version">v2.9</span><span class="changelog-date">29.04.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>Нова секція «Команда &amp; орг-структура»</strong> у блоці «Вступ» — між «Про бренд» і «Історія».</li>
+      <li data-lang="en"><strong>New "Team &amp; org structure" section</strong> in the "Intro" group, between "About" and "Story".</li>
+      <li data-lang="uk">Інтерактивна орг-схема snEco UA з 4 колонками (Виробництво / Operations / Маркетинг / Продажі) і 19 вузлами. Колірне кодування: жовтий — фундатори/COO, зелений — звичайні позиції, червоний пунктир — вакансії, сірий — аутсорс, темний з зеленим тлом — крос-функційне.</li>
+      <li data-lang="en">Interactive snEco UA org chart with 4 columns (Production / Operations / Marketing / Sales) and 19 nodes. Color-coded: yellow — founders/COO, green — standard, red dashed — vacancies, gray — outsourced, dark with green tint — cross-functional.</li>
+      <li data-lang="uk"><strong>Можна редагувати імена і ролі прямо в браузері</strong> (контролі: Перегляд / Редагування, Скинути, Експорт JSON). Зміни зберігаються в localStorage; для постійних правок — експорт JSON і надсилання Вадиму.</li>
+      <li data-lang="en"><strong>Edit names and roles inline in the browser</strong> (controls: View / Edit, Reset, Export JSON). Changes saved in localStorage; for permanent updates, export JSON and send to Vadym.</li>
+      <li data-lang="uk">Додано блок-спостереження: Вадим зараз закріплений за 5 ролями — найочевидніший вектор делегування. Підсвічено вакансію SMM.</li>
+      <li data-lang="en">Added an observation block: Vadym currently wears 5 hats — the most obvious delegation vector. SMM vacancy highlighted.</li>
+      <li data-lang="uk">Окремі блоки: <strong>Sneco SK</strong> (структура власності) і <strong>Ключові контакти</strong> (за функціями).</li>
+      <li data-lang="en">Separate blocks: <strong>Sneco SK</strong> (ownership) and <strong>Key contacts</strong> (by function).</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.8</span><span class="changelog-date">29.04.2026</span>
     <ul class="changelog-list">
       <li data-lang="uk"><strong>Структурне «схлопування» 24 → 17 розділів.</strong> Видалено надлишкову фрагментацію, документ став компактнішим без втрати змісту.</li>
       <li data-lang="en"><strong>Structural consolidation: 24 → 17 sections.</strong> Eliminated overlap and made the document more compact without losing content.</li>
@@ -3897,6 +4180,102 @@ h3.block-title:first-of-type { margin-top: 0; }
   const burger = document.getElementById('burger');
   const sidebar = document.getElementById('sidebar');
   if (burger) burger.addEventListener('click', () => sidebar.classList.toggle('open'));
+
+  // === ORG CHART INTERACTIVE (v2.9) ===
+  const orgTree = document.getElementById('org-tree');
+  if (orgTree) {
+    const STORAGE_KEY = 'sneco-org-chart-v1';
+    const fields = orgTree.querySelectorAll('[data-field]');
+    const cards = orgTree.querySelectorAll('.org-card');
+    // 1. Capture canonical defaults from initial DOM
+    const defaults = {};
+    fields.forEach(el => {
+      const node = el.closest('.org-card').dataset.node;
+      const field = el.dataset.field;
+      defaults[node + '__' + field] = el.textContent.trim();
+    });
+    // 2. Hydrate from localStorage
+    function hydrate() {
+      let saved = {};
+      try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e) {}
+      fields.forEach(el => {
+        const node = el.closest('.org-card').dataset.node;
+        const field = el.dataset.field;
+        const key = node + '__' + field;
+        if (saved[key] != null) el.textContent = saved[key];
+      });
+    }
+    hydrate();
+    // 3. Save changes on input
+    function save() {
+      const snapshot = {};
+      fields.forEach(el => {
+        const node = el.closest('.org-card').dataset.node;
+        const field = el.dataset.field;
+        const key = node + '__' + field;
+        const val = el.textContent.trim();
+        if (val !== defaults[key]) snapshot[key] = val;
+      });
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot)); } catch(e) {}
+    }
+    fields.forEach(el => el.addEventListener('input', save));
+    // 4. Mode toggle
+    const modeBtn = document.getElementById('org-mode-toggle');
+    const modeBadge = document.getElementById('org-mode-badge');
+    let editing = false;
+    function setMode(on) {
+      editing = on;
+      cards.forEach(c => c.classList.toggle('is-editable', on));
+      fields.forEach(el => el.setAttribute('contenteditable', on ? 'true' : 'false'));
+      modeBadge.classList.toggle('is-edit', on);
+      modeBadge.innerHTML = on
+        ? '<span data-lang="uk">Режим: редагування</span><span data-lang="en">Mode: editing</span>'
+        : '<span data-lang="uk">Режим: перегляд</span><span data-lang="en">Mode: view</span>';
+      modeBtn.innerHTML = on
+        ? '<span data-lang="uk">Завершити редагування</span><span data-lang="en">Finish editing</span>'
+        : '<span data-lang="uk">Увімкнути редагування</span><span data-lang="en">Enable editing</span>';
+      // Re-apply lang switcher to the newly inserted spans
+      const currentLang = document.body.classList.contains('lang-en') ? 'en' : 'uk';
+      [modeBadge, modeBtn].forEach(el => {
+        el.querySelectorAll('[data-lang]').forEach(s => {
+          s.style.display = (s.dataset.lang === currentLang) ? '' : 'none';
+        });
+      });
+    }
+    setMode(false);
+    modeBtn.addEventListener('click', () => setMode(!editing));
+    // 5. Reset
+    document.getElementById('org-reset').addEventListener('click', () => {
+      if (!confirm('Скинути всі правки до канонічної версії?')) return;
+      try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+      fields.forEach(el => {
+        const node = el.closest('.org-card').dataset.node;
+        const field = el.dataset.field;
+        el.textContent = defaults[node + '__' + field];
+      });
+    });
+    // 6. Export JSON
+    document.getElementById('org-export').addEventListener('click', () => {
+      const out = { snapshot_date: new Date().toISOString(), nodes: {} };
+      cards.forEach(card => {
+        const node = card.dataset.node;
+        out.nodes[node] = {};
+        card.querySelectorAll('[data-field]').forEach(el => {
+          out.nodes[node][el.dataset.field] = el.textContent.trim();
+        });
+      });
+      const json = JSON.stringify(out, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'sneco-org-snapshot-' + new Date().toISOString().slice(0,10) + '.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  }
 })();
 </script>
 </body>
