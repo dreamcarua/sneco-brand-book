@@ -2731,7 +2731,23 @@ h3.block-title:first-of-type { margin-top: 0; }
   </div>
 
   <h3 class="block-title"><span data-lang="uk">Формати SKU</span><span data-lang="en">SKU formats</span></h3>
-  <div class="grid-3">
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px">
+    <!-- Compact retail 14/20g -->
+    <div class="packaging-card">
+      <div class="pkg-visual" style="background:linear-gradient(135deg,#FEBF27 0%,#E89B2A 100%)">⛽</div>
+      <div>
+        <div class="pkg-name"><span data-lang="uk">Compact retail</span><span data-lang="en">Compact retail</span></div>
+        <div class="pkg-sku"><span data-lang="uk">Малі магазини · АЗС · прикасова</span><span data-lang="en">Small stores · petrol · checkout</span></div>
+      </div>
+      <div class="pkg-info">
+        <div class="pkg-row"><span class="pkg-row-label"><span data-lang="uk">Вага</span><span data-lang="en">Weight</span></span><span class="pkg-row-val">14 / 20 г</span></div>
+        <div class="pkg-row"><span class="pkg-row-label"><span data-lang="uk">Формат</span><span data-lang="en">Format</span></span><span class="pkg-row-val">90×160 mm</span></div>
+        <div class="pkg-row"><span class="pkg-row-label">SKU</span><span class="pkg-row-val">12</span></div>
+        <div class="pkg-row"><span class="pkg-row-label"><span data-lang="uk">Канал</span><span data-lang="en">Channel</span></span><span class="pkg-row-val"><span data-lang="uk">Імпульсна</span><span data-lang="en">Impulse</span></span></div>
+      </div>
+    </div>
+
+    <!-- Retail Showbox 28g -->
     <div class="packaging-card">
       <div class="pkg-visual" style="background:var(--black)">📦</div>
       <div>
@@ -2739,12 +2755,14 @@ h3.block-title:first-of-type { margin-top: 0; }
         <div class="pkg-sku"><span data-lang="uk">Основний роздрібний формат</span><span data-lang="en">Main retail format</span></div>
       </div>
       <div class="pkg-info">
-        <div class="pkg-row"><span class="pkg-row-label"><span data-lang="uk">Вага</span><span data-lang="en">Weight</span></span><span class="pkg-row-val">28g</span></div>
+        <div class="pkg-row"><span class="pkg-row-label"><span data-lang="uk">Вага</span><span data-lang="en">Weight</span></span><span class="pkg-row-val">28 г</span></div>
         <div class="pkg-row"><span class="pkg-row-label"><span data-lang="uk">К-сть в коробці</span><span data-lang="en">Units / box</span></span><span class="pkg-row-val">15</span></div>
         <div class="pkg-row"><span class="pkg-row-label"><span data-lang="uk">Варіанти</span><span data-lang="en">Varieties</span></span><span class="pkg-row-val">10</span></div>
         <div class="pkg-row"><span class="pkg-row-label"><span data-lang="uk">Мови</span><span data-lang="en">Languages</span></span><span class="pkg-row-val">9</span></div>
       </div>
     </div>
+
+    <!-- HoReCa Bulk 500g -->
     <div class="packaging-card">
       <div class="pkg-visual" style="background:var(--yellow)">🏪</div>
       <div>
@@ -2752,11 +2770,13 @@ h3.block-title:first-of-type { margin-top: 0; }
         <div class="pkg-sku"><span data-lang="uk">Для HoReCa та B2B</span><span data-lang="en">For HoReCa &amp; B2B</span></div>
       </div>
       <div class="pkg-info">
-        <div class="pkg-row"><span class="pkg-row-label"><span data-lang="uk">Вага</span><span data-lang="en">Weight</span></span><span class="pkg-row-val">500g</span></div>
+        <div class="pkg-row"><span class="pkg-row-label"><span data-lang="uk">Вага</span><span data-lang="en">Weight</span></span><span class="pkg-row-val">500 г</span></div>
         <div class="pkg-row"><span class="pkg-row-label"><span data-lang="uk">Формат</span><span data-lang="en">Format</span></span><span class="pkg-row-val"><span data-lang="uk">Zip-пакет</span><span data-lang="en">Zip pouch</span></span></div>
         <div class="pkg-row"><span class="pkg-row-label"><span data-lang="uk">Маркування</span><span data-lang="en">Labeling</span></span><span class="pkg-row-val">B2B label</span></div>
       </div>
     </div>
+
+    <!-- Tasting sets -->
     <div class="packaging-card">
       <div class="pkg-visual" style="background:var(--green)">🎁</div>
       <div>
@@ -2770,6 +2790,28 @@ h3.block-title:first-of-type { margin-top: 0; }
         <div class="pkg-row"><span class="pkg-row-label">MIX</span><span class="pkg-row-val"><span data-lang="uk">Мікс</span><span data-lang="en">Mix</span></span></div>
       </div>
     </div>
+
+    <!-- Private Label / Custom -->
+    <div class="packaging-card" style="border:1px dashed rgba(254,191,39,0.6);background:linear-gradient(180deg,rgba(254,191,39,0.04) 0%,transparent 100%)">
+      <div class="pkg-visual" style="background:linear-gradient(135deg,#1E1E1E 0%,#FEBF27 100%);color:#fff">🏷</div>
+      <div>
+        <div class="pkg-name">Private Label</div>
+        <div class="pkg-sku"><span data-lang="uk">Кастомний бренд / OEM</span><span data-lang="en">Customer brand / OEM</span></div>
+      </div>
+      <div class="pkg-info">
+        <div class="pkg-row"><span class="pkg-row-label"><span data-lang="uk">База</span><span data-lang="en">Base product</span></span><span class="pkg-row-val"><span data-lang="uk">Уся лінійка</span><span data-lang="en">Full range</span></span></div>
+        <div class="pkg-row"><span class="pkg-row-label"><span data-lang="uk">Бренд</span><span data-lang="en">Brand</span></span><span class="pkg-row-val"><span data-lang="uk">Партнера</span><span data-lang="en">Partner's</span></span></div>
+        <div class="pkg-row"><span class="pkg-row-label"><span data-lang="uk">Дизайн / мови</span><span data-lang="en">Design / languages</span></span><span class="pkg-row-val">Custom</span></div>
+        <div class="pkg-row"><span class="pkg-row-label">MOQ</span><span class="pkg-row-val"><span data-lang="uk">За домовленістю</span><span data-lang="en">By agreement</span></span></div>
+        <div class="pkg-row"><span class="pkg-row-label">Lead time</span><span class="pkg-row-val">6–8 <span data-lang="uk">тижнів</span><span data-lang="en">weeks</span></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:14px;padding:12px 16px;background:var(--yellow-10);border-radius:8px;font-size:12px;line-height:1.6">
+    <strong>🏷 Private Label · <span data-lang="uk">що ми можемо</span><span data-lang="en">what we can do</span></strong><br>
+    <span data-lang="uk">Партнер бере наш базовий продукт (одну з 28 SKU) і отримує його у власному пакуванні: бренд, рецептура мікс / новий смак, вибрані мови, кастомні розміри пачки, особливі вимоги до сертифікації. Ми лишаємось виробником і утримуємо технологію — ви отримуєте продукт під своєю маркою. Запит: <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>.</span>
+    <span data-lang="en">The partner takes our base product (one of 28 SKUs) and receives it in their own packaging: their brand, custom mix / new flavor, selected languages, bespoke pack sizes, specific certification requirements. We remain the producer and own the technology — you ship under your brand. Inquiry: <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>.</span>
   </div>
 
   <div class="accent-section" style="margin-top:32px">
@@ -4675,7 +4717,21 @@ h3.block-title:first-of-type { margin-top: 0; }
 
   <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span></h3>
   <div class="changelog-entry">
-    <span class="changelog-version">v2.16</span><span class="changelog-date">04.05.2026</span>
+    <span class="changelog-version">v2.17</span><span class="changelog-date">04.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>SKU-формати: 3 → 5 карток.</strong> Додано <strong>Compact retail (14/20 г, 90×160 мм, 12 SKU)</strong> для малих магазинів, АЗС і прикасової зони — окремий формат, не плутати з 28г Showbox.</li>
+      <li data-lang="en"><strong>SKU formats: 3 → 5 cards.</strong> Added <strong>Compact retail (14/20 g, 90×160 mm, 12 SKUs)</strong> for small stores, petrol and impulse — a separate format, not to be confused with the 28 g Showbox.</li>
+      <li data-lang="uk">Додано <strong>Private Label / OEM</strong> картку: партнер отримує продукт під своєю маркою, ми — виробник. Custom: бренд, мікси, мови, розмір пачки, сертифікація. MOQ за домовленістю, lead time 6–8 тижнів.</li>
+      <li data-lang="en">Added <strong>Private Label / OEM</strong> card: partner ships under their own brand, we manufacture. Custom: brand, mixes, languages, pack size, certification. MOQ by agreement, lead time 6–8 weeks.</li>
+      <li data-lang="uk">Сітка переведена з фіксованого 3-колонкового на <code>auto-fill minmax(220px, 1fr)</code> — на широкому екрані 5 карток в один ряд, на вузькому переходять у кілька рядів.</li>
+      <li data-lang="en">Grid switched from fixed 3-column to <code>auto-fill minmax(220px, 1fr)</code> — 5 cards in one row on wide screens, multiple rows on narrow ones.</li>
+      <li data-lang="uk">Порядок: <strong>Compact 14/20 → Showbox 28 → HoReCa 500 → Tasting → Private Label</strong> (від найменшого до найбільшого, плюс кастомний у кінці).</li>
+      <li data-lang="en">Order: <strong>Compact 14/20 → Showbox 28 → HoReCa 500 → Tasting → Private Label</strong> (smallest to largest, custom last).</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.16</span><span class="changelog-date">04.05.2026</span>
     <ul class="changelog-list">
       <li data-lang="uk"><strong>Новий розділ «ЗМІ про нас» / Press Coverage</strong> у Сервіс-блоку. <strong>26+ публікацій</strong> зібрано з блогу snEco і знайдено через web search. Згруповано по 5 темах:
         <ul style="margin-top:4px;padding-left:18px;color:var(--text-muted);font-size:12px">
