@@ -149,8 +149,11 @@ body {
 /* ============================================================
    LANGUAGE TOGGLE
    ============================================================ */
-body.lang-uk [data-lang="en"] { display: none !important; }
-body.lang-en [data-lang="uk"] { display: none !important; }
+/* Lang switcher base rules. SK mode handled by JS (graceful fallback to UK if SK missing). */
+body.lang-uk [data-lang="en"], body.lang-uk [data-lang="sk"] { display: none !important; }
+body.lang-en [data-lang="uk"], body.lang-en [data-lang="sk"] { display: none !important; }
+body.lang-sk [data-lang="en"] { display: none !important; }
+/* In SK mode UK spans are hidden by JS only if a sibling SK span exists. */
 
 /* ============================================================
    LAYOUT
@@ -1356,6 +1359,7 @@ h3.block-title:first-of-type { margin-top: 0; }
   <div class="lang-switcher" role="tablist" aria-label="Language">
     <button class="lang-btn active" data-set-lang="uk" type="button">UA</button>
     <button class="lang-btn" data-set-lang="en" type="button">EN</button>
+    <button class="lang-btn" data-set-lang="sk" type="button">SK</button>
   </div>
 
   <div class="nav-group">
@@ -1363,15 +1367,15 @@ h3.block-title:first-of-type { margin-top: 0; }
     <div class="nav-group-label" data-lang="en">Introduction</div>
     <button class="nav-link active" data-target="manifesto" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Маніфест</span><span data-lang="en">Manifesto</span>
+      <span data-lang="uk">Маніфест</span><span data-lang="en">Manifesto</span><span data-lang="sk">Manifest</span>
     </button>
     <button class="nav-link" data-target="intro" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Про бренд</span><span data-lang="en">About</span>
+      <span data-lang="uk">Про бренд</span><span data-lang="en">About</span><span data-lang="sk">O značke</span>
     </button>
     <button class="nav-link" data-target="team" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Команда &amp; орг-структура</span><span data-lang="en">Team &amp; org structure</span>
+      <span data-lang="uk">Команда &amp; орг-структура</span><span data-lang="en">Team &amp; org structure</span><span data-lang="sk">Tím &amp; org. štruktúra</span>
     </button>
     <button class="nav-link" data-target="story" type="button">
       <span class="dot"></span>
@@ -1388,15 +1392,15 @@ h3.block-title:first-of-type { margin-top: 0; }
     <div class="nav-group-label" data-lang="en">Identity</div>
     <button class="nav-link" data-target="visual" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Візуальна система</span><span data-lang="en">Visual system</span>
+      <span data-lang="uk">Візуальна система</span><span data-lang="en">Visual system</span><span data-lang="sk">Vizuálny systém</span>
     </button>
     <button class="nav-link" data-target="voice" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Голос бренду</span><span data-lang="en">Voice &amp; tone</span>
+      <span data-lang="uk">Голос бренду</span><span data-lang="en">Voice &amp; tone</span><span data-lang="sk">Hlas značky</span>
     </button>
     <button class="nav-link" data-target="photo" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Фотографія</span><span data-lang="en">Photography</span>
+      <span data-lang="uk">Фотографія</span><span data-lang="en">Photography</span><span data-lang="sk">Fotografia</span>
     </button>
   </div>
 
@@ -1405,35 +1409,35 @@ h3.block-title:first-of-type { margin-top: 0; }
     <div class="nav-group-label" data-lang="en">Application</div>
     <button class="nav-link" data-target="digital" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Digital &amp; соцмережі</span><span data-lang="en">Digital &amp; social</span>
+      <span data-lang="uk">Digital &amp; соцмережі</span><span data-lang="en">Digital &amp; social</span><span data-lang="sk">Digital &amp; social</span>
     </button>
     <button class="nav-link" data-target="packaging" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Упаковка</span><span data-lang="en">Packaging</span>
+      <span data-lang="uk">Упаковка</span><span data-lang="en">Packaging</span><span data-lang="sk">Obal</span>
     </button>
     <button class="nav-link" data-target="international" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Міжнародна версія</span><span data-lang="en">International</span>
+      <span data-lang="uk">Міжнародна версія</span><span data-lang="en">International</span><span data-lang="sk">Medzinárodná verzia</span>
     </button>
     <button class="nav-link" data-target="externals" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Зовнішні комунікації</span><span data-lang="en">External communications</span>
+      <span data-lang="uk">Зовнішні комунікації</span><span data-lang="en">External communications</span><span data-lang="sk">Externá komunikácia</span>
     </button>
     <button class="nav-link" data-target="sales" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Sales playbook</span><span data-lang="en">Sales playbook</span>
+      <span data-lang="uk">Sales playbook</span><span data-lang="en">Sales playbook</span><span data-lang="sk">Sales playbook</span>
     </button>
     <button class="nav-link" data-target="legal" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Legal &amp; substantiation</span><span data-lang="en">Legal &amp; substantiation</span>
+      <span data-lang="uk">Legal &amp; substantiation</span><span data-lang="en">Legal &amp; substantiation</span><span data-lang="sk">Legal &amp; substantiation</span>
     </button>
     <button class="nav-link" data-target="retail" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Фірмова торгова точка</span><span data-lang="en">Branded retail kiosk</span>
+      <span data-lang="uk">Фірмова торгова точка</span><span data-lang="en">Branded retail kiosk</span><span data-lang="sk">Firemná predajňa</span>
     </button>
     <button class="nav-link" data-target="touchpoints" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Точки контакту</span><span data-lang="en">Touchpoints</span>
+      <span data-lang="uk">Точки контакту</span><span data-lang="en">Touchpoints</span><span data-lang="sk">Kontaktné body</span>
     </button>
   </div>
 
@@ -1442,19 +1446,19 @@ h3.block-title:first-of-type { margin-top: 0; }
     <div class="nav-group-label" data-lang="en">Reference</div>
     <button class="nav-link" data-target="documents" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Документи</span><span data-lang="en">Documents</span>
+      <span data-lang="uk">Документи</span><span data-lang="en">Documents</span><span data-lang="sk">Dokumenty</span>
     </button>
     <button class="nav-link" data-target="press-coverage" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">ЗМІ про нас</span><span data-lang="en">Press coverage</span>
+      <span data-lang="uk">ЗМІ про нас</span><span data-lang="en">Press coverage</span><span data-lang="sk">Médiá o nás</span>
     </button>
     <button class="nav-link" data-target="roadmap" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Стратегічний roadmap</span><span data-lang="en">Strategic roadmap</span>
+      <span data-lang="uk">Стратегічний roadmap</span><span data-lang="en">Strategic roadmap</span><span data-lang="sk">Strategický roadmap</span>
     </button>
     <button class="nav-link" data-target="maintenance" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Maintenance</span><span data-lang="en">Maintenance</span>
+      <span data-lang="uk">Maintenance</span><span data-lang="en">Maintenance</span><span data-lang="sk">Maintenance</span>
     </button>
   </div>
 
@@ -1463,7 +1467,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <div class="nav-group-label" data-lang="en">💡 Collaboration</div>
     <button class="nav-link" data-target="ideas" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">Пропозиції</span><span data-lang="en">Ideas</span>
+      <span data-lang="uk">Пропозиції</span><span data-lang="en">Ideas</span><span data-lang="sk">Návrhy</span>
     </button>
   </div>
 
@@ -1472,7 +1476,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <div class="nav-group-label" data-lang="en">🔒 Confidential</div>
     <button class="nav-link" data-target="hr" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">HR</span><span data-lang="en">HR</span>
+      <span data-lang="uk">HR</span><span data-lang="en">HR</span><span data-lang="sk">HR</span>
     </button>
   </div>
 
@@ -1480,7 +1484,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Bible v2.28 · 2026
+    Brand Bible v2.29 · 2026
   </div>
 </nav>
 
@@ -1488,12 +1492,13 @@ h3.block-title:first-of-type { margin-top: 0; }
 
 <!-- NORTH STAR HEADER -->
 <div class="quick-ref">
-  <div class="qr-mark">SNÉCO<span class="qr-mark-sub" data-lang="uk">Біблія бренду</span><span class="qr-mark-sub" data-lang="en">Brand Bible</span></div>
+  <div class="qr-mark">SNÉCO<span class="qr-mark-sub" data-lang="uk">Біблія бренду</span><span class="qr-mark-sub" data-lang="en">Brand Bible</span><span class="qr-mark-sub" data-lang="sk">Biblia značky</span></div>
   <div class="qr-northstar">
     <span data-lang="uk">Один інгредієнт. <span class="qr-ns-accent">Жодних компромісів.</span> Сирний снек XXI століття.</span>
     <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
+    <span data-lang="sk">Jedna ingrediencia. <span class="qr-ns-accent">Žiadne kompromisy.</span> Syrový snack 21. storočia.</span>
   </div>
-  <div class="qr-meta">v2.28 · 2026</div>
+  <div class="qr-meta">v2.29 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -1504,7 +1509,7 @@ h3.block-title:first-of-type { margin-top: 0; }
      ============================================================ -->
 <section class="section active" id="sec-manifesto" style="padding:0">
   <div class="hero" style="padding:140px 64px;min-height:88vh;display:flex;flex-direction:column;justify-content:center">
-    <div class="hero-eyebrow"><span data-lang="uk">Маніфест</span><span data-lang="en">Manifesto</span></div>
+    <div class="hero-eyebrow"><span data-lang="uk">Маніфест</span><span data-lang="en">Manifesto</span><span data-lang="sk">Manifest</span></div>
     <h1 class="hero-title" style="font-size:60px;line-height:1.1;letter-spacing:-1px;max-width:920px;font-weight:800">
       <span data-lang="uk"><span style="color:var(--yellow)">Хрусткий</span> сир.<br>Лише сир.<br>Усе інше — інженерія.</span>
       <span data-lang="en"><span style="color:var(--yellow)">Crunchy</span> cheese.<br>Just cheese.<br>Everything else is engineering.</span>
@@ -1605,8 +1610,8 @@ h3.block-title:first-of-type { margin-top: 0; }
   </div>
 
   <div style="padding: 48px 64px;">
-    <div class="section-eyebrow"><span data-lang="uk">Основи</span><span data-lang="en">Fundamentals</span></div>
-    <h2 class="section-title"><span data-lang="uk">Хто ми</span><span data-lang="en">Who we are</span></h2>
+    <div class="section-eyebrow"><span data-lang="uk">Основи</span><span data-lang="en">Fundamentals</span><span data-lang="sk">Základy</span></div>
+    <h2 class="section-title"><span data-lang="uk">Хто ми</span><span data-lang="en">Who we are</span><span data-lang="sk">Kto sme</span></h2>
     <div class="section-lead">
       <span data-lang="uk">snEco — перший в Україні сертифікований еко-снек з 100% натурального сиру за власною запатентованою технологією. Один інгредієнт, максимум смаку, нуль зайвого.</span>
       <span data-lang="en">snEco is Ukraine's first certified eco-snack made from 100% natural cheese using our own patented technology. One ingredient. Maximum flavor. Nothing else.</span>
@@ -1641,7 +1646,7 @@ h3.block-title:first-of-type { margin-top: 0; }
 
     <div class="divider"></div>
 
-    <div class="section-eyebrow"><span data-lang="uk">Платформа бренду</span><span data-lang="en">Brand platform</span></div>
+    <div class="section-eyebrow"><span data-lang="uk">Платформа бренду</span><span data-lang="en">Brand platform</span><span data-lang="sk">Platforma značky</span></div>
     <div class="grid-2" style="margin-top:8px">
       <div class="card">
         <div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px">
@@ -1710,7 +1715,7 @@ h3.block-title:first-of-type { margin-top: 0; }
 
 
   <!-- Architecture (merged from sec-architecture in v2.8) -->
-  <h3 class="block-title"><span data-lang="uk">Архітектура бренду</span><span data-lang="en">Brand architecture</span></h3>
+  <h3 class="block-title"><span data-lang="uk">Архітектура бренду</span><span data-lang="en">Brand architecture</span><span data-lang="sk">Architektúra značky</span></h3>
   <div style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:24px"><span data-lang="uk">snEco — єдиний споживчий бренд. За ним стоять дві юридичні особи: українська (Prime Snack LLC, завод у Мукачево) та словацька (Sneco SK s.r.o., завод у Гуменне). Бренд єдиний, юр-дані відрізняються залежно від ринку.</span>
     <span data-lang="en">snEco is a single consumer brand backed by two legal entities: Ukrainian (Prime Snack LLC, Mukachevo plant) and Slovak (Sneco SK s.r.o., Humenné plant). One brand, different legal entities depending on the market.</span></div>
 
@@ -1795,8 +1800,8 @@ h3.block-title:first-of-type { margin-top: 0; }
      TEAM & ORG STRUCTURE (added in v2.9)
      ============================================================ -->
 <section class="section" id="sec-team" style="padding:56px 64px">
-  <div class="section-eyebrow"><span data-lang="uk">Команда</span><span data-lang="en">Team</span></div>
-  <h2 class="section-title"><span data-lang="uk">Команда &amp; орг-структура</span><span data-lang="en">Team &amp; org structure</span></h2>
+  <div class="section-eyebrow"><span data-lang="uk">Команда</span><span data-lang="en">Team</span><span data-lang="sk">Tím</span></div>
+  <h2 class="section-title"><span data-lang="uk">Команда &amp; орг-структура</span><span data-lang="en">Team &amp; org structure</span><span data-lang="sk">Tím &amp; org. štruktúra</span></h2>
   <div class="section-lead">
     <span data-lang="uk">Хто за що відповідає в snEco UA. Інтерактивна структура: можна редагувати імена, ролі та функції — зміни зберігаються у вашому браузері. Для постійного оновлення документа — натисніть «Експорт JSON» і надішліть Вадиму.</span>
     <span data-lang="en">Who owns what at snEco UA. Interactive structure — names, roles and functions are editable; changes are saved in your browser. For permanent updates, click "Export JSON" and send the snapshot to Vadym.</span>
@@ -1933,7 +1938,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     </div>
   </div>
 
-  <h4 style="margin:24px 0 12px 0;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted)"><span data-lang="uk">Співвласники (4)</span><span data-lang="en">Co-owners (4)</span></h4>
+  <h4 style="margin:24px 0 12px 0;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted)"><span data-lang="uk">Співвласники (4)</span><span data-lang="en">Co-owners (4)</span><span data-lang="sk">Spoluvlastníci (4)</span></h4>
   <div class="org-tree" style="padding:16px">
     <div class="org-row row-departments">
       <div class="org-column">
@@ -1967,7 +1972,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     </div>
   </div>
 
-  <h4 style="margin:24px 0 12px 0;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted)"><span data-lang="uk">Функціональні керівники (4)</span><span data-lang="en">Functional leads (4)</span></h4>
+  <h4 style="margin:24px 0 12px 0;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted)"><span data-lang="uk">Функціональні керівники (4)</span><span data-lang="en">Functional leads (4)</span><span data-lang="sk">Funkční vedúci (4)</span></h4>
   <div class="org-tree" style="padding:16px">
     <div class="org-row row-departments" style="grid-template-columns:repeat(4, minmax(0, 1fr));min-width:800px">
       <div class="org-column">
@@ -2001,7 +2006,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     </div>
   </div>
 
-  <h4 style="margin:24px 0 12px 0;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted)"><span data-lang="uk">Виробничий персонал</span><span data-lang="en">Production team</span></h4>
+  <h4 style="margin:24px 0 12px 0;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted)"><span data-lang="uk">Виробничий персонал</span><span data-lang="en">Production team</span><span data-lang="sk">Výrobný personál</span></h4>
   <div class="org-tree" style="padding:16px">
     <div class="org-row row-departments" style="grid-template-columns:repeat(2, minmax(0, 1fr));min-width:400px">
       <div class="org-column">
@@ -2021,7 +2026,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     </div>
   </div>
 
-  <h3 class="block-title" style="margin-top:48px">📞 <span data-lang="uk">Ключові контакти</span><span data-lang="en">Key contacts</span></h3>
+  <h3 class="block-title" style="margin-top:48px">📞 <span data-lang="uk">Ключові контакти</span><span data-lang="en">Key contacts</span><span data-lang="sk">Kľúčové kontakty</span></h3>
   <div class="card" style="padding:0;overflow:hidden">
     <div style="font-size:13px;color:var(--text-muted);line-height:1.65;margin-bottom:14px">
       <span data-lang="uk">Повний реєстр контактів. Натисни на email/телефон для швидкого зв'язку. LinkedIn-посилання — для верифікації і first-contact outreach.</span>
@@ -2030,11 +2035,11 @@ h3.block-title:first-of-type { margin-top: 0; }
     <div class="card" style="padding:0;overflow:hidden">
       <table class="spec-table" style="font-size:12.5px">
         <thead><tr>
-          <th style="width:20%"><span data-lang="uk">Ім'я</span><span data-lang="en">Name</span></th>
-          <th style="width:22%"><span data-lang="uk">Посада</span><span data-lang="en">Role</span></th>
-          <th style="width:14%"><span data-lang="uk">Мови</span><span data-lang="en">Languages</span></th>
-          <th style="width:16%"><span data-lang="uk">Телефон</span><span data-lang="en">Phone</span></th>
-          <th style="width:18%"><span data-lang="uk">Email</span><span data-lang="en">Email</span></th>
+          <th style="width:20%"><span data-lang="uk">Ім'я</span><span data-lang="en">Name</span><span data-lang="sk">Meno</span></th>
+          <th style="width:22%"><span data-lang="uk">Посада</span><span data-lang="en">Role</span><span data-lang="sk">Pozícia</span></th>
+          <th style="width:14%"><span data-lang="uk">Мови</span><span data-lang="en">Languages</span><span data-lang="sk">Jazyky</span></th>
+          <th style="width:16%"><span data-lang="uk">Телефон</span><span data-lang="en">Phone</span><span data-lang="sk">Telefón</span></th>
+          <th style="width:18%"><span data-lang="uk">Email</span><span data-lang="en">Email</span><span data-lang="sk">Email</span></th>
           <th style="width:10%">LinkedIn</th>
         </tr></thead>
         <tbody>
@@ -2138,8 +2143,8 @@ h3.block-title:first-of-type { margin-top: 0; }
      STORY & TECHNOLOGY
      ============================================================ -->
 <section class="section" id="sec-story" style="padding:56px 64px">
-  <div class="section-eyebrow"><span data-lang="uk">Історія</span><span data-lang="en">Our story</span></div>
-  <h2 class="section-title"><span data-lang="uk">Як з'явився snEco</span><span data-lang="en">How snEco came to be</span></h2>
+  <div class="section-eyebrow"><span data-lang="uk">Історія</span><span data-lang="en">Our story</span><span data-lang="sk">História</span></div>
+  <h2 class="section-title"><span data-lang="uk">Як з'явився snEco</span><span data-lang="en">How snEco came to be</span><span data-lang="sk">Ako vznikol snEco</span></h2>
   <div class="section-lead">
     <span data-lang="uk">Ідея зародилась у <strong>Харкові, 2015 року</strong>. Брати Пилип і Вадим Гришини — рідні брати з іншим успішним бізнесом, але закохані в сир — поставили собі питання: <strong>«Який сир — у XXI столітті?»</strong> Натхнення прийшло від технології, винайденої в 1970-х NASA Planetary Missions Program для космонавтів — мікрохвильово-вакуумна дегідрація. Понад два роки експериментів і тисячі кілограмів сиру — і у 2016 році на ринку з'явився snEco.</span>
     <span data-lang="en">The idea was born in <strong>Kharkiv, 2015</strong>. Brothers Pylyp and Vadym Gryshyn — already running another successful business but passionate about cheese — asked themselves: <strong>"What is cheese in the 21st century?"</strong> Inspiration came from a technology invented in the 1970s by NASA's Planetary Missions Program to feed astronauts — microwave-vacuum dehydration. Over two years of experiments and thousands of kilograms of cheese — and in 2016 snEco hit the market.</span>
@@ -2367,7 +2372,7 @@ h3.block-title:first-of-type { margin-top: 0; }
      ============================================================ -->
 <section class="section" id="sec-claims" style="padding:56px 64px">
   <div class="section-eyebrow"><span data-lang="uk">Меседжі</span><span data-lang="en">Messaging</span></div>
-  <h2 class="section-title"><span data-lang="uk">Слогани, тези, ключові факти</span><span data-lang="en">Slogans, claims, key facts</span></h2>
+  <h2 class="section-title"><span data-lang="uk">Слогани, тези, ключові факти</span><span data-lang="en">Slogans, claims, key facts</span><span data-lang="sk">Slogany, tézy, kľúčové fakty</span></h2>
   <div class="section-lead">
     <span data-lang="uk">Затверджена бібліотека формулювань. Використовуйте ці фрази в комунікації — вони перевірені, погоджені і відповідають фактичній базі бренду.</span>
     <span data-lang="en">An approved library of phrases. Use these in communications — they're vetted, on-brand, and backed by facts.</span>
@@ -2550,13 +2555,13 @@ h3.block-title:first-of-type { margin-top: 0; }
      ============================================================ -->
 <section class="section" id="sec-visual" style="padding:56px 64px">
   <div class="section-eyebrow"><span data-lang="uk">Візуальна система</span><span data-lang="en">Visual system</span></div>
-  <h2 class="section-title"><span data-lang="uk">Логотип, кольори, типографіка</span><span data-lang="en">Logo, colors, typography</span></h2>
+  <h2 class="section-title"><span data-lang="uk">Логотип, кольори, типографіка</span><span data-lang="en">Logo, colors, typography</span><span data-lang="sk">Logo, farby, typografia</span></h2>
   <div class="section-lead">
     <span data-lang="uk">Три стовпи візуальної ідентичності snEco. Логотип — графічна форма SNÉCO у 4 варіантах. Кольори — жовтий / чорний / зелений / білий. Типографіка — Qanelas + HighVoltage Rough.</span>
     <span data-lang="en">The three pillars of snEco's visual identity. Logo — the SNÉCO mark in 4 variants. Colors — yellow / black / green / white. Typography — Qanelas + HighVoltage Rough.</span>
   </div>
 
-  <h3 class="block-title">🅻 <span data-lang="uk">Логотип</span><span data-lang="en">Logo</span></h3>
+  <h3 class="block-title">🅻 <span data-lang="uk">Логотип</span><span data-lang="en">Logo</span><span data-lang="sk">Logo</span></h3>
   <h3 class="block-title"><span data-lang="uk">Варіанти</span><span data-lang="en">Variants</span></h3>
   <div class="logo-showcase">
     <div class="logo-variant on-dark">
@@ -2831,7 +2836,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     </div>
   </div>
 
-  <h3 class="block-title" style="margin-top:48px">🎨 <span data-lang="uk">Кольори</span><span data-lang="en">Colors</span></h3>
+  <h3 class="block-title" style="margin-top:48px">🎨 <span data-lang="uk">Кольори</span><span data-lang="en">Colors</span><span data-lang="sk">Farby</span></h3>
   <div class="color-grid">
     <div class="swatch" data-copy="#FEBF27">
       <div class="swatch-color" style="background:#FEBF27"><div class="swatch-copy-hint">Copy HEX</div></div>
@@ -2927,7 +2932,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     </div>
   </div>
 
-  <h3 class="block-title" style="margin-top:48px">🔤 <span data-lang="uk">Типографіка</span><span data-lang="en">Typography</span></h3>
+  <h3 class="block-title" style="margin-top:48px">🔤 <span data-lang="uk">Типографіка</span><span data-lang="en">Typography</span><span data-lang="sk">Typografia</span></h3>
   <div class="font-notice" style="background:rgba(150,193,31,0.12);border-color:rgba(150,193,31,0.4)">
     <div style="font-size:18px">✅</div>
     <div>
@@ -3105,7 +3110,7 @@ h3.block-title:first-of-type { margin-top: 0; }
      ============================================================ -->
 <section class="section" id="sec-photo" style="padding:56px 64px">
   <div class="section-eyebrow"><span data-lang="uk">Фотографія</span><span data-lang="en">Photography</span></div>
-  <h2 class="section-title"><span data-lang="uk">Візуальний стиль</span><span data-lang="en">Visual style</span></h2>
+  <h2 class="section-title"><span data-lang="uk">Візуальний стиль</span><span data-lang="en">Visual style</span><span data-lang="sk">Vizuálny štýl</span></h2>
   <div class="section-lead">
     <span data-lang="uk">Фотографія snEco — це апетит і довіра. Темний фон, золоті кульки в польоті, природне освітлення. Без фільтрів, без штучного «Instagram-глянцю».</span>
     <span data-lang="en">snEco photography is about appetite and trust. Dark backgrounds, golden balls in motion, natural light. No filters. No Instagram gloss.</span>
@@ -3169,7 +3174,7 @@ h3.block-title:first-of-type { margin-top: 0; }
           <th><span data-lang="uk">Формат</span><span data-lang="en">Format</span></th>
           <th><span data-lang="uk">Мін. роздільність</span><span data-lang="en">Min resolution</span></th>
           <th><span data-lang="uk">Колір</span><span data-lang="en">Color</span></th>
-          <th><span data-lang="uk">Файл</span><span data-lang="en">File</span></th>
+          <th><span data-lang="uk">Файл</span><span data-lang="en">File</span><span data-lang="sk">Súbor</span></th>
         </tr>
       </thead>
       <tbody>
@@ -3187,7 +3192,7 @@ h3.block-title:first-of-type { margin-top: 0; }
      ============================================================ -->
 <section class="section" id="sec-digital" style="padding:56px 64px">
   <div class="section-eyebrow">Digital</div>
-  <h2 class="section-title"><span data-lang="uk">Digital &amp; соцмережі</span><span data-lang="en">Digital &amp; social</span></h2>
+  <h2 class="section-title"><span data-lang="uk">Digital &amp; соцмережі</span><span data-lang="en">Digital &amp; social</span><span data-lang="sk">Digital &amp; social</span></h2>
   <div class="section-lead">
     <span data-lang="uk">Специфікації для Instagram, Facebook, LinkedIn та email-комунікацій. Розміри, відступи і правила публікацій для кожного каналу.</span>
     <span data-lang="en">Specs for Instagram, Facebook, LinkedIn and email. Sizes, spacing and publication rules for each channel.</span>
@@ -3269,7 +3274,7 @@ h3.block-title:first-of-type { margin-top: 0; }
      ============================================================ -->
 <section class="section" id="sec-packaging" style="padding:56px 64px">
   <div class="section-eyebrow"><span data-lang="uk">Упаковка</span><span data-lang="en">Packaging</span></div>
-  <h2 class="section-title"><span data-lang="uk">Система упаковки</span><span data-lang="en">Packaging system</span></h2>
+  <h2 class="section-title"><span data-lang="uk">Система упаковки</span><span data-lang="en">Packaging system</span><span data-lang="sk">Systém obalov</span></h2>
   <div class="section-lead">
     <span data-lang="uk">20+ SKU — єдина система правил. Ієрархія інформації однакова для всього асортименту. Лише акцентний колір сорту змінюється між варіантами.</span>
     <span data-lang="en">20+ SKUs — one rule set. Information hierarchy is identical across the range; only the variety accent color changes.</span>
@@ -3333,7 +3338,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <div class="pkg-row"><span class="pkg-row-label"><span data-lang="uk">Пачка</span><span data-lang="en">Pack</span></span><span class="pkg-row-val">28 г · 200×150×20 мм</span></div>
         <div class="pkg-row"><span class="pkg-row-label"><span data-lang="uk">Шоубокс</span><span data-lang="en">Showbox</span></span><span class="pkg-row-val">15 шт · 210×150×380</span></div>
         <div class="pkg-row"><span class="pkg-row-label"><span data-lang="uk">Варіанти</span><span data-lang="en">Varieties</span></span><span class="pkg-row-val">10</span></div>
-        <div class="pkg-row"><span class="pkg-row-label"><span data-lang="uk">Мови</span><span data-lang="en">Languages</span></span><span class="pkg-row-val">9</span></div>
+        <div class="pkg-row"><span class="pkg-row-label"><span data-lang="uk">Мови</span><span data-lang="en">Languages</span><span data-lang="sk">Jazyky</span></span><span class="pkg-row-val">9</span></div>
       </div>
     </div>
 
@@ -3495,7 +3500,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     </div>
 
     <div class="pkg-cat-header">
-      <span class="pkg-cat-title"><span data-lang="uk">Чисті сири</span><span data-lang="en">Pure cheese</span></span>
+      <span class="pkg-cat-title"><span data-lang="uk">Чисті сири</span><span data-lang="en">Pure cheese</span><span data-lang="sk">Čisté syry</span></span>
       <span class="pkg-cat-count">6</span>
     </div>
     <div class="pkg-gallery">
@@ -3550,7 +3555,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     </div>
 
     <div class="pkg-cat-header">
-      <span class="pkg-cat-title"><span data-lang="uk">Мікси сир + горіх</span><span data-lang="en">Cheese + nut mixes</span></span>
+      <span class="pkg-cat-title"><span data-lang="uk">Мікси сир + горіх</span><span data-lang="en">Cheese + nut mixes</span><span data-lang="sk">Mixy syr + orech</span></span>
       <span class="pkg-cat-count">5</span>
     </div>
     <div class="pkg-gallery">
@@ -3597,7 +3602,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     </div>
 
     <div class="pkg-cat-header">
-      <span class="pkg-cat-title"><span data-lang="uk">Веган-серія (без сиру)</span><span data-lang="en">Vegan series (cheese-free)</span></span>
+      <span class="pkg-cat-title"><span data-lang="uk">Веган-серія (без сиру)</span><span data-lang="en">Vegan series (cheese-free)</span><span data-lang="sk">Vegánska séria (bez syra)</span></span>
       <span class="pkg-cat-count">1</span>
     </div>
     <div class="pkg-gallery">
@@ -3611,7 +3616,7 @@ h3.block-title:first-of-type { margin-top: 0; }
       </div>
     </div>
 
-    <h3 class="block-title" style="margin-top:48px">🌍 <span data-lang="uk">Міжнародні версії</span><span data-lang="en">International versions</span></h3>
+    <h3 class="block-title" style="margin-top:48px">🌍 <span data-lang="uk">Міжнародні версії</span><span data-lang="en">International versions</span><span data-lang="sk">Medzinárodné verzie</span></h3>
     <div style="font-size:13px;color:var(--text-muted);line-height:1.65;margin-bottom:18px">
       <span data-lang="uk">Окремі лицьові дизайни 90×160 мм для трьох цільових ринків: <strong>EN</strong> (general international, англомовний), <strong>US</strong> (Північна Америка, OZ.+g, з конкретною кількістю протеїну), <strong>SK</strong> (ЄС / Словаччина, з 8-мовною зворотною етикеткою). Та сама архітектура layout, але змінюються бейджі, мова, ribbon і back-side.</span>
       <span data-lang="en">Front designs 90×160 mm for three target markets: <strong>EN</strong> (general international, English), <strong>US</strong> (North America, OZ.+g, with explicit protein quantity), <strong>SK</strong> (EU / Slovakia, with an 8-language back label). Same layout architecture; badges, language, ribbon and back-side differ.</span>
@@ -3856,7 +3861,7 @@ h3.block-title:first-of-type { margin-top: 0; }
      ============================================================ -->
 <section class="section" id="sec-international" style="padding:56px 64px">
   <div class="section-eyebrow"><span data-lang="uk">Міжнародна версія</span><span data-lang="en">International</span></div>
-  <h2 class="section-title"><span data-lang="uk">EU та глобальні ринки</span><span data-lang="en">EU &amp; global markets</span></h2>
+  <h2 class="section-title"><span data-lang="uk">EU та глобальні ринки</span><span data-lang="en">EU &amp; global markets</span><span data-lang="sk">EU a globálne trhy</span></h2>
   <div class="section-lead">
     <span data-lang="uk">Бренд єдиний, але юридичні дані, маркування й окремі меседжі залежать від ринку. UA-матеріали — від Prime Snack LLC. EU-матеріали — від Sneco SK s.r.o.</span>
     <span data-lang="en">One brand, but legal details, origin labels and certain messages depend on the market. UA materials are issued by Prime Snack LLC. EU materials are issued by Sneco SK s.r.o.</span>
@@ -3976,8 +3981,8 @@ h3.block-title:first-of-type { margin-top: 0; }
      EXTERNAL COMMUNICATIONS (PR + Crisis, merged in v2.8)
      ============================================================ -->
 <section class="section" id="sec-externals" style="padding:56px 64px">
-  <div class="section-eyebrow"><span data-lang="uk">Зовнішні комунікації</span><span data-lang="en">External communications</span></div>
-  <h2 class="section-title"><span data-lang="uk">Як ми говоримо зі світом</span><span data-lang="en">How we speak to the world</span></h2>
+  <div class="section-eyebrow"><span data-lang="uk">Зовнішні комунікації</span><span data-lang="en">External communications</span><span data-lang="sk">Externá komunikácia</span></div>
+  <h2 class="section-title"><span data-lang="uk">Як ми говоримо зі світом</span><span data-lang="en">How we speak to the world</span><span data-lang="sk">Ako hovoríme so svetom</span></h2>
   <div class="section-lead">
     <span data-lang="uk">Усе, що виходить за межі snEco до журналістів, інвесторів, регуляторів, споживачів. Дві дисципліни: проактивна (прес-кіт, історії, цитати) і реактивна (кризові комунікації — recall, скарга, війна, SMM-помилка).</span>
     <span data-lang="en">Everything that leaves snEco for journalists, investors, regulators and consumers. Two disciplines: proactive (press kit, story angles, founder quotes) and reactive (crisis comms — recall, complaint, war, SMM mistake).</span>
@@ -4100,7 +4105,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     </div>
   </div>
 
-  <h3 class="block-title" style="margin-top:48px">🚨 <span data-lang="uk">Кризові комунікації</span><span data-lang="en">Crisis communications</span></h3>
+  <h3 class="block-title" style="margin-top:48px">🚨 <span data-lang="uk">Кризові комунікації</span><span data-lang="en">Crisis communications</span><span data-lang="sk">Krízová komunikácia</span></h3>
   <h3 class="block-title"><span data-lang="uk">Принципи реакції</span><span data-lang="en">Response principles</span></h3>
   <div class="grid-3">
     <div class="card card-sm">
@@ -4188,7 +4193,7 @@ h3.block-title:first-of-type { margin-top: 0; }
      ============================================================ -->
 <section class="section" id="sec-sales" style="padding:56px 64px">
   <div class="section-eyebrow">Sales</div>
-  <h2 class="section-title"><span data-lang="uk">Sales playbook</span><span data-lang="en">Sales playbook</span></h2>
+  <h2 class="section-title"><span data-lang="uk">Sales playbook</span><span data-lang="en">Sales playbook</span><span data-lang="sk">Sales playbook</span></h2>
   <div class="section-lead">
     <span data-lang="uk">Заперечення байерів, відповіді, базові комерційні умови. Те, що sales-команда відкриває перед кожною зустріччю з ритейлом / дистрибуцією / HoReCa.</span>
     <span data-lang="en">Buyer objections, responses, baseline commercial terms. What sales opens before every retail, distribution or HoReCa meeting.</span>
@@ -4308,13 +4313,13 @@ h3.block-title:first-of-type { margin-top: 0; }
   <div class="otp-unlocked">
     <div class="otp-session-bar">
       <span><span data-lang="uk">✓ Розблоковано для</span><span data-lang="en">✓ Unlocked for</span> <span class="otp-session-email" data-otp-email-display></span> · <span data-otp-expires-display></span></span>
-      <button class="otp-logout" data-otp-logout="prices"><span data-lang="uk">🔒 Вийти</span><span data-lang="en">🔒 Lock</span></button>
+      <button class="otp-logout" data-otp-logout="prices"><span data-lang="uk">🔒 Вийти</span><span data-lang="en">🔒 Lock</span><span data-lang="sk">🔒 Odhlásiť</span></button>
     </div>
 
     <div style="margin-bottom:18px;padding:12px 16px;background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.25);border-radius:8px;font-size:12px;line-height:1.55;display:flex;gap:10px;align-items:flex-start">
       <div style="font-size:16px">⚠️</div>
       <div>
-        <strong><span data-lang="uk">Конфіденційно</span><span data-lang="en">Confidential</span></strong> ·
+        <strong><span data-lang="uk">Конфіденційно</span><span data-lang="en">Confidential</span><span data-lang="sk">Dôverné</span></strong> ·
         <span data-lang="uk">ціни Дист / Гурт — комерційна таємниця. Не пересилати конкурентам, ритейлерам інших країн, у відкриті групи. Ціни в гривнях, з ПДВ, дійсні з 02.03.2026 до окремих змін.</span>
         <span data-lang="en">Dist / Wholesale prices are commercial secrets. Don't forward to competitors, foreign retailers or open groups. Prices in UAH, VAT included, valid from Mar 2, 2026 until further notice.</span>
       </div>
@@ -4323,7 +4328,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <!-- Download grid -->
     <div style="margin-bottom:24px">
       <div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px">
-        <span data-lang="uk">Завантажити PDF</span><span data-lang="en">Download PDF</span>
+        <span data-lang="uk">Завантажити PDF</span><span data-lang="en">Download PDF</span><span data-lang="sk">Stiahnuť PDF</span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
         <a href="pricing/snEco-price-28g-dist.pdf" download class="pricing-dl"><strong>28 г · Дистр</strong><span>Розширений — Dist + Гурт + РРЦ</span></a>
@@ -4451,7 +4456,7 @@ h3.block-title:first-of-type { margin-top: 0; }
      ============================================================ -->
 <section class="section" id="sec-legal" style="padding:56px 64px">
   <div class="section-eyebrow">Legal</div>
-  <h2 class="section-title"><span data-lang="uk">Legal &amp; substantiation</span><span data-lang="en">Legal &amp; substantiation</span></h2>
+  <h2 class="section-title"><span data-lang="uk">Legal &amp; substantiation</span><span data-lang="en">Legal &amp; substantiation</span><span data-lang="sk">Legal &amp; substantiation</span></h2>
   <div class="section-lead">
     <span data-lang="uk">Які claim чим підкріплюються, що можна казати в EU-комунікації, як і коли вживати ™ / ®. Перш ніж публікувати — звіртеся з цією секцією.</span>
     <span data-lang="en">Which claims are backed by what, what can be said in EU communications, when to use ™ / ®. Check this section before any release.</span>
@@ -4645,8 +4650,8 @@ h3.block-title:first-of-type { margin-top: 0; }
      TOUCHPOINTS
      ============================================================ -->
 <section class="section" id="sec-touchpoints" style="padding:56px 64px">
-  <div class="section-eyebrow"><span data-lang="uk">Точки контакту</span><span data-lang="en">Touchpoints</span></div>
-  <h2 class="section-title"><span data-lang="uk">Карта точок контакту</span><span data-lang="en">Touchpoint map</span></h2>
+  <div class="section-eyebrow"><span data-lang="uk">Точки контакту</span><span data-lang="en">Touchpoints</span><span data-lang="sk">Kontaktné body</span></div>
+  <h2 class="section-title"><span data-lang="uk">Карта точок контакту</span><span data-lang="en">Touchpoint map</span><span data-lang="sk">Mapa kontaktných bodov</span></h2>
   <div class="section-lead">
     <span data-lang="uk">Усі моменти, коли людина перетинається з брендом snEco — від полиці у супермаркеті до листа від експортного менеджера. Кожна з них працює на той самий бренд або проти нього.</span>
     <span data-lang="en">Every moment a person meets the snEco brand — from a supermarket shelf to an email from our export manager. Each one either works for the brand or against it.</span>
@@ -4713,8 +4718,8 @@ h3.block-title:first-of-type { margin-top: 0; }
      RETAIL CONCEPT — BRANDED KIOSK (added in v2.21)
      ============================================================ -->
 <section class="section" id="sec-retail" style="padding:56px 64px">
-  <div class="section-eyebrow"><span data-lang="uk">Фірмова торгова точка</span><span data-lang="en">Branded retail kiosk</span></div>
-  <h2 class="section-title"><span data-lang="uk">Фірмова торгова точка snEco</span><span data-lang="en">snEco branded retail kiosk</span></h2>
+  <div class="section-eyebrow"><span data-lang="uk">Фірмова торгова точка</span><span data-lang="en">Branded retail kiosk</span><span data-lang="sk">Firemná predajňa</span></div>
+  <h2 class="section-title"><span data-lang="uk">Фірмова торгова точка snEco</span><span data-lang="en">snEco branded retail kiosk</span><span data-lang="sk">Firemná predajňa snEco</span></h2>
   <div class="section-lead">
     <span data-lang="uk">Острівна торгова точка snEco у торгово-розважальному центрі. Запущено в <strong>ТРЦ «Французький бульвар» (Київ, 1 жовтня 2020)</strong>, провела повний рік повноцінної роботи. Цей розділ — для дистриб'юторів, франчайзі та трейд-маркетинг команди: габарити, матеріали, ключові елементи дизайну і реальні фото з ТРЦ.</span>
     <span data-lang="en">Free-standing snEco kiosk for shopping-centre formats. Launched at <strong>Frantsuzkyi Bulvar Mall (Kyiv, 1 October 2020)</strong>, ran for a full year. This section is for distributors, franchisees and trade-marketing: dimensions, materials, key design elements and real-store photos.</span>
@@ -4861,8 +4866,8 @@ h3.block-title:first-of-type { margin-top: 0; }
      DOCUMENTS & CERTIFICATES
      ============================================================ -->
 <section class="section" id="sec-documents" style="padding:56px 64px">
-  <div class="section-eyebrow"><span data-lang="uk">Документи</span><span data-lang="en">Documents</span></div>
-  <h2 class="section-title"><span data-lang="uk">Сертифікати, нагороди, юридичні документи</span><span data-lang="en">Certificates, awards, legal documents</span></h2>
+  <div class="section-eyebrow"><span data-lang="uk">Документи</span><span data-lang="en">Documents</span><span data-lang="sk">Dokumenty</span></div>
+  <h2 class="section-title"><span data-lang="uk">Сертифікати, нагороди, юридичні документи</span><span data-lang="en">Certificates, awards, legal documents</span><span data-lang="sk">Certifikáty, ocenenia, právne dokumenty</span></h2>
   <div class="section-lead">
     <span data-lang="uk">Усі публічні документи бренду snEco — для партнерів, ритейлу, преси, сертифікаційних і митних органів. Усі файли можна завантажити прямо звідси. Конфіденційні документи (контракти, фінансові звіти, дозволи регуляторів) надаються за запитом: <a href="mailto:vg@sneco.ua" style="color:var(--text);text-decoration:underline">vg@sneco.ua</a>.</span>
     <span data-lang="en">All public-facing snEco brand documents — for partners, retailers, press, certification and customs authorities. Every file is downloadable from this page. Confidential documents (contracts, financial reports, regulator permits) are available on request: <a href="mailto:vg@sneco.ua" style="color:var(--text);text-decoration:underline">vg@sneco.ua</a>.</span>
@@ -4875,10 +4880,10 @@ h3.block-title:first-of-type { margin-top: 0; }
   <div class="card" style="padding:0;overflow:hidden">
     <table class="spec-table">
       <thead><tr>
-        <th style="width:30%"><span data-lang="uk">Документ</span><span data-lang="en">Document</span></th>
-        <th><span data-lang="uk">Опис</span><span data-lang="en">Description</span></th>
-        <th style="width:18%"><span data-lang="uk">Чинний до</span><span data-lang="en">Valid until</span></th>
-        <th style="width:14%"><span data-lang="uk">Файл</span><span data-lang="en">File</span></th>
+        <th style="width:30%"><span data-lang="uk">Документ</span><span data-lang="en">Document</span><span data-lang="sk">Dokument</span></th>
+        <th><span data-lang="uk">Опис</span><span data-lang="en">Description</span><span data-lang="sk">Popis</span></th>
+        <th style="width:18%"><span data-lang="uk">Чинний до</span><span data-lang="en">Valid until</span><span data-lang="sk">Platné do</span></th>
+        <th style="width:14%"><span data-lang="uk">Файл</span><span data-lang="en">File</span><span data-lang="sk">Súbor</span></th>
       </tr></thead>
       <tbody>
         <tr>
@@ -4896,7 +4901,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <tr>
           <td><strong>FSSC 22000</strong> · TÜV NORD</td>
           <td><span data-lang="uk">Паралельний FSSC-аудит від TÜV NORD — додаткове незалежне підтвердження для DACH-ринків (Німеччина, Австрія, Швейцарія).</span><span data-lang="en">Parallel FSSC audit by TÜV NORD — additional independent proof for DACH markets (Germany, Austria, Switzerland).</span></td>
-          <td>✅ <span data-lang="uk">діє</span><span data-lang="en">active</span></td>
+          <td>✅ <span data-lang="uk">діє</span><span data-lang="en">active</span><span data-lang="sk">aktívne</span></td>
           <td><a href="documents/certificates/FSSC_22000_TUV_NORD.pdf" target="_blank" style="text-decoration:underline">PDF</a></td>
         </tr>
         <tr>
@@ -4913,22 +4918,22 @@ h3.block-title:first-of-type { margin-top: 0; }
   <div class="card" style="padding:0;overflow:hidden">
     <table class="spec-table">
       <thead><tr>
-        <th style="width:30%"><span data-lang="uk">Документ</span><span data-lang="en">Document</span></th>
-        <th><span data-lang="uk">Опис</span><span data-lang="en">Description</span></th>
-        <th style="width:18%"><span data-lang="uk">Статус</span><span data-lang="en">Status</span></th>
-        <th style="width:14%"><span data-lang="uk">Файл</span><span data-lang="en">File</span></th>
+        <th style="width:30%"><span data-lang="uk">Документ</span><span data-lang="en">Document</span><span data-lang="sk">Dokument</span></th>
+        <th><span data-lang="uk">Опис</span><span data-lang="en">Description</span><span data-lang="sk">Popis</span></th>
+        <th style="width:18%"><span data-lang="uk">Статус</span><span data-lang="en">Status</span><span data-lang="sk">Stav</span></th>
+        <th style="width:14%"><span data-lang="uk">Файл</span><span data-lang="en">File</span><span data-lang="sk">Súbor</span></th>
       </tr></thead>
       <tbody>
         <tr>
           <td><strong><span data-lang="uk">Патент №139035</span><span data-lang="en">Patent No. 139035</span></strong></td>
           <td><span data-lang="uk">Патент на технологію виробництва спіненого сиру VacWave Bio Nutrition (мікрохвильово-вакуумна сушка при 36-38°C).</span><span data-lang="en">Patent on the spun-cheese production technology — VacWave Bio Nutrition (microwave-vacuum drying at 36-38°C).</span></td>
-          <td>✅ <span data-lang="uk">чинний</span><span data-lang="en">in force</span></td>
+          <td>✅ <span data-lang="uk">чинний</span><span data-lang="en">in force</span><span data-lang="sk">platné</span></td>
           <td><a href="documents/legal/Patent_UA_139035.pdf" target="_blank" style="text-decoration:underline">PDF</a></td>
         </tr>
         <tr>
           <td><strong><span data-lang="uk">Торговельна марка №230269</span><span data-lang="en">Trademark No. 230269</span></strong></td>
           <td><span data-lang="uk">Свідоцтво України на торговельну марку snEco / SNÉCO.</span><span data-lang="en">Ukrainian trademark certificate — snEco / SNÉCO.</span></td>
-          <td>✅ <span data-lang="uk">чинна</span><span data-lang="en">registered</span></td>
+          <td>✅ <span data-lang="uk">чинна</span><span data-lang="en">registered</span><span data-lang="sk">platná</span></td>
           <td><a href="documents/legal/Trademark_UA_230269.pdf" target="_blank" style="text-decoration:underline">PDF</a></td>
         </tr>
         <tr>
@@ -4957,10 +4962,10 @@ h3.block-title:first-of-type { margin-top: 0; }
   <div class="card" style="padding:0;overflow:hidden">
     <table class="spec-table">
       <thead><tr>
-        <th style="width:30%"><span data-lang="uk">Документ</span><span data-lang="en">Document</span></th>
-        <th><span data-lang="uk">Опис</span><span data-lang="en">Description</span></th>
+        <th style="width:30%"><span data-lang="uk">Документ</span><span data-lang="en">Document</span><span data-lang="sk">Dokument</span></th>
+        <th><span data-lang="uk">Опис</span><span data-lang="en">Description</span><span data-lang="sk">Popis</span></th>
         <th style="width:18%"><span data-lang="uk">Рік</span><span data-lang="en">Year</span></th>
-        <th style="width:14%"><span data-lang="uk">Файл</span><span data-lang="en">File</span></th>
+        <th style="width:14%"><span data-lang="uk">Файл</span><span data-lang="en">File</span><span data-lang="sk">Súbor</span></th>
       </tr></thead>
       <tbody>
         <tr>
@@ -5001,10 +5006,10 @@ h3.block-title:first-of-type { margin-top: 0; }
   <div class="card" style="padding:0;overflow:hidden">
     <table class="spec-table">
       <thead><tr>
-        <th style="width:30%"><span data-lang="uk">Документ</span><span data-lang="en">Document</span></th>
-        <th><span data-lang="uk">Опис</span><span data-lang="en">Description</span></th>
-        <th style="width:18%"><span data-lang="uk">Статус</span><span data-lang="en">Status</span></th>
-        <th style="width:14%"><span data-lang="uk">Файл</span><span data-lang="en">File</span></th>
+        <th style="width:30%"><span data-lang="uk">Документ</span><span data-lang="en">Document</span><span data-lang="sk">Dokument</span></th>
+        <th><span data-lang="uk">Опис</span><span data-lang="en">Description</span><span data-lang="sk">Popis</span></th>
+        <th style="width:18%"><span data-lang="uk">Статус</span><span data-lang="en">Status</span><span data-lang="sk">Stav</span></th>
+        <th style="width:14%"><span data-lang="uk">Файл</span><span data-lang="en">File</span><span data-lang="sk">Súbor</span></th>
       </tr></thead>
       <tbody>
         <tr>
@@ -5033,16 +5038,16 @@ h3.block-title:first-of-type { margin-top: 0; }
   <div class="card" style="padding:0;overflow:hidden">
     <table class="spec-table">
       <thead><tr>
-        <th style="width:30%"><span data-lang="uk">Документ</span><span data-lang="en">Document</span></th>
-        <th><span data-lang="uk">Опис</span><span data-lang="en">Description</span></th>
-        <th style="width:18%"><span data-lang="uk">Статус</span><span data-lang="en">Status</span></th>
-        <th style="width:14%"><span data-lang="uk">Файл</span><span data-lang="en">File</span></th>
+        <th style="width:30%"><span data-lang="uk">Документ</span><span data-lang="en">Document</span><span data-lang="sk">Dokument</span></th>
+        <th><span data-lang="uk">Опис</span><span data-lang="en">Description</span><span data-lang="sk">Popis</span></th>
+        <th style="width:18%"><span data-lang="uk">Статус</span><span data-lang="en">Status</span><span data-lang="sk">Stav</span></th>
+        <th style="width:14%"><span data-lang="uk">Файл</span><span data-lang="en">File</span><span data-lang="sk">Súbor</span></th>
       </tr></thead>
       <tbody>
         <tr>
           <td><strong>USA FDA Food Facility Registration</strong></td>
           <td><span data-lang="uk">Реєстрація виробничого об'єкта в FDA США. Поточний номер FFR: <strong>10618353146</strong> (попередній №15800110488 — закінчився 31.12.2024).</span><span data-lang="en">FDA Food Facility Registration (USA). Current FFR: <strong>10618353146</strong> (previous No. 15800110488 expired 31.12.2024).</span></td>
-          <td>✅ <span data-lang="uk">актуальний</span><span data-lang="en">active</span></td>
+          <td>✅ <span data-lang="uk">актуальний</span><span data-lang="en">active</span><span data-lang="sk">aktuálne</span></td>
           <td><a href="documents/export/USA_FDA_Food_Control_Certificate.pdf" target="_blank" style="text-decoration:underline">PDF</a></td>
         </tr>
       </tbody>
@@ -5062,10 +5067,10 @@ h3.block-title:first-of-type { margin-top: 0; }
   <div class="card" style="padding:0;overflow:hidden">
     <table class="spec-table">
       <thead><tr>
-        <th style="width:30%"><span data-lang="uk">Документ</span><span data-lang="en">Document</span></th>
-        <th><span data-lang="uk">Опис</span><span data-lang="en">Description</span></th>
+        <th style="width:30%"><span data-lang="uk">Документ</span><span data-lang="en">Document</span><span data-lang="sk">Dokument</span></th>
+        <th><span data-lang="uk">Опис</span><span data-lang="en">Description</span><span data-lang="sk">Popis</span></th>
         <th style="width:18%"><span data-lang="uk">Дата / статус</span><span data-lang="en">Date / status</span></th>
-        <th style="width:14%"><span data-lang="uk">Файл</span><span data-lang="en">File</span></th>
+        <th style="width:14%"><span data-lang="uk">Файл</span><span data-lang="en">File</span><span data-lang="sk">Súbor</span></th>
       </tr></thead>
       <tbody>
         <tr>
@@ -5100,10 +5105,10 @@ h3.block-title:first-of-type { margin-top: 0; }
   <div class="card" style="padding:0;overflow:hidden">
     <table class="spec-table">
       <thead><tr>
-        <th style="width:30%"><span data-lang="uk">Документ</span><span data-lang="en">Document</span></th>
-        <th><span data-lang="uk">Опис</span><span data-lang="en">Description</span></th>
-        <th style="width:18%"><span data-lang="uk">Дата</span><span data-lang="en">Date</span></th>
-        <th style="width:14%"><span data-lang="uk">Файл</span><span data-lang="en">File</span></th>
+        <th style="width:30%"><span data-lang="uk">Документ</span><span data-lang="en">Document</span><span data-lang="sk">Dokument</span></th>
+        <th><span data-lang="uk">Опис</span><span data-lang="en">Description</span><span data-lang="sk">Popis</span></th>
+        <th style="width:18%"><span data-lang="uk">Дата</span><span data-lang="en">Date</span><span data-lang="sk">Dátum</span></th>
+        <th style="width:14%"><span data-lang="uk">Файл</span><span data-lang="en">File</span><span data-lang="sk">Súbor</span></th>
       </tr></thead>
       <tbody>
         <tr>
@@ -5138,10 +5143,10 @@ h3.block-title:first-of-type { margin-top: 0; }
   <div class="card" style="padding:0;overflow:hidden">
     <table class="spec-table">
       <thead><tr>
-        <th style="width:30%"><span data-lang="uk">Документ</span><span data-lang="en">Document</span></th>
-        <th><span data-lang="uk">Опис</span><span data-lang="en">Description</span></th>
-        <th style="width:18%"><span data-lang="uk">Дата</span><span data-lang="en">Date</span></th>
-        <th style="width:14%"><span data-lang="uk">Файл</span><span data-lang="en">File</span></th>
+        <th style="width:30%"><span data-lang="uk">Документ</span><span data-lang="en">Document</span><span data-lang="sk">Dokument</span></th>
+        <th><span data-lang="uk">Опис</span><span data-lang="en">Description</span><span data-lang="sk">Popis</span></th>
+        <th style="width:18%"><span data-lang="uk">Дата</span><span data-lang="en">Date</span><span data-lang="sk">Dátum</span></th>
+        <th style="width:14%"><span data-lang="uk">Файл</span><span data-lang="en">File</span><span data-lang="sk">Súbor</span></th>
       </tr></thead>
       <tbody>
         <tr>
@@ -5199,7 +5204,7 @@ h3.block-title:first-of-type { margin-top: 0; }
      PRESS COVERAGE / ЗМІ ПРО НАС
      ============================================================ -->
 <section class="section" id="sec-press-coverage" style="padding:56px 64px">
-  <div class="section-eyebrow"><span data-lang="uk">ЗМІ про нас</span><span data-lang="en">Press coverage</span></div>
+  <div class="section-eyebrow"><span data-lang="uk">ЗМІ про нас</span><span data-lang="en">Press coverage</span><span data-lang="sk">Médiá o nás</span></div>
   <h2 class="section-title"><span data-lang="uk">snEco у пресі</span><span data-lang="en">snEco in the press</span></h2>
   <div class="section-lead">
     <span data-lang="uk">26+ публікацій з 2022 року: бізнес-видання, food-індустрія, держустанови, міжнародні платформи. Згруповано за темами. Використовуй для прес-кітів, B2B-партнерів, інвесторів і у всіх pitch-матеріалах.</span>
@@ -5233,7 +5238,7 @@ h3.block-title:first-of-type { margin-top: 0; }
       <thead>
         <tr>
           <th style="width:18%"><span data-lang="uk">Видання</span><span data-lang="en">Outlet</span></th>
-          <th style="width:9%"><span data-lang="uk">Дата</span><span data-lang="en">Date</span></th>
+          <th style="width:9%"><span data-lang="uk">Дата</span><span data-lang="en">Date</span><span data-lang="sk">Dátum</span></th>
           <th><span data-lang="uk">Заголовок</span><span data-lang="en">Headline</span></th>
           <th style="width:6%">Lang</th>
           <th style="width:8%">Link</th>
@@ -5287,7 +5292,7 @@ h3.block-title:first-of-type { margin-top: 0; }
       <thead>
         <tr>
           <th style="width:18%"><span data-lang="uk">Видання</span><span data-lang="en">Outlet</span></th>
-          <th style="width:9%"><span data-lang="uk">Дата</span><span data-lang="en">Date</span></th>
+          <th style="width:9%"><span data-lang="uk">Дата</span><span data-lang="en">Date</span><span data-lang="sk">Dátum</span></th>
           <th><span data-lang="uk">Заголовок</span><span data-lang="en">Headline</span></th>
           <th style="width:6%">Lang</th>
           <th style="width:8%">Link</th>
@@ -5347,7 +5352,7 @@ h3.block-title:first-of-type { margin-top: 0; }
       <thead>
         <tr>
           <th style="width:18%"><span data-lang="uk">Видання</span><span data-lang="en">Outlet</span></th>
-          <th style="width:9%"><span data-lang="uk">Дата</span><span data-lang="en">Date</span></th>
+          <th style="width:9%"><span data-lang="uk">Дата</span><span data-lang="en">Date</span><span data-lang="sk">Dátum</span></th>
           <th><span data-lang="uk">Заголовок</span><span data-lang="en">Headline</span></th>
           <th style="width:6%">Lang</th>
           <th style="width:8%">Link</th>
@@ -5407,7 +5412,7 @@ h3.block-title:first-of-type { margin-top: 0; }
       <thead>
         <tr>
           <th style="width:18%"><span data-lang="uk">Видання</span><span data-lang="en">Outlet</span></th>
-          <th style="width:9%"><span data-lang="uk">Дата</span><span data-lang="en">Date</span></th>
+          <th style="width:9%"><span data-lang="uk">Дата</span><span data-lang="en">Date</span><span data-lang="sk">Dátum</span></th>
           <th><span data-lang="uk">Заголовок</span><span data-lang="en">Headline</span></th>
           <th style="width:6%">Lang</th>
           <th style="width:8%">Link</th>
@@ -5455,7 +5460,7 @@ h3.block-title:first-of-type { margin-top: 0; }
       <thead>
         <tr>
           <th style="width:18%"><span data-lang="uk">Видання</span><span data-lang="en">Outlet</span></th>
-          <th style="width:9%"><span data-lang="uk">Дата</span><span data-lang="en">Date</span></th>
+          <th style="width:9%"><span data-lang="uk">Дата</span><span data-lang="en">Date</span><span data-lang="sk">Dátum</span></th>
           <th><span data-lang="uk">Заголовок</span><span data-lang="en">Headline</span></th>
           <th style="width:6%">Lang</th>
           <th style="width:8%">Link</th>
@@ -5507,7 +5512,7 @@ h3.block-title:first-of-type { margin-top: 0; }
      ============================================================ -->
 <section class="section" id="sec-roadmap" style="padding:56px 64px">
   <div class="section-eyebrow"><span data-lang="uk">Стратегія</span><span data-lang="en">Strategy</span></div>
-  <h2 class="section-title"><span data-lang="uk">Стратегічний roadmap</span><span data-lang="en">Strategic roadmap</span></h2>
+  <h2 class="section-title"><span data-lang="uk">Стратегічний roadmap</span><span data-lang="en">Strategic roadmap</span><span data-lang="sk">Strategický roadmap</span></h2>
   <div class="section-lead">
     <span data-lang="uk">Куди веде snEco у наступні 3 роки. Не «що зробити з брендбуком», а «куди йде сам бренд». Тактичний backlog — окремо у Рекомендаціях.</span>
     <span data-lang="en">Where snEco is heading over the next 3 years. Not "what to do with the brand book" — but where the brand itself is going. The tactical backlog lives separately in Recommendations.</span>
@@ -5626,8 +5631,8 @@ h3.block-title:first-of-type { margin-top: 0; }
      IDEAS / TICKETS (added v2.27)
      ============================================================ -->
 <section class="section" id="sec-ideas" style="padding:56px 64px">
-  <div class="section-eyebrow">💡 <span data-lang="uk">Пропозиції</span><span data-lang="en">Ideas</span></div>
-  <h2 class="section-title"><span data-lang="uk">Пропозиції команди</span><span data-lang="en">Team ideas &amp; suggestions</span></h2>
+  <div class="section-eyebrow">💡 <span data-lang="uk">Пропозиції</span><span data-lang="en">Ideas</span><span data-lang="sk">Návrhy</span></div>
+  <h2 class="section-title"><span data-lang="uk">Пропозиції команди</span><span data-lang="en">Team ideas &amp; suggestions</span><span data-lang="sk">Návrhy tímu</span></h2>
   <div class="section-lead">
     <span data-lang="uk">Місце для ідей, тікетів і пропозицій від команди. Створює будь-хто (ім'я + email). Сортується від нових до старих. Адміни (vg/fg) позначають «✓ зроблено» або повертають у роботу. Коментарі і файли — у будь-який час.</span>
     <span data-lang="en">Place for ideas, tickets and suggestions from the team. Anyone can submit (name + email). Sorted newest first. Admins (vg/fg) mark as done or reopen. Comments and files anytime.</span>
@@ -5635,9 +5640,9 @@ h3.block-title:first-of-type { margin-top: 0; }
 
   <div class="ideas-toolbar">
     <div class="ideas-filter" id="ideas-filter">
-      <button data-filter="open" class="is-active"><span data-lang="uk">Відкриті</span><span data-lang="en">Open</span></button>
-      <button data-filter="done"><span data-lang="uk">Зроблено</span><span data-lang="en">Done</span></button>
-      <button data-filter="all"><span data-lang="uk">Усі</span><span data-lang="en">All</span></button>
+      <button data-filter="open" class="is-active"><span data-lang="uk">Відкриті</span><span data-lang="en">Open</span><span data-lang="sk">Otvorené</span></button>
+      <button data-filter="done"><span data-lang="uk">Зроблено</span><span data-lang="en">Done</span><span data-lang="sk">Hotové</span></button>
+      <button data-filter="all"><span data-lang="uk">Усі</span><span data-lang="en">All</span><span data-lang="sk">Všetky</span></button>
     </div>
     <span class="ideas-counter" id="ideas-counter"></span>
     <button class="ideas-new-btn" id="ideas-new-btn">+ <span data-lang="uk">Нова пропозиція</span><span data-lang="en">New idea</span></button>
@@ -5662,15 +5667,15 @@ h3.block-title:first-of-type { margin-top: 0; }
       </div>
     </div>
     <div class="ideas-form-actions">
-      <button class="primary" data-role="submit"><span data-lang="uk">Створити</span><span data-lang="en">Submit</span></button>
-      <button class="secondary" data-role="cancel"><span data-lang="uk">Скасувати</span><span data-lang="en">Cancel</span></button>
+      <button class="primary" data-role="submit"><span data-lang="uk">Створити</span><span data-lang="en">Submit</span><span data-lang="sk">Vytvoriť</span></button>
+      <button class="secondary" data-role="cancel"><span data-lang="uk">Скасувати</span><span data-lang="en">Cancel</span><span data-lang="sk">Zrušiť</span></button>
       <span class="otp-msg" data-role="msg" style="margin:0"></span>
     </div>
   </div>
 
   <!-- List of ideas -->
   <div id="ideas-list">
-    <div class="ideas-empty"><span data-lang="uk">Завантаження…</span><span data-lang="en">Loading…</span></div>
+    <div class="ideas-empty"><span data-lang="uk">Завантаження…</span><span data-lang="en">Loading…</span><span data-lang="sk">Načítava sa…</span></div>
   </div>
 
   <div style="margin-top:24px;padding:14px 18px;background:var(--black-05);border-radius:8px;font-size:11.5px;color:var(--text-muted);line-height:1.6">
@@ -5683,14 +5688,14 @@ h3.block-title:first-of-type { margin-top: 0; }
      MAINTENANCE (Checklist + Versioning, merged in v2.8)
      ============================================================ -->
 <section class="section" id="sec-maintenance" style="padding:56px 64px">
-  <div class="section-eyebrow"><span data-lang="uk">Maintenance</span><span data-lang="en">Maintenance</span></div>
-  <h2 class="section-title"><span data-lang="uk">Підтримка документа</span><span data-lang="en">Document maintenance</span></h2>
+  <div class="section-eyebrow"><span data-lang="uk">Maintenance</span><span data-lang="en">Maintenance</span><span data-lang="sk">Maintenance</span></div>
+  <h2 class="section-title"><span data-lang="uk">Підтримка документа</span><span data-lang="en">Document maintenance</span><span data-lang="sk">Údržba dokumentu</span></h2>
   <div class="section-lead">
     <span data-lang="uk">Як перевіряти і як вести цей документ. Compliance-чеклист (для будь-якого матеріалу перед випуском), розподіл доступу до захищених розділів і повна історія версій.</span>
     <span data-lang="en">How to check materials against this document and how to maintain it. Compliance checklist (for any asset before release), access management for protected sections, and full version history.</span>
   </div>
 
-  <h3 class="block-title" id="access-control">🔐 <span data-lang="uk">Розподіл доступу</span><span data-lang="en">Access management</span></h3>
+  <h3 class="block-title" id="access-control">🔐 <span data-lang="uk">Розподіл доступу</span><span data-lang="en">Access management</span><span data-lang="sk">Distribúcia prístupu</span></h3>
   <div data-otp-block="admin" class="is-locked" id="admin-section">
     <!-- Locked state: admin login -->
     <div class="otp-locked">
@@ -5705,7 +5710,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <div class="otp-unlocked">
       <div class="otp-session-bar">
         <span><span data-lang="uk">✓ Адмін-сесія для</span><span data-lang="en">✓ Admin session for</span> <span class="otp-session-email" data-otp-email-display></span> · <span data-otp-expires-display></span></span>
-        <button class="otp-logout" data-otp-logout="admin"><span data-lang="uk">🔒 Вийти</span><span data-lang="en">🔒 Lock</span></button>
+        <button class="otp-logout" data-otp-logout="admin"><span data-lang="uk">🔒 Вийти</span><span data-lang="en">🔒 Lock</span><span data-lang="sk">🔒 Odhlásiť</span></button>
       </div>
       <div id="admin-blocks-container">
         <div style="font-size:12px;color:var(--text-muted);text-align:center;padding:24px"><span data-lang="uk">Завантажуємо whitelist'и…</span><span data-lang="en">Loading whitelists…</span></div>
@@ -5751,7 +5756,25 @@ h3.block-title:first-of-type { margin-top: 0; }
 
   <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span></h3>
   <div class="changelog-entry">
-    <span class="changelog-version">v2.28</span><span class="changelog-date">08.05.2026</span>
+    <span class="changelog-version">v2.29</span><span class="changelog-date">08.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>🇸🇰 Додана словацька мовна версія (Phase 1).</strong> Toggle <strong>SK</strong> поряд з UA/EN. Перекладено 131 елемент: 17 sidebar entries · 43 section eyebrows і titles · 71 body label (форми, фільтри, статуси, org-структура, контакти, статуси документів).</li>
+      <li data-lang="en"><strong>🇸🇰 Slovak language added (Phase 1).</strong> <strong>SK</strong> toggle next to UA/EN. 131 items translated: 17 sidebar · 43 section headings · 71 body labels (forms, filters, statuses, org chart, contacts, document statuses).</li>
+      <li data-lang="sk"><strong>🇸🇰 Pridaná slovenčina (Fáza 1).</strong> Prepínač <strong>SK</strong> vedľa UA/EN. Preložených 131 prvkov: 17 položiek menu · 43 nadpisov sekcií · 71 textov UI (formuláre, filtre, stavy, org. štruktúra, kontakty).</li>
+      <li data-lang="uk"><strong>Graceful fallback:</strong> у SK режимі, де переклад відсутній, JS показує UA-варіант (бо SK ближче до UA). Жодна секція не залишається порожньою.</li>
+      <li data-lang="en"><strong>Graceful fallback:</strong> in SK mode, where translation is missing, JS shows the UA variant (since SK is closer to UA). No section is empty.</li>
+      <li data-lang="sk"><strong>Plynulý fallback:</strong> v SK režime, kde chýba preklad, JS zobrazí UA verziu (SK je bližšie k UA). Žiadna sekcia nezostáva prázdna.</li>
+      <li data-lang="uk"><strong>Тримовні email-шаблони:</strong> кожен лист OTP містить пояснення UA + EN + SK одночасно. Subject: <code>Код доступу / Access code / Prístupový kód</code>.</li>
+      <li data-lang="en"><strong>Trilingual email templates:</strong> each OTP email has UA + EN + SK side by side. Subject: <code>Код доступу / Access code / Prístupový kód</code>.</li>
+      <li data-lang="sk"><strong>Trojjazyčné šablóny emailov:</strong> každý OTP email obsahuje UA + EN + SK súčasne. Predmet: <code>Код доступу / Access code / Prístupový kód</code>.</li>
+      <li data-lang="uk"><strong>Phase 2 (наступна сесія):</strong> переклад деталей body всередині секцій (Manifest, Story, Voice, Photo, Packaging, Legal, Sales). Поки — UA fallback видно у SK.</li>
+      <li data-lang="en"><strong>Phase 2 (next session):</strong> translation of body details (Manifest, Story, Voice, Photo, Packaging, Legal, Sales). For now — UA fallback shows in SK mode.</li>
+      <li data-lang="sk"><strong>Fáza 2 (ďalšia relácia):</strong> preklad podrobností sekcií (Manifest, História, Hlas, Foto, Obaly, Legal, Sales). Zatiaľ — v SK sa zobrazuje UA fallback.</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.28</span><span class="changelog-date">08.05.2026</span>
     <ul class="changelog-list">
       <li data-lang="uk"><strong>«Пропозиції» винесено в окрему sidebar-групу «💡 Колаборація»</strong> — раніше було у «Сервіс».</li>
       <li data-lang="en"><strong>"Ideas" moved to its own sidebar group "💡 Collaboration"</strong> — was in "Service".</li>
@@ -6235,7 +6258,7 @@ h3.block-title:first-of-type { margin-top: 0; }
      HR — CONFIDENTIAL (password-gated, added v2.24)
      ============================================================ -->
 <section class="section is-locked" id="sec-hr" data-otp-block="hr" style="padding:56px 64px">
-  <div class="section-eyebrow">🔒 <span data-lang="uk">Конфіденційне · HR</span><span data-lang="en">Confidential · HR</span></div>
+  <div class="section-eyebrow">🔒 <span data-lang="uk">Конфіденційне · HR</span><span data-lang="en">Confidential · HR</span><span data-lang="sk">Dôverné · HR</span></div>
   <h2 class="section-title">HR</h2>
 
   <!-- LOCKED STATE: OTP login form (universal, populated by JS) -->
@@ -6251,7 +6274,7 @@ h3.block-title:first-of-type { margin-top: 0; }
   <div class="otp-unlocked">
     <div class="otp-session-bar">
       <span><span data-lang="uk">✓ Розблоковано для</span><span data-lang="en">✓ Unlocked for</span> <span class="otp-session-email" data-otp-email-display></span> · <span data-otp-expires-display></span></span>
-      <button class="otp-logout" data-otp-logout="hr"><span data-lang="uk">🔒 Вийти</span><span data-lang="en">🔒 Lock</span></button>
+      <button class="otp-logout" data-otp-logout="hr"><span data-lang="uk">🔒 Вийти</span><span data-lang="en">🔒 Lock</span><span data-lang="sk">🔒 Odhlásiť</span></button>
     </div>
 
     <div class="hr-warning-banner">
@@ -6260,7 +6283,7 @@ h3.block-title:first-of-type { margin-top: 0; }
       <span data-lang="en">This brand book lives in a public GitHub repository. The password gate here is a UI barrier, not real cryptographic protection. Any file published in this section is technically reachable via direct raw URL without a password. Keep only <strong>process documentation</strong> in this section; send sensitive files (full payroll, contracts, passport scans) via secure channels (personal email, Signal, Sneco SK Drive). In future, files should move to a private repo.</span>
     </div>
 
-    <h3 class="block-title">📑 <span data-lang="uk">Документи персоналу</span><span data-lang="en">Personnel documents</span></h3>
+    <h3 class="block-title">📑 <span data-lang="uk">Документи персоналу</span><span data-lang="en">Personnel documents</span><span data-lang="sk">Personálne dokumenty</span></h3>
 
     <!-- ZP Vyrobnyctvo -->
     <div class="hr-doc-card">
@@ -6370,19 +6393,35 @@ h3.block-title:first-of-type { margin-top: 0; }
   });
 
   // language toggle
+  function currentLang() {
+    if (document.body.classList.contains('lang-sk')) return 'sk';
+    if (document.body.classList.contains('lang-en')) return 'en';
+    return 'uk';
+  }
+  function applySkFallback() {
+    // CSS hides EN+SK in UK mode and UK+SK in EN mode by !important.
+    // SK mode: CSS hides EN; UK is hidden by JS only if a sibling SK span exists in same parent.
+    // Clear any stale inline display first
+    document.querySelectorAll('[data-lang]').forEach(el => { el.style.display = ''; });
+    if (currentLang() !== 'sk') return;
+    document.querySelectorAll('[data-lang="uk"]').forEach(el => {
+      const parent = el.parentElement;
+      if (parent && parent.querySelector(':scope > [data-lang="sk"]')) {
+        el.style.display = 'none';
+      }
+    });
+  }
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const lang = btn.getAttribute('data-set-lang');
-      document.body.classList.remove('lang-uk','lang-en');
+      document.body.classList.remove('lang-uk','lang-en','lang-sk');
       document.body.classList.add('lang-' + lang);
-      document.documentElement.lang = lang === 'uk' ? 'uk' : 'en';
+      document.documentElement.lang = lang;
       document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b === btn));
-      // Clear any stale inline display from older builds
-      document.querySelectorAll('[data-lang]').forEach(el => { el.style.display = ''; });
+      applySkFallback();
     });
   });
-  // Also clear stale inline display once on init
-  document.querySelectorAll('[data-lang]').forEach(el => { el.style.display = ''; });
+  applySkFallback();
 
   // burger
   const burger = document.getElementById('burger');
@@ -6437,19 +6476,19 @@ h3.block-title:first-of-type { margin-top: 0; }
       if (stage === 'email') {
         return `
           <div class="otp-icon">📧</div>
-          <div class="otp-title"><span data-lang="uk">Введіть email</span><span data-lang="en">Enter email</span></div>
-          <div class="otp-desc"><span data-lang="uk">Якщо ваш email у списку доступу — на нього надійде 6-значний код. Сесія діє 1 годину.</span><span data-lang="en">If your email is whitelisted, you'll receive a 6-digit code. Session lasts 1 hour.</span></div>
+          <div class="otp-title"><span data-lang="uk">Введіть email</span><span data-lang="en">Enter email</span><span data-lang="sk">Zadajte email</span></div>
+          <div class="otp-desc"><span data-lang="uk">Якщо ваш email у списку доступу — на нього надійде 6-значний код. Сесія діє 1 годину.</span><span data-lang="en">If your email is whitelisted, you'll receive a 6-digit code. Session lasts 1 hour.</span><span data-lang="sk">Ak je váš email v zozname prístupu — bude vám zaslaný 6-miestny kód. Relácia trvá 1 hodinu.</span></div>
           <input type="email" class="otp-input" data-role="email" placeholder="you@company.com" autocomplete="email">
-          <button class="otp-btn" data-role="submit"><span data-lang="uk">Надіслати код</span><span data-lang="en">Send code</span></button>
+          <button class="otp-btn" data-role="submit"><span data-lang="uk">Надіслати код</span><span data-lang="en">Send code</span><span data-lang="sk">Odoslať kód</span></button>
           <div class="otp-msg" data-role="msg"></div>`;
       }
       return `
         <div class="otp-icon">🔢</div>
-        <div class="otp-title"><span data-lang="uk">Введіть код з листа</span><span data-lang="en">Enter the code</span></div>
-        <div class="otp-desc">${escapeHtml(email)}<br><span data-lang="uk">Код надіслано — перевірте пошту (включно зі спамом).</span><span data-lang="en">Code sent — check your inbox (and spam).</span></div>
+        <div class="otp-title"><span data-lang="uk">Введіть код з листа</span><span data-lang="en">Enter the code</span><span data-lang="sk">Zadajte kód z listu</span></div>
+        <div class="otp-desc">${escapeHtml(email)}<br><span data-lang="uk">Код надіслано — перевірте пошту (включно зі спамом).</span><span data-lang="en">Code sent — check your inbox (and spam).</span><span data-lang="sk">Kód odoslaný — skontrolujte poštu (vrátane spamu).</span></div>
         <input type="text" inputmode="numeric" maxlength="6" class="otp-input" data-role="code" placeholder="••••••" autocomplete="one-time-code">
-        <button class="otp-btn" data-role="submit"><span data-lang="uk">Підтвердити</span><span data-lang="en">Verify</span></button>
-        <a class="otp-back-link" data-role="back"><span data-lang="uk">← Інший email</span><span data-lang="en">← Use another email</span></a>
+        <button class="otp-btn" data-role="submit"><span data-lang="uk">Підтвердити</span><span data-lang="en">Verify</span><span data-lang="sk">Potvrdiť</span></button>
+        <a class="otp-back-link" data-role="back"><span data-lang="uk">← Інший email</span><span data-lang="en">← Use another email</span><span data-lang="sk">← Iný email</span></a>
         <div class="otp-msg" data-role="msg"></div>`;
     }
     function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]); }
@@ -6514,12 +6553,10 @@ h3.block-title:first-of-type { margin-top: 0; }
   }
   function isEn() { return document.body.classList.contains('lang-en'); }
   function applyLang() {
-    // CSS rules `body.lang-uk [data-lang="en"] { display: none !important }` etc. handle visibility.
-    // Just clear any stale inline display we (or older code) may have set previously,
-    // so newly inserted dynamic content also shows up correctly.
-    document.querySelectorAll('[data-lang]').forEach(el => { el.style.display = ''; });
+    // Re-applies SK→UK fallback after dynamic HTML insertion.
+    if (typeof applySkFallback === 'function') applySkFallback();
+    else document.querySelectorAll('[data-lang]').forEach(el => { el.style.display = ''; });
   }
-  // Run once on init to clear any pre-existing inline display from older builds
   applyLang();
 
   function setBlockUnlocked(rootEl, on, sess) {
@@ -6592,7 +6629,7 @@ h3.block-title:first-of-type { margin-top: 0; }
             </div>
             <div class="admin-add-row">
               <input type="email" placeholder="email@company.com" data-add-input>
-              <button data-add-btn><span data-lang="uk">+ Додати</span><span data-lang="en">+ Add</span></button>
+              <button data-add-btn><span data-lang="uk">+ Додати</span><span data-lang="en">+ Add</span><span data-lang="sk">+ Pridať</span></button>
             </div>
           </div>`;
       }
