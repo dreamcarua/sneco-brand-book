@@ -6487,9 +6487,13 @@ h3.block-title:first-of-type { margin-top: 0; }
   }
   function isEn() { return document.body.classList.contains('lang-en'); }
   function applyLang() {
-    const lang = isEn() ? 'en' : 'uk';
-    document.querySelectorAll('[data-lang]').forEach(el => { el.style.display = el.dataset.lang === lang ? '' : 'none'; });
+    // CSS rules `body.lang-uk [data-lang="en"] { display: none !important }` etc. handle visibility.
+    // Just clear any stale inline display we (or older code) may have set previously,
+    // so newly inserted dynamic content also shows up correctly.
+    document.querySelectorAll('[data-lang]').forEach(el => { el.style.display = ''; });
   }
+  // Run once on init to clear any pre-existing inline display from older builds
+  applyLang();
 
   function setBlockUnlocked(rootEl, on, sess) {
     rootEl.classList.toggle('is-unlocked', on);
