@@ -953,6 +953,63 @@ h3.block-title:first-of-type { margin-top: 0; }
   padding: 2px 8px; border-radius: 10px; background: var(--black-05);
 }
 
+/* RETAIL CONCEPT (TT) */
+.tt-hero {
+  display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; align-items: center;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px; margin-bottom: 24px;
+}
+.tt-hero img { width: 100%; height: auto; border-radius: 8px; display: block; }
+.tt-hero-text h4 { font-size: 16px; font-weight: 800; margin-bottom: 8px; line-height: 1.3; }
+.tt-hero-text p { font-size: 13px; line-height: 1.65; color: var(--text-muted); margin-bottom: 8px; }
+.tt-hero-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.tt-hero-tag {
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 12px;
+  background: var(--yellow); color: var(--black);
+}
+.tt-hero-tag.muted { background: var(--black-05); color: var(--text-muted); }
+.tt-gallery {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px; margin-top: 12px;
+}
+.tt-card {
+  background: var(--white); border: 1px solid var(--border); border-radius: 10px;
+  overflow: hidden; transition: transform 0.15s, box-shadow 0.15s;
+}
+.tt-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(30,30,30,0.10); }
+.tt-card-image {
+  background: var(--black-05); display: flex; align-items: center; justify-content: center;
+  aspect-ratio: 4/3; overflow: hidden;
+}
+.tt-card-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tt-card-meta { padding: 8px 12px; font-size: 11.5px; color: var(--text-muted); line-height: 1.45; border-top: 1px solid var(--border); }
+.tt-spec-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px; margin-top: 10px;
+}
+.tt-spec-item {
+  padding: 12px 14px; background: var(--black-05); border-radius: 8px;
+  font-size: 12px; line-height: 1.55;
+}
+.tt-spec-item strong { display: block; color: var(--black); font-size: 12.5px; margin-bottom: 2px; letter-spacing: -0.01em; }
+.tt-timeline {
+  display: flex; gap: 0; margin: 16px 0; flex-wrap: wrap;
+  border-left: 2px solid var(--yellow); padding-left: 16px;
+}
+.tt-timeline-item {
+  margin-bottom: 14px; min-width: 240px; flex: 1;
+}
+.tt-timeline-date {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 4px;
+}
+.tt-timeline-title { font-size: 13px; font-weight: 700; color: var(--black); margin-bottom: 4px; }
+.tt-timeline-desc { font-size: 12px; line-height: 1.5; color: var(--text-muted); }
+@media (max-width: 700px) {
+  .tt-hero { grid-template-columns: 1fr; }
+}
+
 /* PRINT */
 @media print {
   body { background: var(--white); }
@@ -1055,6 +1112,10 @@ h3.block-title:first-of-type { margin-top: 0; }
       <span class="dot"></span>
       <span data-lang="uk">Legal &amp; substantiation</span><span data-lang="en">Legal &amp; substantiation</span>
     </button>
+    <button class="nav-link" data-target="retail" type="button">
+      <span class="dot"></span>
+      <span data-lang="uk">Фірмова торгова точка</span><span data-lang="en">Branded retail kiosk</span>
+    </button>
     <button class="nav-link" data-target="touchpoints" type="button">
       <span class="dot"></span>
       <span data-lang="uk">Точки контакту</span><span data-lang="en">Touchpoints</span>
@@ -1086,7 +1147,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Bible v2.20 · 2026
+    Brand Bible v2.22 · 2026
   </div>
 </nav>
 
@@ -1099,7 +1160,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <span data-lang="uk">Один інгредієнт. <span class="qr-ns-accent">Жодних компромісів.</span> Сирний снек XXI століття.</span>
     <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
   </div>
-  <div class="qr-meta">v2.20 · 2026</div>
+  <div class="qr-meta">v2.22 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -3117,44 +3178,170 @@ h3.block-title:first-of-type { margin-top: 0; }
       </div>
     </div>
 
+    <h3 class="block-title" style="margin-top:48px">🌍 <span data-lang="uk">Міжнародні версії</span><span data-lang="en">International versions</span></h3>
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.65;margin-bottom:18px">
+      <span data-lang="uk">Окремі лицьові дизайни 90×160 мм для трьох цільових ринків: <strong>EN</strong> (general international, англомовний), <strong>US</strong> (Північна Америка, OZ.+g, з конкретною кількістю протеїну), <strong>SK</strong> (ЄС / Словаччина, з 8-мовною зворотною етикеткою). Та сама архітектура layout, але змінюються бейджі, мова, ribbon і back-side.</span>
+      <span data-lang="en">Front designs 90×160 mm for three target markets: <strong>EN</strong> (general international, English), <strong>US</strong> (North America, OZ.+g, with explicit protein quantity), <strong>SK</strong> (EU / Slovakia, with an 8-language back label). Same layout architecture; badges, language, ribbon and back-side differ.</span>
+    </div>
+
+    <!-- EN -->
     <div class="pkg-cat-header">
-      <span class="pkg-cat-title"><span data-lang="uk">Експортна / EU версія (англомовна)</span><span data-lang="en">Export / EU version (English)</span></span>
-      <span class="pkg-cat-count">2</span>
+      <span class="pkg-cat-title">🇬🇧 <span data-lang="uk">EN — General International</span><span data-lang="en">EN — General International</span></span>
+      <span class="pkg-cat-count">3</span>
     </div>
     <div class="pkg-gallery">
       <div class="pkg-card">
-        <a href="packaging/small/preview/SNECO_BR_ENG.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_BR_ENG.jpg" alt="snEco Blue Royale ENG" loading="lazy"></a>
+        <a href="packaging/small/preview/SNECO_CED_ENG.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_CED_ENG.jpg" alt="snEco Cheddar EN" loading="lazy"></a>
         <div class="pkg-card-meta">
-          <div class="pkg-card-name">Blue Royale (EN)</div>
-          <div class="pkg-card-sub" data-lang="uk">Блю Рояль · 0.5 OZ. (14 g) · BR_ENG</div><div class="pkg-card-sub" data-lang="en">Blue Royale · 0.5 OZ. (14 g) · BR_ENG</div>
-          <a href="packaging/print/EN-28g/SNECO%2090x160%20N%20BR%20ENG%20crv.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
+          <div class="pkg-card-name">Cheddar (EN)</div>
+          <div class="pkg-card-sub" data-lang="uk">Чеддер · 1 OZ. (28 g) · London bg</div><div class="pkg-card-sub" data-lang="en">Cheddar · 1 OZ. (28 g) · London bg</div>
+          <a href="packaging/print/EN-28g/SNECO%20CHEDDAR_v13_FINAL.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
       <div class="pkg-card">
-        <a href="packaging/small/preview/SNECO_GOU_ENG.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_GOU_ENG.jpg" alt="snEco Gouda ENG" loading="lazy"></a>
+        <a href="packaging/small/preview/SNECO_GOU_ENG.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_GOU_ENG.jpg" alt="snEco Gouda EN" loading="lazy"></a>
         <div class="pkg-card-meta">
           <div class="pkg-card-name">Gouda (EN)</div>
-          <div class="pkg-card-sub" data-lang="uk">Гауда · 1 OZ. (28 g) · GOU_ENG</div><div class="pkg-card-sub" data-lang="en">Gouda · 1 OZ. (28 g) · GOU_ENG</div>
+          <div class="pkg-card-sub" data-lang="uk">Гауда · 1 OZ. (28 g) · Holland bg</div><div class="pkg-card-sub" data-lang="en">Gouda · 1 OZ. (28 g) · Holland bg</div>
           <a href="packaging/print/EN-28g/SNECO%20GOUDA_eng%20v13_final.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
+        </div>
+      </div>
+      <div class="pkg-card">
+        <a href="packaging/small/preview/SNECO_BR_ENG.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_BR_ENG.jpg" alt="snEco Blue Royale EN" loading="lazy"></a>
+        <div class="pkg-card-meta">
+          <div class="pkg-card-name">Blue Royale (EN)</div>
+          <div class="pkg-card-sub" data-lang="uk">Блю Рояль · 0.5 OZ. (14 g) · Paris bg</div><div class="pkg-card-sub" data-lang="en">Blue Royale · 0.5 OZ. (14 g) · Paris bg</div>
+          <a href="packaging/print/EN-28g/SNECO%2090x160%20N%20BR%20ENG%20crv.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
     </div>
     <div style="margin-top:14px;padding:12px 16px;background:rgba(150,193,31,0.08);border-left:3px solid var(--green);border-radius:4px;font-size:12px;color:var(--text-muted);line-height:1.6">
-      <span data-lang="uk"><strong>Відмінності від UA-версії:</strong> повністю англомовний layout · бейджі <code>KETO FRIENDLY</code> + <code>HIGH PROTEIN</code> + <code>RENEWABLE ENERGY</code> (іконка вітряка/сонця) · колірний beige-ribbon «<code>FROM 100% [CHEESE]</code>» · силует столиці країни сиру (Париж для BR, голландське містечко з вітряком для Gouda) · вага в обох системах <code>OZ. (g)</code> · значок <code>SIAL Innovation Grand Prix 2024</code> (на Gouda) · глобальний slogan «<strong>TASTE THE CRUNCH OF THE WORLD!</strong>».</span>
-      <span data-lang="en"><strong>Differences from the UA version:</strong> fully English layout · badges <code>KETO FRIENDLY</code> + <code>HIGH PROTEIN</code> + <code>RENEWABLE ENERGY</code> (wind/sun icon) · colored beige ribbon "<code>FROM 100% [CHEESE]</code>" · capital silhouette of the cheese-origin country (Paris for BR, a Dutch town with windmill for Gouda) · weight in both systems <code>OZ. (g)</code> · <code>SIAL Innovation Grand Prix 2024</code> badge (on Gouda) · global slogan "<strong>TASTE THE CRUNCH OF THE WORLD!</strong>".</span>
+      <span data-lang="uk"><strong>EN-варіант:</strong> ribbon «<code>FROM 100% [CHEESE] CHEESE</code>» (з FROM) · бейдж <code>HIGH PROTEIN</code> (без числа) · бекграунд силует столиці країни сиру: Cheddar — Лондон, Gouda — голландське містечко з вітряком, Blue Royale — Париж.</span>
+      <span data-lang="en"><strong>EN variant:</strong> ribbon "<code>FROM 100% [CHEESE] CHEESE</code>" (with FROM) · badge <code>HIGH PROTEIN</code> (no number) · capital-silhouette background of the cheese-origin country: Cheddar — London, Gouda — a Dutch town with windmill, Blue Royale — Paris.</span>
     </div>
-    <div style="margin-top:8px;padding:10px 14px;background:rgba(220,38,38,0.06);border-left:3px solid #dc2626;border-radius:4px;font-size:11.5px;color:var(--text-muted);line-height:1.55">
-      <span data-lang="uk">⚠ <strong>Друкарська помилка у Blue Royale ENG:</strong> «CRUN<strong>C</strong>Y CHEESE BITES» → правильно <strong>CRUNCHY</strong> (як на Gouda ENG). Виправити перед тиражем.</span>
-      <span data-lang="en">⚠ <strong>Typo in Blue Royale ENG:</strong> "CRUN<strong>C</strong>Y CHEESE BITES" → correct spelling is <strong>CRUNCHY</strong> (as on Gouda ENG). Fix before press run.</span>
+
+    <!-- US -->
+    <div class="pkg-cat-header">
+      <span class="pkg-cat-title">🇺🇸 <span data-lang="uk">US — Північна Америка</span><span data-lang="en">US — North America</span></span>
+      <span class="pkg-cat-count">1</span>
     </div>
+    <div class="pkg-gallery">
+      <div class="pkg-card">
+        <a href="packaging/small/preview/SNECO_GOU_US.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_GOU_US.jpg" alt="snEco Gauda US" loading="lazy"></a>
+        <div class="pkg-card-meta">
+          <div class="pkg-card-name">Gauda (US)</div>
+          <div class="pkg-card-sub" data-lang="uk">Гауда · 1 OZ. (28 g) · 15G PROTEIN · GOU_US</div><div class="pkg-card-sub" data-lang="en">Gauda · 1 OZ. (28 g) · 15G PROTEIN · GOU_US</div>
+          <a href="packaging/print/US-90x160/SNECO%20GAUDA_v10_FINAL_US.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:14px;padding:12px 16px;background:rgba(150,193,31,0.08);border-left:3px solid var(--green);border-radius:4px;font-size:12px;color:var(--text-muted);line-height:1.6">
+      <span data-lang="uk"><strong>US-варіант:</strong> ribbon «<code>100% [CHEESE] CHEESE</code>» (без FROM) · бейдж <code>15G PROTEIN in this pack</code> (з конкретною кількістю — вимога FDA / consumer) · той самий голландський бекграунд як EN.</span>
+      <span data-lang="en"><strong>US variant:</strong> ribbon "<code>100% [CHEESE] CHEESE</code>" (no FROM) · badge <code>15G PROTEIN in this pack</code> (explicit number — FDA / consumer expectation) · same Dutch background as EN.</span>
+    </div>
+
+    <!-- SK -->
+    <div class="pkg-cat-header">
+      <span class="pkg-cat-title">🇸🇰 <span data-lang="uk">SK — Словаччина / EU</span><span data-lang="en">SK — Slovakia / EU</span></span>
+      <span class="pkg-cat-count">2</span>
+    </div>
+    <div class="pkg-gallery">
+      <div class="pkg-card">
+        <a href="packaging/small/preview/SNECO_CED_SK.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_CED_SK.jpg" alt="snEco Cheddar SK" loading="lazy"></a>
+        <div class="pkg-card-meta">
+          <div class="pkg-card-name">Cheddar (SK)</div>
+          <div class="pkg-card-sub" data-lang="uk">Чеддер · 1 OZ. (28 g) · 12G PROTEIN · CED_SK</div><div class="pkg-card-sub" data-lang="en">Cheddar · 1 OZ. (28 g) · 12G PROTEIN · CED_SK</div>
+          <a href="packaging/print/SK-90x160/SNECO%20CHEDDAR_v10_FINAL_SK.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
+        </div>
+      </div>
+      <div class="pkg-card">
+        <a href="packaging/small/preview/SNECO_GOU_SK.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_GOU_SK.jpg" alt="snEco Gauda SK" loading="lazy"></a>
+        <div class="pkg-card-meta">
+          <div class="pkg-card-name">Gauda (SK)</div>
+          <div class="pkg-card-sub" data-lang="uk">Гауда · 1 OZ. (28 g) · 15G PROTEIN · GOU_SK</div><div class="pkg-card-sub" data-lang="en">Gauda · 1 OZ. (28 g) · 15G PROTEIN · GOU_SK</div>
+          <a href="packaging/print/SK-90x160/SNECO%20GAUDA_v10_FINAL_SK.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:14px;padding:12px 16px;background:rgba(150,193,31,0.08);border-left:3px solid var(--green);border-radius:4px;font-size:12px;color:var(--text-muted);line-height:1.6">
+      <span data-lang="uk"><strong>SK-варіант:</strong> ribbon «<code>100% [CHEESE] CHEESE</code>» (без FROM) · бейдж з кількістю протеїну (12G для Cheddar, 15G для Gauda) · комплектується <strong>зворотною етикеткою 57×70 мм</strong> з юр.даними Sneco SK s.r.o. і 8-мовним перекладом.</span>
+      <span data-lang="en"><strong>SK variant:</strong> ribbon "<code>100% [CHEESE] CHEESE</code>" (no FROM) · badge with protein quantity (12G for Cheddar, 15G for Gauda) · ships with a <strong>57×70 mm back label</strong> bearing Sneco SK s.r.o. legal data and 8-language translation.</span>
+    </div>
+
+    <!-- SK back labels -->
+    <div class="pkg-cat-header">
+      <span class="pkg-cat-title">🏷️ <span data-lang="uk">SK — зворотні етикетки 57×70 мм</span><span data-lang="en">SK — back labels 57×70 mm</span></span>
+      <span class="pkg-cat-count">2</span>
+    </div>
+    <div class="pkg-gallery">
+      <div class="pkg-card">
+        <a href="packaging/small/preview/SNECO_CED_SK57.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_CED_SK57.jpg" alt="Cheddar SK back label" loading="lazy"></a>
+        <div class="pkg-card-meta">
+          <div class="pkg-card-name">Cheddar SK · back</div>
+          <div class="pkg-card-sub" data-lang="uk">EAN 8 582000 056710 · 57×70 мм</div><div class="pkg-card-sub" data-lang="en">EAN 8 582000 056710 · 57×70 mm</div>
+          <a href="packaging/print/SK-57x70/SNECO%20CHEDDAR_SK_57x70_v15_final.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
+        </div>
+      </div>
+      <div class="pkg-card">
+        <a href="packaging/small/preview/SNECO_GOU_SK57.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_GOU_SK57.jpg" alt="Gauda SK back label" loading="lazy"></a>
+        <div class="pkg-card-meta">
+          <div class="pkg-card-name">Gauda SK · back</div>
+          <div class="pkg-card-sub" data-lang="uk">EAN 8 582000 056703 · 57×70 мм</div><div class="pkg-card-sub" data-lang="en">EAN 8 582000 056703 · 57×70 mm</div>
+          <a href="packaging/print/SK-57x70/SNECO%20GAUDA_SK_57x70_v13_final.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:14px;padding:12px 16px;background:rgba(150,193,31,0.08);border-left:3px solid var(--green);border-radius:4px;font-size:12px;color:var(--text-muted);line-height:1.6">
+      <span data-lang="uk"><strong>Зворотна етикетка:</strong> Sneco SK, s.r.o. · Karpatska 1328/3, 040 01 Kosice · sales@sneco.eu · sneco.eu · BARCODE EAN-13 · поля Best Before / Batch Number · іконки утилізації · 8 мов перекладу слова «Виготовлено» (EN/SK/PL/CZ/DE/IT/FR/ES + SE).</span>
+      <span data-lang="en"><strong>Back label:</strong> Sneco SK, s.r.o. · Karpatska 1328/3, 040 01 Kosice · sales@sneco.eu · sneco.eu · EAN-13 barcode · Best Before / Batch Number fields · waste-sorting icons · 8 translations of "Manufactured by" (EN/SK/PL/CZ/DE/IT/FR/ES + SE).</span>
+    </div>
+
+    <!-- Comparison matrix -->
+    <h4 style="margin:32px 0 8px 0;font-size:12.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted)"><span data-lang="uk">Матриця ринок × SKU</span><span data-lang="en">Market × SKU matrix</span></h4>
+    <div class="card" style="padding:0;overflow:hidden">
+      <table class="spec-table">
+        <thead><tr>
+          <th><span data-lang="uk">SKU</span><span data-lang="en">SKU</span></th>
+          <th>UA</th>
+          <th>EN</th>
+          <th>US</th>
+          <th>SK</th>
+          <th><span data-lang="uk">SK back</span><span data-lang="en">SK back</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td><strong>Cheddar</strong></td><td>✅</td><td>✅</td><td>—</td><td>✅</td><td>✅</td></tr>
+          <tr><td><strong>Gouda</strong></td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+          <tr><td><strong>Blue Royale</strong></td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td>Mozzarella</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td>Primaggio</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td>Smoked Suluguni</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td>5 mixes (cheese+nut)</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td>Crispy Olives (vegan)</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Typos -->
+    <div style="margin-top:14px;padding:12px 16px;background:rgba(220,38,38,0.06);border-left:3px solid #dc2626;border-radius:4px;font-size:12px;color:var(--text-muted);line-height:1.65">
+      <strong style="color:#b91c1c"><span data-lang="uk">⚠ Друкарські помилки знайдено в експортних файлах — виправити перед тиражем:</span><span data-lang="en">⚠ Typos found in export files — fix before press run:</span></strong>
+      <ul style="margin:8px 0 0 16px;line-height:1.7">
+        <li data-lang="uk"><strong>«CRUNCY»</strong> замість <strong>«CRUNCHY»</strong> (відсутня H) — на Blue Royale EN, Cheddar SK, Gauda US, Gauda SK</li>
+        <li data-lang="en"><strong>"CRUNCY"</strong> instead of <strong>"CRUNCHY"</strong> (missing H) — on Blue Royale EN, Cheddar SK, Gauda US, Gauda SK</li>
+        <li data-lang="uk"><strong>«CEDDAR»</strong> замість <strong>«CHEDDAR»</strong> (відсутня H) — на Cheddar SK</li>
+        <li data-lang="en"><strong>"CEDDAR"</strong> instead of <strong>"CHEDDAR"</strong> (missing H) — on Cheddar SK</li>
+        <li data-lang="uk"><strong>«GAUDA»</strong> замість <strong>«GOUDA»</strong> — на US і SK варіантах. Стандартна англомовна форма — Gouda. Для словацького ринку «GAUDA» можливо допустимо (перевірити з місцевим маркетингом), але для US це не правильно — узгодити перед друком</li>
+        <li data-lang="en"><strong>"GAUDA"</strong> instead of <strong>"GOUDA"</strong> — on US and SK variants. Standard English spelling is Gouda. May be acceptable for Slovak market (verify with local marketing), but should be Gouda for US — confirm before print</li>
+      </ul>
+    </div>
+
     <div style="margin-top:8px;padding:10px 14px;background:rgba(254,191,39,0.10);border-left:3px solid var(--yellow);border-radius:4px;font-size:11.5px;color:var(--text-muted);line-height:1.55">
-      <span data-lang="uk">🔄 <strong>В розробці:</strong> Cheddar EN, Mozzarella EN, Primaggio EN, Smoked Suluguni EN, Crispy Olives EN — додамо в галерею щойно надішлеш нові файли.</span>
-      <span data-lang="en">🔄 <strong>In development:</strong> Cheddar EN, Mozzarella EN, Primaggio EN, Smoked Suluguni EN, Crispy Olives EN — will be added to the gallery as soon as new files are shared.</span>
+      <span data-lang="uk">🔄 <strong>В розробці для EN/US/SK:</strong> Mozzarella, Primaggio, Smoked Suluguni, 5 міксів сир+горіх, Crispy Olives — додамо в галерею щойно надішлеш нові файли.</span>
+      <span data-lang="en">🔄 <strong>In development for EN/US/SK:</strong> Mozzarella, Primaggio, Smoked Suluguni, 5 cheese+nut mixes, Crispy Olives — will be added to the gallery as new files come in.</span>
     </div>
 
     <div style="margin-top:24px;padding:14px 18px;background:var(--yellow-10);border-radius:8px;font-size:12px;line-height:1.6">
-      <span data-lang="uk">📂 <strong>Усі 14 PDF — оригінали (CMYK, готові до друку)</strong>: 12 UA + 2 EN. Кнопка <strong>⬇ PDF</strong> на кожній картці завантажує файл напряму. Розмір 9–15 МБ. .ai сирці — за запитом: <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>.</span>
-      <span data-lang="en">📂 <strong>All 14 PDFs — originals (CMYK, print-ready)</strong>: 12 UA + 2 EN. The <strong>⬇ PDF</strong> button on each card downloads the file directly. 9–15 MB each. .ai sources on request: <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>.</span>
+      <span data-lang="uk">📂 <strong>Усі 20 PDF — оригінали (CMYK, готові до друку)</strong>: 12 UA + 3 EN + 1 US + 2 SK (front) + 2 SK (back 57×70). Кнопка <strong>⬇ PDF</strong> на кожній картці завантажує файл напряму. Розмір 4–15 МБ. .ai сирці — за запитом: <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>.</span>
+      <span data-lang="en">📂 <strong>All 20 PDFs — originals (CMYK, print-ready)</strong>: 12 UA + 3 EN + 1 US + 2 SK (front) + 2 SK (back 57×70). The <strong>⬇ PDF</strong> button on each card downloads the file directly. 4–15 MB each. .ai sources on request: <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>.</span>
     </div>
   </div>
 
@@ -4110,6 +4297,154 @@ h3.block-title:first-of-type { margin-top: 0; }
 </section>
 
 <!-- ============================================================
+     RETAIL CONCEPT — BRANDED KIOSK (added in v2.21)
+     ============================================================ -->
+<section class="section" id="sec-retail" style="padding:56px 64px">
+  <div class="section-eyebrow"><span data-lang="uk">Фірмова торгова точка</span><span data-lang="en">Branded retail kiosk</span></div>
+  <h2 class="section-title"><span data-lang="uk">Фірмова торгова точка snEco</span><span data-lang="en">snEco branded retail kiosk</span></h2>
+  <div class="section-lead">
+    <span data-lang="uk">Острівна торгова точка snEco у торгово-розважальному центрі. Запущено в <strong>ТРЦ «Французький бульвар» (Київ, 1 жовтня 2020)</strong>, провела повний рік повноцінної роботи. Цей розділ — для дистриб'юторів, франчайзі та трейд-маркетинг команди: габарити, матеріали, ключові елементи дизайну і реальні фото з ТРЦ.</span>
+    <span data-lang="en">Free-standing snEco kiosk for shopping-centre formats. Launched at <strong>Frantsuzkyi Bulvar Mall (Kyiv, 1 October 2020)</strong>, ran for a full year. This section is for distributors, franchisees and trade-marketing: dimensions, materials, key design elements and real-store photos.</span>
+  </div>
+
+  <!-- HERO: Live store photo -->
+  <div class="tt-hero">
+    <img src="retail/concept-2020/photo_2021_b.jpg" alt="snEco kiosk · live operation, Kyiv 2021" loading="lazy">
+    <div class="tt-hero-text">
+      <h4><span data-lang="uk">L-подібний острів. Чорна основа, скло, мох, підсвічений логотип.</span><span data-lang="en">L-shaped island. Black base, glass, moss, backlit logo.</span></h4>
+      <p><span data-lang="uk">Габарити <strong>2800 × 1300 × 2300 мм</strong>. Площа ~3,6 м² — оптимально під фуд-корт або прохідний коридор. Самостійний острів без пристосування до стін.</span>
+      <span data-lang="en">Dimensions <strong>2800 × 1300 × 2300 mm</strong>. Footprint ~3.6 m² — optimal for food court or main aisle. Free-standing island, no wall attachment required.</span></p>
+      <div class="tt-hero-meta">
+        <span class="tt-hero-tag">L-shape · 2800×1300</span>
+        <span class="tt-hero-tag muted">Kyiv · 2020</span>
+        <span class="tt-hero-tag muted">Mall food court</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <h3 class="block-title">📅 <span data-lang="uk">Хронологія проєкту</span><span data-lang="en">Project timeline</span></h3>
+  <div class="tt-timeline">
+    <div class="tt-timeline-item">
+      <div class="tt-timeline-date">01.07.2020</div>
+      <div class="tt-timeline-title"><span data-lang="uk">Концепт-варіанти 1 і 2</span><span data-lang="en">Concept variants 1 &amp; 2</span></div>
+      <div class="tt-timeline-desc"><span data-lang="uk">Перші концепти у деревʼяно-коричневому стилі з doodle-логотипом і кав'ярним підходом. Не пройшли — відмовилися від «cafe-стилю».</span><span data-lang="en">First concepts in a wood-brown style with a doodle logo and a coffee-shop feel. Rejected — moved away from the "cafe vibe".</span></div>
+    </div>
+    <div class="tt-timeline-item">
+      <div class="tt-timeline-date">~09.2020</div>
+      <div class="tt-timeline-title"><span data-lang="uk">Фінальний техпроєкт</span><span data-lang="en">Final blueprint</span></div>
+      <div class="tt-timeline-desc"><span data-lang="uk">Чорний фон, підсвічений логотип, декоративний мох, скляна вітрина. Перехід від cafe-стилю до food-tech-snack-look.</span><span data-lang="en">Black backdrop, backlit logo, decorative moss, glass display. Cafe-vibe replaced with food-tech snack identity.</span></div>
+    </div>
+    <div class="tt-timeline-item">
+      <div class="tt-timeline-date">30.09 → 01.10.2020</div>
+      <div class="tt-timeline-title"><span data-lang="uk">Монтаж і відкриття</span><span data-lang="en">Install &amp; opening</span></div>
+      <div class="tt-timeline-desc"><span data-lang="uk">Підрядник ПП ТФ «Влад». ТРЦ «Французький бульвар», 3-й поверх, фуд-корт.</span><span data-lang="en">Contractor: PP TF "Vlad". Frantsuzkyi Bulvar Mall, 3rd floor, food court.</span></div>
+    </div>
+    <div class="tt-timeline-item">
+      <div class="tt-timeline-date">07.2021</div>
+      <div class="tt-timeline-title"><span data-lang="uk">~9 місяців у роботі</span><span data-lang="en">~9 months in operation</span></div>
+      <div class="tt-timeline-desc"><span data-lang="uk">Точка стабільно працювала, проводила дегустації, мала постійних покупців.</span><span data-lang="en">Kiosk in stable operation, hosting tastings and serving repeat customers.</span></div>
+    </div>
+  </div>
+
+  <!-- KEY DESIGN ELEMENTS -->
+  <h3 class="block-title" style="margin-top:48px">🎨 <span data-lang="uk">Ключові елементи дизайну</span><span data-lang="en">Key design elements</span></h3>
+  <div class="card">
+    <div class="tt-spec-grid">
+      <div class="tt-spec-item"><strong>🖤 <span data-lang="uk">Чорна основа</span><span data-lang="en">Black base</span></strong><span data-lang="uk">Корпус і бічні стінки — мел.фарба темно-коричневого/чорного. Дозволяє писати рекламні меседжі крейдою (сезонні промо, дегустації, новинки).</span><span data-lang="en">Body and side panels — chalk-paint dark-brown/black. Lets you chalk-write seasonal promos, tastings and launches by hand.</span></div>
+      <div class="tt-spec-item"><strong>💡 <span data-lang="uk">Підсвічений логотип</span><span data-lang="en">Backlit logo</span></strong><span data-lang="uk">SNÉCO на бічній стінці. LED-торцева підсвітка букв. Удень — білий + жовтий. Увечері — світиться помаранчевим (теплий світловий акцент у залі).</span><span data-lang="en">SNÉCO on the side panel. LED edge-lit lettering. White + yellow by day. Warm orange glow at night — a beacon in the dim hall.</span></div>
+      <div class="tt-spec-item"><strong>🌿 <span data-lang="uk">Декоративний мох</span><span data-lang="en">Decorative moss</span></strong><span data-lang="uk">Зелена смуга 80 мм по периметру верхньої частини корпусу. Природний матеріал, без поливу. Підсилює «еко» позиціонування.</span><span data-lang="en">A green stripe of 80 mm around the top edge of the body. Real preserved moss, no maintenance. Reinforces the "eco" positioning.</span></div>
+      <div class="tt-spec-item"><strong>🪟 <span data-lang="uk">Скляна вітрина</span><span data-lang="en">Glass display</span></strong><span data-lang="uk">Прозорі ємності з насипними сирними кульками: світлі, копчені, мікси. «Wow-effect» — пройти повз неможливо.</span><span data-lang="en">Clear bins with bulk cheese balls: regular, smoked, mixes. The "wow" effect — impossible to walk past.</span></div>
+      <div class="tt-spec-item"><strong>📦 <span data-lang="uk">Полиці упаковок</span><span data-lang="en">Pack shelves</span></strong><span data-lang="uk">Нахилені полиці з LED-підсвіткою в торці. Пачки 28 г усіх смаків + ціни на жовтих цінниках. Прозоре скло — все видно.</span><span data-lang="en">Tilted shelves with LED edge-lighting. 28 g packs in all flavours + yellow price tags. Glass-fronted — everything visible.</span></div>
+      <div class="tt-spec-item"><strong>✏️ <span data-lang="uk">Дошка-«крейдомет»</span><span data-lang="en">Chalkboard message</span></strong><span data-lang="uk">«Запрошуємо на дегустацію сирних snEco» — рукописний меседж на корпусі. Швидко змінюється під поточну акцію.</span><span data-lang="en">"Come try our cheese snEco" — handwritten message on the body. Quick to swap for the current activation.</span></div>
+    </div>
+  </div>
+
+  <!-- BLUEPRINT -->
+  <h3 class="block-title" style="margin-top:48px">📐 <span data-lang="uk">Технічне креслення (фінальний варіант)</span><span data-lang="en">Final blueprint</span></h3>
+  <div class="card">
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.65;margin-bottom:16px">
+      <span data-lang="uk">Робочий технічний проект з усіма розмірами і матеріалами. Кліком — на повну роздільну здатність. PDF-сирець доступний для підрядників за запитом на <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>.</span>
+      <span data-lang="en">Working technical drawing with all dimensions and materials. Click for full size. PDF source for contractors on request at <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>.</span>
+    </div>
+    <a href="retail/concept-2020/render_main.jpg" target="_blank" style="display:block;border-radius:8px;overflow:hidden;border:1px solid var(--border)"><img src="retail/concept-2020/render_main.jpg" alt="snEco kiosk blueprint — final design" style="width:100%;height:auto;display:block" loading="lazy"></a>
+  </div>
+
+  <!-- LIVE STORE -->
+  <h3 class="block-title" style="margin-top:48px">📸 <span data-lang="uk">Точка у роботі (липень 2021)</span><span data-lang="en">Kiosk in operation (July 2021)</span></h3>
+  <div style="font-size:13px;color:var(--text-muted);line-height:1.65;margin-bottom:8px">
+    <span data-lang="uk">Реальні фото з ТРЦ після ~9 місяців роботи. Натисни на картку для повного розміру.</span>
+    <span data-lang="en">Real photos from the mall after ~9 months of operation. Click a card to view full size.</span>
+  </div>
+  <div class="tt-gallery">
+    <a href="retail/concept-2020/photo_2021_a.jpg" target="_blank" class="tt-card">
+      <div class="tt-card-image"><img src="retail/concept-2020/photo_2021_a.jpg" alt="snEco kiosk side view" loading="lazy"></div>
+      <div class="tt-card-meta"><span data-lang="uk">Бічна вітрина: насипні кульки на 3 види, продавець у фірмовому, вивіска «ВІДКРИТТЯ»</span><span data-lang="en">Side display: bulk cheese balls (3 varieties), staff in brand t-shirt, "Now open" sign</span></div>
+    </a>
+    <a href="retail/concept-2020/photo_2021_b.jpg" target="_blank" class="tt-card">
+      <div class="tt-card-image"><img src="retail/concept-2020/photo_2021_b.jpg" alt="snEco kiosk full L-shape" loading="lazy"></div>
+      <div class="tt-card-meta"><span data-lang="uk">Загальний вид L-форми. Підсвічений логотип, мох, рукописний меседж «дегустація»</span><span data-lang="en">Full L-shape view. Backlit logo, moss strip, handwritten "tasting" message</span></div>
+    </a>
+    <a href="retail/concept-2020/photo_2021_c.jpg" target="_blank" class="tt-card">
+      <div class="tt-card-image"><img src="retail/concept-2020/photo_2021_c.jpg" alt="snEco kiosk product display" loading="lazy"></div>
+      <div class="tt-card-meta"><span data-lang="uk">Скляна вітрина крупним планом: 3 види насипних + полиці з 28 г пачками і цінами</span><span data-lang="en">Glass display close-up: 3 bulk varieties + shelves with 28 g packs and prices</span></div>
+    </a>
+    <a href="retail/concept-2020/photo_2021_d.jpg" target="_blank" class="tt-card">
+      <div class="tt-card-image"><img src="retail/concept-2020/photo_2021_d.jpg" alt="snEco kiosk evening view" loading="lazy"></div>
+      <div class="tt-card-meta"><span data-lang="uk">Вечірній режим. Логотип світиться теплим помаранчевим — beacon у залі ТРЦ</span><span data-lang="en">Evening mode. Logo glows warm orange — a beacon in the mall hall</span></div>
+    </a>
+  </div>
+
+  <!-- EARLY CONCEPTS -->
+  <h3 class="block-title" style="margin-top:48px">🗂 <span data-lang="uk">Ранні концепти (липень 2020) — що відкинули</span><span data-lang="en">Early concepts (July 2020) — what we rejected</span></h3>
+  <div class="card" style="margin-bottom:12px">
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.65">
+      <span data-lang="uk">Перші 8 рендерів — дерев'яно-коричневий стиль з doodle-меню кав'ярні і барним табуретом. Здавався «затишним», але <strong>підсилював асоціацію з кавою / десертами</strong>, а не з food-tech-снеком. Відкинули — і за 2 місяці зробили чорний техно-острів. Тримай ці варіанти як <em>«як НЕ треба»</em> для майбутніх франчайзі.</span>
+      <span data-lang="en">First 8 renders were a wood-brown style with doodle cafe menus and a bar stool. Felt "cosy" but <strong>pushed the brand toward coffee/desserts</strong> instead of food-tech snacking. Rejected — replaced with the black tech-island in two months. Keep these as a <em>"how-not-to"</em> reference for future franchisees.</span>
+    </div>
+  </div>
+  <h4 style="margin:14px 0 8px 0;font-size:12.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted)"><span data-lang="uk">Концепт-варіант 1</span><span data-lang="en">Concept variant 1</span></h4>
+  <div class="tt-gallery">
+    <a href="retail/concept-2020/render_v1_a.jpg" target="_blank" class="tt-card"><div class="tt-card-image"><img src="retail/concept-2020/render_v1_a.jpg" alt="Concept 1 view A" loading="lazy"></div></a>
+    <a href="retail/concept-2020/render_v1_b.jpg" target="_blank" class="tt-card"><div class="tt-card-image"><img src="retail/concept-2020/render_v1_b.jpg" alt="Concept 1 view B" loading="lazy"></div></a>
+    <a href="retail/concept-2020/render_v1_c.jpg" target="_blank" class="tt-card"><div class="tt-card-image"><img src="retail/concept-2020/render_v1_c.jpg" alt="Concept 1 view C" loading="lazy"></div></a>
+    <a href="retail/concept-2020/render_v1_d.jpg" target="_blank" class="tt-card"><div class="tt-card-image"><img src="retail/concept-2020/render_v1_d.jpg" alt="Concept 1 view D" loading="lazy"></div></a>
+  </div>
+  <h4 style="margin:18px 0 8px 0;font-size:12.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted)"><span data-lang="uk">Концепт-варіант 2</span><span data-lang="en">Concept variant 2</span></h4>
+  <div class="tt-gallery">
+    <a href="retail/concept-2020/render_v2_a.jpg" target="_blank" class="tt-card"><div class="tt-card-image"><img src="retail/concept-2020/render_v2_a.jpg" alt="Concept 2 view A" loading="lazy"></div></a>
+    <a href="retail/concept-2020/render_v2_b.jpg" target="_blank" class="tt-card"><div class="tt-card-image"><img src="retail/concept-2020/render_v2_b.jpg" alt="Concept 2 view B" loading="lazy"></div></a>
+    <a href="retail/concept-2020/render_v2_c.jpg" target="_blank" class="tt-card"><div class="tt-card-image"><img src="retail/concept-2020/render_v2_c.jpg" alt="Concept 2 view C" loading="lazy"></div></a>
+    <a href="retail/concept-2020/render_v2_d.jpg" target="_blank" class="tt-card"><div class="tt-card-image"><img src="retail/concept-2020/render_v2_d.jpg" alt="Concept 2 view D" loading="lazy"></div></a>
+  </div>
+
+  <!-- LESSONS LEARNED -->
+  <h3 class="block-title" style="margin-top:48px">🎓 <span data-lang="uk">Уроки з проєкту — для майбутніх ТТ</span><span data-lang="en">Lessons learned — for future kiosks</span></h3>
+  <div class="card">
+    <ul style="margin:0;padding-left:18px;line-height:1.85;font-size:13px">
+      <li data-lang="uk"><strong>Спочатку позиціонування, потім дизайн.</strong> Перші концепти провалилися бо рухалися за «cafe-feel»; коли дизайнер отримав чіткий бриф «food-tech snack, не кав'ярня» — все перебудувалося за 2 місяці.</li>
+      <li data-lang="en"><strong>Positioning first, design second.</strong> Early concepts failed because they chased a "cafe feel"; once the designer got a sharp brief — "food-tech snack, not a cafe" — everything reset in two months.</li>
+      <li data-lang="uk"><strong>Скляна вітрина з насипом — найсильніший trigger.</strong> Купа сирних кульок за склом продає сама себе, без слогана.</li>
+      <li data-lang="en"><strong>Glass bulk display is the strongest trigger.</strong> A heap of cheese balls behind glass sells itself — no slogan needed.</li>
+      <li data-lang="uk"><strong>Підсвічений логотип критичний.</strong> Увечері в ТРЦ темно і шумно. Тепле помаранчеве світло SNÉCO — beacon, який бачить пів-залу.</li>
+      <li data-lang="en"><strong>Backlit logo is critical.</strong> Malls are dark and noisy in the evening. The warm orange SNÉCO glow is a beacon visible across half the floor.</li>
+      <li data-lang="uk"><strong>Меловий простір ≠ дешево, ≠ непрофесійно.</strong> Дозволяє швидко змінювати меседж під сезон/промо/новинку без друку нових банерів.</li>
+      <li data-lang="en"><strong>Chalk space ≠ cheap, ≠ unprofessional.</strong> Lets you swap the message instantly for season / promo / launch without printing banners.</li>
+      <li data-lang="uk"><strong>Мох — простий хак на «еко».</strong> 80-міліметрова смужка сухого моху коштує копійки, тримається роками, і одразу комунікує природу/еко.</li>
+      <li data-lang="en"><strong>Moss — a cheap "eco" hack.</strong> An 80-mm strip of preserved moss costs pennies, lasts years, and instantly communicates nature/eco.</li>
+      <li data-lang="uk"><strong>L-форма у ~3.6 м² — оптимум.</strong> Достатньо для вітрини + полиць + продавця, поміщається у фуд-корт-острівок.</li>
+      <li data-lang="en"><strong>L-shape at ~3.6 m² — the sweet spot.</strong> Enough for display + shelves + staff, fits a food-court island slot.</li>
+    </ul>
+  </div>
+
+  <!-- SOURCE FILES -->
+  <div style="margin-top:24px;padding:14px 18px;background:var(--black-05);border-radius:8px;font-size:12px;color:var(--text-muted);line-height:1.6">
+    <span data-lang="uk">📁 <strong>Сирці проєкту</strong> — техпроєкт PDF, креслення CAD, договори оренди, специфікації матеріалів, документація з електрики — за запитом на <a href="mailto:vg@sneco.ua" style="color:var(--text)">vg@sneco.ua</a>. Архів проєкту зберігається локально (<code>~/snEco/retail/concept-2020/</code>).</span>
+    <span data-lang="en">📁 <strong>Project source files</strong> — blueprint PDF, CAD, mall lease, materials specs, electricals — on request from <a href="mailto:vg@sneco.ua" style="color:var(--text)">vg@sneco.ua</a>. Project archive kept locally (<code>~/snEco/retail/concept-2020/</code>).</span>
+  </div>
+</section>
+
+<!-- ============================================================
      DOCUMENTS & CERTIFICATES
      ============================================================ -->
 <section class="section" id="sec-documents" style="padding:56px 64px">
@@ -4922,7 +5257,45 @@ h3.block-title:first-of-type { margin-top: 0; }
 
   <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span></h3>
   <div class="changelog-entry">
-    <span class="changelog-version">v2.20</span><span class="changelog-date">07.05.2026</span>
+    <span class="changelog-version">v2.22</span><span class="changelog-date">08.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>Реструктуризовано «Експортна / EU версія»</strong> у повноцінний блок «🌍 Міжнародні версії» з 4 sub-категоріями: <strong>EN</strong> (3 SKU) · <strong>US</strong> (1) · <strong>SK</strong> (2) · <strong>SK back labels 57×70 мм</strong> (2). Загалом 8 нових/оновлених карток.</li>
+      <li data-lang="en"><strong>Restructured "Export / EU version"</strong> into a full "🌍 International versions" block with 4 sub-categories: <strong>EN</strong> (3 SKUs) · <strong>US</strong> (1) · <strong>SK</strong> (2) · <strong>SK back labels 57×70 mm</strong> (2). 8 new/updated cards in total.</li>
+      <li data-lang="uk">Додано Cheddar EN (London bg), Gauda US (15G PROTEIN), Cheddar SK (12G PROTEIN), Gauda SK (15G PROTEIN), Cheddar SK back-label, Gauda SK back-label.</li>
+      <li data-lang="en">Added Cheddar EN (London bg), Gauda US (15G PROTEIN), Cheddar SK (12G PROTEIN), Gauda SK (15G PROTEIN), Cheddar SK back-label, Gauda SK back-label.</li>
+      <li data-lang="uk">Документовано market-specific відмінності: ribbon «<code>FROM 100% [CHEESE]</code>» на EN vs «<code>100% [CHEESE]</code>» на US/SK · бейдж <code>HIGH PROTEIN</code> (EN) vs <code>12G/15G PROTEIN in this pack</code> (US/SK) · 8-мовна зворотна етикетка для SK ринку (Sneco SK s.r.o., Karpatska 1328/3, Kosice).</li>
+      <li data-lang="en">Documented market-specific differences: ribbon "<code>FROM 100% [CHEESE]</code>" on EN vs "<code>100% [CHEESE]</code>" on US/SK · badge <code>HIGH PROTEIN</code> (EN) vs <code>12G/15G PROTEIN in this pack</code> (US/SK) · 8-language back label for the SK market (Sneco SK s.r.o., Karpatska 1328/3, Kosice).</li>
+      <li data-lang="uk">Додано <strong>матрицю ринок × SKU</strong>: 8 рядків × 5 стовпців (UA / EN / US / SK / SK back) — швидкий visual для розуміння де якого SKU нема.</li>
+      <li data-lang="en">Added <strong>market × SKU matrix</strong>: 8 rows × 5 columns (UA / EN / US / SK / SK back) — quick visual gap-finder.</li>
+      <li data-lang="uk"><strong>⚠ Знайдено 3 типи друкарських помилок:</strong> «CRUNCY» (без H) на 4 файлах · «CEDDAR» (без H) на Cheddar SK · «GAUDA» (А замість O) на US/SK. Підсвічено окремим warning-блоком — виправити перед тиражем.</li>
+      <li data-lang="en"><strong>⚠ 3 types of typos found:</strong> "CRUNCY" (no H) on 4 files · "CEDDAR" (no H) on Cheddar SK · "GAUDA" (A instead of O) on US/SK. Flagged in a dedicated warning block — fix before press run.</li>
+      <li data-lang="uk">Файлова структура розширена: <code>packaging/print/EN-28g/</code>, <code>US-90x160/</code>, <code>SK-90x160/</code>, <code>SK-57x70/</code> (нові 4 папки замість 1).</li>
+      <li data-lang="en">File structure expanded: <code>packaging/print/EN-28g/</code>, <code>US-90x160/</code>, <code>SK-90x160/</code>, <code>SK-57x70/</code> (4 new folders instead of 1).</li>
+      <li data-lang="uk">Усього в галереї: <strong>20 PDF</strong> (12 UA + 3 EN + 1 US + 2 SK + 2 SK-back), <strong>20 JPG превью</strong> (~1.7 MB разом).</li>
+      <li data-lang="en">Gallery total: <strong>20 PDFs</strong> (12 UA + 3 EN + 1 US + 2 SK + 2 SK-back), <strong>20 JPG previews</strong> (~1.7 MB combined).</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.21</span><span class="changelog-date">08.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>Новий розділ «Фірмова торгова точка»</strong> у sidebar (між «Точки контакту» і «Документи»). Архів проєкту 2020-2021 — точка у ТРЦ «Французький бульвар» (Київ).</li>
+      <li data-lang="en"><strong>New "Branded retail kiosk" section</strong> in the sidebar (between "Touchpoints" and "Documents"). Project archive 2020-2021 — kiosk at Frantsuzkyi Bulvar Mall (Kyiv).</li>
+      <li data-lang="uk">Хронологія проєкту (4 milestones): концепти 1-2 (07.2020) → фінальний техпроєкт (09.2020) → монтаж (30.09 → 01.10.2020) → ~9 місяців роботи (07.2021).</li>
+      <li data-lang="en">Project timeline (4 milestones): concepts 1-2 (Jul 2020) → final blueprint (Sep 2020) → install (30 Sep → 1 Oct 2020) → ~9 months in operation (Jul 2021).</li>
+      <li data-lang="uk">6 ключових елементів дизайну: чорна основа з мел.фарбою · підсвічений LED-логотип · декоративний мох (80мм) · скляна вітрина з насипом · нахилені полиці упаковок · меловий простір для меседжів.</li>
+      <li data-lang="en">6 key design elements: black chalk-paint body · backlit LED logo · decorative moss (80 mm) · glass bulk display · tilted pack shelves · chalk-message space.</li>
+      <li data-lang="uk">Технічне креслення (фінал) + 4 реальні фото з ТРЦ + 8 ранніх концептів (рендерів) як «як НЕ треба».</li>
+      <li data-lang="en">Final blueprint + 4 real mall photos + 8 early concept renders as a "how-not-to" reference.</li>
+      <li data-lang="uk">7 «уроків з проєкту» для майбутніх ТТ і франчайзі: спочатку позиціонування, скляна вітрина — найсильніший trigger, підсвічений лого критичний у ТРЦ, мох як «еко»-хак, L-форма ~3.6 м² — оптимум.</li>
+      <li data-lang="en">7 "lessons learned" for future kiosks and franchisees: positioning first, glass bulk display is the strongest trigger, backlit logo is critical, moss as an "eco hack", L-shape ~3.6 m² is the sweet spot.</li>
+      <li data-lang="uk">14 веб-оптимізованих JPG у <code>retail/concept-2020/</code> (~1.3 MB разом). Сирці CAD/PDF — за запитом.</li>
+      <li data-lang="en">14 web-optimized JPGs in <code>retail/concept-2020/</code> (~1.3 MB total). CAD/PDF sources on request.</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.20</span><span class="changelog-date">07.05.2026</span>
     <ul class="changelog-list">
       <li data-lang="uk"><strong>Sneco SK команда розгорнута</strong> у секції «Команда & орг-структура»: 4 співвласники + 3 функціональні керівники + 2 виробничі оператори (всього 9 осіб). Кожна картка містить посаду, зону відповідальності і мовні навички.</li>
       <li data-lang="en"><strong>Sneco SK team expanded</strong> in the "Team & org structure" section: 4 co-owners + 3 functional leads + 2 production operators (9 people total). Each card includes title, area of responsibility and language skills.</li>
