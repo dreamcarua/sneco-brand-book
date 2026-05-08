@@ -1010,6 +1010,321 @@ h3.block-title:first-of-type { margin-top: 0; }
   .tt-hero { grid-template-columns: 1fr; }
 }
 
+/* IDEAS / TICKETS (v2.27) */
+.ideas-toolbar {
+  display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  padding: 12px 16px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 10px; margin-bottom: 16px;
+}
+.ideas-filter {
+  display: inline-flex; gap: 4px; padding: 3px;
+  background: var(--black-05); border-radius: 8px;
+}
+.ideas-filter button {
+  padding: 6px 14px; border: none; background: transparent; cursor: pointer;
+  font-family: inherit; font-size: 12px; font-weight: 600; border-radius: 6px;
+  color: var(--text-muted);
+}
+.ideas-filter button.is-active { background: var(--white); color: var(--black); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.ideas-counter { font-size: 11.5px; color: var(--text-muted); margin-left: auto; }
+.ideas-new-btn {
+  padding: 8px 16px; border: none; border-radius: 8px;
+  background: var(--yellow); color: var(--black);
+  font-family: inherit; font-size: 12px; font-weight: 700;
+  letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer;
+}
+.ideas-new-btn:hover { background: var(--black); color: var(--yellow); }
+
+.ideas-form, .idea-comment-form {
+  background: var(--white); border: 1.5px solid var(--yellow); border-radius: 10px;
+  padding: 16px 18px; margin-bottom: 16px;
+}
+.ideas-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
+.ideas-form input, .ideas-form textarea, .idea-comment-form input, .idea-comment-form textarea {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px;
+  font-family: inherit; font-size: 13px; box-sizing: border-box;
+}
+.ideas-form textarea, .idea-comment-form textarea { min-height: 80px; resize: vertical; }
+.ideas-form-row { margin-bottom: 8px; }
+.ideas-form-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+.ideas-form-actions button.primary {
+  padding: 9px 18px; border: none; border-radius: 6px;
+  background: var(--black); color: var(--white);
+  font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+.ideas-form-actions button.secondary {
+  padding: 9px 14px; border: 1px solid var(--border); border-radius: 6px;
+  background: transparent; color: var(--text-muted);
+  font-family: inherit; font-size: 12px; cursor: pointer;
+}
+.ideas-attach-zone {
+  display: inline-flex; gap: 6px; align-items: center; flex-wrap: wrap;
+  font-size: 12px; color: var(--text-muted);
+}
+.ideas-attach-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 8px; background: var(--black-05); border-radius: 12px;
+  font-size: 11.5px;
+}
+.ideas-attach-chip button { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 0; font-size: 12px; }
+.ideas-attach-chip.is-uploading { opacity: 0.5; }
+
+.idea-card {
+  background: var(--white); border: 1px solid var(--border); border-radius: 10px;
+  margin-bottom: 10px; overflow: hidden; transition: box-shadow 0.15s;
+}
+.idea-card:hover { box-shadow: 0 4px 14px rgba(30,30,30,0.06); }
+.idea-card.is-done { opacity: 0.7; }
+.idea-card.is-done .idea-title { text-decoration: line-through; color: var(--text-muted); }
+.idea-card-header {
+  display: flex; gap: 12px; padding: 12px 16px; cursor: pointer; align-items: flex-start;
+}
+.idea-status-dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 5px;
+  background: var(--green);
+}
+.idea-status-dot.is-done { background: var(--text-muted); }
+.idea-main { flex: 1; min-width: 0; }
+.idea-title { font-size: 14px; font-weight: 700; line-height: 1.3; margin-bottom: 4px; }
+.idea-meta { font-size: 11px; color: var(--text-muted); display: flex; gap: 8px; flex-wrap: wrap; }
+.idea-meta-item { display: inline-flex; align-items: center; gap: 3px; }
+.idea-preview { font-size: 12.5px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
+.idea-arrow { font-size: 14px; color: var(--text-muted); margin-left: 8px; flex-shrink: 0; }
+.idea-card.is-expanded .idea-arrow { transform: rotate(90deg); }
+
+.idea-card-body {
+  display: none;
+  padding: 0 16px 16px;
+  border-top: 1px solid var(--border);
+}
+.idea-card.is-expanded .idea-card-body { display: block; }
+.idea-full-text {
+  font-size: 13px; line-height: 1.65; color: var(--text);
+  padding: 14px 0; white-space: pre-wrap; word-break: break-word;
+}
+.idea-attachments-list { display: flex; gap: 8px; flex-wrap: wrap; padding-bottom: 12px; }
+.idea-attachment {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px; background: var(--black-05); border-radius: 6px;
+  font-size: 11.5px; text-decoration: none; color: var(--text);
+}
+.idea-attachment:hover { background: var(--yellow); }
+
+.idea-comments { border-top: 1px solid var(--border); padding-top: 12px; margin-top: 8px; }
+.idea-comment {
+  padding: 10px 12px; background: var(--black-05); border-radius: 8px; margin-bottom: 8px;
+}
+.idea-comment-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+.idea-comment-meta strong { color: var(--text); }
+.idea-comment-body { font-size: 12.5px; line-height: 1.55; white-space: pre-wrap; word-break: break-word; }
+.idea-comment-attachments { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+
+.idea-actions { display: flex; gap: 8px; margin-top: 10px; align-items: center; flex-wrap: wrap; }
+.idea-action-btn {
+  padding: 6px 14px; border: 1px solid var(--border); border-radius: 6px;
+  background: transparent; color: var(--text-muted);
+  font-family: inherit; font-size: 11.5px; cursor: pointer;
+}
+.idea-action-btn.is-primary { border-color: var(--green); color: #2d6a00; background: rgba(150,193,31,0.10); }
+.idea-action-btn.is-reopen { border-color: var(--yellow); color: #7a5a00; background: rgba(254,191,39,0.10); }
+.idea-action-btn:hover { background: var(--black); color: var(--white); }
+.idea-closed-info {
+  font-size: 11px; color: var(--text-muted); padding: 6px 10px;
+  background: rgba(150,193,31,0.10); border-radius: 6px;
+}
+
+.ideas-empty {
+  text-align: center; padding: 40px 16px; color: var(--text-muted);
+  font-size: 13px; line-height: 1.55;
+}
+
+@media (max-width: 700px) {
+  .ideas-form-grid { grid-template-columns: 1fr; }
+}
+
+/* OTP AUTH — universal (HR / Prices / Admin) v2.26 */
+.otp-locked, .otp-unlocked { display: none; }
+.is-locked .otp-locked { display: block; }
+.is-unlocked .otp-unlocked { display: block; }
+.otp-card {
+  max-width: 460px; margin: 32px auto;
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 28px 32px;
+}
+.otp-icon { font-size: 42px; text-align: center; margin-bottom: 10px; }
+.otp-title { font-size: 17px; font-weight: 800; text-align: center; margin-bottom: 6px; }
+.otp-desc { font-size: 12.5px; color: var(--text-muted); line-height: 1.55; text-align: center; margin-bottom: 18px; }
+.otp-input {
+  width: 100%; padding: 12px 14px; border: 1.5px solid var(--border);
+  border-radius: 8px; font-family: inherit; font-size: 14px;
+  background: var(--white); margin-bottom: 10px;
+  box-sizing: border-box;
+}
+.otp-input:focus { outline: 2px solid var(--yellow); border-color: var(--black); }
+.otp-input.is-error { border-color: #dc2626; outline-color: #dc2626; }
+.otp-input[type="text"][inputmode="numeric"] {
+  font-family: monospace; font-size: 22px; letter-spacing: 8px; text-align: center;
+}
+.otp-btn {
+  width: 100%; padding: 12px 14px; border: none; border-radius: 8px;
+  background: var(--black); color: var(--white);
+  font-family: inherit; font-size: 13px; font-weight: 700;
+  letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer;
+}
+.otp-btn:hover { opacity: 0.9; }
+.otp-btn.secondary { background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); }
+.otp-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.otp-msg { font-size: 12px; margin-top: 10px; min-height: 16px; line-height: 1.4; }
+.otp-msg.is-error { color: #dc2626; }
+.otp-msg.is-success { color: #2d6a00; }
+.otp-step-hint {
+  font-size: 11px; color: var(--text-muted); text-align: center;
+  margin-bottom: 14px;
+  padding: 6px 12px; background: var(--black-05); border-radius: 12px;
+  display: inline-block; width: auto;
+}
+.otp-back-link {
+  font-size: 12px; color: var(--text-muted); text-decoration: underline;
+  cursor: pointer; display: inline-block; margin-top: 10px;
+}
+.otp-session-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 14px; margin-bottom: 16px;
+  background: rgba(150,193,31,0.10); border: 1px solid rgba(150,193,31,0.3);
+  border-radius: 8px; font-size: 11.5px; color: var(--text-muted);
+  flex-wrap: wrap; gap: 6px;
+}
+.otp-session-email { font-weight: 700; color: var(--text); }
+.otp-logout {
+  font-size: 11px; padding: 4px 10px; border-radius: 6px;
+  background: var(--black-05); border: 1px solid var(--border); cursor: pointer;
+  font-family: inherit; color: var(--text-muted);
+}
+.otp-logout:hover { background: var(--black); color: var(--white); }
+
+/* Admin UI in Maintenance */
+.admin-block-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px 20px; margin-bottom: 14px;
+}
+.admin-block-title { font-size: 14px; font-weight: 800; margin-bottom: 4px; }
+.admin-block-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+.admin-emails-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.admin-email-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px; border-radius: 12px;
+  background: var(--black-05); font-size: 12px;
+}
+.admin-email-chip.is-admin { background: var(--yellow); }
+.admin-email-remove {
+  background: none; border: none; cursor: pointer; color: var(--text-muted);
+  font-size: 14px; padding: 0; line-height: 1;
+}
+.admin-email-remove:hover { color: #dc2626; }
+.admin-add-row { display: flex; gap: 8px; }
+.admin-add-row input {
+  flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px;
+  font-family: inherit; font-size: 12.5px;
+}
+.admin-add-row button {
+  padding: 8px 14px; background: var(--black); color: var(--white);
+  border: none; border-radius: 6px; font-family: inherit; font-size: 12px;
+  font-weight: 700; cursor: pointer;
+}
+
+/* Backwards-compat: keep old .hr-* classes mapped to new — just in case */
+.hr-locked-state { display: none; }
+.hr-unlocked-state { display: none; }
+#sec-hr.is-locked .hr-locked-state { display: block; }
+#sec-hr.is-unlocked .hr-unlocked-state { display: block; }
+.hr-warning-banner {
+  background: rgba(220,38,38,0.06); border: 1px solid rgba(220,38,38,0.3);
+  border-left: 4px solid #dc2626;
+  border-radius: 8px; padding: 14px 18px;
+  font-size: 12.5px; line-height: 1.6; color: var(--text);
+  margin-bottom: 24px;
+}
+.hr-warning-banner strong { color: #b91c1c; }
+.hr-doc-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 10px; padding: 20px 22px; margin-bottom: 16px;
+}
+.hr-doc-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+  padding-bottom: 12px; border-bottom: 1px solid var(--border);
+}
+.hr-doc-icon {
+  width: 44px; height: 44px; border-radius: 8px;
+  background: rgba(150,193,31,0.15); color: #2d6a00;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.hr-doc-title { font-size: 15px; font-weight: 800; line-height: 1.3; }
+.hr-doc-meta { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+.hr-doc-download {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 8px;
+  background: var(--yellow); color: var(--black);
+  font-size: 12px; font-weight: 700; text-decoration: none;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  margin-left: auto;
+}
+.hr-doc-download:hover { background: var(--black); color: var(--yellow); }
+.hr-doc-section {
+  margin-top: 14px; padding: 12px 14px;
+  background: var(--black-05); border-radius: 6px;
+  font-size: 13px; line-height: 1.65;
+}
+.hr-doc-section strong { color: var(--black); display: block; margin-bottom: 4px; font-size: 12.5px; letter-spacing: 0.02em; }
+.hr-warning-banner {
+  background: rgba(220,38,38,0.06); border: 1px solid rgba(220,38,38,0.3);
+  border-left: 4px solid #dc2626;
+  border-radius: 8px; padding: 14px 18px;
+  font-size: 12.5px; line-height: 1.6; color: var(--text);
+  margin-bottom: 24px;
+}
+.hr-warning-banner strong { color: #b91c1c; }
+.hr-doc-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 10px; padding: 20px 22px; margin-bottom: 16px;
+}
+.hr-doc-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+  padding-bottom: 12px; border-bottom: 1px solid var(--border);
+}
+.hr-doc-icon {
+  width: 44px; height: 44px; border-radius: 8px;
+  background: rgba(150,193,31,0.15); color: #2d6a00;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.hr-doc-title { font-size: 15px; font-weight: 800; line-height: 1.3; }
+.hr-doc-meta { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+.hr-doc-download {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 8px;
+  background: var(--yellow); color: var(--black);
+  font-size: 12px; font-weight: 700; text-decoration: none;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  margin-left: auto;
+}
+.hr-doc-download:hover { background: var(--black); color: var(--yellow); }
+.hr-doc-section {
+  margin-top: 14px; padding: 12px 14px;
+  background: var(--black-05); border-radius: 6px;
+  font-size: 13px; line-height: 1.65;
+}
+.hr-doc-section strong { color: var(--black); display: block; margin-bottom: 4px; font-size: 12.5px; letter-spacing: 0.02em; }
+.hr-logout-btn {
+  font-size: 11px; font-weight: 600;
+  padding: 6px 12px; border-radius: 6px;
+  background: var(--black-05); color: var(--text-muted);
+  border: 1px solid var(--border); cursor: pointer;
+  font-family: inherit;
+}
+.hr-logout-btn:hover { background: var(--black); color: var(--white); }
+
 /* PRINT */
 @media print {
   body { background: var(--white); }
@@ -1137,9 +1452,22 @@ h3.block-title:first-of-type { margin-top: 0; }
       <span class="dot"></span>
       <span data-lang="uk">Стратегічний roadmap</span><span data-lang="en">Strategic roadmap</span>
     </button>
+    <button class="nav-link" data-target="ideas" type="button">
+      <span class="dot"></span>
+      <span data-lang="uk">💡 Пропозиції</span><span data-lang="en">💡 Ideas</span>
+    </button>
     <button class="nav-link" data-target="maintenance" type="button">
       <span class="dot"></span>
       <span data-lang="uk">Maintenance</span><span data-lang="en">Maintenance</span>
+    </button>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label" data-lang="uk">🔒 Конфіденційне</div>
+    <div class="nav-group-label" data-lang="en">🔒 Confidential</div>
+    <button class="nav-link" data-target="hr" type="button">
+      <span class="dot"></span>
+      <span data-lang="uk">HR — персонал, ЗП</span><span data-lang="en">HR — personnel, payroll</span>
     </button>
   </div>
 
@@ -1147,7 +1475,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Bible v2.23 · 2026
+    Brand Bible v2.27 · 2026
   </div>
 </nav>
 
@@ -1160,7 +1488,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <span data-lang="uk">Один інгредієнт. <span class="qr-ns-accent">Жодних компромісів.</span> Сирний снек XXI століття.</span>
     <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
   </div>
-  <div class="qr-meta">v2.23 · 2026</div>
+  <div class="qr-meta">v2.27 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -1393,8 +1721,8 @@ h3.block-title:first-of-type { margin-top: 0; }
         <div class="arch-entity-name">Prime Snack LLC</div>
         <div class="arch-entity-role"><span data-lang="uk">UA · виробництво · UA-ринок</span><span data-lang="en">UA · production · UA market</span></div>
         <div class="arch-entity-desc">
-          <span data-lang="uk">Завод: Мукачево, Україна.<br>Маркування: «Made in Ukraine».<br>Сертифікати: FSSC 22000 v6.0, HACCP / ISO 22000.<br>Регулятор: Держпродспоживслужба України.</span>
-          <span data-lang="en">Plant: Mukachevo, Ukraine.<br>Origin label: "Made in Ukraine".<br>Certifications: FSSC 22000 v6.0, HACCP / ISO 22000.<br>Regulator: State Service for Food Safety (Ukraine).</span>
+          <span data-lang="uk">Завод: Мукачево, Україна.<br>Маркування: «Made in Ukraine».<br>Сертифікати: <a href="documents/certificates/FSSC_22000_v6_AFAQ_UA.pdf" target="_blank" rel="noopener">FSSC 22000 v6.0 📄</a>, <a href="documents/certificates/HACCP_ISO_22000_UA.pdf" target="_blank" rel="noopener">HACCP / ISO 22000 📄</a>.<br>Регулятор: Держпродспоживслужба України.</span>
+          <span data-lang="en">Plant: Mukachevo, Ukraine.<br>Origin label: "Made in Ukraine".<br>Certifications: <a href="documents/certificates/FSSC_22000_v6_AFAQ_EN.pdf" target="_blank" rel="noopener">FSSC 22000 v6.0 📄</a>, <a href="documents/certificates/HACCP_ISO_22000_EN.pdf" target="_blank" rel="noopener">HACCP / ISO 22000 📄</a>.<br>Regulator: State Service for Food Safety (Ukraine).</span>
         </div>
       </div>
       <div class="arch-entity">
@@ -1402,8 +1730,8 @@ h3.block-title:first-of-type { margin-top: 0; }
         <div class="arch-entity-name">Sneco SK s.r.o.</div>
         <div class="arch-entity-role"><span data-lang="uk">EU · виробництво · EU-ринок</span><span data-lang="en">EU · production · EU market</span></div>
         <div class="arch-entity-desc">
-          <span data-lang="uk">Завод: Гуменне, Словаччина.<br>Маркування: «Made in EU».<br>Сертифікати: IFS Food v8, HACCP, EU TRACES.<br>Регулятор: ÚVZ SR (Slovakia) + EU Reg. 1169/2011.</span>
-          <span data-lang="en">Plant: Humenné, Slovakia.<br>Origin label: "Made in EU".<br>Certifications: IFS Food v8, HACCP, EU TRACES.<br>Regulator: Public Health Authority of Slovakia + EU Reg. 1169/2011.</span>
+          <span data-lang="uk">Завод: Гуменне, Словаччина.<br>Маркування: «Made in EU».<br>Сертифікати: <a href="documents/sk_certificates/IFS_Audit_Letter.pdf" target="_blank" rel="noopener">IFS Food v8 📄</a>, <a href="documents/sk_certificates/HACCP_Sneco_SK.pdf" target="_blank" rel="noopener">HACCP 📄</a>, EU TRACES.<br>Регулятор: ÚVZ SR (Slovakia) + EU Reg. 1169/2011.</span>
+          <span data-lang="en">Plant: Humenné, Slovakia.<br>Origin label: "Made in EU".<br>Certifications: <a href="documents/sk_certificates/IFS_Audit_Letter.pdf" target="_blank" rel="noopener">IFS Food v8 📄</a>, <a href="documents/sk_certificates/HACCP_Sneco_SK.pdf" target="_blank" rel="noopener">HACCP 📄</a>, EU TRACES.<br>Regulator: Public Health Authority of Slovakia + EU Reg. 1169/2011.</span>
         </div>
       </div>
     </div>
@@ -2081,7 +2409,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <tr>
           <td><span data-lang="uk">Білок</span><span data-lang="en">Protein</span></td>
           <td>up to 60% protein · high protein</td>
-          <td><span data-lang="uk">Лабораторні дослідження Eurofins</span><span data-lang="en">Eurofins lab tests</span></td>
+          <td><a href="documents/sk_lab_tests/Eurofins_Cheddar_Fatty_Acid_Profile.pdf" target="_blank" rel="noopener">📄 Eurofins lab tests</a></td>
         </tr>
         <tr>
           <td><span data-lang="uk">Зберігання</span><span data-lang="en">Shelf life</span></td>
@@ -2096,7 +2424,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <tr>
           <td><span data-lang="uk">Інновація</span><span data-lang="en">Innovation</span></td>
           <td>SIAL Innovation Grand Prix 2024 · 2200+ products · Paris</td>
-          <td>SIAL 2024</td>
+          <td><a href="documents/awards/SIAL_Innovation_Award.pdf" target="_blank" rel="noopener">📄 Award</a> · <a href="documents/awards/SIAL_Innovation_Certificate.pdf" target="_blank" rel="noopener">📄 Cert</a></td>
         </tr>
         <tr>
           <td><span data-lang="uk">Визнання</span><span data-lang="en">Recognition</span></td>
@@ -2106,12 +2434,12 @@ h3.block-title:first-of-type { margin-top: 0; }
         <tr>
           <td><span data-lang="uk">Технологія</span><span data-lang="en">Technology</span></td>
           <td>VacWave Bio Nutrition · patented · microwave-vacuum drying at 36-38°C</td>
-          <td><span data-lang="uk">Патент №139035</span><span data-lang="en">Patent No. 139035</span></td>
+          <td><a href="documents/legal/Patent_UA_139035.pdf" target="_blank" rel="noopener">📄 <span data-lang="uk">Патент №139035</span><span data-lang="en">Patent No. 139035</span></a></td>
         </tr>
         <tr>
           <td><span data-lang="uk">Sustainability</span><span data-lang="en">Sustainability</span></td>
           <td>100% renewable energy · solar-powered · Type I Ecolabel · ISO 14024</td>
-          <td><span data-lang="uk">Сертифікати + панелі</span><span data-lang="en">Certificates + on-site panels</span></td>
+          <td><a href="documents/eco/Green_Crane_UA_Ecolabel.pdf" target="_blank" rel="noopener">📄 Green Crane</a> · <a href="documents/eco/EU_PEF_Green_Certificate.pdf" target="_blank" rel="noopener">📄 EU PEF</a></td>
         </tr>
         <tr>
           <td><span data-lang="uk">Походження</span><span data-lang="en">Origin</span></td>
@@ -2121,7 +2449,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <tr>
           <td><span data-lang="uk">Якість</span><span data-lang="en">Quality</span></td>
           <td>FSSC 22000 · IFS Food v8 · HACCP · ISO 22000 · EU TRACES · FDA</td>
-          <td><span data-lang="uk">Сертифікати</span><span data-lang="en">Certifications</span></td>
+          <td><a href="documents/certificates/FSSC_22000_v6_AFAQ_EN.pdf" target="_blank" rel="noopener">📄 FSSC</a> · <a href="documents/certificates/HACCP_ISO_22000_EN.pdf" target="_blank" rel="noopener">📄 HACCP</a> · <a href="documents/sk_certificates/IFS_Audit_Letter.pdf" target="_blank" rel="noopener">📄 IFS</a> · <a href="documents/export/USA_FDA_Food_Control_Certificate.pdf" target="_blank" rel="noopener">📄 FDA</a></td>
         </tr>
         <tr>
           <td><span data-lang="uk">Лояльність</span><span data-lang="en">Loyalty</span></td>
@@ -3959,29 +4287,24 @@ h3.block-title:first-of-type { margin-top: 0; }
     </table>
   </div>
 
+  <div data-otp-block="prices" class="is-locked" id="pricing-section">
   <h3 class="block-title">🔒 <span data-lang="uk">Прайс-листи · UA · 02.03.2026</span><span data-lang="en">Price lists · UA · Mar 2, 2026</span></h3>
 
-  <!-- Locked state -->
-  <div id="pricing-locked" class="card" style="text-align:center;padding:40px 24px;background:linear-gradient(135deg,#1E1E1E,#2a2a2a);color:#fff;border:1px solid var(--border)">
-    <div style="font-size:48px;margin-bottom:14px">🔒</div>
-    <div style="font-size:17px;font-weight:700;margin-bottom:8px">
-      <span data-lang="uk">Розділ захищено</span><span data-lang="en">Section is locked</span>
+  <!-- Locked state — OTP login -->
+  <div class="otp-locked">
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.55;margin-bottom:14px">
+      <span data-lang="uk">Прайс-листи доступні тільки авторизованим партнерам. Доступ — за email-кодом. Якщо твоєї пошти ще немає в whitelist — напиши на <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>.</span>
+      <span data-lang="en">Price lists are available to authorized partners only. Access by email code. If your email isn't yet on the whitelist — message <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>.</span>
     </div>
-    <div style="font-size:13px;color:rgba(255,255,255,0.6);max-width:480px;margin:0 auto 22px;line-height:1.55">
-      <span data-lang="uk">Прайс-листи доступні тільки авторизованим партнерам. Запит на пароль — <a href="mailto:vg@sneco.ua" style="color:var(--yellow)">vg@sneco.ua</a>.</span>
-      <span data-lang="en">Price lists are available to authorized partners only. Request access — <a href="mailto:vg@sneco.ua" style="color:var(--yellow)">vg@sneco.ua</a>.</span>
-    </div>
-    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-      <input type="password" id="pricing-pwd" placeholder="Password" onkeydown="if(event.key==='Enter')unlockPricing()" style="padding:11px 16px;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:14px;background:rgba(255,255,255,0.06);color:#fff;width:220px;font-family:var(--font-body)">
-      <button onclick="unlockPricing()" style="background:var(--yellow);color:var(--black);border:none;padding:11px 22px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;letter-spacing:0.04em;font-family:var(--font-body)"><span data-lang="uk">Розблокувати</span><span data-lang="en">Unlock</span></button>
-    </div>
-    <div id="pricing-error" style="color:#fca5a5;font-size:12px;margin-top:14px;display:none">
-      <span data-lang="uk">Невірний пароль</span><span data-lang="en">Wrong password</span>
-    </div>
+    <div class="otp-card" data-otp-mount="prices"></div>
   </div>
 
   <!-- Unlocked content -->
-  <div id="pricing-content" style="display:none">
+  <div class="otp-unlocked">
+    <div class="otp-session-bar">
+      <span><span data-lang="uk">✓ Розблоковано для</span><span data-lang="en">✓ Unlocked for</span> <span class="otp-session-email" data-otp-email-display></span> · <span data-otp-expires-display></span></span>
+      <button class="otp-logout" data-otp-logout="prices"><span data-lang="uk">🔒 Вийти</span><span data-lang="en">🔒 Lock</span></button>
+    </div>
 
     <div style="margin-bottom:18px;padding:12px 16px;background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.25);border-radius:8px;font-size:12px;line-height:1.55;display:flex;gap:10px;align-items:flex-start">
       <div style="font-size:16px">⚠️</div>
@@ -4094,49 +4417,8 @@ h3.block-title:first-of-type { margin-top: 0; }
       <span data-lang="en">All prices in UAH, VAT included. Shelf life: 18 months (pure cheese), 8 months (nut mixes &amp; B2B 500 g), 12 months (olive). Storage: 0–30 °C. Approved by Pylyp Gryshyn, Director, Prime Snack LLC. Version of Mar 2, 2026.</span>
     </div>
 
-    <div style="text-align:right;margin-top:18px">
-      <button onclick="lockPricing()" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:7px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-family:var(--font-body)">🔒 <span data-lang="uk">Заблокувати знову</span><span data-lang="en">Lock again</span></button>
-    </div>
-  </div>
-
-  <script>
-  // Soft password gate (base64-obfuscated). To change password: open console and run btoa("новий_пароль"), replace string below.
-  // Поточний пароль: sneco2026
-  (function(){
-    var KEY = atob("c25lY28yMDI2");
-    window.unlockPricing = function() {
-      var input = document.getElementById('pricing-pwd').value;
-      if (input === KEY) {
-        document.getElementById('pricing-locked').style.display = 'none';
-        document.getElementById('pricing-content').style.display = 'block';
-        try { localStorage.setItem('sneco-pricing-unlocked','1'); } catch(e){}
-      } else {
-        var err = document.getElementById('pricing-error');
-        err.style.display = 'block';
-        setTimeout(function(){ err.style.display = 'none'; }, 3000);
-      }
-    };
-    window.lockPricing = function() {
-      document.getElementById('pricing-locked').style.display = 'block';
-      document.getElementById('pricing-content').style.display = 'none';
-      try { localStorage.removeItem('sneco-pricing-unlocked'); } catch(e){}
-      window.scrollTo({ top: document.getElementById('pricing-locked').offsetTop - 100, behavior: 'smooth' });
-    };
-    // Auto-unlock if previously authenticated
-    document.addEventListener('DOMContentLoaded', function(){
-      try {
-        if (localStorage.getItem('sneco-pricing-unlocked') === '1') {
-          var locked = document.getElementById('pricing-locked');
-          var content = document.getElementById('pricing-content');
-          if (locked && content) {
-            locked.style.display = 'none';
-            content.style.display = 'block';
-          }
-        }
-      } catch(e){}
-    });
-  })();
-  </script>
+  </div><!-- /otp-unlocked -->
+  </div><!-- /pricing-section -->
 
   <h3 class="block-title"><span data-lang="uk">Що sales-команда може запропонувати «з коробки»</span><span data-lang="en">What sales can offer out of the box</span></h3>
   <div class="grid-2">
@@ -4181,16 +4463,42 @@ h3.block-title:first-of-type { margin-top: 0; }
         </tr>
       </thead>
       <tbody>
-        <tr><td>high protein · 40%+ protein · up to 60% protein</td><td><span data-lang="uk">Лабораторні тести Eurofins (≥40% білка усі сорти, до 60% Fitness/Superfood). EU 1924/2006: ≥20% енергії з білка — задовольняє вся лінійка.</span><span data-lang="en">Eurofins lab reports (≥40% protein in all varieties, up to 60% in Fitness/Superfood). EU 1924/2006: ≥20% energy from protein — satisfied across the entire range.</span></td><td><code>documents_SK/07_lab_tests/</code></td></tr>
-        <tr><td>gluten-free</td><td><span data-lang="uk">Аналіз на глютен &lt;20 ppm (EU 828/2014)</span><span data-lang="en">Gluten test &lt;20 ppm (EU 828/2014)</span></td><td><span data-lang="uk">Лаб. сертифікат</span><span data-lang="en">Lab certificate</span></td></tr>
-        <tr><td>no preservatives / no additives</td><td><span data-lang="uk">Технічні умови (ТУ): склад = «сир натуральний»</span><span data-lang="en">Technical spec: ingredient = "natural cheese"</span></td><td><code>documents/02_legal/ТУ</code></td></tr>
-        <tr><td>up to 24 months shelf life</td><td><span data-lang="uk">Тести стабільності зберігання, специфікація</span><span data-lang="en">Storage stability tests, spec</span></td><td><span data-lang="uk">Технологічна документація</span><span data-lang="en">Production documentation</span></td></tr>
-        <tr><td>VacWave Bio Nutrition</td><td><span data-lang="uk">Патент №139035</span><span data-lang="en">Patent No. 139035</span></td><td><code>documents/02_legal/Патент</code></td></tr>
-        <tr><td>SIAL Grand Prix 2024</td><td><span data-lang="uk">Сертифікат журі</span><span data-lang="en">Jury certificate</span></td><td><code>documents/04_awards/Seal innovation</code></td></tr>
-        <tr><td>FSSC 22000 / IFS Food v8</td><td><span data-lang="uk">Сертифікати акредитованих органів</span><span data-lang="en">Accredited body certificates</span></td><td><code>documents/01_certificates/</code> + <code>documents_SK/03_quality_certificates/</code></td></tr>
-        <tr><td>100% solar-powered</td><td><span data-lang="uk">Акт встановлення сонячних панелей, лічильник</span><span data-lang="en">Solar installation act, meter readings</span></td><td><span data-lang="uk">Виробничі звіти</span><span data-lang="en">Production reports</span></td></tr>
-        <tr><td>76% online repeat / 100% B2B reorder</td><td><span data-lang="uk">Внутрішня e-commerce аналітика та дані ERP</span><span data-lang="en">Internal e-commerce analytics &amp; ERP data</span></td><td><span data-lang="uk">Sales dashboard</span><span data-lang="en">Sales dashboard</span></td></tr>
-        <tr><td>×25 in 6 years</td><td><span data-lang="uk">Фінансова звітність 2018–2024</span><span data-lang="en">Financial statements 2018–2024</span></td><td><span data-lang="uk">Внутрішнє</span><span data-lang="en">Internal</span></td></tr>
+        <tr><td>high protein · 40%+ protein · up to 60% protein</td><td><span data-lang="uk">Лабораторні тести Eurofins (≥40% білка усі сорти, до 60% Fitness/Superfood). EU 1924/2006: ≥20% енергії з білка — задовольняє вся лінійка.</span><span data-lang="en">Eurofins lab reports (≥40% protein in all varieties, up to 60% in Fitness/Superfood). EU 1924/2006: ≥20% energy from protein — satisfied across the entire range.</span></td><td>
+          <a href="documents/sk_lab_tests/Eurofins_Cheddar_Fatty_Acid_Profile.pdf" target="_blank" rel="noopener">📄 Cheddar profile</a> ·
+          <a href="documents/sk_lab_tests/Eurofins_AR_26_SZ_008246.pdf" target="_blank" rel="noopener">📄 #1</a>
+          <a href="documents/sk_lab_tests/Eurofins_AR_26_SZ_007852.pdf" target="_blank" rel="noopener">📄 #2</a>
+          <a href="documents/sk_lab_tests/Eurofins_AR_26_SZ_008376.pdf" target="_blank" rel="noopener">📄 #3</a>
+          <a href="documents/sk_lab_tests/Eurofins_AR_26_SZ_012720.pdf" target="_blank" rel="noopener">📄 #4</a>
+        </td></tr>
+        <tr><td>gluten-free</td><td><span data-lang="uk">Аналіз на глютен &lt;20 ppm (EU 828/2014)</span><span data-lang="en">Gluten test &lt;20 ppm (EU 828/2014)</span></td><td><span style="color:var(--text-muted);font-size:11.5px"><span data-lang="uk">Лаб. сертифікат — за запитом</span><span data-lang="en">Lab cert — on request</span></span></td></tr>
+        <tr><td>no preservatives / no additives</td><td><span data-lang="uk">Технічні умови (ТУ): склад = «сир натуральний»</span><span data-lang="en">Technical spec: ingredient = "natural cheese"</span></td><td><a href="documents/legal/TU_title_page.pdf" target="_blank" rel="noopener">📄 ТУ титульний</a></td></tr>
+        <tr><td>up to 24 months shelf life</td><td><span data-lang="uk">Тести стабільності зберігання, специфікація</span><span data-lang="en">Storage stability tests, spec</span></td><td><span style="color:var(--text-muted);font-size:11.5px"><span data-lang="uk">Технологічна документація — за запитом</span><span data-lang="en">Production docs — on request</span></span></td></tr>
+        <tr><td>VacWave Bio Nutrition</td><td><span data-lang="uk">Патент №139035</span><span data-lang="en">Patent No. 139035</span></td><td><a href="documents/legal/Patent_UA_139035.pdf" target="_blank" rel="noopener">📄 Patent UA 139035</a></td></tr>
+        <tr><td>SIAL Grand Prix 2024</td><td><span data-lang="uk">Сертифікат журі</span><span data-lang="en">Jury certificate</span></td><td>
+          <a href="documents/awards/SIAL_Innovation_Award.pdf" target="_blank" rel="noopener">📄 Award</a> ·
+          <a href="documents/awards/SIAL_Innovation_Certificate.pdf" target="_blank" rel="noopener">📄 Certificate</a>
+        </td></tr>
+        <tr><td>FSSC 22000 / IFS Food v8</td><td><span data-lang="uk">Сертифікати акредитованих органів</span><span data-lang="en">Accredited body certificates</span></td><td>
+          <a href="documents/certificates/FSSC_22000_v6_AFAQ_EN.pdf" target="_blank" rel="noopener">📄 FSSC v6 EN</a>
+          <a href="documents/certificates/FSSC_22000_v6_AFAQ_UA.pdf" target="_blank" rel="noopener">📄 UA</a> ·
+          <a href="documents/certificates/FSSC_22000_TUV_NORD.pdf" target="_blank" rel="noopener">📄 TÜV</a> ·
+          <a href="documents/certificates/HACCP_ISO_22000_EN.pdf" target="_blank" rel="noopener">📄 HACCP/ISO 22000 EN</a>
+          <a href="documents/certificates/HACCP_ISO_22000_UA.pdf" target="_blank" rel="noopener">📄 UA</a> ·
+          <a href="documents/sk_certificates/HACCP_Sneco_SK.pdf" target="_blank" rel="noopener">📄 HACCP SK</a> ·
+          <a href="documents/sk_certificates/IFS_Audit_Letter.pdf" target="_blank" rel="noopener">📄 IFS audit letter</a>
+        </td></tr>
+        <tr><td>100% solar-powered</td><td><span data-lang="uk">Акт встановлення сонячних панелей, лічильник</span><span data-lang="en">Solar installation act, meter readings</span></td><td><span style="color:var(--text-muted);font-size:11.5px"><span data-lang="uk">Виробничі звіти — за запитом</span><span data-lang="en">Production reports — on request</span></span></td></tr>
+        <tr><td>76% online repeat / 100% B2B reorder</td><td><span data-lang="uk">Внутрішня e-commerce аналітика та дані ERP</span><span data-lang="en">Internal e-commerce analytics &amp; ERP data</span></td><td><span style="color:var(--text-muted);font-size:11.5px"><span data-lang="uk">Sales dashboard — внутрішнє</span><span data-lang="en">Sales dashboard — internal</span></span></td></tr>
+        <tr><td>×25 in 6 years</td><td><span data-lang="uk">Фінансова звітність 2018–2024</span><span data-lang="en">Financial statements 2018–2024</span></td><td><span style="color:var(--text-muted);font-size:11.5px"><span data-lang="uk">Внутрішнє — за запитом</span><span data-lang="en">Internal — on request</span></span></td></tr>
+        <tr><td>USA FDA Food Facility Registration</td><td><span data-lang="uk">FFR номер 10618353146</span><span data-lang="en">FFR number 10618353146</span></td><td><a href="documents/export/USA_FDA_Food_Control_Certificate.pdf" target="_blank" rel="noopener">📄 USA FDA cert</a></td></tr>
+        <tr><td>UA Ecolabel «Зелений журавлик»</td><td><span data-lang="uk">ISO 14024 Type I, перший еко-снек в UA</span><span data-lang="en">ISO 14024 Type I, first eco-snack in UA</span></td><td>
+          <a href="documents/eco/Green_Crane_UA_Ecolabel.pdf" target="_blank" rel="noopener">📄 Green Crane</a> ·
+          <a href="documents/eco/EU_PEF_Green_Certificate.pdf" target="_blank" rel="noopener">📄 EU PEF</a>
+        </td></tr>
+        <tr><td>CE Declaration · УКТЗЕД</td><td><span data-lang="uk">CE-декларація обладнання · класифікація для митниці</span><span data-lang="en">CE equipment declaration · customs classification</span></td><td>
+          <a href="documents/legal/CE_Declaration_Equipment.pdf" target="_blank" rel="noopener">📄 CE</a> ·
+          <a href="documents/legal/UKTZED_classification.pdf" target="_blank" rel="noopener">📄 УКТЗЕД</a>
+        </td></tr>
       </tbody>
     </table>
   </div>
@@ -4216,11 +4524,11 @@ h3.block-title:first-of-type { margin-top: 0; }
   <div class="grid-2">
     <div class="card">
       <div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--yellow);margin-bottom:10px"><span data-lang="uk">Зареєстровано</span><span data-lang="en">Registered</span></div>
-      <div style="font-size:13px;line-height:1.7;color:var(--text-muted)">
-        🇺🇦 UA №230269<br>
-        🇸🇰 SK №266751<br>
-        🇨🇿 CZ №411165<br>
-        🇵🇱 PL Z.590834 <span data-lang="uk">(13.02.2026)</span><span data-lang="en">(Feb 13, 2026)</span>
+      <div style="font-size:13px;line-height:1.85;color:var(--text-muted)">
+        🇺🇦 <a href="documents/legal/Trademark_UA_230269.pdf" target="_blank" rel="noopener">UA №230269 📄</a><br>
+        🇸🇰 <a href="documents/sk_trademarks/Trademark_SK_266751.pdf" target="_blank" rel="noopener">SK №266751 📄</a><br>
+        🇨🇿 <a href="documents/sk_trademarks/Trademark_CZ_411165.pdf" target="_blank" rel="noopener">CZ №411165 📄</a><br>
+        🇵🇱 <a href="documents/sk_trademarks/Trademark_PL_Z590834.pdf" target="_blank" rel="noopener">PL Z.590834 📄</a> <span data-lang="uk">(13.02.2026)</span><span data-lang="en">(Feb 13, 2026)</span>
       </div>
     </div>
     <div class="card">
@@ -5310,17 +5618,98 @@ h3.block-title:first-of-type { margin-top: 0; }
 </section>
 
 <!-- ============================================================
+     IDEAS / TICKETS (added v2.27)
+     ============================================================ -->
+<section class="section" id="sec-ideas" style="padding:56px 64px">
+  <div class="section-eyebrow">💡 <span data-lang="uk">Пропозиції</span><span data-lang="en">Ideas</span></div>
+  <h2 class="section-title"><span data-lang="uk">Пропозиції команди</span><span data-lang="en">Team ideas &amp; suggestions</span></h2>
+  <div class="section-lead">
+    <span data-lang="uk">Місце для ідей, тікетів і пропозицій від команди. Створює будь-хто (ім'я + email). Сортується від нових до старих. Адміни (vg/fg) позначають «✓ зроблено» або повертають у роботу. Коментарі і файли — у будь-який час.</span>
+    <span data-lang="en">Place for ideas, tickets and suggestions from the team. Anyone can submit (name + email). Sorted newest first. Admins (vg/fg) mark as done or reopen. Comments and files anytime.</span>
+  </div>
+
+  <div class="ideas-toolbar">
+    <div class="ideas-filter" id="ideas-filter">
+      <button data-filter="open" class="is-active"><span data-lang="uk">Відкриті</span><span data-lang="en">Open</span></button>
+      <button data-filter="done"><span data-lang="uk">Зроблено</span><span data-lang="en">Done</span></button>
+      <button data-filter="all"><span data-lang="uk">Усі</span><span data-lang="en">All</span></button>
+    </div>
+    <span class="ideas-counter" id="ideas-counter"></span>
+    <button class="ideas-new-btn" id="ideas-new-btn">+ <span data-lang="uk">Нова пропозиція</span><span data-lang="en">New idea</span></button>
+  </div>
+
+  <!-- New idea form (hidden by default) -->
+  <div class="ideas-form" id="ideas-form" style="display:none">
+    <div class="ideas-form-row">
+      <input type="text" data-role="title" maxlength="200" placeholder="Назва пропозиції / Title" autocomplete="off">
+    </div>
+    <div class="ideas-form-row">
+      <textarea data-role="body" maxlength="10000" placeholder="Опишіть пропозицію детально / Describe the idea in detail"></textarea>
+    </div>
+    <div class="ideas-form-grid">
+      <input type="text" data-role="name" maxlength="80" placeholder="Ваше ім'я / Your name">
+      <input type="email" data-role="email" maxlength="200" placeholder="Email">
+    </div>
+    <div class="ideas-form-row">
+      <div class="ideas-attach-zone" id="ideas-attach-zone">
+        <label class="idea-action-btn" style="cursor:pointer">📎 <span data-lang="uk">Додати файл</span><span data-lang="en">Attach file</span><input type="file" multiple style="display:none" data-role="files"></label>
+        <span class="ideas-attach-list" data-role="attach-list"></span>
+      </div>
+    </div>
+    <div class="ideas-form-actions">
+      <button class="primary" data-role="submit"><span data-lang="uk">Створити</span><span data-lang="en">Submit</span></button>
+      <button class="secondary" data-role="cancel"><span data-lang="uk">Скасувати</span><span data-lang="en">Cancel</span></button>
+      <span class="otp-msg" data-role="msg" style="margin:0"></span>
+    </div>
+  </div>
+
+  <!-- List of ideas -->
+  <div id="ideas-list">
+    <div class="ideas-empty"><span data-lang="uk">Завантаження…</span><span data-lang="en">Loading…</span></div>
+  </div>
+
+  <div style="margin-top:24px;padding:14px 18px;background:var(--black-05);border-radius:8px;font-size:11.5px;color:var(--text-muted);line-height:1.6">
+    <span data-lang="uk">📁 Файли (макс. 10 МБ кожен, до 6 на пропозицію) зберігаються у Cloudflare R2 і доступні за прямим URL. Не публікуйте sensitive дані — це public storage. Адмін може видалити будь-яку пропозицію за запитом на vg@sneco.ua.</span>
+    <span data-lang="en">📁 Files (max 10 MB each, up to 6 per idea) are stored in Cloudflare R2 and available via direct URL. Don't post sensitive data — this is public storage. Admin can delete any idea on request to vg@sneco.ua.</span>
+  </div>
+</section>
+
+<!-- ============================================================
      MAINTENANCE (Checklist + Versioning, merged in v2.8)
      ============================================================ -->
 <section class="section" id="sec-maintenance" style="padding:56px 64px">
   <div class="section-eyebrow"><span data-lang="uk">Maintenance</span><span data-lang="en">Maintenance</span></div>
   <h2 class="section-title"><span data-lang="uk">Підтримка документа</span><span data-lang="en">Document maintenance</span></h2>
   <div class="section-lead">
-    <span data-lang="uk">Як перевіряти і як вести цей документ. Compliance-чеклист (для будь-якого матеріалу перед випуском) і повна історія версій.</span>
-    <span data-lang="en">How to check materials against this document and how to maintain it. Compliance checklist (for any asset before release) and full version history.</span>
+    <span data-lang="uk">Як перевіряти і як вести цей документ. Compliance-чеклист (для будь-якого матеріалу перед випуском), розподіл доступу до захищених розділів і повна історія версій.</span>
+    <span data-lang="en">How to check materials against this document and how to maintain it. Compliance checklist (for any asset before release), access management for protected sections, and full version history.</span>
   </div>
 
-  <h3 class="block-title">✅ <span data-lang="uk">Brand compliance — чеклист</span><span data-lang="en">Brand compliance checklist</span></h3>
+  <h3 class="block-title" id="access-control">🔐 <span data-lang="uk">Розподіл доступу</span><span data-lang="en">Access management</span></h3>
+  <div data-otp-block="admin" class="is-locked" id="admin-section">
+    <!-- Locked state: admin login -->
+    <div class="otp-locked">
+      <div style="font-size:13px;color:var(--text-muted);line-height:1.55;margin-bottom:14px">
+        <span data-lang="uk">Керування whitelist'ами захищених розділів (HR, Прайс-листи). Доступ — лише для засновників: <code>vg@sneco.ua</code> і <code>fg@abrisart.com</code>.</span>
+        <span data-lang="en">Manage whitelists for protected sections (HR, Prices). Access restricted to founders: <code>vg@sneco.ua</code> and <code>fg@abrisart.com</code>.</span>
+      </div>
+      <div class="otp-card" data-otp-mount="admin"></div>
+    </div>
+
+    <!-- Unlocked: admin UI -->
+    <div class="otp-unlocked">
+      <div class="otp-session-bar">
+        <span><span data-lang="uk">✓ Адмін-сесія для</span><span data-lang="en">✓ Admin session for</span> <span class="otp-session-email" data-otp-email-display></span> · <span data-otp-expires-display></span></span>
+        <button class="otp-logout" data-otp-logout="admin"><span data-lang="uk">🔒 Вийти</span><span data-lang="en">🔒 Lock</span></button>
+      </div>
+      <div id="admin-blocks-container">
+        <div style="font-size:12px;color:var(--text-muted);text-align:center;padding:24px"><span data-lang="uk">Завантажуємо whitelist'и…</span><span data-lang="en">Loading whitelists…</span></div>
+      </div>
+      <div id="admin-msg" style="font-size:12px;margin-top:12px;min-height:16px"></div>
+    </div>
+  </div>
+
+  <h3 class="block-title" style="margin-top:48px">✅ <span data-lang="uk">Brand compliance — чеклист</span><span data-lang="en">Brand compliance checklist</span></h3>
   <h3 class="block-title"><span data-lang="uk">Логотип і кольори</span><span data-lang="en">Logo &amp; colors</span></h3>
   <div class="checklist">
     <div class="check-item"><span class="check-icon check-done">✓</span><span data-lang="uk">Використано оригінальний файл логотипу (не перемальований)</span><span data-lang="en">Original logo file used (not redrawn)</span></div>
@@ -5357,7 +5746,65 @@ h3.block-title:first-of-type { margin-top: 0; }
 
   <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span></h3>
   <div class="changelog-entry">
-    <span class="changelog-version">v2.23</span><span class="changelog-date">08.05.2026</span>
+    <span class="changelog-version">v2.27</span><span class="changelog-date">08.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>💡 Новий розділ «Пропозиції»</strong> у sidebar групі «Сервіс» — система тікетів/ідей для команди. Будь-хто може створити (ім'я+email), будь-хто коментує, файли (до 6, по 10 МБ) — приймаються. Адміни (vg/fg) позначають як «✓ зроблено» або повертають у роботу.</li>
+      <li data-lang="en"><strong>💡 New "Ideas" section</strong> in the "Service" sidebar group — a ticket/idea system for the team. Anyone can submit (name + email), anyone can comment, attachments (up to 6 × 10 MB) supported. Admins (vg/fg) mark as done or reopen.</li>
+      <li data-lang="uk">Сортування — від нових до старих. Фільтр <strong>Відкриті / Зроблено / Усі</strong>. Кожен idea-card розгортається кліком: видно повний текст, коментарі, файли, форму нового коментаря.</li>
+      <li data-lang="en">Newest-first sorting. Filter <strong>Open / Done / All</strong>. Each idea card expands on click: full text, comments, attachments, comment form.</li>
+      <li data-lang="uk">Email-сповіщення через Resend: нова ідея → адмінам; новий коментар → адмінам + автору тікета.</li>
+      <li data-lang="en">Email notifications via Resend: new idea → admins; new comment → admins + ticket author.</li>
+      <li data-lang="uk"><strong>Backend:</strong> розширено sneco-auth Worker. <strong>D1</strong> (SQL) для тікетів і коментарів, <strong>R2</strong> (object storage) для файлів. Email — через існуючий Resend API key. Endpoints: <code>/api/ideas/list|get|create|comment|close|reopen</code>, <code>/api/ideas/upload</code>, <code>/files/&lt;key&gt;</code>.</li>
+      <li data-lang="en"><strong>Backend:</strong> sneco-auth Worker extended. <strong>D1</strong> (SQL) for ideas and comments, <strong>R2</strong> (object storage) for files. Email — via existing Resend API key. Endpoints: <code>/api/ideas/list|get|create|comment|close|reopen</code>, <code>/api/ideas/upload</code>, <code>/files/&lt;key&gt;</code>.</li>
+      <li data-lang="uk"><strong>⚠ Перед публікацією v2.27 потрібен setup-2:</strong> створити D1 db <code>sneco-bible</code>, виконати <code>schema.sql</code>, створити R2 bucket <code>sneco-files</code>, uncomment блоки у wrangler.toml, redeploy. Інструкція — у новому <code>~/snEco/sneco-auth/setup-2.sh</code>.</li>
+      <li data-lang="en"><strong>⚠ Before publishing v2.27, run setup-2:</strong> create D1 db <code>sneco-bible</code>, apply <code>schema.sql</code>, create R2 bucket <code>sneco-files</code>, uncomment blocks in wrangler.toml, redeploy. Instructions in the new <code>~/snEco/sneco-auth/setup-2.sh</code>.</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.26</span><span class="changelog-date">08.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>🔐 Нова система паролів — OTP по email.</strong> Замість статичних паролів (sneco-hr-2026, sneco2026) — одноразові 6-значні коди, що приходять на email. Email має бути у whitelist відповідного розділу. Сесія діє 1 годину, потім треба перезайти.</li>
+      <li data-lang="en"><strong>🔐 New password system — email OTP.</strong> Instead of static passwords (sneco-hr-2026, sneco2026) — one-time 6-digit codes sent to email. Email must be on the whitelist for that section. Session valid 1 hour, then re-login required.</li>
+      <li data-lang="uk">Перероблено: <strong>HR розділ</strong> + <strong>Прайс-листи</strong> у Sales playbook. Універсальний модуль <code>snAuth</code> — тепер можна додавати нові захищені блоки.</li>
+      <li data-lang="en">Refactored: <strong>HR section</strong> + <strong>Price lists</strong> in Sales playbook. Universal <code>snAuth</code> module — easy to add new protected blocks.</li>
+      <li data-lang="uk">Новий блок у Maintenance — <strong>«🔐 Розподіл доступу»</strong>. Доступний лише засновникам (vg@sneco.ua, fg@abrisart.com). Дозволяє редагувати whitelist'и emails per block: додати/видалити людей з доступом до HR і Прайс-листів. Адміни завжди мають доступ за замовчуванням.</li>
+      <li data-lang="en">New Maintenance block — <strong>"🔐 Access management"</strong>. Available only to founders (vg@sneco.ua, fg@abrisart.com). Lets you edit per-block email whitelists: add/remove who can access HR and Prices. Admins always have access by default.</li>
+      <li data-lang="uk"><strong>Backend:</strong> Cloudflare Worker + KV + Resend для email. Код, конфіг і setup-інструкція — у <code>~/snEco/sneco-auth/</code> (<code>src/index.js</code>, <code>wrangler.toml</code>, <code>DEPLOY.md</code>). JWT для сесій (HMAC-SHA256, 1 год TTL). CORS обмежено dreamcarua.github.io.</li>
+      <li data-lang="en"><strong>Backend:</strong> Cloudflare Worker + KV + Resend for email. Code, config and setup instructions in <code>~/snEco/sneco-auth/</code> (<code>src/index.js</code>, <code>wrangler.toml</code>, <code>DEPLOY.md</code>). JWT sessions (HMAC-SHA256, 1h TTL). CORS restricted to dreamcarua.github.io.</li>
+      <li data-lang="uk"><strong>Як це працює:</strong> 1) Юзер вводить email → 2) Worker перевіряє whitelist → 3) надсилає 6-значний код через Resend → 4) Юзер вводить код → 5) Worker видає JWT → 6) JWT зберігається у sessionStorage → 7) розблоковує контент. Закриття браузера → треба знов залогінитись.</li>
+      <li data-lang="en"><strong>How it works:</strong> 1) User enters email → 2) Worker checks whitelist → 3) sends 6-digit code via Resend → 4) User enters code → 5) Worker issues JWT → 6) JWT in sessionStorage → 7) content unlocks. Close browser → must re-login.</li>
+      <li data-lang="uk"><strong>Перед публікацією v2.26 потрібно:</strong> deploy Worker (1-разовий setup, ~30 хв за DEPLOY.md), потім підставити URL Worker'а у <code>WORKER_URL</code> у HTML. До цього моменту login-форми будуть показувати помилку «Send failed».</li>
+      <li data-lang="en"><strong>Before publishing v2.26:</strong> deploy the Worker (one-time setup, ~30 min via DEPLOY.md), then set the Worker URL as <code>WORKER_URL</code> in HTML. Until then, login forms will show "Send failed".</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.25</span><span class="changelog-date">08.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>Усі згадки документів — клікабельні.</strong> У <strong>Legal &amp; substantiation</strong> (substantiation map і Trademarks) і <strong>Press kit substantion table</strong>, а також у <strong>Architecture cards</strong> (UA + EU юр. особи) текст про сертифікати, патент, ТМ, FDA, eco тепер є прямим лінком на відповідний PDF у <code>documents/</code>.</li>
+      <li data-lang="en"><strong>All document mentions — now clickable.</strong> In <strong>Legal &amp; substantiation</strong> (substantiation map and Trademarks) and the <strong>Press kit substantion table</strong>, plus the <strong>Architecture cards</strong> (UA + EU legal entities), references to certificates, patent, trademarks, FDA, eco now link directly to the corresponding PDF in <code>documents/</code>.</li>
+      <li data-lang="uk">Patent UA 139035 · Trademark UA 230269 · TM SK/CZ/PL · FSSC 22000 (v6 EN+UA, TÜV) · HACCP/ISO 22000 (EN+UA) · HACCP SK · IFS audit · SIAL Award + Cert · Eurofins lab tests (5) · USA FDA · Зелений журавлик · EU PEF · CE Declaration · УКТЗЕД · ТУ — усі резолвлять у документ одним кліком.</li>
+      <li data-lang="en">Patent UA 139035 · Trademark UA 230269 · TM SK/CZ/PL · FSSC 22000 (v6 EN+UA, TÜV) · HACCP/ISO 22000 (EN+UA) · HACCP SK · IFS audit · SIAL Award + Cert · Eurofins lab tests (5) · USA FDA · Green Crane · EU PEF · CE Declaration · UKTZED · TU — all open the document with one click.</li>
+      <li data-lang="uk"><strong>Стандарт на майбутнє:</strong> при будь-якій новій згадці назви сертифікату, патенту, нагороди, ТМ, lab test — обов'язково обгорнути в <code>&lt;a href="documents/[категорія]/[файл].pdf" target="_blank"&gt;</code>. Якщо файлу ще немає — додати <span style="color:var(--text-muted)">«за запитом»</span> замість «через CRM».</li>
+      <li data-lang="en"><strong>Going-forward standard:</strong> any new mention of a certificate, patent, award, trademark or lab test must be wrapped in <code>&lt;a href="documents/[category]/[file].pdf" target="_blank"&gt;</code>. If the file isn't published yet — write <span style="color:var(--text-muted)">"on request"</span> instead of "via CRM".</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.24</span><span class="changelog-date">08.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>🔒 Новий розділ HR — персонал і зарплати</strong> у новій sidebar-групі «Конфіденційне». Захищений паролем (SHA-256 hash, sessionStorage).</li>
+      <li data-lang="en"><strong>🔒 New HR — personnel &amp; payroll section</strong> in a new "Confidential" sidebar group. Password-gated (SHA-256 hash, sessionStorage).</li>
+      <li data-lang="uk">Перший документ: <strong>«ЗП Виробництво»</strong> — щомісячна табличка зарплат (.xlsx). Опис процесу: щомісячно — лише верхня таблиця, формули затягують усе інше; від бухгалтерії — аванс/залишок вручну; години — автоматично з табелю; при виплаті — друк 2 однакових таблиць у альбомному форматі (відрізна для підпису + для працівника).</li>
+      <li data-lang="en">First document: <strong>"Production payroll"</strong> — monthly worksheet (.xlsx). Process documentation: each month — only the top table is edited, formulas pull the rest; advance/final from accounting entered manually; hours computed automatically from the daily timesheet; on payday — print 2 identical tables in landscape (one for signature, one for the employee).</li>
+      <li data-lang="uk"><strong>⚠ Security warning</strong> у HR-розділі: пароль у HTML — UI-бар'єр, а не реальний криптографічний захист. У публічному repo файли доступні через RAW URL без пароля. Sensitive файли — через захищені канали; у майбутньому — окремий приватний repo.</li>
+      <li data-lang="en"><strong>⚠ Security warning</strong> in HR section: HTML password is a UI gate, not real cryptographic protection. In a public repo, files are reachable via raw URLs without a password. Sensitive files — via secure channels; long-term — private repo.</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.23</span><span class="changelog-date">08.05.2026</span>
     <ul class="changelog-list">
       <li data-lang="uk"><strong>Повний реєстр контактів команди</strong> у секції «Команда & орг-структура» — імена, посади, мови, телефони, email, LinkedIn для всієї snEco SK команди + co-owners.</li>
       <li data-lang="en"><strong>Full team contact registry</strong> in the "Team &amp; org structure" section — names, roles, languages, phones, emails, LinkedIn for the whole snEco SK team + co-owners.</li>
@@ -5761,6 +6208,90 @@ h3.block-title:first-of-type { margin-top: 0; }
   </div>
 </section>
 
+<!-- ============================================================
+     HR — CONFIDENTIAL (password-gated, added v2.24)
+     ============================================================ -->
+<section class="section is-locked" id="sec-hr" data-otp-block="hr" style="padding:56px 64px">
+  <div class="section-eyebrow">🔒 <span data-lang="uk">Конфіденційне · HR</span><span data-lang="en">Confidential · HR</span></div>
+  <h2 class="section-title"><span data-lang="uk">HR — персонал і зарплати</span><span data-lang="en">HR — personnel &amp; payroll</span></h2>
+
+  <!-- LOCKED STATE: OTP login form (universal, populated by JS) -->
+  <div class="otp-locked">
+    <div class="section-lead">
+      <span data-lang="uk">Розділ містить чутливу інформацію про персонал: ставки, оклади, відомості ЗП. Доступ — за email-кодом.</span>
+      <span data-lang="en">This section contains sensitive personnel data: rates, salaries, payroll. Access requires an email code.</span>
+    </div>
+    <div class="otp-card" data-otp-mount="hr"></div>
+  </div>
+
+  <!-- UNLOCKED STATE -->
+  <div class="otp-unlocked">
+    <div class="otp-session-bar">
+      <span><span data-lang="uk">✓ Розблоковано для</span><span data-lang="en">✓ Unlocked for</span> <span class="otp-session-email" data-otp-email-display></span> · <span data-otp-expires-display></span></span>
+      <button class="otp-logout" data-otp-logout="hr"><span data-lang="uk">🔒 Вийти</span><span data-lang="en">🔒 Lock</span></button>
+    </div>
+
+    <div class="hr-warning-banner">
+      <strong>⚠️ <span data-lang="uk">Попередження про безпеку.</span><span data-lang="en">Security notice.</span></strong>
+      <span data-lang="uk">Цей brand book розміщено у публічному GitHub-репозиторії. Password-gate тут — це інтерфейсний бар'єр, а не реальний криптографічний захист. Будь-який файл, опублікований у цьому розділі, технічно доступний за прямим RAW-посиланням навіть без пароля. Тримайте у цьому розділі лише <strong>опис процесів</strong>; sensitive файли (повні відомості ЗП, договори, скани паспортів) надсилайте через захищені канали (особистий email, Signal, Sneco SK Drive). У майбутньому варто перенести файли у приватний repo.</span>
+      <span data-lang="en">This brand book lives in a public GitHub repository. The password gate here is a UI barrier, not real cryptographic protection. Any file published in this section is technically reachable via direct raw URL without a password. Keep only <strong>process documentation</strong> in this section; send sensitive files (full payroll, contracts, passport scans) via secure channels (personal email, Signal, Sneco SK Drive). In future, files should move to a private repo.</span>
+    </div>
+
+    <h3 class="block-title">📑 <span data-lang="uk">Документи персоналу</span><span data-lang="en">Personnel documents</span></h3>
+
+    <!-- ZP Vyrobnyctvo -->
+    <div class="hr-doc-card">
+      <div class="hr-doc-header">
+        <div class="hr-doc-icon">📊</div>
+        <div style="flex:1">
+          <div class="hr-doc-title"><span data-lang="uk">ЗП Виробництво — щомісячна табличка зарплат</span><span data-lang="en">Production payroll — monthly worksheet</span></div>
+          <div class="hr-doc-meta">XLSX · 70 KB · <span data-lang="uk">оновлюється щомісяця</span><span data-lang="en">updated monthly</span></div>
+        </div>
+        <a href="hr/zp_vyrobnyctvo.xlsx" download class="hr-doc-download">⬇ XLSX</a>
+      </div>
+
+      <div class="hr-doc-section">
+        <strong><span data-lang="uk">Як ведеться</span><span data-lang="en">How it's maintained</span></strong>
+        <span data-lang="uk">Кожний місяць — окрема закладка. Щомісячним змінам підлягає <strong>тільки верхня таблиця</strong> (дні, числа, кількість робочих днів у місяці) — все інше затягується формулами на її основі.</span>
+        <span data-lang="en">Each month — a separate sheet. The <strong>top table is the only thing edited monthly</strong> (days of week, dates, total working days in the month) — everything else is pulled from it via formulas.</span>
+      </div>
+
+      <div class="hr-doc-section">
+        <strong><span data-lang="uk">Дані з бухгалтерії</span><span data-lang="en">Accounting inputs</span></strong>
+        <span data-lang="uk">Від бухгалтерії надходить відомість на <strong>аванс</strong> і <strong>залишок ЗП</strong>. Ці значення вносяться у відповідні рядки <strong>вручну</strong>.</span>
+        <span data-lang="en">Accounting provides the <strong>advance</strong> and <strong>final payment</strong> sheets. These values are entered into the corresponding rows <strong>manually</strong>.</span>
+      </div>
+
+      <div class="hr-doc-section">
+        <strong><span data-lang="uk">Відпрацьовані години</span><span data-lang="en">Hours worked</span></strong>
+        <span data-lang="uk">Рахуються <strong>автоматично</strong> з щоденного заповнення керівником виробництва кількості відпрацьованих годин на день.</span>
+        <span data-lang="en">Calculated <strong>automatically</strong> from the daily entry of hours worked by the production manager.</span>
+      </div>
+
+      <div class="hr-doc-section" style="background:rgba(254,191,39,0.10);border-left:3px solid var(--yellow);padding-left:12px">
+        <strong>📄 <span data-lang="uk">Що друкувати при виплаті</span><span data-lang="en">What to print on payday</span></strong>
+        <span data-lang="uk">Перед виплатою працівникам потрібно <strong>розгорнути (розгрупувати) приховані ячейки</strong> та роздрукувати <strong>2 однакові таблиці на кожного працівника</strong> у форматі <strong>альбомного листа A4</strong>:
+          <ul style="margin:6px 0 0 18px;line-height:1.7">
+            <li><strong>Верхня таблиця</strong> — відривається, надається співробітнику на підпис, залишається у нас.</li>
+            <li><strong>Нижня таблиця</strong> — надається працівнику для звірки ЗП.</li>
+          </ul>
+        </span>
+        <span data-lang="en">Before payday, <strong>expand (ungroup) the hidden cells</strong> and print <strong>two identical tables per employee</strong> on <strong>A4 landscape</strong>:
+          <ul style="margin:6px 0 0 18px;line-height:1.7">
+            <li><strong>Top table</strong> — torn off, signed by the employee, kept on file.</li>
+            <li><strong>Bottom table</strong> — handed to the employee for verification.</li>
+          </ul>
+        </span>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;padding:14px 18px;background:var(--black-05);border-radius:8px;font-size:12px;color:var(--text-muted);line-height:1.6">
+      <span data-lang="uk">📁 <strong>Інші HR-документи</strong> (договори, штатний розклад, відпустки, лікарняні) додаватимуться сюди по мірі формалізації. На запит — vg@sneco.ua або через Pylyp.</span>
+      <span data-lang="en">📁 <strong>Other HR documents</strong> (contracts, staffing schedule, vacations, sick leave) will be added here as they are formalised. On request — vg@sneco.ua or via Pylyp.</span>
+    </div>
+  </div>
+</section>
+
 </main>
 </div>
 
@@ -5830,6 +6361,583 @@ h3.block-title:first-of-type { margin-top: 0; }
   const burger = document.getElementById('burger');
   const sidebar = document.getElementById('sidebar');
   if (burger) burger.addEventListener('click', () => sidebar.classList.toggle('open'));
+
+  // === snAuth — OTP module (v2.26) ===
+  // Replace WORKER_URL with your deployed Cloudflare Worker URL after `wrangler deploy`.
+  const WORKER_URL = window.SNECO_AUTH_URL || 'https://sneco-auth.vg-ab6.workers.dev';
+  const SS_PREFIX = 'snauth:';
+
+  const snAuth = {
+    workerUrl: WORKER_URL,
+    sessionFor(block) {
+      try {
+        const raw = sessionStorage.getItem(SS_PREFIX + block);
+        if (!raw) return null;
+        const s = JSON.parse(raw);
+        if (s.exp && Date.now() / 1000 > s.exp) {
+          sessionStorage.removeItem(SS_PREFIX + block);
+          return null;
+        }
+        return s;
+      } catch (e) { return null; }
+    },
+    saveSession(block, sess) {
+      try { sessionStorage.setItem(SS_PREFIX + block, JSON.stringify(sess)); } catch (e) {}
+    },
+    clear(block) {
+      try { sessionStorage.removeItem(SS_PREFIX + block); } catch (e) {}
+    },
+    async post(path, body, opts = {}) {
+      const headers = { 'Content-Type': 'application/json' };
+      if (opts.token) headers['Authorization'] = 'Bearer ' + opts.token;
+      const r = await fetch(this.workerUrl + path, { method: 'POST', headers, body: JSON.stringify(body) });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(data.error || ('HTTP ' + r.status));
+      return data;
+    },
+    requestOtp(email, block) { return this.post('/api/otp/request', { email, block }); },
+    verifyOtp(email, code, block) { return this.post('/api/otp/verify', { email, code, block }); },
+    adminGet(token) { return this.post('/api/admin/whitelist/get', {}, { token }); },
+    adminUpdate(token, block, emails) { return this.post('/api/admin/whitelist/update', { block, emails }, { token }); },
+  };
+  window.snAuth = snAuth; // expose for admin UI
+
+  // Mount login form into any [data-otp-mount="<block>"] element
+  function mountOtpForm(mountEl, block, onSuccess) {
+    let stage = 'email'; // or 'code'
+    let email = '';
+    function html() {
+      if (stage === 'email') {
+        return `
+          <div class="otp-icon">📧</div>
+          <div class="otp-title"><span data-lang="uk">Введіть email</span><span data-lang="en">Enter email</span></div>
+          <div class="otp-desc"><span data-lang="uk">Якщо ваш email у списку доступу — на нього надійде 6-значний код. Сесія діє 1 годину.</span><span data-lang="en">If your email is whitelisted, you'll receive a 6-digit code. Session lasts 1 hour.</span></div>
+          <input type="email" class="otp-input" data-role="email" placeholder="you@company.com" autocomplete="email">
+          <button class="otp-btn" data-role="submit"><span data-lang="uk">Надіслати код</span><span data-lang="en">Send code</span></button>
+          <div class="otp-msg" data-role="msg"></div>`;
+      }
+      return `
+        <div class="otp-icon">🔢</div>
+        <div class="otp-title"><span data-lang="uk">Введіть код з листа</span><span data-lang="en">Enter the code</span></div>
+        <div class="otp-desc">${escapeHtml(email)}<br><span data-lang="uk">Код надіслано — перевірте пошту (включно зі спамом).</span><span data-lang="en">Code sent — check your inbox (and spam).</span></div>
+        <input type="text" inputmode="numeric" maxlength="6" class="otp-input" data-role="code" placeholder="••••••" autocomplete="one-time-code">
+        <button class="otp-btn" data-role="submit"><span data-lang="uk">Підтвердити</span><span data-lang="en">Verify</span></button>
+        <a class="otp-back-link" data-role="back"><span data-lang="uk">← Інший email</span><span data-lang="en">← Use another email</span></a>
+        <div class="otp-msg" data-role="msg"></div>`;
+    }
+    function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]); }
+    function render() {
+      mountEl.innerHTML = html();
+      applyLang(); // re-apply lang switcher to newly inserted spans
+      const submit = mountEl.querySelector('[data-role="submit"]');
+      const msg = mountEl.querySelector('[data-role="msg"]');
+      const back = mountEl.querySelector('[data-role="back"]');
+      const input = mountEl.querySelector(stage === 'email' ? '[data-role="email"]' : '[data-role="code"]');
+      input.focus();
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submit.click(); } });
+      submit.addEventListener('click', async () => {
+        msg.className = 'otp-msg';
+        msg.textContent = '';
+        if (stage === 'email') {
+          const v = input.value.trim();
+          if (!v || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
+            msg.classList.add('is-error');
+            msg.textContent = isEn() ? 'Enter a valid email.' : 'Введіть правильний email.';
+            return;
+          }
+          submit.disabled = true;
+          submit.textContent = isEn() ? 'Sending...' : 'Надсилаємо...';
+          try {
+            await snAuth.requestOtp(v, block);
+            email = v;
+            stage = 'code';
+            render();
+          } catch (e) {
+            msg.classList.add('is-error');
+            msg.textContent = (isEn() ? 'Send failed: ' : 'Помилка: ') + e.message;
+            submit.disabled = false;
+            submit.innerHTML = isEn() ? 'Send code' : 'Надіслати код';
+          }
+        } else {
+          const code = input.value.trim();
+          if (!/^\d{6}$/.test(code)) {
+            msg.classList.add('is-error');
+            msg.textContent = isEn() ? 'Code must be 6 digits.' : 'Код — 6 цифр.';
+            return;
+          }
+          submit.disabled = true;
+          submit.textContent = isEn() ? 'Verifying...' : 'Перевіряємо...';
+          try {
+            const result = await snAuth.verifyOtp(email, code, block);
+            snAuth.saveSession(block, { token: result.token, email: result.email, isAdmin: result.isAdmin, exp: result.exp });
+            onSuccess(result);
+          } catch (e) {
+            msg.classList.add('is-error');
+            msg.textContent = isEn() ? 'Wrong or expired code.' : 'Невірний або застарілий код.';
+            input.classList.add('is-error');
+            setTimeout(() => input.classList.remove('is-error'), 1500);
+            submit.disabled = false;
+            submit.innerHTML = isEn() ? 'Verify' : 'Підтвердити';
+          }
+        }
+      });
+      if (back) back.addEventListener('click', () => { stage = 'email'; render(); });
+    }
+    render();
+  }
+  function isEn() { return document.body.classList.contains('lang-en'); }
+  function applyLang() {
+    const lang = isEn() ? 'en' : 'uk';
+    document.querySelectorAll('[data-lang]').forEach(el => { el.style.display = el.dataset.lang === lang ? '' : 'none'; });
+  }
+
+  function setBlockUnlocked(rootEl, on, sess) {
+    rootEl.classList.toggle('is-unlocked', on);
+    rootEl.classList.toggle('is-locked', !on);
+    if (on && sess) {
+      rootEl.querySelectorAll('[data-otp-email-display]').forEach(el => el.textContent = sess.email);
+      rootEl.querySelectorAll('[data-otp-expires-display]').forEach(el => {
+        const mins = Math.max(0, Math.floor((sess.exp * 1000 - Date.now()) / 60000));
+        el.textContent = (isEn() ? 'expires in ' : 'до завершення ') + mins + ' min';
+      });
+    }
+  }
+
+  // Wire up all OTP blocks (sec-hr + #pricing-section + admin-section)
+  document.querySelectorAll('[data-otp-block]').forEach(rootEl => {
+    const block = rootEl.dataset.otpBlock;
+    const mount = rootEl.querySelector('[data-otp-mount="' + block + '"]');
+    const sess = snAuth.sessionFor(block);
+    if (sess) {
+      setBlockUnlocked(rootEl, true, sess);
+      if (block === 'admin') renderAdminUi(sess);
+    } else if (mount) {
+      mountOtpForm(mount, block, sess => {
+        setBlockUnlocked(rootEl, true, sess);
+        if (block === 'admin') renderAdminUi(sess);
+      });
+    }
+    rootEl.querySelectorAll('[data-otp-logout="' + block + '"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        snAuth.clear(block);
+        setBlockUnlocked(rootEl, false, null);
+        if (mount) mountOtpForm(mount, block, sess => {
+          setBlockUnlocked(rootEl, true, sess);
+          if (block === 'admin') renderAdminUi(sess);
+        });
+      });
+    });
+  });
+
+  // === ADMIN UI for whitelist management ===
+  async function renderAdminUi(sess) {
+    const container = document.getElementById('admin-blocks-container');
+    const msgEl = document.getElementById('admin-msg');
+    if (!container) return;
+    if (!sess.isAdmin) {
+      container.innerHTML = '<div style="padding:18px;color:#dc2626;font-size:13px"><span data-lang="uk">⛔ Ваш email не в списку адмінів. Доступ лише для засновників.</span><span data-lang="en">⛔ Your email is not on the admin list. Access restricted to founders.</span></div>';
+      applyLang();
+      return;
+    }
+    container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);text-align:center;padding:18px">Loading…</div>';
+    try {
+      const data = await snAuth.adminGet(sess.token);
+      const blocks = data.blocks || {};
+      const blockMeta = {
+        hr: { uk: 'HR — персонал, ЗП', en: 'HR — personnel, payroll', icon: '👥' },
+        prices: { uk: 'Прайс-листи (Sales playbook)', en: 'Price lists (Sales playbook)', icon: '💰' },
+      };
+      let html = '';
+      for (const block of Object.keys(blockMeta)) {
+        const emails = blocks[block] || [];
+        const meta = blockMeta[block];
+        html += `
+          <div class="admin-block-card" data-block="${block}">
+            <div class="admin-block-title">${meta.icon} <span data-lang="uk">${meta.uk}</span><span data-lang="en">${meta.en}</span></div>
+            <div class="admin-block-desc"><span data-lang="uk">Кому надсилається OTP-код для цього розділу. Адміни (${(data.admins||[]).join(', ')}) завжди мають доступ.</span><span data-lang="en">Who can request an OTP for this section. Admins (${(data.admins||[]).join(', ')}) always have access.</span></div>
+            <div class="admin-emails-list">
+              ${emails.map(e => `<span class="admin-email-chip${(data.admins||[]).includes(e) ? ' is-admin' : ''}">${escapeHtml2(e)}${(data.admins||[]).includes(e) ? '' : ` <button class="admin-email-remove" data-remove="${escapeHtml2(e)}" title="Remove">×</button>`}</span>`).join('')}
+              ${emails.length === 0 ? '<span style="color:var(--text-muted);font-size:12px">empty</span>' : ''}
+            </div>
+            <div class="admin-add-row">
+              <input type="email" placeholder="email@company.com" data-add-input>
+              <button data-add-btn><span data-lang="uk">+ Додати</span><span data-lang="en">+ Add</span></button>
+            </div>
+          </div>`;
+      }
+      container.innerHTML = html;
+      applyLang();
+      // Wire add/remove buttons
+      container.querySelectorAll('.admin-block-card').forEach(card => {
+        const block = card.dataset.block;
+        const input = card.querySelector('[data-add-input]');
+        const addBtn = card.querySelector('[data-add-btn]');
+        addBtn.addEventListener('click', async () => {
+          const newEmail = input.value.trim().toLowerCase();
+          if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+            msgEl.textContent = isEn() ? 'Enter a valid email.' : 'Введіть правильний email.';
+            msgEl.style.color = '#dc2626';
+            return;
+          }
+          const current = blocks[block] || [];
+          if (current.includes(newEmail)) {
+            msgEl.textContent = isEn() ? 'Already in list.' : 'Вже є у списку.';
+            msgEl.style.color = '#7a5a00';
+            return;
+          }
+          const updated = [...current, newEmail];
+          try {
+            await snAuth.adminUpdate(sess.token, block, updated);
+            msgEl.textContent = isEn() ? '✓ Added.' : '✓ Додано.';
+            msgEl.style.color = '#2d6a00';
+            renderAdminUi(sess); // refresh
+          } catch (e) {
+            msgEl.textContent = (isEn() ? 'Error: ' : 'Помилка: ') + e.message;
+            msgEl.style.color = '#dc2626';
+          }
+        });
+        card.querySelectorAll('[data-remove]').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const emailToRemove = btn.dataset.remove;
+            const updated = (blocks[block] || []).filter(x => x !== emailToRemove);
+            try {
+              await snAuth.adminUpdate(sess.token, block, updated);
+              msgEl.textContent = isEn() ? '✓ Removed.' : '✓ Видалено.';
+              msgEl.style.color = '#2d6a00';
+              renderAdminUi(sess);
+            } catch (e) {
+              msgEl.textContent = (isEn() ? 'Error: ' : 'Помилка: ') + e.message;
+              msgEl.style.color = '#dc2626';
+            }
+          });
+        });
+      });
+    } catch (e) {
+      container.innerHTML = '<div style="padding:18px;color:#dc2626;font-size:13px">Error: ' + escapeHtml2(e.message) + '</div>';
+    }
+  }
+  function escapeHtml2(s) { return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]); }
+
+  // === IDEAS / TICKETS controller (v2.27) ===
+  const ideasSection = document.getElementById('sec-ideas');
+  if (ideasSection) {
+    const listEl = document.getElementById('ideas-list');
+    const counterEl = document.getElementById('ideas-counter');
+    const filterEl = document.getElementById('ideas-filter');
+    const newBtn = document.getElementById('ideas-new-btn');
+    const formEl = document.getElementById('ideas-form');
+    let currentFilter = 'open';
+    let cachedIdeas = [];
+    let pendingAttachments = [];   // for new-idea form
+
+    function authorPrefs() {
+      try { return JSON.parse(localStorage.getItem('sneco-ideas-author') || '{}'); }
+      catch (e) { return {}; }
+    }
+    function saveAuthor(name, email) {
+      try { localStorage.setItem('sneco-ideas-author', JSON.stringify({ name, email })); }
+      catch (e) {}
+    }
+    function fmtTime(s) {
+      if (!s) return '';
+      const d = new Date(s * 1000);
+      const today = new Date(); today.setHours(0,0,0,0);
+      const ddy = new Date(today); ddy.setDate(ddy.getDate() - 1);
+      const dt = new Date(d); dt.setHours(0,0,0,0);
+      if (dt.getTime() === today.getTime()) return (isEn() ? 'today ' : 'сьогодні ') + d.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' });
+      if (dt.getTime() === ddy.getTime()) return (isEn() ? 'yesterday ' : 'вчора ') + d.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' });
+      return d.toLocaleDateString(undefined, { day:'numeric', month:'short' }) + ' ' + d.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' });
+    }
+    function fmtSize(b) {
+      if (!b) return '';
+      if (b < 1024) return b + ' B';
+      if (b < 1024*1024) return (b / 1024).toFixed(0) + ' KB';
+      return (b / 1024 / 1024).toFixed(1) + ' MB';
+    }
+    function fileUrl(key) { return WORKER_URL + '/files/' + key; }
+    function attachmentLink(a) {
+      return '<a class="idea-attachment" href="' + escapeHtml2(fileUrl(a.key)) + '" target="_blank" rel="noopener">📄 ' + escapeHtml2(a.name) + ' <span style="opacity:.6">(' + fmtSize(a.size) + ')</span></a>';
+    }
+
+    async function uploadFile(file) {
+      if (file.size > 10 * 1024 * 1024) throw new Error('File >10 MB');
+      const r = await fetch(WORKER_URL + '/api/ideas/upload?filename=' + encodeURIComponent(file.name), {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type || 'application/octet-stream' },
+        body: file,
+      });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(data.error || 'upload failed');
+      return data;
+    }
+
+    async function loadList() {
+      try {
+        const data = await snAuth.post('/api/ideas/list', { status: currentFilter });
+        cachedIdeas = data.items || [];
+        renderList();
+      } catch (e) {
+        listEl.innerHTML = '<div class="ideas-empty" style="color:#dc2626">⚠ ' + escapeHtml2(e.message) + '</div>';
+      }
+    }
+    function renderList() {
+      const items = cachedIdeas;
+      counterEl.textContent = items.length + ' ' + (isEn() ? 'idea(s)' : 'пропозиц.');
+      if (items.length === 0) {
+        listEl.innerHTML = '<div class="ideas-empty">' + (isEn() ? 'No ideas yet — be the first.' : 'Поки нічого — будь першим.') + '</div>';
+        return;
+      }
+      listEl.innerHTML = items.map(it => `
+        <div class="idea-card${it.status === 'done' ? ' is-done' : ''}" data-id="${escapeHtml2(it.id)}">
+          <div class="idea-card-header">
+            <div class="idea-status-dot${it.status === 'done' ? ' is-done' : ''}"></div>
+            <div class="idea-main">
+              <div class="idea-title">${escapeHtml2(it.title)}</div>
+              <div class="idea-meta">
+                <span class="idea-meta-item">👤 ${escapeHtml2(it.author_name)}</span>
+                <span class="idea-meta-item">⏱ ${fmtTime(it.created_at)}</span>
+                ${it.comment_count > 0 ? '<span class="idea-meta-item">💬 ' + it.comment_count + '</span>' : ''}
+                ${(it.attachments || []).length > 0 ? '<span class="idea-meta-item">📎 ' + it.attachments.length + '</span>' : ''}
+              </div>
+              ${it.preview ? '<div class="idea-preview">' + escapeHtml2(it.preview).slice(0, 200) + (it.preview.length > 200 ? '…' : '') + '</div>' : ''}
+            </div>
+            <div class="idea-arrow">▸</div>
+          </div>
+          <div class="idea-card-body" data-role="body"></div>
+        </div>
+      `).join('');
+      // Wire expand/collapse
+      listEl.querySelectorAll('.idea-card').forEach(card => {
+        const header = card.querySelector('.idea-card-header');
+        header.addEventListener('click', () => toggleCard(card));
+      });
+    }
+
+    async function toggleCard(card) {
+      if (card.classList.contains('is-expanded')) {
+        card.classList.remove('is-expanded');
+        return;
+      }
+      card.classList.add('is-expanded');
+      const bodyEl = card.querySelector('[data-role="body"]');
+      bodyEl.innerHTML = '<div style="padding:14px 0;font-size:12px;color:var(--text-muted)">' + (isEn() ? 'Loading…' : 'Завантажуємо…') + '</div>';
+      try {
+        const data = await snAuth.post('/api/ideas/get', { id: card.dataset.id });
+        renderCardBody(card, data);
+      } catch (e) {
+        bodyEl.innerHTML = '<div style="padding:14px 0;color:#dc2626">⚠ ' + escapeHtml2(e.message) + '</div>';
+      }
+    }
+
+    function renderCardBody(card, data) {
+      const idea = data.idea;
+      const comments = data.comments || [];
+      const adminSess = snAuth.sessionFor('admin');
+      const isAdmin = adminSess && adminSess.isAdmin;
+      const bodyEl = card.querySelector('[data-role="body"]');
+      const attachmentsHtml = (idea.attachments || []).length
+        ? '<div class="idea-attachments-list">' + idea.attachments.map(attachmentLink).join('') + '</div>'
+        : '';
+      const commentsHtml = comments.map(c => `
+        <div class="idea-comment">
+          <div class="idea-comment-meta"><strong>${escapeHtml2(c.author_name)}</strong> · ${fmtTime(c.created_at)}</div>
+          ${c.body ? '<div class="idea-comment-body">' + escapeHtml2(c.body) + '</div>' : ''}
+          ${(c.attachments || []).length ? '<div class="idea-comment-attachments">' + c.attachments.map(attachmentLink).join('') + '</div>' : ''}
+        </div>`).join('');
+      const closedInfo = idea.status === 'done'
+        ? '<div class="idea-closed-info">✓ ' + (isEn() ? 'Closed by ' : 'Закрито: ') + escapeHtml2(idea.closed_by || '') + ' · ' + fmtTime(idea.closed_at) + '</div>'
+        : '';
+      const adminBtn = isAdmin
+        ? (idea.status === 'open'
+            ? '<button class="idea-action-btn is-primary" data-role="close">✓ ' + (isEn() ? 'Mark as done' : 'Зроблено') + '</button>'
+            : '<button class="idea-action-btn is-reopen">↺ ' + (isEn() ? 'Reopen' : 'Повернути в роботу') + '</button>')
+        : '';
+      bodyEl.innerHTML = `
+        <div class="idea-full-text">${escapeHtml2(idea.body || '')}</div>
+        ${attachmentsHtml}
+        <div class="idea-actions">
+          ${adminBtn}
+          ${closedInfo}
+        </div>
+        ${commentsHtml ? '<div class="idea-comments">' + commentsHtml + '</div>' : ''}
+        <div class="idea-comment-form" style="margin-top:14px">
+          <div class="ideas-form-row"><textarea data-role="comment-body" maxlength="10000" placeholder="${isEn() ? 'Add comment / new info' : 'Додати коментар / нову інформацію'}"></textarea></div>
+          <div class="ideas-form-grid">
+            <input type="text" data-role="comment-name" maxlength="80" placeholder="${isEn() ? 'Your name' : 'Ваше ім\\'я'}">
+            <input type="email" data-role="comment-email" maxlength="200" placeholder="Email">
+          </div>
+          <div class="ideas-form-row">
+            <div class="ideas-attach-zone" data-role="comment-attach-zone">
+              <label class="idea-action-btn" style="cursor:pointer">📎 ${isEn() ? 'Attach file' : 'Файл'}<input type="file" multiple style="display:none" data-role="comment-files"></label>
+              <span data-role="comment-attach-list"></span>
+            </div>
+          </div>
+          <div class="ideas-form-actions">
+            <button class="primary" data-role="comment-submit">${isEn() ? 'Submit' : 'Додати'}</button>
+            <span class="otp-msg" data-role="comment-msg" style="margin:0"></span>
+          </div>
+        </div>
+      `;
+      // Hydrate author from prefs
+      const prefs = authorPrefs();
+      bodyEl.querySelector('[data-role="comment-name"]').value = prefs.name || '';
+      bodyEl.querySelector('[data-role="comment-email"]').value = prefs.email || '';
+      // Wire admin
+      const closeBtn = bodyEl.querySelector('[data-role="close"]');
+      if (closeBtn) closeBtn.addEventListener('click', async () => {
+        if (!confirm(isEn() ? 'Mark as done?' : 'Позначити як зроблено?')) return;
+        try {
+          await snAuth.post('/api/ideas/close', { idea_id: idea.id }, { token: adminSess.token });
+          await loadList();
+        } catch (e) { alert('Error: ' + e.message); }
+      });
+      const reopenBtn = bodyEl.querySelector('.is-reopen');
+      if (reopenBtn) reopenBtn.addEventListener('click', async () => {
+        try {
+          await snAuth.post('/api/ideas/reopen', { idea_id: idea.id }, { token: adminSess.token });
+          await loadList();
+        } catch (e) { alert('Error: ' + e.message); }
+      });
+      // Wire comment file upload
+      let commentAttachments = [];
+      const commentFiles = bodyEl.querySelector('[data-role="comment-files"]');
+      const commentAttachList = bodyEl.querySelector('[data-role="comment-attach-list"]');
+      function renderCommentAttachments() {
+        commentAttachList.innerHTML = commentAttachments.map((a, i) =>
+          `<span class="ideas-attach-chip${a._uploading ? ' is-uploading' : ''}">📄 ${escapeHtml2(a.name)} ${a._uploading ? '⏳' : ''}<button data-rm="${i}">×</button></span>`
+        ).join('');
+        commentAttachList.querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', () => {
+          commentAttachments.splice(Number(b.dataset.rm), 1); renderCommentAttachments();
+        }));
+      }
+      commentFiles.addEventListener('change', async () => {
+        for (const f of commentFiles.files) {
+          if (commentAttachments.length >= 6) break;
+          const placeholder = { name: f.name, size: f.size, _uploading: true };
+          commentAttachments.push(placeholder);
+          renderCommentAttachments();
+          try {
+            const result = await uploadFile(f);
+            const idx = commentAttachments.indexOf(placeholder);
+            if (idx >= 0) commentAttachments[idx] = result;
+          } catch (e) {
+            const idx = commentAttachments.indexOf(placeholder);
+            if (idx >= 0) commentAttachments.splice(idx, 1);
+            alert('Upload error: ' + e.message);
+          }
+          renderCommentAttachments();
+        }
+        commentFiles.value = '';
+      });
+      // Submit comment
+      bodyEl.querySelector('[data-role="comment-submit"]').addEventListener('click', async () => {
+        const text = bodyEl.querySelector('[data-role="comment-body"]').value.trim();
+        const name = bodyEl.querySelector('[data-role="comment-name"]').value.trim();
+        const email = bodyEl.querySelector('[data-role="comment-email"]').value.trim();
+        const msgEl = bodyEl.querySelector('[data-role="comment-msg"]');
+        msgEl.className = 'otp-msg';
+        if (!name || !email) { msgEl.classList.add('is-error'); msgEl.textContent = isEn() ? 'Name and email required' : 'Ім\'я та email обов\'язкові'; return; }
+        if (!text && commentAttachments.length === 0) { msgEl.classList.add('is-error'); msgEl.textContent = isEn() ? 'Add text or file' : 'Додайте текст або файл'; return; }
+        if (commentAttachments.some(a => a._uploading)) { msgEl.classList.add('is-error'); msgEl.textContent = isEn() ? 'Wait for upload' : 'Зачекайте завантаження'; return; }
+        try {
+          await snAuth.post('/api/ideas/comment', {
+            idea_id: idea.id, body: text, author_name: name, author_email: email,
+            attachments: commentAttachments.map(({_uploading, ...rest}) => rest),
+          });
+          saveAuthor(name, email);
+          await loadList();
+          // Re-expand the same card
+          setTimeout(() => {
+            const c = listEl.querySelector('[data-id="' + idea.id + '"]');
+            if (c) toggleCard(c);
+          }, 100);
+        } catch (e) { msgEl.classList.add('is-error'); msgEl.textContent = e.message; }
+      });
+    }
+
+    // Filter buttons
+    filterEl.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentFilter = btn.dataset.filter;
+        filterEl.querySelectorAll('button').forEach(b => b.classList.toggle('is-active', b === btn));
+        loadList();
+      });
+    });
+
+    // New idea button
+    newBtn.addEventListener('click', () => {
+      formEl.style.display = formEl.style.display === 'none' ? 'block' : 'none';
+      if (formEl.style.display === 'block') {
+        const prefs = authorPrefs();
+        formEl.querySelector('[data-role="name"]').value = prefs.name || '';
+        formEl.querySelector('[data-role="email"]').value = prefs.email || '';
+        formEl.querySelector('[data-role="title"]').focus();
+      }
+    });
+
+    // New idea — file uploads
+    const filesInput = formEl.querySelector('[data-role="files"]');
+    const attachListEl = formEl.querySelector('[data-role="attach-list"]');
+    function renderPendingAttachments() {
+      attachListEl.innerHTML = pendingAttachments.map((a, i) =>
+        `<span class="ideas-attach-chip${a._uploading ? ' is-uploading' : ''}">📄 ${escapeHtml2(a.name)} ${a._uploading ? '⏳' : ''}<button data-rm="${i}">×</button></span>`
+      ).join('');
+      attachListEl.querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', () => {
+        pendingAttachments.splice(Number(b.dataset.rm), 1); renderPendingAttachments();
+      }));
+    }
+    filesInput.addEventListener('change', async () => {
+      for (const f of filesInput.files) {
+        if (pendingAttachments.length >= 6) break;
+        const placeholder = { name: f.name, size: f.size, _uploading: true };
+        pendingAttachments.push(placeholder);
+        renderPendingAttachments();
+        try {
+          const result = await uploadFile(f);
+          const idx = pendingAttachments.indexOf(placeholder);
+          if (idx >= 0) pendingAttachments[idx] = result;
+        } catch (e) {
+          const idx = pendingAttachments.indexOf(placeholder);
+          if (idx >= 0) pendingAttachments.splice(idx, 1);
+          alert('Upload error: ' + e.message);
+        }
+        renderPendingAttachments();
+      }
+      filesInput.value = '';
+    });
+    formEl.querySelector('[data-role="cancel"]').addEventListener('click', () => {
+      formEl.style.display = 'none';
+      pendingAttachments = [];
+      renderPendingAttachments();
+    });
+    formEl.querySelector('[data-role="submit"]').addEventListener('click', async () => {
+      const title = formEl.querySelector('[data-role="title"]').value.trim();
+      const body = formEl.querySelector('[data-role="body"]').value.trim();
+      const name = formEl.querySelector('[data-role="name"]').value.trim();
+      const email = formEl.querySelector('[data-role="email"]').value.trim();
+      const msgEl = formEl.querySelector('[data-role="msg"]');
+      msgEl.className = 'otp-msg';
+      if (title.length < 4) { msgEl.classList.add('is-error'); msgEl.textContent = isEn() ? 'Title too short' : 'Назва коротка'; return; }
+      if (!name || !email) { msgEl.classList.add('is-error'); msgEl.textContent = isEn() ? 'Name and email required' : 'Ім\'я та email обов\'язкові'; return; }
+      if (pendingAttachments.some(a => a._uploading)) { msgEl.classList.add('is-error'); msgEl.textContent = isEn() ? 'Wait for upload' : 'Зачекайте'; return; }
+      try {
+        await snAuth.post('/api/ideas/create', {
+          title, body, author_name: name, author_email: email,
+          attachments: pendingAttachments.map(({_uploading, ...rest}) => rest),
+        });
+        saveAuthor(name, email);
+        formEl.querySelector('[data-role="title"]').value = '';
+        formEl.querySelector('[data-role="body"]').value = '';
+        pendingAttachments = [];
+        renderPendingAttachments();
+        formEl.style.display = 'none';
+        await loadList();
+      } catch (e) { msgEl.classList.add('is-error'); msgEl.textContent = e.message; }
+    });
+
+    // Initial load
+    loadList();
+  }
 
   // === ORG CHART INTERACTIVE (v2.9) ===
   const orgTree = document.getElementById('org-tree');
