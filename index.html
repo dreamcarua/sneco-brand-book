@@ -3,7 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>snEco — Brand Bible</title>
+
+<!-- ============================================================
+     SEARCH ENGINE / AI SCRAPER PROTECTION (v2.34)
+     Цей документ — внутрішній brand book snEco.
+     НЕ повинен з'являтись у Google / Bing / соцмережах.
+     ============================================================ -->
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="slurp" content="noindex, nofollow">
+<meta name="duckduckbot" content="noindex, nofollow">
+<meta name="yandex" content="noindex, nofollow">
+<meta name="baiduspider" content="noindex, nofollow">
+<!-- AI scrapers -->
+<meta name="GPTBot" content="noindex, nofollow">
+<meta name="ChatGPT-User" content="noindex, nofollow">
+<meta name="anthropic-ai" content="noindex, nofollow">
+<meta name="ClaudeBot" content="noindex, nofollow">
+<meta name="CCBot" content="noindex, nofollow">
+<meta name="Google-Extended" content="noindex, nofollow">
+<meta name="PerplexityBot" content="noindex, nofollow">
+<!-- Privacy -->
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="X-Robots-Tag" content="noindex, nofollow, noarchive">
+
+<title>snEco — Brand Bible (internal)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -290,6 +315,204 @@ body.lang-sk [data-lang="en"] { display: none !important; }
   .lang-floater .lang-btn {
     padding: 6px 9px; font-size: 10.5px; min-width: 32px;
   }
+}
+
+/* ============================================================
+   PREDICTIVE SEARCH (v2.34)
+   ============================================================ */
+
+/* Sidebar search */
+.search-sidebar {
+  position: relative;
+  margin: 16px 24px 4px;
+}
+.search-sidebar-input {
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 9px 12px 9px 34px;
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 500;
+  outline: none;
+  transition: all .15s;
+}
+.search-sidebar-input::placeholder { color: rgba(255,255,255,0.4); }
+.search-sidebar-input:focus {
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(254,191,39,0.45);
+}
+.search-sidebar-icon {
+  position: absolute;
+  left: 11px; top: 50%;
+  transform: translateY(-50%);
+  width: 14px; height: 14px;
+  pointer-events: none;
+  color: rgba(255,255,255,0.45);
+}
+.search-sidebar-shortcut {
+  position: absolute;
+  right: 8px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono, monospace);
+  pointer-events: none;
+  letter-spacing: 0.02em;
+}
+.search-sidebar-input:focus ~ .search-sidebar-shortcut { display: none; }
+
+/* Floating search button + expanded search */
+.search-floater {
+  position: fixed;
+  top: 16px; right: 156px;
+  z-index: 250;
+  display: flex; align-items: center;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  height: 36px;
+  transition: width .25s ease;
+  width: 220px;
+  overflow: hidden;
+}
+.search-floater.is-collapsed { width: 36px; }
+.search-floater-input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  padding: 0 12px 0 0;
+  outline: none;
+  height: 100%;
+  min-width: 0;
+}
+.search-floater-input::placeholder { color: rgba(255,255,255,0.45); }
+.search-floater.is-collapsed .search-floater-input { display: none; }
+.search-floater-toggle {
+  width: 36px; height: 34px;
+  background: transparent; border: 0; cursor: pointer;
+  color: rgba(255,255,255,0.65);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.search-floater-toggle:hover { color: var(--yellow); }
+.search-floater-toggle svg { width: 14px; height: 14px; }
+
+@media (max-width: 768px) {
+  .search-floater {
+    top: 12px; right: 134px;
+    height: 32px;
+    width: 180px;
+  }
+  .search-floater.is-collapsed { width: 32px; }
+  .search-floater-toggle { width: 32px; height: 30px; }
+}
+@media (max-width: 600px) {
+  .search-floater { display: none; } /* on small screens use sidebar search via burger */
+}
+
+/* Results dropdown (shared by both inputs) */
+.search-results {
+  position: absolute;
+  top: calc(100% + 6px); left: 0; right: 0;
+  background: var(--white);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+  max-height: 70vh;
+  overflow-y: auto;
+  z-index: 300;
+  display: none;
+}
+.search-results.is-open { display: block; }
+.search-results-floating {
+  position: fixed;
+  top: 60px; right: 16px;
+  width: 460px; max-width: calc(100vw - 32px);
+}
+@media (max-width: 768px) {
+  .search-results-floating { right: 12px; top: 52px; width: calc(100vw - 24px); }
+}
+
+.search-result {
+  display: flex; gap: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--black-05);
+  align-items: flex-start;
+  transition: background .12s;
+}
+.search-result:last-child { border-bottom: 0; }
+.search-result:hover, .search-result.is-active {
+  background: rgba(254,191,39,0.10);
+}
+.search-result-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--black-05);
+  border-radius: 6px;
+}
+.search-result-body { flex: 1; min-width: 0; }
+.search-result-section {
+  font-size: 10.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.10em;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+.search-result-title {
+  font-size: 13.5px; font-weight: 700;
+  color: var(--text);
+  margin-bottom: 3px;
+  line-height: 1.3;
+}
+.search-result-snippet {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.search-result-snippet mark {
+  background: var(--yellow);
+  color: var(--black);
+  padding: 0 2px;
+  border-radius: 2px;
+}
+.search-no-results {
+  padding: 20px 14px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.search-results-header {
+  padding: 8px 14px;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  color: var(--text-muted);
+  background: var(--black-05);
+  border-bottom: 1px solid var(--black-05);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.search-results-header span:last-child {
+  font-weight: 500; letter-spacing: 0;
+  text-transform: none;
 }
 
 /* ============================================================
@@ -1390,6 +1613,18 @@ h3.block-title:first-of-type { margin-top: 0; }
   <button class="lang-btn" data-set-lang="sk" type="button" title="Slovenčina">SK</button>
 </div>
 
+<!-- Floating predictive search — top right (v2.34) -->
+<div class="search-floater is-collapsed" id="searchFloater">
+  <button class="search-floater-toggle" id="searchFloaterToggle" type="button" aria-label="Search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="7"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+  </button>
+  <input type="text" class="search-floater-input" id="searchFloating" autocomplete="off" spellcheck="false">
+</div>
+<div class="search-results search-results-floating" id="searchResultsFloating" role="listbox" aria-label="Search results"></div>
+
 <div class="layout">
 
 <!-- SIDEBAR -->
@@ -1400,6 +1635,17 @@ h3.block-title:first-of-type { margin-top: 0; }
       <span data-lang="uk">Brand Guidelines</span>
       <span data-lang="en">Brand Guidelines</span><span data-lang="sk">Brand Guidelines</span>
     </div>
+  </div>
+
+  <!-- Predictive search — sidebar (v2.34) -->
+  <div class="search-sidebar">
+    <svg class="search-sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="7"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+    <input type="text" class="search-sidebar-input" id="searchSidebar" autocomplete="off" spellcheck="false">
+    <span class="search-sidebar-shortcut">⌘K</span>
+    <div class="search-results" id="searchResultsSidebar" role="listbox" aria-label="Search results"></div>
   </div>
 
   <div class="lang-switcher" role="tablist" aria-label="Language">
@@ -1532,7 +1778,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Bible v2.33 · 2026
+    Brand Bible v2.34 · 2026
   </div>
 </nav>
 
@@ -1546,7 +1792,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
     <span data-lang="sk">Jedna ingrediencia. <span class="qr-ns-accent">Žiadne kompromisy.</span> Syrový snack 21. storočia.</span>
   </div>
-  <div class="qr-meta">v2.33 · 2026</div>
+  <div class="qr-meta">v2.34 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -5854,7 +6100,22 @@ h3.block-title:first-of-type { margin-top: 0; }
 
   <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span><span data-lang="sk">História verzií</span></h3>
   <div class="changelog-entry">
-    <span class="changelog-version">v2.33</span><span class="changelog-date">08.05.2026</span>
+    <span class="changelog-version">v2.34</span><span class="changelog-date">08.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>🔒 Закрито від індексації пошуковими системами і AI-скраперами.</strong> Додано <code>&lt;meta name="robots"&gt;</code> з <code>noindex, nofollow, noarchive, nosnippet</code> + окремі meta-теги для Google / Bing / Yandex / Baidu / DuckDuckGo + AI-ботів (GPTBot, ChatGPT-User, anthropic-ai, ClaudeBot, CCBot, Google-Extended, PerplexityBot). Додано <code>X-Robots-Tag</code> і <code>referrer: no-referrer</code>. Створено <code>brand/robots.txt</code> з <code>Disallow: /</code> для всіх ботів. Документи у <code>documents/</code> також закриті від індексації через robots.txt.</li>
+      <li data-lang="en"><strong>🔒 Locked down from search engines and AI scrapers.</strong> Added <code>&lt;meta name="robots"&gt;</code> with <code>noindex, nofollow, noarchive, nosnippet</code> + separate meta tags for Google / Bing / Yandex / Baidu / DuckDuckGo + AI bots (GPTBot, ChatGPT-User, anthropic-ai, ClaudeBot, CCBot, Google-Extended, PerplexityBot). Added <code>X-Robots-Tag</code> and <code>referrer: no-referrer</code>. Created <code>brand/robots.txt</code> with <code>Disallow: /</code> for all bots. Documents in <code>documents/</code> are also blocked from indexing via robots.txt.</li>
+      <li data-lang="sk"><strong>🔒 Zatvorené pre vyhľadávače a AI scrapery.</strong> Pridané <code>&lt;meta name="robots"&gt;</code> s <code>noindex, nofollow, noarchive, nosnippet</code> + samostatné meta-tagy pre Google / Bing / Yandex / Baidu / DuckDuckGo + AI bots (GPTBot, ChatGPT-User, anthropic-ai, ClaudeBot, CCBot, Google-Extended, PerplexityBot). Pridaný <code>X-Robots-Tag</code> a <code>referrer: no-referrer</code>. Vytvorený <code>brand/robots.txt</code> s <code>Disallow: /</code> pre všetkých botov. Dokumenty v <code>documents/</code> sú tiež blokované pred indexovaním cez robots.txt.</li>
+      <li data-lang="uk"><strong>🔍 Предиктивний пошук по всьому сайту.</strong> Два поля введення: (1) у sidebar над перемикачем мови — повноширинне з лупою-іконкою; (2) у верхньому правому куті поряд з floating перемикачем мови — компактний, розкривається кліком на лупу. Індекс будується лазі (на першому пошуку), охоплює <strong>усі 21 секцій + усі документи</strong> (35+ PDF з папки <code>documents/</code>). Пошук <strong>трьома мовами одночасно</strong> — можна шукати UA-словом і знайти SK/EN-розділ.</li>
+      <li data-lang="en"><strong>🔍 Predictive search across the whole site.</strong> Two input fields: (1) in the sidebar above the language switcher — full-width with a magnifier icon; (2) in the top-right corner next to the floating language switcher — compact, expands on magnifier click. Index is built lazily (on first search), covers <strong>all 21 sections + all documents</strong> (35+ PDFs from the <code>documents/</code> folder). Search works <strong>across all three languages simultaneously</strong> — you can type in UA and find an SK/EN section.</li>
+      <li data-lang="sk"><strong>🔍 Prediktívne vyhľadávanie po celej stránke.</strong> Dve vstupné polia: (1) v bočnom paneli nad prepínačom jazyka — na celú šírku s ikonou lupy; (2) v pravom hornom rohu vedľa plávajúceho prepínača jazyka — kompaktné, rozbalí sa kliknutím na lupu. Index sa vytvára lazy (pri prvom vyhľadávaní), pokrýva <strong>všetkých 21 sekcií + všetky dokumenty</strong> (35+ PDF z priečinka <code>documents/</code>). Vyhľadávanie funguje <strong>vo všetkých troch jazykoch súčasne</strong> — môžete písať v UA a nájdete SK/EN sekciu.</li>
+      <li data-lang="uk"><strong>Можливості пошуку:</strong> підсвічування збігів у результатах (yellow <code>&lt;mark&gt;</code>), сніпет навколо першого збігу, навігація стрілками ↑↓, відкриття на Enter, закриття на Escape, глобальний шорткат <strong>⌘K / Ctrl+K</strong> для миттєвого фокусу. Документи відкриваються у новій вкладці; розділи — клік симулює sidebar-навігацію.</li>
+      <li data-lang="en"><strong>Search features:</strong> match highlighting in results (yellow <code>&lt;mark&gt;</code>), snippet around the first match, ↑↓ arrow navigation, Enter to open, Escape to close, global <strong>⌘K / Ctrl+K</strong> shortcut for instant focus. Documents open in a new tab; sections — click triggers sidebar navigation.</li>
+      <li data-lang="sk"><strong>Funkcie vyhľadávania:</strong> zvýraznenie zhôd vo výsledkoch (žlté <code>&lt;mark&gt;</code>), snippet okolo prvej zhody, navigácia šípkami ↑↓, otvorenie na Enter, zatvorenie na Escape, globálna skratka <strong>⌘K / Ctrl+K</strong> pre okamžité zameranie. Dokumenty sa otvárajú v novej karte; sekcie — kliknutie spustí navigáciu cez sidebar.</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.33</span><span class="changelog-date">08.05.2026</span>
     <ul class="changelog-list">
       <li data-lang="uk"><strong>🔄 Реструктуризація sidebar.</strong> «<strong>Упаковка</strong>» переміщена з групи «Застосування» у групу «<strong>Ідентичність</strong>» — поряд з Visual / Voice / Photo. Логіка: упаковка — це візуальна ідентичність продукту, не випадковий «application-блок».</li>
       <li data-lang="en"><strong>🔄 Sidebar restructure.</strong> "<strong>Packaging</strong>" moved from "Application" group into the "<strong>Identity</strong>" group — alongside Visual / Voice / Photo. Logic: packaging is product visual identity, not a random "application" block.</li>
@@ -6748,6 +7009,376 @@ h3.block-title:first-of-type { margin-top: 0; }
   const burger = document.getElementById('burger');
   const sidebar = document.getElementById('sidebar');
   if (burger) burger.addEventListener('click', () => sidebar.classList.toggle('open'));
+
+  // === Predictive search (v2.34) ===
+  const SEARCH_PLACEHOLDERS = {
+    uk: 'Пошук по бренд-біблії…',
+    en: 'Search the brand bible…',
+    sk: 'Hľadať v brand bible…'
+  };
+  const SEARCH_NO_RESULTS = {
+    uk: 'Нічого не знайдено',
+    en: 'No results found',
+    sk: 'Nič sa nenašlo'
+  };
+  const SEARCH_HEADER_LABELS = {
+    uk: { results: 'Результати', enter: 'Enter — відкрити' },
+    en: { results: 'Results', enter: 'Enter — open' },
+    sk: { results: 'Výsledky', enter: 'Enter — otvoriť' }
+  };
+  const SEARCH_TYPE_LABELS = {
+    uk: { section: 'Розділ', document: 'Документ' },
+    en: { section: 'Section', document: 'Document' },
+    sk: { section: 'Sekcia', document: 'Dokument' }
+  };
+
+  let searchIndex = null;
+  let searchActiveIdx = -1;
+  let searchActiveResults = [];
+  let searchActiveBox = null;
+  let searchActiveInput = null;
+
+  function buildSearchIndex() {
+    if (searchIndex) return searchIndex;
+    const items = [];
+
+    // Sections — extract title and full text content
+    document.querySelectorAll('section.section').forEach(sec => {
+      const id = sec.id;
+      if (!id || id === 'sec-hr') return; // skip HR (locked) — but allow if user wants
+      const target = id.replace(/^sec-/, '');
+
+      // Get title from section-title or section-eyebrow (combine all language texts)
+      const titleEls = sec.querySelectorAll(':scope > .section-title, :scope > .section-eyebrow, :scope > h2');
+      const titleParts = [];
+      titleEls.forEach(el => {
+        // Collect text from each language span
+        el.querySelectorAll('[data-lang]').forEach(s => {
+          const t = s.textContent.trim();
+          if (t) titleParts.push(t);
+        });
+        // If no spans, use textContent
+        if (!el.querySelector('[data-lang]')) {
+          const t = el.textContent.trim();
+          if (t) titleParts.push(t);
+        }
+      });
+      const titles = {
+        uk: titleParts[0] || target,
+        en: titleParts[1] || titleParts[0] || target,
+        sk: titleParts[2] || titleParts[0] || target
+      };
+
+      // Get all text content (across all languages — for search matching)
+      const allText = sec.textContent.replace(/\s+/g, ' ').trim();
+
+      items.push({
+        type: 'section',
+        target: target,
+        sectionId: id,
+        titles: titles,
+        searchText: allText.toLowerCase()
+      });
+    });
+
+    // Documents — find <a> links to documents/ folder
+    const docsSection = document.getElementById('sec-documents');
+    if (docsSection) {
+      docsSection.querySelectorAll('a[href*="documents/"]').forEach(a => {
+        const url = a.getAttribute('href');
+        if (!url || url.startsWith('http')) return;
+
+        // Get visible text per language (a may contain spans)
+        const langTexts = { uk: '', en: '', sk: '' };
+        const langSpans = a.querySelectorAll('[data-lang]');
+        if (langSpans.length > 0) {
+          langSpans.forEach(s => {
+            const lang = s.getAttribute('data-lang');
+            if (lang in langTexts) langTexts[lang] = s.textContent.trim();
+          });
+        } else {
+          const t = a.textContent.trim();
+          langTexts.uk = langTexts.en = langTexts.sk = t;
+        }
+
+        // Find the surrounding context — closest h3 or h4 above
+        let ctx = '';
+        let ctxNode = a.closest('.card, .doc-card, td, li, p, div');
+        while (ctxNode && !ctx) {
+          let prev = ctxNode.previousElementSibling;
+          while (prev) {
+            if (/^H[1-6]$/.test(prev.tagName) || prev.classList.contains('block-title')) {
+              ctx = prev.textContent.trim().replace(/\s+/g, ' ');
+              break;
+            }
+            prev = prev.previousElementSibling;
+          }
+          if (!ctx) ctxNode = ctxNode.parentElement;
+        }
+
+        const filename = url.split('/').pop();
+        const allText = (langTexts.uk + ' ' + langTexts.en + ' ' + langTexts.sk + ' ' + filename + ' ' + ctx).toLowerCase();
+
+        items.push({
+          type: 'document',
+          url: url,
+          filename: filename,
+          context: ctx,
+          titles: langTexts.uk || langTexts.en ? langTexts : { uk: filename, en: filename, sk: filename },
+          searchText: allText
+        });
+      });
+    }
+
+    searchIndex = items;
+    return items;
+  }
+
+  function escapeRegExp(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+  function highlight(text, query) {
+    if (!query) return escapeHtml(text);
+    const tokens = query.toLowerCase().split(/\s+/).filter(t => t.length > 0);
+    let html = escapeHtml(text);
+    tokens.forEach(t => {
+      const re = new RegExp('(' + escapeRegExp(t) + ')', 'gi');
+      html = html.replace(re, '<mark>$1</mark>');
+    });
+    return html;
+  }
+
+  function searchQuery(query) {
+    if (!query || query.length < 2) return [];
+    const idx = buildSearchIndex();
+    const tokens = query.toLowerCase().split(/\s+/).filter(t => t.length > 0);
+    if (!tokens.length) return [];
+
+    const lang = (function() {
+      if (document.body.classList.contains('lang-sk')) return 'sk';
+      if (document.body.classList.contains('lang-en')) return 'en';
+      return 'uk';
+    })();
+
+    const scored = [];
+    idx.forEach(item => {
+      let score = 0;
+      let firstMatchPos = -1;
+      tokens.forEach(t => {
+        // Title gets big bonus (in current lang especially)
+        const currentTitle = (item.titles[lang] || '').toLowerCase();
+        const allTitlesText = Object.values(item.titles).join(' ').toLowerCase();
+        if (currentTitle.startsWith(t)) score += 25;
+        else if (currentTitle.includes(t)) score += 15;
+        else if (allTitlesText.includes(t)) score += 10;
+        // Body content
+        const re = new RegExp(escapeRegExp(t), 'gi');
+        const matches = item.searchText.match(re);
+        if (matches) {
+          score += Math.min(matches.length, 5);
+          if (firstMatchPos === -1) {
+            firstMatchPos = item.searchText.indexOf(t);
+          }
+        }
+      });
+      // Document slight bonus (often more specific)
+      if (item.type === 'document' && score > 0) score += 2;
+
+      if (score > 0) {
+        // Build snippet around first match
+        let snippet = '';
+        if (firstMatchPos >= 0) {
+          const start = Math.max(0, firstMatchPos - 50);
+          const end = Math.min(item.searchText.length, firstMatchPos + 100);
+          snippet = (start > 0 ? '…' : '') + item.searchText.substring(start, end).trim() + (end < item.searchText.length ? '…' : '');
+        } else {
+          snippet = item.searchText.substring(0, 120).trim() + '…';
+        }
+        scored.push({ ...item, score, snippet });
+      }
+    });
+
+    scored.sort((a, b) => b.score - a.score);
+    return scored.slice(0, 12);
+  }
+
+  function getCurrentLang() {
+    if (document.body.classList.contains('lang-sk')) return 'sk';
+    if (document.body.classList.contains('lang-en')) return 'en';
+    return 'uk';
+  }
+
+  function renderResults(results, container, query) {
+    const lang = getCurrentLang();
+    if (!results.length) {
+      container.innerHTML = '<div class="search-no-results">' + SEARCH_NO_RESULTS[lang] + '</div>';
+      return;
+    }
+    const headerLabels = SEARCH_HEADER_LABELS[lang];
+    let html = '<div class="search-results-header"><span>' + headerLabels.results + ' (' + results.length + ')</span><span>' + headerLabels.enter + '</span></div>';
+    results.forEach((r, i) => {
+      const titleLang = r.titles[lang] || r.titles.uk || r.titles.en;
+      const typeLabel = SEARCH_TYPE_LABELS[lang][r.type];
+      const icon = r.type === 'section' ? '📄' : '📎';
+      const dataAttrs = r.type === 'section'
+        ? ('data-type="section" data-target="' + r.target + '"')
+        : ('data-type="document" data-url="' + escapeHtml(r.url) + '"');
+      html += '<div class="search-result" ' + dataAttrs + ' data-idx="' + i + '">'
+        + '<div class="search-result-icon">' + icon + '</div>'
+        + '<div class="search-result-body">'
+        + '<div class="search-result-section">' + typeLabel + (r.context ? ' · ' + escapeHtml(r.context) : '') + '</div>'
+        + '<div class="search-result-title">' + highlight(titleLang, query) + '</div>'
+        + '<div class="search-result-snippet">' + highlight(r.snippet, query) + '</div>'
+        + '</div></div>';
+    });
+    container.innerHTML = html;
+    // Attach click handlers
+    container.querySelectorAll('.search-result').forEach(el => {
+      el.addEventListener('mousedown', (e) => { e.preventDefault(); }); // prevent input blur before click fires
+      el.addEventListener('click', () => activateResult(el));
+    });
+  }
+
+  function activateResult(el) {
+    const type = el.getAttribute('data-type');
+    if (type === 'section') {
+      const target = el.getAttribute('data-target');
+      const navLink = document.querySelector('.nav-link[data-target="' + target + '"]');
+      if (navLink) navLink.click();
+    } else if (type === 'document') {
+      const url = el.getAttribute('data-url');
+      if (url) window.open(url, '_blank', 'noopener');
+    }
+    closeAllSearchDropdowns();
+  }
+
+  function closeAllSearchDropdowns() {
+    document.querySelectorAll('.search-results').forEach(r => r.classList.remove('is-open'));
+    searchActiveIdx = -1;
+    searchActiveResults = [];
+    searchActiveBox = null;
+    searchActiveInput = null;
+    // Collapse floating search if empty
+    const floater = document.getElementById('searchFloater');
+    const fInput = document.getElementById('searchFloating');
+    if (floater && fInput && !fInput.value) floater.classList.add('is-collapsed');
+  }
+
+  function navigateResults(delta) {
+    if (!searchActiveBox) return;
+    const items = searchActiveBox.querySelectorAll('.search-result');
+    if (!items.length) return;
+    searchActiveIdx = Math.max(0, Math.min(items.length - 1, searchActiveIdx + delta));
+    items.forEach((it, i) => it.classList.toggle('is-active', i === searchActiveIdx));
+    items[searchActiveIdx].scrollIntoView({ block: 'nearest' });
+  }
+
+  function attachSearch(input, resultsBox) {
+    const placeholder = SEARCH_PLACEHOLDERS[getCurrentLang()];
+    input.placeholder = placeholder;
+
+    let debounceTimer = null;
+    input.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      const q = input.value.trim();
+      if (q.length < 2) {
+        resultsBox.classList.remove('is-open');
+        return;
+      }
+      debounceTimer = setTimeout(() => {
+        const results = searchQuery(q);
+        searchActiveResults = results;
+        searchActiveBox = resultsBox;
+        searchActiveInput = input;
+        searchActiveIdx = -1;
+        renderResults(results, resultsBox, q);
+        resultsBox.classList.add('is-open');
+      }, 80);
+    });
+
+    input.addEventListener('focus', () => {
+      if (input.value.trim().length >= 2) {
+        searchActiveBox = resultsBox;
+        searchActiveInput = input;
+        resultsBox.classList.add('is-open');
+      }
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') { e.preventDefault(); navigateResults(1); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); navigateResults(-1); }
+      else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (searchActiveBox) {
+          const items = searchActiveBox.querySelectorAll('.search-result');
+          if (searchActiveIdx >= 0 && items[searchActiveIdx]) {
+            activateResult(items[searchActiveIdx]);
+          } else if (items.length > 0) {
+            activateResult(items[0]);
+          }
+        }
+      } else if (e.key === 'Escape') {
+        input.blur();
+        closeAllSearchDropdowns();
+        input.value = '';
+      }
+    });
+
+    // Update placeholder when lang changes
+    const observer = new MutationObserver(() => {
+      input.placeholder = SEARCH_PLACEHOLDERS[getCurrentLang()];
+    });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  }
+
+  // Initialize sidebar search
+  const sidebarInput = document.getElementById('searchSidebar');
+  const sidebarResults = document.getElementById('searchResultsSidebar');
+  if (sidebarInput && sidebarResults) attachSearch(sidebarInput, sidebarResults);
+
+  // Initialize floating search
+  const floaterEl = document.getElementById('searchFloater');
+  const floaterToggle = document.getElementById('searchFloaterToggle');
+  const floaterInput = document.getElementById('searchFloating');
+  const floaterResults = document.getElementById('searchResultsFloating');
+  if (floaterEl && floaterInput && floaterResults) {
+    attachSearch(floaterInput, floaterResults);
+    floaterToggle.addEventListener('click', () => {
+      floaterEl.classList.toggle('is-collapsed');
+      if (!floaterEl.classList.contains('is-collapsed')) {
+        setTimeout(() => floaterInput.focus(), 200);
+      }
+    });
+  }
+
+  // Global Cmd+K / Ctrl+K shortcut
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      // Focus the most appropriate input — sidebar if visible, otherwise floating
+      const sb = document.getElementById('searchSidebar');
+      if (sb && window.getComputedStyle(sb).display !== 'none') {
+        sb.focus();
+        sb.select();
+      } else if (floaterInput) {
+        floaterEl.classList.remove('is-collapsed');
+        setTimeout(() => floaterInput.focus(), 200);
+      }
+    }
+    if (e.key === 'Escape') {
+      closeAllSearchDropdowns();
+    }
+  });
+
+  // Click outside to close
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-sidebar') && !e.target.closest('.search-floater') && !e.target.closest('.search-results')) {
+      closeAllSearchDropdowns();
+    }
+  });
 
   // === snAuth — OTP module (v2.26) ===
   // Replace WORKER_URL with your deployed Cloudflare Worker URL after `wrangler deploy`.
