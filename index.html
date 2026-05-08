@@ -253,6 +253,45 @@ body.lang-sk [data-lang="en"] { display: none !important; }
   border: 0; cursor: pointer; font-size: 20px;
 }
 
+/* Floating language switcher — top right corner (v2.31) */
+.lang-floater {
+  position: fixed; top: 16px; right: 16px; z-index: 250;
+  display: flex; gap: 3px;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 8px; padding: 3px;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+}
+.lang-floater .lang-btn {
+  flex: 0 0 auto;
+  padding: 7px 12px;
+  font-family: var(--font-body); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.55);
+  background: transparent; border: 0;
+  border-radius: 6px; cursor: pointer;
+  transition: all .15s;
+  min-width: 36px;
+}
+.lang-floater .lang-btn.active {
+  background: var(--yellow); color: var(--black);
+}
+.lang-floater .lang-btn:hover:not(.active) {
+  color: rgba(255,255,255,0.95);
+  background: rgba(255,255,255,0.06);
+}
+@media (max-width: 768px) {
+  .lang-floater {
+    top: 12px; right: 12px;
+    padding: 2px;
+  }
+  .lang-floater .lang-btn {
+    padding: 6px 9px; font-size: 10.5px; min-width: 32px;
+  }
+}
+
 /* ============================================================
    SECTIONS
    ============================================================ */
@@ -1344,6 +1383,13 @@ h3.block-title:first-of-type { margin-top: 0; }
 <button class="burger" id="burger" aria-label="Menu">☰</button>
 <div class="copy-toast" id="copyToast">Copied!</div>
 
+<!-- Floating language switcher — top right (v2.31) -->
+<div class="lang-floater" role="tablist" aria-label="Language switcher">
+  <button class="lang-btn active" data-set-lang="uk" type="button" title="Українська">UA</button>
+  <button class="lang-btn" data-set-lang="en" type="button" title="English">EN</button>
+  <button class="lang-btn" data-set-lang="sk" type="button" title="Slovenčina">SK</button>
+</div>
+
 <div class="layout">
 
 <!-- SIDEBAR -->
@@ -1365,6 +1411,7 @@ h3.block-title:first-of-type { margin-top: 0; }
   <div class="nav-group">
     <div class="nav-group-label" data-lang="uk">Вступ</div>
     <div class="nav-group-label" data-lang="en">Introduction</div>
+    <div class="nav-group-label" data-lang="sk">Úvod</div>
     <button class="nav-link active" data-target="manifesto" type="button">
       <span class="dot"></span>
       <span data-lang="uk">Маніфест</span><span data-lang="en">Manifesto</span><span data-lang="sk">Manifest</span>
@@ -1390,6 +1437,7 @@ h3.block-title:first-of-type { margin-top: 0; }
   <div class="nav-group">
     <div class="nav-group-label" data-lang="uk">Ідентичність</div>
     <div class="nav-group-label" data-lang="en">Identity</div>
+    <div class="nav-group-label" data-lang="sk">Identita</div>
     <button class="nav-link" data-target="visual" type="button">
       <span class="dot"></span>
       <span data-lang="uk">Візуальна система</span><span data-lang="en">Visual system</span><span data-lang="sk">Vizuálny systém</span>
@@ -1407,6 +1455,7 @@ h3.block-title:first-of-type { margin-top: 0; }
   <div class="nav-group">
     <div class="nav-group-label" data-lang="uk">Застосування</div>
     <div class="nav-group-label" data-lang="en">Application</div>
+    <div class="nav-group-label" data-lang="sk">Použitie</div>
     <button class="nav-link" data-target="digital" type="button">
       <span class="dot"></span>
       <span data-lang="uk">Digital &amp; соцмережі</span><span data-lang="en">Digital &amp; social</span><span data-lang="sk">Digital &amp; social</span>
@@ -1444,6 +1493,7 @@ h3.block-title:first-of-type { margin-top: 0; }
   <div class="nav-group">
     <div class="nav-group-label" data-lang="uk">Сервіс</div>
     <div class="nav-group-label" data-lang="en">Reference</div>
+    <div class="nav-group-label" data-lang="sk">Servis</div>
     <button class="nav-link" data-target="documents" type="button">
       <span class="dot"></span>
       <span data-lang="uk">Документи</span><span data-lang="en">Documents</span><span data-lang="sk">Dokumenty</span>
@@ -1465,6 +1515,7 @@ h3.block-title:first-of-type { margin-top: 0; }
   <div class="nav-group">
     <div class="nav-group-label" data-lang="uk">💡 Колаборація</div>
     <div class="nav-group-label" data-lang="en">💡 Collaboration</div>
+    <div class="nav-group-label" data-lang="sk">💡 Spolupráca</div>
     <button class="nav-link" data-target="ideas" type="button">
       <span class="dot"></span>
       <span data-lang="uk">Пропозиції</span><span data-lang="en">Ideas</span><span data-lang="sk">Návrhy</span>
@@ -1474,6 +1525,7 @@ h3.block-title:first-of-type { margin-top: 0; }
   <div class="nav-group">
     <div class="nav-group-label" data-lang="uk">🔒 Конфіденційне</div>
     <div class="nav-group-label" data-lang="en">🔒 Confidential</div>
+    <div class="nav-group-label" data-lang="sk">🔒 Dôverné</div>
     <button class="nav-link" data-target="hr" type="button">
       <span class="dot"></span>
       <span data-lang="uk">HR</span><span data-lang="en">HR</span><span data-lang="sk">HR</span>
@@ -1484,7 +1536,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Bible v2.30 · 2026
+    Brand Bible v2.31 · 2026
   </div>
 </nav>
 
@@ -1498,7 +1550,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
     <span data-lang="sk">Jedna ingrediencia. <span class="qr-ns-accent">Žiadne kompromisy.</span> Syrový snack 21. storočia.</span>
   </div>
-  <div class="qr-meta">v2.30 · 2026</div>
+  <div class="qr-meta">v2.31 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -2252,21 +2304,21 @@ h3.block-title:first-of-type { margin-top: 0; }
     <div class="do-block">
       <div class="do-block-title">✓ snEco</div>
       <ul>
-        <li data-lang="uk">100% натуральний сир, один інгредієнт</li><li data-lang="en">100% natural cheese, single ingredient</li>
-        <li data-lang="uk">Низькотемпературна сушка (36-38°C) — поживні речовини зберігаються</li><li data-lang="en">Low-temp drying (36-38°C) — nutrients preserved</li>
-        <li data-lang="uk">Кулькова форма — finger food, без жирних рук</li><li data-lang="en">Ball shape — true finger food, no greasy hands</li>
-        <li data-lang="uk">До 60% протеїну, без цукру, без глютену</li><li data-lang="en">Up to 60% protein, no sugar, gluten-free</li>
-        <li data-lang="uk">KETO-friendly, виробництво на сонячній енергії</li><li data-lang="en">KETO-friendly, solar-powered production</li>
+        <li data-lang="uk">100% натуральний сир, один інгредієнт</li><li data-lang="en">100% natural cheese, single ingredient</li><li data-lang="sk">100% prírodný syr, jedna ingrediencia</li>
+        <li data-lang="uk">Низькотемпературна сушка (36-38°C) — поживні речовини зберігаються</li><li data-lang="en">Low-temp drying (36-38°C) — nutrients preserved</li><li data-lang="sk">Nízkoteplotné sušenie (36-38°C) — výživové látky sa zachovávajú</li>
+        <li data-lang="uk">Кулькова форма — finger food, без жирних рук</li><li data-lang="en">Ball shape — true finger food, no greasy hands</li><li data-lang="sk">Guľová forma — finger food, bez mastných rúk</li>
+        <li data-lang="uk">До 60% протеїну, без цукру, без глютену</li><li data-lang="en">Up to 60% protein, no sugar, gluten-free</li><li data-lang="sk">Až 60% bielkovín, bez cukru, bez gluténu</li>
+        <li data-lang="uk">KETO-friendly, виробництво на сонячній енергії</li><li data-lang="en">KETO-friendly, solar-powered production</li><li data-lang="sk">KETO-friendly, výroba na solárnej energii</li>
       </ul>
     </div>
     <div class="dont-block">
       <div class="dont-block-title">✕ <span data-lang="uk">Типові конкуренти</span><span data-lang="en">Typical competitors</span><span data-lang="sk">Typickí konkurenti</span></div>
       <ul>
-        <li data-lang="uk">Сир + кукурудза / пшениця + консерванти + барвники</li><li data-lang="en">Cheese mixed with corn / wheat + preservatives + colorants</li>
-        <li data-lang="uk">Запікають або смажать — поживна цінність втрачається</li><li data-lang="en">Baked or fried — nutritional value lost</li>
-        <li data-lang="uk">Пласка форма — брудні руки від розтопленого жиру</li><li data-lang="en">Flat shape — dirty fingers from melted fat</li>
-        <li data-lang="uk">Низький білок, цукор і глютен у складі</li><li data-lang="en">Low protein, sugar and gluten in the recipe</li>
-        <li data-lang="uk">Не sustainable виробництво</li><li data-lang="en">Not a sustainable production process</li>
+        <li data-lang="uk">Сир + кукурудза / пшениця + консерванти + барвники</li><li data-lang="en">Cheese mixed with corn / wheat + preservatives + colorants</li><li data-lang="sk">Syr + kukurica / pšenica + konzervanty + farbivá</li>
+        <li data-lang="uk">Запікають або смажать — поживна цінність втрачається</li><li data-lang="en">Baked or fried — nutritional value lost</li><li data-lang="sk">Pečú alebo smažia — výživová hodnota sa stráca</li>
+        <li data-lang="uk">Пласка форма — брудні руки від розтопленого жиру</li><li data-lang="en">Flat shape — dirty fingers from melted fat</li><li data-lang="sk">Plochý tvar — špinavé ruky od roztopeného tuku</li>
+        <li data-lang="uk">Низький білок, цукор і глютен у складі</li><li data-lang="en">Low protein, sugar and gluten in the recipe</li><li data-lang="sk">Nízke bielkoviny, cukor a glutén v zložení</li>
+        <li data-lang="uk">Не sustainable виробництво</li><li data-lang="en">Not a sustainable production process</li><li data-lang="sk">Nie sustainable výroba</li>
       </ul>
     </div>
   </div>
@@ -2913,21 +2965,21 @@ h3.block-title:first-of-type { margin-top: 0; }
     <div class="do-block">
       <div class="do-block-title">✓ <span data-lang="uk">Можна</span><span data-lang="en">Do</span><span data-lang="sk">Možno</span></div>
       <ul>
-        <li data-lang="uk">Чорний фон + жовтий текст / логотип</li><li data-lang="en">Black background + yellow text / logo</li>
-        <li data-lang="uk">Жовтий фон + чорний текст</li><li data-lang="en">Yellow background + black text</li>
-        <li data-lang="uk">Білий фон + чорний або зелений логотип</li><li data-lang="en">White background + black or green logo</li>
-        <li data-lang="uk">Жовтий як акцентний колір на нейтральному фоні</li><li data-lang="en">Yellow as an accent on neutral surfaces</li>
-        <li data-lang="uk">Чорно-білий варіант для документів і факсів</li><li data-lang="en">Black &amp; white version for documents and faxes</li>
+        <li data-lang="uk">Чорний фон + жовтий текст / логотип</li><li data-lang="en">Black background + yellow text / logo</li><li data-lang="sk">Čierne pozadie + žltý text / logo</li>
+        <li data-lang="uk">Жовтий фон + чорний текст</li><li data-lang="en">Yellow background + black text</li><li data-lang="sk">Žlté pozadie + čierny text</li>
+        <li data-lang="uk">Білий фон + чорний або зелений логотип</li><li data-lang="en">White background + black or green logo</li><li data-lang="sk">Biele pozadie + čierne alebo zelené logo</li>
+        <li data-lang="uk">Жовтий як акцентний колір на нейтральному фоні</li><li data-lang="en">Yellow as an accent on neutral surfaces</li><li data-lang="sk">Žltá ako akcentná farba na neutrálnom pozadí</li>
+        <li data-lang="uk">Чорно-білий варіант для документів і факсів</li><li data-lang="en">Black &amp; white version for documents and faxes</li><li data-lang="sk">Čierno-biela varianta pre dokumenty a faxy</li>
       </ul>
     </div>
     <div class="dont-block">
       <div class="dont-block-title">✕ <span data-lang="uk">Заборонено</span><span data-lang="en">Don't</span><span data-lang="sk">Zakázané</span></div>
       <ul>
-        <li data-lang="uk">Будь-які кольори поза палітрою без погодження</li><li data-lang="en">Any non-palette colors without approval</li>
-        <li data-lang="uk">Градієнти на логотипі або в основних блоках</li><li data-lang="en">Gradients on the logo or core elements</li>
-        <li data-lang="uk">Жовтий + білий (низький контраст, нечитабельно)</li><li data-lang="en">Yellow on white (low contrast, unreadable)</li>
-        <li data-lang="uk">Зелений як основний фоновий колір</li><li data-lang="en">Green as a dominant background color</li>
-        <li data-lang="uk">Напівпрозорий або «приглушений» логотип</li><li data-lang="en">Translucent or muted logo treatment</li>
+        <li data-lang="uk">Будь-які кольори поза палітрою без погодження</li><li data-lang="en">Any non-palette colors without approval</li><li data-lang="sk">Akékoľvek farby mimo palety bez schválenia</li>
+        <li data-lang="uk">Градієнти на логотипі або в основних блоках</li><li data-lang="en">Gradients on the logo or core elements</li><li data-lang="sk">Gradienty na logu alebo v hlavných blokoch</li>
+        <li data-lang="uk">Жовтий + білий (низький контраст, нечитабельно)</li><li data-lang="en">Yellow on white (low contrast, unreadable)</li><li data-lang="sk">Žltá + biela (nízky kontrast, nečitateľné)</li>
+        <li data-lang="uk">Зелений як основний фоновий колір</li><li data-lang="en">Green as a dominant background color</li><li data-lang="sk">Zelená ako hlavná farba pozadia</li>
+        <li data-lang="uk">Напівпрозорий або «приглушений» логотип</li><li data-lang="en">Translucent or muted logo treatment</li><li data-lang="sk">Polopriehľadné alebo „stlmené" logo</li>
       </ul>
     </div>
   </div>
@@ -3145,23 +3197,23 @@ h3.block-title:first-of-type { margin-top: 0; }
     <div class="do-block">
       <div class="do-block-title">✓ <span data-lang="uk">Наш стиль</span><span data-lang="en">Our style</span><span data-lang="sk">Náš štýl</span></div>
       <ul>
-        <li data-lang="uk">Кульки великим планом — видно текстуру</li><li data-lang="en">Close-ups of the balls — texture visible</li>
-        <li data-lang="uk">Натуральне або студійне м'яке освітлення</li><li data-lang="en">Natural or soft studio light</li>
-        <li data-lang="uk">Справжні руки, реальні люди (не моделі-статуї)</li><li data-lang="en">Real hands, real people (not stiff models)</li>
-        <li data-lang="uk">Рух, динаміка — кульки «летять», розсипаються</li><li data-lang="en">Motion — balls in flight, scattered</li>
-        <li data-lang="uk">Сир у розрізі поруч із кульками (для HoReCa)</li><li data-lang="en">Cheese cross-section next to balls (for HoReCa)</li>
-        <li data-lang="uk">Фото сертифікатів і нагород на нейтральному фоні</li><li data-lang="en">Certifications and awards on neutral backgrounds</li>
+        <li data-lang="uk">Кульки великим планом — видно текстуру</li><li data-lang="en">Close-ups of the balls — texture visible</li><li data-lang="sk">Guľôčky zblízka — vidno textúru</li>
+        <li data-lang="uk">Натуральне або студійне м'яке освітлення</li><li data-lang="en">Natural or soft studio light</li><li data-lang="sk">Prirodzené alebo štúdiové mäkké osvetlenie</li>
+        <li data-lang="uk">Справжні руки, реальні люди (не моделі-статуї)</li><li data-lang="en">Real hands, real people (not stiff models)</li><li data-lang="sk">Skutočné ruky, reálni ľudia (nie modely-sochy)</li>
+        <li data-lang="uk">Рух, динаміка — кульки «летять», розсипаються</li><li data-lang="en">Motion — balls in flight, scattered</li><li data-lang="sk">Pohyb, dynamika — guľôčky „letia", sypú sa</li>
+        <li data-lang="uk">Сир у розрізі поруч із кульками (для HoReCa)</li><li data-lang="en">Cheese cross-section next to balls (for HoReCa)</li><li data-lang="sk">Syr v reze vedľa guľôčok (pre HoReCa)</li>
+        <li data-lang="uk">Фото сертифікатів і нагород на нейтральному фоні</li><li data-lang="en">Certifications and awards on neutral backgrounds</li><li data-lang="sk">Fotky certifikátov a ocenení na neutrálnom pozadí</li>
       </ul>
     </div>
     <div class="dont-block">
       <div class="dont-block-title">✕ <span data-lang="uk">Уникаємо</span><span data-lang="en">Avoid</span><span data-lang="sk">Nepoužívať</span></div>
       <ul>
-        <li data-lang="uk">Надмірно насичені фільтри, «Instagram-тон»</li><li data-lang="en">Heavy filters, the "Instagram look"</li>
-        <li data-lang="uk">Стокові фото людей і ситуацій</li><li data-lang="en">Stock photography of people or situations</li>
-        <li data-lang="uk">Конкуруючий продукт у кадрі</li><li data-lang="en">Competing products in frame</li>
-        <li data-lang="uk">Видимі лого інших брендів</li><li data-lang="en">Visible third-party logos</li>
-        <li data-lang="uk">Низька якість, розмиті фото</li><li data-lang="en">Low resolution or blurred shots</li>
-        <li data-lang="uk">Постановочні «ідеальні» сім'ї</li><li data-lang="en">Staged "perfect family" scenes</li>
+        <li data-lang="uk">Надмірно насичені фільтри, «Instagram-тон»</li><li data-lang="en">Heavy filters, the "Instagram look"</li><li data-lang="sk">Príliš nasýtené filtre, „Instagram-tón"</li>
+        <li data-lang="uk">Стокові фото людей і ситуацій</li><li data-lang="en">Stock photography of people or situations</li><li data-lang="sk">Stockové fotky ľudí a situácií</li>
+        <li data-lang="uk">Конкуруючий продукт у кадрі</li><li data-lang="en">Competing products in frame</li><li data-lang="sk">Konkurenčný produkt v zábere</li>
+        <li data-lang="uk">Видимі лого інших брендів</li><li data-lang="en">Visible third-party logos</li><li data-lang="sk">Viditeľné logá iných značiek</li>
+        <li data-lang="uk">Низька якість, розмиті фото</li><li data-lang="en">Low resolution or blurred shots</li><li data-lang="sk">Nízka kvalita, rozmazané fotky</li>
+        <li data-lang="uk">Постановочні «ідеальні» сім'ї</li><li data-lang="en">Staged "perfect family" scenes</li><li data-lang="sk">Insceniranе „ideálne" rodiny</li>
       </ul>
     </div>
   </div>
@@ -3508,7 +3560,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <a href="packaging/small/preview/SNECO_CED.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_CED.jpg" alt="snEco Cheddar" loading="lazy"></a>
         <div class="pkg-card-meta">
           <div class="pkg-card-name">Cheddar</div>
-          <div class="pkg-card-sub" data-lang="uk">Чеддер · CED</div><div class="pkg-card-sub" data-lang="en">Cheddar · CED</div>
+          <div class="pkg-card-sub" data-lang="uk">Чеддер · CED</div><div class="pkg-card-sub" data-lang="en">Cheddar · CED</div><div class="pkg-card-sub" data-lang="sk">Cheddar · CED</div>
           <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20CED%20crv.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
@@ -3516,7 +3568,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <a href="packaging/small/preview/SNECO_GOU.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_GOU.jpg" alt="snEco Gouda" loading="lazy"></a>
         <div class="pkg-card-meta">
           <div class="pkg-card-name">Gouda</div>
-          <div class="pkg-card-sub" data-lang="uk">Гауда · GOU</div><div class="pkg-card-sub" data-lang="en">Gouda · GOU</div>
+          <div class="pkg-card-sub" data-lang="uk">Гауда · GOU</div><div class="pkg-card-sub" data-lang="en">Gouda · GOU</div><div class="pkg-card-sub" data-lang="sk">Gouda · GOU</div>
           <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20GOU%20crv.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
@@ -3524,7 +3576,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <a href="packaging/small/preview/SNECO_MOZ.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_MOZ.jpg" alt="snEco Mozzarella" loading="lazy"></a>
         <div class="pkg-card-meta">
           <div class="pkg-card-name">Mozzarella</div>
-          <div class="pkg-card-sub" data-lang="uk">Моцарела · MOZ</div><div class="pkg-card-sub" data-lang="en">Mozzarella · MOZ</div>
+          <div class="pkg-card-sub" data-lang="uk">Моцарела · MOZ</div><div class="pkg-card-sub" data-lang="en">Mozzarella · MOZ</div><div class="pkg-card-sub" data-lang="sk">Mozzarella · MOZ</div>
           <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20MOZ%20crv.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
@@ -3532,7 +3584,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <a href="packaging/small/preview/SNECO_PRIM.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_PRIM.jpg" alt="snEco Primaggio" loading="lazy"></a>
         <div class="pkg-card-meta">
           <div class="pkg-card-name">Primaggio</div>
-          <div class="pkg-card-sub" data-lang="uk">Прімаджо · PRIM</div><div class="pkg-card-sub" data-lang="en">Primaggio · PRIM</div>
+          <div class="pkg-card-sub" data-lang="uk">Прімаджо · PRIM</div><div class="pkg-card-sub" data-lang="en">Primaggio · PRIM</div><div class="pkg-card-sub" data-lang="sk">Primaggio · PRIM</div>
           <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20PRIM%20crv.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
@@ -3540,7 +3592,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <a href="packaging/small/preview/SNECO_SULU.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_SULU.jpg" alt="snEco Smoked Suluguni" loading="lazy"></a>
         <div class="pkg-card-meta">
           <div class="pkg-card-name">Smoked Suluguni</div>
-          <div class="pkg-card-sub" data-lang="uk">Копчений Сулугуні · SULU</div><div class="pkg-card-sub" data-lang="en">Smoked Suluguni · SULU</div>
+          <div class="pkg-card-sub" data-lang="uk">Копчений Сулугуні · SULU</div><div class="pkg-card-sub" data-lang="en">Smoked Suluguni · SULU</div><div class="pkg-card-sub" data-lang="sk">Údený Suluguni · SULU</div>
           <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20SULU%20crv.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
@@ -3548,7 +3600,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <a href="packaging/small/preview/SNECO_BR.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_BR.jpg" alt="snEco Blue Royale" loading="lazy"></a>
         <div class="pkg-card-meta">
           <div class="pkg-card-name">Blue Royale</div>
-          <div class="pkg-card-sub" data-lang="uk">Блю Рояль · BR</div><div class="pkg-card-sub" data-lang="en">Blue Royale · BR</div>
+          <div class="pkg-card-sub" data-lang="uk">Блю Рояль · BR</div><div class="pkg-card-sub" data-lang="en">Blue Royale · BR</div><div class="pkg-card-sub" data-lang="sk">Blue Royale · BR</div>
           <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20BR%20crv.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
@@ -3563,7 +3615,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <a href="packaging/small/preview/SNECO_CED_MIGD.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_CED_MIGD.jpg" alt="snEco Cheddar + Almond" loading="lazy"></a>
         <div class="pkg-card-meta">
           <div class="pkg-card-name">Cheddar + Almond</div>
-          <div class="pkg-card-sub" data-lang="uk">Чеддер + Мигдаль · CED_MIGD</div><div class="pkg-card-sub" data-lang="en">Cheddar + Almond · CED_MIGD</div>
+          <div class="pkg-card-sub" data-lang="uk">Чеддер + Мигдаль · CED_MIGD</div><div class="pkg-card-sub" data-lang="en">Cheddar + Almond · CED_MIGD</div><div class="pkg-card-sub" data-lang="sk">Cheddar + Mandle · CED_MIGD</div>
           <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20CED_MIGD%20crv.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
@@ -3571,7 +3623,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <a href="packaging/small/preview/SNECO_GOU_FUND.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_GOU_FUND.jpg" alt="snEco Gouda + Hazelnut" loading="lazy"></a>
         <div class="pkg-card-meta">
           <div class="pkg-card-name">Gouda + Hazelnut</div>
-          <div class="pkg-card-sub" data-lang="uk">Гауда + Фундук · GOU_FUND</div><div class="pkg-card-sub" data-lang="en">Gouda + Hazelnut · GOU_FUND</div>
+          <div class="pkg-card-sub" data-lang="uk">Гауда + Фундук · GOU_FUND</div><div class="pkg-card-sub" data-lang="en">Gouda + Hazelnut · GOU_FUND</div><div class="pkg-card-sub" data-lang="sk">Gouda + Lieskovce · GOU_FUND</div>
           <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20GOU_FUND%20crv.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
@@ -3579,7 +3631,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <a href="packaging/small/preview/SNECO_MOZ_KESH.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_MOZ_KESH.jpg" alt="snEco Mozzarella + Cashew" loading="lazy"></a>
         <div class="pkg-card-meta">
           <div class="pkg-card-name">Mozzarella + Cashew</div>
-          <div class="pkg-card-sub" data-lang="uk">Моцарела + Кеш'ю · MOZ_KESH</div><div class="pkg-card-sub" data-lang="en">Mozzarella + Cashew · MOZ_KESH</div>
+          <div class="pkg-card-sub" data-lang="uk">Моцарела + Кеш'ю · MOZ_KESH</div><div class="pkg-card-sub" data-lang="en">Mozzarella + Cashew · MOZ_KESH</div><div class="pkg-card-sub" data-lang="sk">Mozzarella + Kešu · MOZ_KESH</div>
           <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20MOZ_KESH%20crv.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
@@ -3587,7 +3639,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <a href="packaging/small/preview/SNECO_PRIM_VOL.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_PRIM_VOL.jpg" alt="snEco Primaggio + Walnut" loading="lazy"></a>
         <div class="pkg-card-meta">
           <div class="pkg-card-name">Primaggio + Walnut</div>
-          <div class="pkg-card-sub" data-lang="uk">Прімаджо + Волоський · PRIM_VOL</div><div class="pkg-card-sub" data-lang="en">Primaggio + Walnut · PRIM_VOL</div>
+          <div class="pkg-card-sub" data-lang="uk">Прімаджо + Волоський · PRIM_VOL</div><div class="pkg-card-sub" data-lang="en">Primaggio + Walnut · PRIM_VOL</div><div class="pkg-card-sub" data-lang="sk">Primaggio + Vlašské · PRIM_VOL</div>
           <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20PRIM_VOL%20crv.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
@@ -3595,7 +3647,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <a href="packaging/small/preview/SNECO_SUL_AR.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_SUL_AR.jpg" alt="snEco Suluguni + Peanut" loading="lazy"></a>
         <div class="pkg-card-meta">
           <div class="pkg-card-name">Suluguni + Peanut</div>
-          <div class="pkg-card-sub" data-lang="uk">Сулугуні + Арахіс · SUL_AR</div><div class="pkg-card-sub" data-lang="en">Suluguni + Peanut · SUL_AR</div>
+          <div class="pkg-card-sub" data-lang="uk">Сулугуні + Арахіс · SUL_AR</div><div class="pkg-card-sub" data-lang="en">Suluguni + Peanut · SUL_AR</div><div class="pkg-card-sub" data-lang="sk">Suluguni + Arašidy · SUL_AR</div>
           <a href="packaging/print/UA-14-20g/SNECO%2090x160%20N%20SUL_AR%20crv.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
@@ -3610,7 +3662,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <a href="packaging/small/preview/SNECO_OLIV_STICK.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_OLIV_STICK.jpg" alt="snEco Crispy Olives" loading="lazy"></a>
         <div class="pkg-card-meta">
           <div class="pkg-card-name">Crispy Olives</div>
-          <div class="pkg-card-sub" data-lang="uk">Хрусткі оливки · 14 г · KETO + VEGAN</div><div class="pkg-card-sub" data-lang="en">Crispy Olives · 14 g · KETO + VEGAN</div>
+          <div class="pkg-card-sub" data-lang="uk">Хрусткі оливки · 14 г · KETO + VEGAN</div><div class="pkg-card-sub" data-lang="en">Crispy Olives · 14 g · KETO + VEGAN</div><div class="pkg-card-sub" data-lang="sk">Chrumkavé olivy · 14 g · KETO + VEGAN</div>
           <a href="packaging/print/UA-14-20g/SNECO%20Olives_stick%2090x160%20%282%29.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
@@ -3632,7 +3684,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <a href="packaging/small/preview/SNECO_CED_ENG.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_CED_ENG.jpg" alt="snEco Cheddar EN" loading="lazy"></a>
         <div class="pkg-card-meta">
           <div class="pkg-card-name">Cheddar (EN)</div>
-          <div class="pkg-card-sub" data-lang="uk">Чеддер · 1 OZ. (28 g) · London bg</div><div class="pkg-card-sub" data-lang="en">Cheddar · 1 OZ. (28 g) · London bg</div>
+          <div class="pkg-card-sub" data-lang="uk">Чеддер · 1 OZ. (28 g) · London bg</div><div class="pkg-card-sub" data-lang="en">Cheddar · 1 OZ. (28 g) · London bg</div><div class="pkg-card-sub" data-lang="sk">Cheddar · 1 OZ. (28 g) · London bg</div>
           <a href="packaging/print/EN-28g/SNECO%20CHEDDAR_v13_FINAL.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
@@ -3640,7 +3692,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <a href="packaging/small/preview/SNECO_GOU_ENG.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_GOU_ENG.jpg" alt="snEco Gouda EN" loading="lazy"></a>
         <div class="pkg-card-meta">
           <div class="pkg-card-name">Gouda (EN)</div>
-          <div class="pkg-card-sub" data-lang="uk">Гауда · 1 OZ. (28 g) · Holland bg</div><div class="pkg-card-sub" data-lang="en">Gouda · 1 OZ. (28 g) · Holland bg</div>
+          <div class="pkg-card-sub" data-lang="uk">Гауда · 1 OZ. (28 g) · Holland bg</div><div class="pkg-card-sub" data-lang="en">Gouda · 1 OZ. (28 g) · Holland bg</div><div class="pkg-card-sub" data-lang="sk">Gouda · 1 OZ. (28 g) · Holland bg</div>
           <a href="packaging/print/EN-28g/SNECO%20GOUDA_eng%20v13_final.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
@@ -3648,7 +3700,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <a href="packaging/small/preview/SNECO_BR_ENG.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_BR_ENG.jpg" alt="snEco Blue Royale EN" loading="lazy"></a>
         <div class="pkg-card-meta">
           <div class="pkg-card-name">Blue Royale (EN)</div>
-          <div class="pkg-card-sub" data-lang="uk">Блю Рояль · 0.5 OZ. (14 g) · Paris bg</div><div class="pkg-card-sub" data-lang="en">Blue Royale · 0.5 OZ. (14 g) · Paris bg</div>
+          <div class="pkg-card-sub" data-lang="uk">Блю Рояль · 0.5 OZ. (14 g) · Paris bg</div><div class="pkg-card-sub" data-lang="en">Blue Royale · 0.5 OZ. (14 g) · Paris bg</div><div class="pkg-card-sub" data-lang="sk">Blue Royale · 0.5 OZ. (14 g) · Paris bg</div>
           <a href="packaging/print/EN-28g/SNECO%2090x160%20N%20BR%20ENG%20crv.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
@@ -3668,7 +3720,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <a href="packaging/small/preview/SNECO_GOU_US.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_GOU_US.jpg" alt="snEco Gauda US" loading="lazy"></a>
         <div class="pkg-card-meta">
           <div class="pkg-card-name">Gauda (US)</div>
-          <div class="pkg-card-sub" data-lang="uk">Гауда · 1 OZ. (28 g) · 15G PROTEIN · GOU_US</div><div class="pkg-card-sub" data-lang="en">Gauda · 1 OZ. (28 g) · 15G PROTEIN · GOU_US</div>
+          <div class="pkg-card-sub" data-lang="uk">Гауда · 1 OZ. (28 g) · 15G PROTEIN · GOU_US</div><div class="pkg-card-sub" data-lang="en">Gauda · 1 OZ. (28 g) · 15G PROTEIN · GOU_US</div><div class="pkg-card-sub" data-lang="sk">Gouda · 1 OZ. (28 g) · 15G PROTEIN · GOU_US</div>
           <a href="packaging/print/US-90x160/SNECO%20GAUDA_v10_FINAL_US.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
@@ -3688,7 +3740,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <a href="packaging/small/preview/SNECO_CED_SK.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_CED_SK.jpg" alt="snEco Cheddar SK" loading="lazy"></a>
         <div class="pkg-card-meta">
           <div class="pkg-card-name">Cheddar (SK)</div>
-          <div class="pkg-card-sub" data-lang="uk">Чеддер · 1 OZ. (28 g) · 12G PROTEIN · CED_SK</div><div class="pkg-card-sub" data-lang="en">Cheddar · 1 OZ. (28 g) · 12G PROTEIN · CED_SK</div>
+          <div class="pkg-card-sub" data-lang="uk">Чеддер · 1 OZ. (28 g) · 12G PROTEIN · CED_SK</div><div class="pkg-card-sub" data-lang="en">Cheddar · 1 OZ. (28 g) · 12G PROTEIN · CED_SK</div><div class="pkg-card-sub" data-lang="sk">Cheddar · 1 OZ. (28 g) · 12G PROTEIN · CED_SK</div>
           <a href="packaging/print/SK-90x160/SNECO%20CHEDDAR_v10_FINAL_SK.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
@@ -3696,7 +3748,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <a href="packaging/small/preview/SNECO_GOU_SK.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_GOU_SK.jpg" alt="snEco Gauda SK" loading="lazy"></a>
         <div class="pkg-card-meta">
           <div class="pkg-card-name">Gauda (SK)</div>
-          <div class="pkg-card-sub" data-lang="uk">Гауда · 1 OZ. (28 g) · 15G PROTEIN · GOU_SK</div><div class="pkg-card-sub" data-lang="en">Gauda · 1 OZ. (28 g) · 15G PROTEIN · GOU_SK</div>
+          <div class="pkg-card-sub" data-lang="uk">Гауда · 1 OZ. (28 g) · 15G PROTEIN · GOU_SK</div><div class="pkg-card-sub" data-lang="en">Gauda · 1 OZ. (28 g) · 15G PROTEIN · GOU_SK</div><div class="pkg-card-sub" data-lang="sk">Gouda · 1 OZ. (28 g) · 15G PROTEIN · GOU_SK</div>
           <a href="packaging/print/SK-90x160/SNECO%20GAUDA_v10_FINAL_SK.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
@@ -3716,7 +3768,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <a href="packaging/small/preview/SNECO_CED_SK57.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_CED_SK57.jpg" alt="Cheddar SK back label" loading="lazy"></a>
         <div class="pkg-card-meta">
           <div class="pkg-card-name">Cheddar SK · back</div>
-          <div class="pkg-card-sub" data-lang="uk">EAN 8 582000 056710 · 57×70 мм</div><div class="pkg-card-sub" data-lang="en">EAN 8 582000 056710 · 57×70 mm</div>
+          <div class="pkg-card-sub" data-lang="uk">EAN 8 582000 056710 · 57×70 мм</div><div class="pkg-card-sub" data-lang="en">EAN 8 582000 056710 · 57×70 mm</div><div class="pkg-card-sub" data-lang="sk">EAN 8 582000 056710 · 57×70 mm</div>
           <a href="packaging/print/SK-57x70/SNECO%20CHEDDAR_SK_57x70_v15_final.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
@@ -3724,7 +3776,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         <a href="packaging/small/preview/SNECO_GOU_SK57.jpg" target="_blank" class="pkg-card-image"><img src="packaging/small/preview/SNECO_GOU_SK57.jpg" alt="Gauda SK back label" loading="lazy"></a>
         <div class="pkg-card-meta">
           <div class="pkg-card-name">Gauda SK · back</div>
-          <div class="pkg-card-sub" data-lang="uk">EAN 8 582000 056703 · 57×70 мм</div><div class="pkg-card-sub" data-lang="en">EAN 8 582000 056703 · 57×70 mm</div>
+          <div class="pkg-card-sub" data-lang="uk">EAN 8 582000 056703 · 57×70 мм</div><div class="pkg-card-sub" data-lang="en">EAN 8 582000 056703 · 57×70 mm</div><div class="pkg-card-sub" data-lang="sk">EAN 8 582000 056703 · 57×70 mm</div>
           <a href="packaging/print/SK-57x70/SNECO%20GAUDA_SK_57x70_v13_final.pdf" download class="pkg-pdf-btn">⬇ PDF</a>
         </div>
       </div>
@@ -3765,10 +3817,13 @@ h3.block-title:first-of-type { margin-top: 0; }
       <ul style="margin:8px 0 0 16px;line-height:1.7">
         <li data-lang="uk"><strong>«CRUNCY»</strong> замість <strong>«CRUNCHY»</strong> (відсутня H) — на Blue Royale EN, Cheddar SK, Gauda US, Gauda SK</li>
         <li data-lang="en"><strong>"CRUNCY"</strong> instead of <strong>"CRUNCHY"</strong> (missing H) — on Blue Royale EN, Cheddar SK, Gauda US, Gauda SK</li>
+        <li data-lang="sk">„CRUNCY" namiesto „CRUNCHY" (chýba H) — na Blue Royale EN, Cheddar SK, Gauda US, Gauda SK</li>
         <li data-lang="uk"><strong>«CEDDAR»</strong> замість <strong>«CHEDDAR»</strong> (відсутня H) — на Cheddar SK</li>
         <li data-lang="en"><strong>"CEDDAR"</strong> instead of <strong>"CHEDDAR"</strong> (missing H) — on Cheddar SK</li>
+        <li data-lang="sk">„CEDDAR" namiesto „CHEDDAR" (chýba H) — na Cheddar SK</li>
         <li data-lang="uk"><strong>«GAUDA»</strong> замість <strong>«GOUDA»</strong> — на US і SK варіантах. Стандартна англомовна форма — Gouda. Для словацького ринку «GAUDA» можливо допустимо (перевірити з місцевим маркетингом), але для US це не правильно — узгодити перед друком</li>
         <li data-lang="en"><strong>"GAUDA"</strong> instead of <strong>"GOUDA"</strong> — on US and SK variants. Standard English spelling is Gouda. May be acceptable for Slovak market (verify with local marketing), but should be Gouda for US — confirm before print</li>
+        <li data-lang="sk">„GAUDA" namiesto „GOUDA" — na US a SK variantoch. Štandardná anglická forma — Gouda. Pre slovenský trh „GAUDA" môže byť prípustné (overiť s lokálnym marketingom), ale pre US to nie je správne — schváliť pred tlačou</li>
       </ul>
     </div>
 
@@ -3957,21 +4012,21 @@ h3.block-title:first-of-type { margin-top: 0; }
     <div class="do-block">
       <div class="do-block-title">✓ EU / Global</div>
       <ul>
-        <li data-lang="uk">«Made in EU» замість «Made in Ukraine» на EU-матеріалах</li><li data-lang="en">"Made in EU" instead of "Made in Ukraine" on EU materials</li>
-        <li data-lang="uk">Юр-адреса: Sneco SK s.r.o., Humenné, Slovakia</li><li data-lang="en">Legal address: Sneco SK s.r.o., Humenné, Slovakia</li>
-        <li data-lang="uk">SIAL Grand Prix як міжнародне визнання — у головному меседжі</li><li data-lang="en">Lead with SIAL Grand Prix as international recognition</li>
-        <li data-lang="uk">«Clean label», «single ingredient», «up to 60% protein»</li><li data-lang="en">"Clean label", "single ingredient", "up to 60% protein"</li>
-        <li data-lang="uk">IFS Food v8 — вказувати у спілкуванні з EU-ритейлом</li><li data-lang="en">Cite IFS Food v8 in conversations with EU retail</li>
-        <li data-lang="uk">Мова ринку на упаковці + англійська як основа</li><li data-lang="en">Local-market language on pack + English as the base</li>
+        <li data-lang="uk">«Made in EU» замість «Made in Ukraine» на EU-матеріалах</li><li data-lang="en">"Made in EU" instead of "Made in Ukraine" on EU materials</li><li data-lang="sk">„Made in EU" namiesto „Made in Ukraine" na EÚ-materiáloch</li>
+        <li data-lang="uk">Юр-адреса: Sneco SK s.r.o., Humenné, Slovakia</li><li data-lang="en">Legal address: Sneco SK s.r.o., Humenné, Slovakia</li><li data-lang="sk">Právna adresa: Sneco SK s.r.o., Humenné, Slovensko</li>
+        <li data-lang="uk">SIAL Grand Prix як міжнародне визнання — у головному меседжі</li><li data-lang="en">Lead with SIAL Grand Prix as international recognition</li><li data-lang="sk">SIAL Grand Prix ako medzinárodné uznanie — v hlavnom posolstve</li>
+        <li data-lang="uk">«Clean label», «single ingredient», «up to 60% protein»</li><li data-lang="en">"Clean label", "single ingredient", "up to 60% protein"</li><li data-lang="sk">„Clean label", „single ingredient", „up to 60% protein"</li>
+        <li data-lang="uk">IFS Food v8 — вказувати у спілкуванні з EU-ритейлом</li><li data-lang="en">Cite IFS Food v8 in conversations with EU retail</li><li data-lang="sk">IFS Food v8 — uvádzať v komunikácii s EÚ-maloobchodom</li>
+        <li data-lang="uk">Мова ринку на упаковці + англійська як основа</li><li data-lang="en">Local-market language on pack + English as the base</li><li data-lang="sk">Jazyk trhu na obale + angličtina ako základ</li>
       </ul>
     </div>
     <div class="dont-block">
       <div class="dont-block-title">✕ <span data-lang="uk">Уникати</span><span data-lang="en">Avoid</span><span data-lang="sk">Nepoužívať</span></div>
       <ul>
-        <li data-lang="uk">«Made in Ukraine» на EU-матеріалах (юридично некоректно для SK)</li><li data-lang="en">"Made in Ukraine" on EU materials (legally incorrect for SK product)</li>
-        <li data-lang="uk">Мішати юр-дані двох ентітей на одному носії</li><li data-lang="en">Mixing both legal entities on the same artwork</li>
-        <li data-lang="uk">Буквальний переклад UA-фраз без локалізації</li><li data-lang="en">Literal translation of UA copy without localization</li>
-        <li data-lang="uk">UA-сертифікати для EU-ринку (різні системи)</li><li data-lang="en">UA certifications for the EU market (different systems)</li>
+        <li data-lang="uk">«Made in Ukraine» на EU-матеріалах (юридично некоректно для SK)</li><li data-lang="en">"Made in Ukraine" on EU materials (legally incorrect for SK product)</li><li data-lang="sk">„Made in Ukraine" na EÚ-materiáloch (právne nekorektné pre SK)</li>
+        <li data-lang="uk">Мішати юр-дані двох ентітей на одному носії</li><li data-lang="en">Mixing both legal entities on the same artwork</li><li data-lang="sk">Miešať právne údaje dvoch entít na jednom nosiči</li>
+        <li data-lang="uk">Буквальний переклад UA-фраз без локалізації</li><li data-lang="en">Literal translation of UA copy without localization</li><li data-lang="sk">Doslovný preklad UA-fráz bez lokalizácie</li>
+        <li data-lang="uk">UA-сертифікати для EU-ринку (різні системи)</li><li data-lang="en">UA certifications for the EU market (different systems)</li><li data-lang="sk">UA-certifikáty pre EÚ-trh (rôzne systémy)</li>
       </ul>
     </div>
   </div>
@@ -4842,16 +4897,22 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul style="margin:0;padding-left:18px;line-height:1.85;font-size:13px">
       <li data-lang="uk"><strong>Спочатку позиціонування, потім дизайн.</strong> Перші концепти провалилися бо рухалися за «cafe-feel»; коли дизайнер отримав чіткий бриф «food-tech snack, не кав'ярня» — все перебудувалося за 2 місяці.</li>
       <li data-lang="en"><strong>Positioning first, design second.</strong> Early concepts failed because they chased a "cafe feel"; once the designer got a sharp brief — "food-tech snack, not a cafe" — everything reset in two months.</li>
+      <li data-lang="sk">Najprv pozicionovanie, potom dizajn. Prvé koncepty zlyhali, lebo sa hýbali za „cafe-feel"; keď dizajnér dostal jasný brief „food-tech snack, nie kaviareň" — všetko sa prebudovalo za 2 mesiace.</li>
       <li data-lang="uk"><strong>Скляна вітрина з насипом — найсильніший trigger.</strong> Купа сирних кульок за склом продає сама себе, без слогана.</li>
       <li data-lang="en"><strong>Glass bulk display is the strongest trigger.</strong> A heap of cheese balls behind glass sells itself — no slogan needed.</li>
+      <li data-lang="sk">Sklenená vitrína so sypaním — najsilnejší trigger. Hromada syrových guľôčok za sklom predáva sama seba, bez sloganu.</li>
       <li data-lang="uk"><strong>Підсвічений логотип критичний.</strong> Увечері в ТРЦ темно і шумно. Тепле помаранчеве світло SNÉCO — beacon, який бачить пів-залу.</li>
       <li data-lang="en"><strong>Backlit logo is critical.</strong> Malls are dark and noisy in the evening. The warm orange SNÉCO glow is a beacon visible across half the floor.</li>
+      <li data-lang="sk">Podsvietené logo je kritické. Večer v TRC je tma a hluk. Teplé oranžové svetlo SNÉCO — beacon, ktorý vidí pol sály.</li>
       <li data-lang="uk"><strong>Меловий простір ≠ дешево, ≠ непрофесійно.</strong> Дозволяє швидко змінювати меседж під сезон/промо/новинку без друку нових банерів.</li>
       <li data-lang="en"><strong>Chalk space ≠ cheap, ≠ unprofessional.</strong> Lets you swap the message instantly for season / promo / launch without printing banners.</li>
+      <li data-lang="sk">Kriedový priestor ≠ lacný, ≠ neprofesionálny. Umožňuje rýchlo meniť posolstvo podľa sezóny/promo/novinky bez tlače nových bannerov.</li>
       <li data-lang="uk"><strong>Мох — простий хак на «еко».</strong> 80-міліметрова смужка сухого моху коштує копійки, тримається роками, і одразу комунікує природу/еко.</li>
       <li data-lang="en"><strong>Moss — a cheap "eco" hack.</strong> An 80-mm strip of preserved moss costs pennies, lasts years, and instantly communicates nature/eco.</li>
+      <li data-lang="sk">Mach — jednoduchý hack na „eko". 80-milimetrový pásik suchého machu stojí pár grošov, drží roky a okamžite komunikuje prírodu/eko.</li>
       <li data-lang="uk"><strong>L-форма у ~3.6 м² — оптимум.</strong> Достатньо для вітрини + полиць + продавця, поміщається у фуд-корт-острівок.</li>
       <li data-lang="en"><strong>L-shape at ~3.6 m² — the sweet spot.</strong> Enough for display + shelves + staff, fits a food-court island slot.</li>
+      <li data-lang="sk">L-tvar v ~3,6 m² — optimum. Dostačuje pre vitrínu + police + predavača, zmestí sa do food-court-ostrova.</li>
     </ul>
   </div>
 
@@ -5756,7 +5817,19 @@ h3.block-title:first-of-type { margin-top: 0; }
 
   <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span><span data-lang="sk">História verzií</span></h3>
   <div class="changelog-entry">
-    <span class="changelog-version">v2.30</span><span class="changelog-date">08.05.2026</span>
+    <span class="changelog-version">v2.31</span><span class="changelog-date">08.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>🌐 Плавучий перемикач мов у верхньому правому кутку.</strong> Додатково до перемикача в sidebar — фіксований UA / EN / SK завжди видимий справа зверху. Вибір мови синхронізований між обома перемикачами і зберігається в localStorage (наступний візит відкривається у вибраній мові).</li>
+      <li data-lang="en"><strong>🌐 Floating language switcher in the top-right corner.</strong> In addition to the sidebar switcher, a fixed UA / EN / SK toggle is always visible top-right. Language choice is synced across both switchers and stored in localStorage (next visit opens in the chosen language).</li>
+      <li data-lang="sk"><strong>🌐 Plávajúci prepínač jazykov v pravom hornom rohu.</strong> Okrem prepínača v bočnom paneli — fixný UA / EN / SK je vždy viditeľný vpravo hore. Voľba jazyka je synchronizovaná medzi oboma prepínačami a uložená v localStorage (nasledujúca návšteva sa otvorí v zvolenom jazyku).</li>
+      <li data-lang="uk">Адаптивний дизайн: на мобільних — компактніший варіант, не накладається з burger-меню (зліва).</li>
+      <li data-lang="en">Responsive design: on mobile — more compact variant, doesn't overlap with the burger menu (left).</li>
+      <li data-lang="sk">Responzívny dizajn: na mobile — kompaktnejší variant, neprekrýva sa s burger menu (vľavo).</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.30</span><span class="changelog-date">08.05.2026</span>
     <ul class="changelog-list">
       <li data-lang="uk"><strong>🇸🇰 SK переклад — 100% покриття (Phase 2 завершено).</strong> Усі 1114 текстових span-ів тепер мають словацький варіант. Перекладено body content усіх секцій: Manifest, Story (вся хронологія + цитати), Technology, Voice (всі правила + приклади), Photography (Don'ts/Dos), Packaging (всі специфікації), International (всі ринки), External communications (4 кризові сценарії), Sales playbook (objections + commercial terms), Legal (substantiation map), Documents (всі сертифікати + descriptions), Retail kiosk (повний archive), Press coverage (26+ публікацій), Roadmap (фази), HR, Ideas, Maintenance.</li>
       <li data-lang="en"><strong>🇸🇰 SK translation — 100% coverage (Phase 2 complete).</strong> All 1114 text spans now have Slovak version. Body content translated across all sections: Manifest, Story (full timeline + quotes), Technology, Voice (all rules + examples), Photography (Don'ts/Dos), Packaging (all specs), International (all markets), External communications (4 crisis scenarios), Sales playbook (objections + commercial terms), Legal (substantiation map), Documents (all certificates + descriptions), Retail kiosk (full archive), Press coverage (26+ publications), Roadmap (phases), HR, Ideas, Maintenance.</li>
@@ -5790,16 +5863,22 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk"><strong>«Пропозиції» винесено в окрему sidebar-групу «💡 Колаборація»</strong> — раніше було у «Сервіс».</li>
       <li data-lang="en"><strong>"Ideas" moved to its own sidebar group "💡 Collaboration"</strong> — was in "Service".</li>
+      <li data-lang="sk">„Návrhy" presunuté do samostatnej sidebar-skupiny „💡 Spolupráca" — predtým bolo v „Servis".</li>
       <li data-lang="uk"><strong>Розділ HR перейменовано:</strong> «HR — персонал, ЗП» → просто <strong>«HR»</strong> у sidebar, заголовку секції і admin UI.</li>
       <li data-lang="en"><strong>HR section renamed:</strong> "HR — personnel, payroll" → just <strong>"HR"</strong> in sidebar, section title and admin UI.</li>
+      <li data-lang="sk">Sekcia HR premenovaná: „HR — personál, mzdy" → jednoducho „HR" v sidebar, hlavičke sekcie a admin UI.</li>
       <li data-lang="uk"><strong>Branded email-шаблони</strong> для всіх 3 типів листів (OTP-код, нова ідея, новий коментар): чорний header з логотипом snEco, beige/жовтий accent block з кодом, зелено-жовтий accent bar, footer з контактами і доменами.</li>
       <li data-lang="en"><strong>Branded email templates</strong> for all 3 email types (OTP code, new idea, new comment): black header with snEco logo, beige/yellow accent block with code, green-yellow accent bar, footer with contacts and domains.</li>
+      <li data-lang="sk">Brandované email-šablóny pre všetky 3 typy emailov (OTP-kód, nový nápad, nový komentár): čierny header s logom snEco, beige/žltý accent blok s kódom, zeleno-žltý accent bar, footer s kontaktmi a doménami.</li>
       <li data-lang="uk"><strong>CORS fix:</strong> Worker тепер повертає <code>Access-Control-Allow-Origin: *</code> — працює з <code>brand.sneco.ua</code>, <code>dreamcarua.github.io</code> і будь-яким origin'ом. Захист — через whitelist + JWT, не CORS. Max-age preflight зменшено з 86400 до 60 сек.</li>
       <li data-lang="en"><strong>CORS fix:</strong> Worker now returns <code>Access-Control-Allow-Origin: *</code> — works with <code>brand.sneco.ua</code>, <code>dreamcarua.github.io</code> and any origin. Protection — via whitelist + JWT, not CORS. Preflight max-age reduced from 86400 to 60 sec.</li>
+      <li data-lang="sk">CORS fix: Worker teraz vracia Access-Control-Allow-Origin: * — funguje s brand.sneco.ua, dreamcarua.github.io a akýmkoľvek originom. Ochrana — cez whitelist + JWT, nie CORS. Preflight max-age znížený z 86400 na 60 sek.</li>
       <li data-lang="uk">Виправлено JS: <code>applyLang()</code> тепер очищає inline display (CSS rules контролюють видимість мови). Усі застарілі inline <code>display: none</code> від попередніх версій видаляються при init і при кожному UA/EN toggle.</li>
       <li data-lang="en">Fixed JS: <code>applyLang()</code> now clears inline display (CSS rules control language visibility). All stale inline <code>display: none</code> from previous versions are removed on init and on every UA/EN toggle.</li>
+      <li data-lang="sk">Opravený JS: applyLang() teraz čistí inline display (CSS pravidlá kontrolujú viditeľnosť jazyka). Všetky zastarané inline display: none z predchádzajúcich verzií sa odstraňujú pri init a pri každom UA/EN toggle.</li>
       <li data-lang="uk">⚠ Після оновлення Worker — потрібен <code>wrangler deploy</code> на твоєму Mac для активації CORS і нових email-шаблонів.</li>
       <li data-lang="en">⚠ After Worker updates — run <code>wrangler deploy</code> on your Mac to activate CORS and new email templates.</li>
+      <li data-lang="sk">⚠ Po aktualizácii Worker — potrebný wrangler deploy na vašom Mac pre aktiváciu CORS a nových email-šablón.</li>
     </ul>
   </div>
 
@@ -5808,14 +5887,19 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk"><strong>💡 Новий розділ «Пропозиції»</strong> у sidebar групі «Сервіс» — система тікетів/ідей для команди. Будь-хто може створити (ім'я+email), будь-хто коментує, файли (до 6, по 10 МБ) — приймаються. Адміни (vg/fg) позначають як «✓ зроблено» або повертають у роботу.</li>
       <li data-lang="en"><strong>💡 New "Ideas" section</strong> in the "Service" sidebar group — a ticket/idea system for the team. Anyone can submit (name + email), anyone can comment, attachments (up to 6 × 10 MB) supported. Admins (vg/fg) mark as done or reopen.</li>
+      <li data-lang="sk">💡 Nová sekcia „Návrhy" v sidebar skupine „Servis" — systém tiketov/nápadov pre tím. Ktokoľvek môže vytvoriť (meno+email), ktokoľvek komentuje, súbory (až 6, po 10 MB) — prijímajú sa. Adminovia (vg/fg) označujú ako „✓ hotovo" alebo vracajú do práce.</li>
       <li data-lang="uk">Сортування — від нових до старих. Фільтр <strong>Відкриті / Зроблено / Усі</strong>. Кожен idea-card розгортається кліком: видно повний текст, коментарі, файли, форму нового коментаря.</li>
       <li data-lang="en">Newest-first sorting. Filter <strong>Open / Done / All</strong>. Each idea card expands on click: full text, comments, attachments, comment form.</li>
+      <li data-lang="sk">Triedenie — od nových po staré. Filter Otvorené / Hotové / Všetky. Každá idea-card sa rozbalí kliknutím: vidno plný text, komentáre, súbory, formulár nového komentára.</li>
       <li data-lang="uk">Email-сповіщення через Resend: нова ідея → адмінам; новий коментар → адмінам + автору тікета.</li>
       <li data-lang="en">Email notifications via Resend: new idea → admins; new comment → admins + ticket author.</li>
+      <li data-lang="sk">Email-notifikácie cez Resend: nový nápad → adminom; nový komentár → adminom + autorovi tiketu.</li>
       <li data-lang="uk"><strong>Backend:</strong> розширено sneco-auth Worker. <strong>D1</strong> (SQL) для тікетів і коментарів, <strong>R2</strong> (object storage) для файлів. Email — через існуючий Resend API key. Endpoints: <code>/api/ideas/list|get|create|comment|close|reopen</code>, <code>/api/ideas/upload</code>, <code>/files/&lt;key&gt;</code>.</li>
       <li data-lang="en"><strong>Backend:</strong> sneco-auth Worker extended. <strong>D1</strong> (SQL) for ideas and comments, <strong>R2</strong> (object storage) for files. Email — via existing Resend API key. Endpoints: <code>/api/ideas/list|get|create|comment|close|reopen</code>, <code>/api/ideas/upload</code>, <code>/files/&lt;key&gt;</code>.</li>
+      <li data-lang="sk">Backend: rozšírený sneco-auth Worker. D1 (SQL) pre tikety a komentáre, R2 (object storage) pre súbory. Email — cez existujúci Resend API key. Endpoints: /api/ideas/list|get|create|comment|close|reopen, /api/ideas/upload, /files/&lt;key&gt;.</li>
       <li data-lang="uk"><strong>⚠ Перед публікацією v2.27 потрібен setup-2:</strong> створити D1 db <code>sneco-bible</code>, виконати <code>schema.sql</code>, створити R2 bucket <code>sneco-files</code>, uncomment блоки у wrangler.toml, redeploy. Інструкція — у новому <code>~/snEco/sneco-auth/setup-2.sh</code>.</li>
       <li data-lang="en"><strong>⚠ Before publishing v2.27, run setup-2:</strong> create D1 db <code>sneco-bible</code>, apply <code>schema.sql</code>, create R2 bucket <code>sneco-files</code>, uncomment blocks in wrangler.toml, redeploy. Instructions in the new <code>~/snEco/sneco-auth/setup-2.sh</code>.</li>
+      <li data-lang="sk">⚠ Pred publikovaním v2.27 potrebný setup-2: vytvoriť D1 db sneco-bible, spustiť schema.sql, vytvoriť R2 bucket sneco-files, odkomentovať bloky vo wrangler.toml, redeploy. Inštrukcie — v novom ~/snEco/sneco-auth/setup-2.sh.</li>
     </ul>
   </div>
 
@@ -5824,16 +5908,22 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk"><strong>🔐 Нова система паролів — OTP по email.</strong> Замість статичних паролів (sneco-hr-2026, sneco2026) — одноразові 6-значні коди, що приходять на email. Email має бути у whitelist відповідного розділу. Сесія діє 1 годину, потім треба перезайти.</li>
       <li data-lang="en"><strong>🔐 New password system — email OTP.</strong> Instead of static passwords (sneco-hr-2026, sneco2026) — one-time 6-digit codes sent to email. Email must be on the whitelist for that section. Session valid 1 hour, then re-login required.</li>
+      <li data-lang="sk">🔐 Nový systém hesiel — OTP cez email. Namiesto statických hesiel (sneco-hr-2026, sneco2026) — jednorazové 6-miestne kódy, ktoré prichádzajú na email. Email musí byť na whiteliste príslušnej sekcie. Relácia trvá 1 hodinu, potom je potrebné znovu sa prihlásiť.</li>
       <li data-lang="uk">Перероблено: <strong>HR розділ</strong> + <strong>Прайс-листи</strong> у Sales playbook. Універсальний модуль <code>snAuth</code> — тепер можна додавати нові захищені блоки.</li>
       <li data-lang="en">Refactored: <strong>HR section</strong> + <strong>Price lists</strong> in Sales playbook. Universal <code>snAuth</code> module — easy to add new protected blocks.</li>
+      <li data-lang="sk">Prerobené: HR sekcia + Cenníky v Sales playbook. Univerzálny modul snAuth — teraz možno pridávať nové chránené bloky.</li>
       <li data-lang="uk">Новий блок у Maintenance — <strong>«🔐 Розподіл доступу»</strong>. Доступний лише засновникам (vg@sneco.ua, fg@abrisart.com). Дозволяє редагувати whitelist'и emails per block: додати/видалити людей з доступом до HR і Прайс-листів. Адміни завжди мають доступ за замовчуванням.</li>
       <li data-lang="en">New Maintenance block — <strong>"🔐 Access management"</strong>. Available only to founders (vg@sneco.ua, fg@abrisart.com). Lets you edit per-block email whitelists: add/remove who can access HR and Prices. Admins always have access by default.</li>
+      <li data-lang="sk">Nový blok v Maintenance — „🔐 Rozdelenie prístupu". Dostupný len zakladateľom (vg@sneco.ua, fg@abrisart.com). Umožňuje upravovať whitelisty emailov per block: pridať/odstrániť ľudí s prístupom k HR a Cenníkom. Adminovia majú vždy prístup štandardne.</li>
       <li data-lang="uk"><strong>Backend:</strong> Cloudflare Worker + KV + Resend для email. Код, конфіг і setup-інструкція — у <code>~/snEco/sneco-auth/</code> (<code>src/index.js</code>, <code>wrangler.toml</code>, <code>DEPLOY.md</code>). JWT для сесій (HMAC-SHA256, 1 год TTL). CORS обмежено dreamcarua.github.io.</li>
       <li data-lang="en"><strong>Backend:</strong> Cloudflare Worker + KV + Resend for email. Code, config and setup instructions in <code>~/snEco/sneco-auth/</code> (<code>src/index.js</code>, <code>wrangler.toml</code>, <code>DEPLOY.md</code>). JWT sessions (HMAC-SHA256, 1h TTL). CORS restricted to dreamcarua.github.io.</li>
+      <li data-lang="sk">Backend: Cloudflare Worker + KV + Resend pre email. Kód, konfig a setup-inštrukcie — v ~/snEco/sneco-auth/ (src/index.js, wrangler.toml, DEPLOY.md). JWT pre relácie (HMAC-SHA256, 1 hod TTL). CORS obmedzené na dreamcarua.github.io.</li>
       <li data-lang="uk"><strong>Як це працює:</strong> 1) Юзер вводить email → 2) Worker перевіряє whitelist → 3) надсилає 6-значний код через Resend → 4) Юзер вводить код → 5) Worker видає JWT → 6) JWT зберігається у sessionStorage → 7) розблоковує контент. Закриття браузера → треба знов залогінитись.</li>
       <li data-lang="en"><strong>How it works:</strong> 1) User enters email → 2) Worker checks whitelist → 3) sends 6-digit code via Resend → 4) User enters code → 5) Worker issues JWT → 6) JWT in sessionStorage → 7) content unlocks. Close browser → must re-login.</li>
+      <li data-lang="sk">Ako to funguje: 1) Užívateľ zadá email → 2) Worker overí whitelist → 3) odošle 6-miestny kód cez Resend → 4) Užívateľ zadá kód → 5) Worker vydá JWT → 6) JWT sa uloží v sessionStorage → 7) odomkne obsah. Zatvorenie prehliadača → znovu sa prihlásiť.</li>
       <li data-lang="uk"><strong>Перед публікацією v2.26 потрібно:</strong> deploy Worker (1-разовий setup, ~30 хв за DEPLOY.md), потім підставити URL Worker'а у <code>WORKER_URL</code> у HTML. До цього моменту login-форми будуть показувати помилку «Send failed».</li>
       <li data-lang="en"><strong>Before publishing v2.26:</strong> deploy the Worker (one-time setup, ~30 min via DEPLOY.md), then set the Worker URL as <code>WORKER_URL</code> in HTML. Until then, login forms will show "Send failed".</li>
+      <li data-lang="sk">Pred publikovaním v2.26 je potrebné: deploy Worker (jednorazový setup, ~30 min podľa DEPLOY.md), potom doplniť URL Worker do WORKER_URL v HTML. Dovtedy login-formuláre budú zobrazovať chybu „Send failed".</li>
     </ul>
   </div>
 
@@ -5842,10 +5932,13 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk"><strong>Усі згадки документів — клікабельні.</strong> У <strong>Legal &amp; substantiation</strong> (substantiation map і Trademarks) і <strong>Press kit substantion table</strong>, а також у <strong>Architecture cards</strong> (UA + EU юр. особи) текст про сертифікати, патент, ТМ, FDA, eco тепер є прямим лінком на відповідний PDF у <code>documents/</code>.</li>
       <li data-lang="en"><strong>All document mentions — now clickable.</strong> In <strong>Legal &amp; substantiation</strong> (substantiation map and Trademarks) and the <strong>Press kit substantion table</strong>, plus the <strong>Architecture cards</strong> (UA + EU legal entities), references to certificates, patent, trademarks, FDA, eco now link directly to the corresponding PDF in <code>documents/</code>.</li>
+      <li data-lang="sk">Všetky zmienky dokumentov — klikateľné. V Legal &amp; substantiation (substantiation map a Trademarks) a Press kit substantion table, a tiež v Architecture cards (UA + EÚ právnické osoby) text o certifikátoch, patente, OZ, FDA, eco je teraz priamym linkom na príslušný PDF v documents/.</li>
       <li data-lang="uk">Patent UA 139035 · Trademark UA 230269 · TM SK/CZ/PL · FSSC 22000 (v6 EN+UA, TÜV) · HACCP/ISO 22000 (EN+UA) · HACCP SK · IFS audit · SIAL Award + Cert · Eurofins lab tests (5) · USA FDA · Зелений журавлик · EU PEF · CE Declaration · УКТЗЕД · ТУ — усі резолвлять у документ одним кліком.</li>
       <li data-lang="en">Patent UA 139035 · Trademark UA 230269 · TM SK/CZ/PL · FSSC 22000 (v6 EN+UA, TÜV) · HACCP/ISO 22000 (EN+UA) · HACCP SK · IFS audit · SIAL Award + Cert · Eurofins lab tests (5) · USA FDA · Green Crane · EU PEF · CE Declaration · UKTZED · TU — all open the document with one click.</li>
+      <li data-lang="sk">Patent UA 139035 · Trademark UA 230269 · TM SK/CZ/PL · FSSC 22000 (v6 EN+UA, TÜV) · HACCP/ISO 22000 (EN+UA) · HACCP SK · IFS audit · SIAL Award + Cert · Eurofins lab tests (5) · USA FDA · Zelený žeriav · EU PEF · CE Declaration · UKTZÚED · TÚ — všetky sa rozbalia do dokumentu jedným kliknutím.</li>
       <li data-lang="uk"><strong>Стандарт на майбутнє:</strong> при будь-якій новій згадці назви сертифікату, патенту, нагороди, ТМ, lab test — обов'язково обгорнути в <code>&lt;a href="documents/[категорія]/[файл].pdf" target="_blank"&gt;</code>. Якщо файлу ще немає — додати <span style="color:var(--text-muted)">«за запитом»</span> замість «через CRM».</li>
       <li data-lang="en"><strong>Going-forward standard:</strong> any new mention of a certificate, patent, award, trademark or lab test must be wrapped in <code>&lt;a href="documents/[category]/[file].pdf" target="_blank"&gt;</code>. If the file isn't published yet — write <span style="color:var(--text-muted)">"on request"</span> instead of "via CRM".</li>
+      <li data-lang="sk">Štandard do budúcna: pri akejkoľvek novej zmienke názvu certifikátu, patentu, ocenenia, OZ, lab testu — povinne zabaliť do &lt;a href="documents/[kategória]/[súbor].pdf" target="_blank"&gt;. Ak súbor ešte neexistuje — pridať „na žiadosť" namiesto „cez CRM".</li>
     </ul>
   </div>
 
@@ -5854,10 +5947,13 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk"><strong>🔒 Новий розділ HR — персонал і зарплати</strong> у новій sidebar-групі «Конфіденційне». Захищений паролем (SHA-256 hash, sessionStorage).</li>
       <li data-lang="en"><strong>🔒 New HR — personnel &amp; payroll section</strong> in a new "Confidential" sidebar group. Password-gated (SHA-256 hash, sessionStorage).</li>
+      <li data-lang="sk">🔒 Nová sekcia HR — personál a mzdy v novej sidebar-skupine „Dôverné". Chránená heslom (SHA-256 hash, sessionStorage).</li>
       <li data-lang="uk">Перший документ: <strong>«ЗП Виробництво»</strong> — щомісячна табличка зарплат (.xlsx). Опис процесу: щомісячно — лише верхня таблиця, формули затягують усе інше; від бухгалтерії — аванс/залишок вручну; години — автоматично з табелю; при виплаті — друк 2 однакових таблиць у альбомному форматі (відрізна для підпису + для працівника).</li>
       <li data-lang="en">First document: <strong>"Production payroll"</strong> — monthly worksheet (.xlsx). Process documentation: each month — only the top table is edited, formulas pull the rest; advance/final from accounting entered manually; hours computed automatically from the daily timesheet; on payday — print 2 identical tables in landscape (one for signature, one for the employee).</li>
+      <li data-lang="sk">Prvý dokument: „Mzdy Výroba" — mesačná tabuľka miezd (.xlsx). Popis procesu: mesačne — len horná tabuľka, vzorce vyplnia ostatné; z účtovníctva — preddavok/zostatok ručne; hodiny — automaticky z dochádzky; pri výplate — tlač 2 rovnakých tabuliek v krajinnom formáte (odtrhávacia na podpis + pre zamestnanca).</li>
       <li data-lang="uk"><strong>⚠ Security warning</strong> у HR-розділі: пароль у HTML — UI-бар'єр, а не реальний криптографічний захист. У публічному repo файли доступні через RAW URL без пароля. Sensitive файли — через захищені канали; у майбутньому — окремий приватний repo.</li>
       <li data-lang="en"><strong>⚠ Security warning</strong> in HR section: HTML password is a UI gate, not real cryptographic protection. In a public repo, files are reachable via raw URLs without a password. Sensitive files — via secure channels; long-term — private repo.</li>
+      <li data-lang="sk">⚠ Security warning v HR-sekcii: heslo v HTML — UI-bariéra, nie reálna kryptografická ochrana. Vo verejnom repo sú súbory dostupné cez RAW URL bez hesla. Sensitive súbory — cez chránené kanály; v budúcnosti — samostatný privátny repo.</li>
     </ul>
   </div>
 
@@ -5866,14 +5962,19 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk"><strong>Повний реєстр контактів команди</strong> у секції «Команда & орг-структура» — імена, посади, мови, телефони, email, LinkedIn для всієї snEco SK команди + co-owners.</li>
       <li data-lang="en"><strong>Full team contact registry</strong> in the "Team &amp; org structure" section — names, roles, languages, phones, emails, LinkedIn for the whole snEco SK team + co-owners.</li>
+      <li data-lang="sk">Plný register kontaktov tímu v sekcii „Tím & org-štruktúra" — mená, pozície, jazyky, telefóny, email, LinkedIn pre celý snEco SK tím + co-ownerov.</li>
       <li data-lang="uk">Додано <strong>Iryna Petryshyna</strong> (Head of Export) у Sneco SK функціональні керівники — тепер 4 leads замість 3.</li>
       <li data-lang="en">Added <strong>Iryna Petryshyna</strong> (Head of Export) to Sneco SK functional leads — now 4 leads instead of 3.</li>
+      <li data-lang="sk">Pridaná Iryna Petryshyna (Head of Export) k Sneco SK funkčným vedúcim — teraz 4 leads namiesto 3.</li>
       <li data-lang="uk">Кожна org-картка SK і co-owners тепер містить телефон і email прямо в meta. Виробничий персонал — телефони.</li>
       <li data-lang="en">Each SK and co-owner org card now shows phone and email in meta. Production operators — phone numbers.</li>
+      <li data-lang="sk">Každá org-karta SK a co-ownerov teraz obsahuje telefón a email priamo v meta. Výrobný personál — telefóny.</li>
       <li data-lang="uk">Перебудовано «Ключові контакти» з короткої в повну таблицю на 10 осіб з усіма даними. <code>tel:</code> і <code>mailto:</code> лінки — клікабельні.</li>
       <li data-lang="en">Rebuilt "Key contacts" from a short list into a full 10-person table with all data. <code>tel:</code> and <code>mailto:</code> links are clickable.</li>
+      <li data-lang="sk">Prepracované „Kľúčové kontakty" z krátkej na plnú tabuľku 10 osôb so všetkými údajmi. tel: a mailto: linky — klikateľné.</li>
       <li data-lang="uk">Додано блок «Загальні канали»: <code>sales@sneco.eu</code> (SK/EU), <code>worldwide@sneco.ua</code> (експорт worldwide), <code>vg@sneco.ua</code> (стратегія/преса) + sneco.ua / sneco.eu.</li>
       <li data-lang="en">Added "General channels" block: <code>sales@sneco.eu</code> (SK/EU), <code>worldwide@sneco.ua</code> (export worldwide), <code>vg@sneco.ua</code> (strategy/press) + sneco.ua / sneco.eu.</li>
+      <li data-lang="sk">Pridaný blok „Všeobecné kanály": sales@sneco.eu (SK/EÚ), worldwide@sneco.ua (export worldwide), vg@sneco.ua (stratégia/tlač) + sneco.ua / sneco.eu.</li>
     </ul>
   </div>
 
@@ -5882,18 +5983,25 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk"><strong>Реструктуризовано «Експортна / EU версія»</strong> у повноцінний блок «🌍 Міжнародні версії» з 4 sub-категоріями: <strong>EN</strong> (3 SKU) · <strong>US</strong> (1) · <strong>SK</strong> (2) · <strong>SK back labels 57×70 мм</strong> (2). Загалом 8 нових/оновлених карток.</li>
       <li data-lang="en"><strong>Restructured "Export / EU version"</strong> into a full "🌍 International versions" block with 4 sub-categories: <strong>EN</strong> (3 SKUs) · <strong>US</strong> (1) · <strong>SK</strong> (2) · <strong>SK back labels 57×70 mm</strong> (2). 8 new/updated cards in total.</li>
+      <li data-lang="sk">Reštrukturalizované „Exportná / EÚ verzia" do plnohodnotného bloku „🌍 Medzinárodné verzie" so 4 sub-kategóriami: EN (3 SKU) · US (1) · SK (2) · SK back labels 57×70 mm (2). Celkovo 8 nových/aktualizovaných kariet.</li>
       <li data-lang="uk">Додано Cheddar EN (London bg), Gauda US (15G PROTEIN), Cheddar SK (12G PROTEIN), Gauda SK (15G PROTEIN), Cheddar SK back-label, Gauda SK back-label.</li>
       <li data-lang="en">Added Cheddar EN (London bg), Gauda US (15G PROTEIN), Cheddar SK (12G PROTEIN), Gauda SK (15G PROTEIN), Cheddar SK back-label, Gauda SK back-label.</li>
+      <li data-lang="sk">Pridané Cheddar EN (London bg), Gauda US (15G PROTEIN), Cheddar SK (12G PROTEIN), Gauda SK (15G PROTEIN), Cheddar SK back-label, Gauda SK back-label.</li>
       <li data-lang="uk">Документовано market-specific відмінності: ribbon «<code>FROM 100% [CHEESE]</code>» на EN vs «<code>100% [CHEESE]</code>» на US/SK · бейдж <code>HIGH PROTEIN</code> (EN) vs <code>12G/15G PROTEIN in this pack</code> (US/SK) · 8-мовна зворотна етикетка для SK ринку (Sneco SK s.r.o., Karpatska 1328/3, Kosice).</li>
       <li data-lang="en">Documented market-specific differences: ribbon "<code>FROM 100% [CHEESE]</code>" on EN vs "<code>100% [CHEESE]</code>" on US/SK · badge <code>HIGH PROTEIN</code> (EN) vs <code>12G/15G PROTEIN in this pack</code> (US/SK) · 8-language back label for the SK market (Sneco SK s.r.o., Karpatska 1328/3, Kosice).</li>
+      <li data-lang="sk">Zdokumentované market-specific rozdiely: ribbon „FROM 100% [CHEESE]" na EN vs „100% [CHEESE]" na US/SK · odznak HIGH PROTEIN (EN) vs 12G/15G PROTEIN in this pack (US/SK) · 8-jazyčná zadná etiketa pre SK trh (Sneco SK s.r.o., Karpatska 1328/3, Kosice).</li>
       <li data-lang="uk">Додано <strong>матрицю ринок × SKU</strong>: 8 рядків × 5 стовпців (UA / EN / US / SK / SK back) — швидкий visual для розуміння де якого SKU нема.</li>
       <li data-lang="en">Added <strong>market × SKU matrix</strong>: 8 rows × 5 columns (UA / EN / US / SK / SK back) — quick visual gap-finder.</li>
+      <li data-lang="sk">Pridaná matica trh × SKU: 8 riadkov × 5 stĺpcov (UA / EN / US / SK / SK back) — rýchly visual pre pochopenie, kde aké SKU chýba.</li>
       <li data-lang="uk"><strong>⚠ Знайдено 3 типи друкарських помилок:</strong> «CRUNCY» (без H) на 4 файлах · «CEDDAR» (без H) на Cheddar SK · «GAUDA» (А замість O) на US/SK. Підсвічено окремим warning-блоком — виправити перед тиражем.</li>
       <li data-lang="en"><strong>⚠ 3 types of typos found:</strong> "CRUNCY" (no H) on 4 files · "CEDDAR" (no H) on Cheddar SK · "GAUDA" (A instead of O) on US/SK. Flagged in a dedicated warning block — fix before press run.</li>
+      <li data-lang="sk">⚠ Nájdené 3 typy tlačových chýb: „CRUNCY" (bez H) na 4 súboroch · „CEDDAR" (bez H) na Cheddar SK · „GAUDA" (A namiesto O) na US/SK. Zvýraznené samostatným warning-blokom — opraviť pred tlačou.</li>
       <li data-lang="uk">Файлова структура розширена: <code>packaging/print/EN-28g/</code>, <code>US-90x160/</code>, <code>SK-90x160/</code>, <code>SK-57x70/</code> (нові 4 папки замість 1).</li>
       <li data-lang="en">File structure expanded: <code>packaging/print/EN-28g/</code>, <code>US-90x160/</code>, <code>SK-90x160/</code>, <code>SK-57x70/</code> (4 new folders instead of 1).</li>
+      <li data-lang="sk">Súborová štruktúra rozšírená: packaging/print/EN-28g/, US-90x160/, SK-90x160/, SK-57x70/ (nové 4 priečinky namiesto 1).</li>
       <li data-lang="uk">Усього в галереї: <strong>20 PDF</strong> (12 UA + 3 EN + 1 US + 2 SK + 2 SK-back), <strong>20 JPG превью</strong> (~1.7 MB разом).</li>
       <li data-lang="en">Gallery total: <strong>20 PDFs</strong> (12 UA + 3 EN + 1 US + 2 SK + 2 SK-back), <strong>20 JPG previews</strong> (~1.7 MB combined).</li>
+      <li data-lang="sk">Celkovo v galérii: 20 PDF (12 UA + 3 EN + 1 US + 2 SK + 2 SK-back), 20 JPG preview (~1.7 MB spolu).</li>
     </ul>
   </div>
 
@@ -5902,16 +6010,22 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk"><strong>Новий розділ «Фірмова торгова точка»</strong> у sidebar (між «Точки контакту» і «Документи»). Архів проєкту 2020-2021 — точка у ТРЦ «Французький бульвар» (Київ).</li>
       <li data-lang="en"><strong>New "Branded retail kiosk" section</strong> in the sidebar (between "Touchpoints" and "Documents"). Project archive 2020-2021 — kiosk at Frantsuzkyi Bulvar Mall (Kyiv).</li>
+      <li data-lang="sk">Nová sekcia „Firemný predajný bod" v sidebar (medzi „Kontaktné body" a „Dokumenty"). Archív projektu 2020-2021 — bod v TRC „Francúzsky bulvár" (Kyjev).</li>
       <li data-lang="uk">Хронологія проєкту (4 milestones): концепти 1-2 (07.2020) → фінальний техпроєкт (09.2020) → монтаж (30.09 → 01.10.2020) → ~9 місяців роботи (07.2021).</li>
       <li data-lang="en">Project timeline (4 milestones): concepts 1-2 (Jul 2020) → final blueprint (Sep 2020) → install (30 Sep → 1 Oct 2020) → ~9 months in operation (Jul 2021).</li>
+      <li data-lang="sk">Chronológia projektu (4 milestones): koncepty 1-2 (07.2020) → finálny technický projekt (09.2020) → inštalácia (30.09 → 01.10.2020) → ~9 mesiacov prevádzky (07.2021).</li>
       <li data-lang="uk">6 ключових елементів дизайну: чорна основа з мел.фарбою · підсвічений LED-логотип · декоративний мох (80мм) · скляна вітрина з насипом · нахилені полиці упаковок · меловий простір для меседжів.</li>
       <li data-lang="en">6 key design elements: black chalk-paint body · backlit LED logo · decorative moss (80 mm) · glass bulk display · tilted pack shelves · chalk-message space.</li>
+      <li data-lang="sk">6 kľúčových prvkov dizajnu: čierny základ s kriedovou farbou · podsvietené LED-logo · dekoratívny mach (80 mm) · sklenená vitrína so sypaním · sklonené police s baleniami · kriedový priestor pre posolstvá.</li>
       <li data-lang="uk">Технічне креслення (фінал) + 4 реальні фото з ТРЦ + 8 ранніх концептів (рендерів) як «як НЕ треба».</li>
       <li data-lang="en">Final blueprint + 4 real mall photos + 8 early concept renders as a "how-not-to" reference.</li>
+      <li data-lang="sk">Technický výkres (finál) + 4 skutočné fotky z TRC + 8 skorých konceptov (renderov) ako „ako NETREBA".</li>
       <li data-lang="uk">7 «уроків з проєкту» для майбутніх ТТ і франчайзі: спочатку позиціонування, скляна вітрина — найсильніший trigger, підсвічений лого критичний у ТРЦ, мох як «еко»-хак, L-форма ~3.6 м² — оптимум.</li>
       <li data-lang="en">7 "lessons learned" for future kiosks and franchisees: positioning first, glass bulk display is the strongest trigger, backlit logo is critical, moss as an "eco hack", L-shape ~3.6 m² is the sweet spot.</li>
+      <li data-lang="sk">7 „lekcií z projektu" pre budúce predajné body a franchisingy: najprv pozicionovanie, sklenená vitrína — najsilnejší trigger, podsvietené logo kritické v TRC, mach ako „eko"-hack, L-forma ~3,6 m² — optimum.</li>
       <li data-lang="uk">14 веб-оптимізованих JPG у <code>retail/concept-2020/</code> (~1.3 MB разом). Сирці CAD/PDF — за запитом.</li>
       <li data-lang="en">14 web-optimized JPGs in <code>retail/concept-2020/</code> (~1.3 MB total). CAD/PDF sources on request.</li>
+      <li data-lang="sk">14 web-optimalizovaných JPG v retail/concept-2020/ (~1.3 MB spolu). Zdroje CAD/PDF — na žiadosť.</li>
     </ul>
   </div>
 
@@ -5920,12 +6034,16 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk"><strong>Sneco SK команда розгорнута</strong> у секції «Команда & орг-структура»: 4 співвласники + 3 функціональні керівники + 2 виробничі оператори (всього 9 осіб). Кожна картка містить посаду, зону відповідальності і мовні навички.</li>
       <li data-lang="en"><strong>Sneco SK team expanded</strong> in the "Team & org structure" section: 4 co-owners + 3 functional leads + 2 production operators (9 people total). Each card includes title, area of responsibility and language skills.</li>
+      <li data-lang="sk">Sneco SK tím rozvinutý v sekcii „Tím & org-štruktúra": 4 spoluvlastníci + 3 funkční vedúci + 2 výrobní operátori (celkovo 9 osôb). Každá karta obsahuje pozíciu, oblasť zodpovednosti a jazykové znalosti.</li>
       <li data-lang="uk"><strong>🔒 Прибрано частки власності</strong> зі Sneco SK блоку (раніше: Andrela 37.5%, Gryshyn 25%, Gryshyn 25%, Levko 12.5%). Конфіденційні дані не місце у публічному Brand Bible — лишилися лише у внутрішньому memory.</li>
       <li data-lang="en"><strong>🔒 Ownership percentages removed</strong> from the Sneco SK block (previously: Andrela 37.5%, Gryshyn 25%, Gryshyn 25%, Levko 12.5%). Confidential data doesn't belong in a public Brand Bible — kept only in internal memory.</li>
+      <li data-lang="sk">🔒 Odstránené podiely vlastníctva zo Sneco SK bloku (predtým: Andrela 37,5%, Gryshyn 25%, Gryshyn 25%, Levko 12,5%). Dôverné údaje nepatria do verejnej Brand Bible — zostali len v internom memory.</li>
       <li data-lang="uk">Додано повні імена раніше неповних: <strong>Serhii Andrela</strong> (CCO) і <strong>Taras Levko</strong> (CFO/BDO).</li>
       <li data-lang="en">Added full names where previously partial: <strong>Serhii Andrela</strong> (CCO) and <strong>Taras Levko</strong> (CFO/BDO).</li>
+      <li data-lang="sk">Pridané plné mená predtým neúplných: Serhii Andrela (CCO) a Taras Levko (CFO/BDO).</li>
       <li data-lang="uk">Нові імена в команді: <strong>Alona Zheliznyk</strong> (Head of Sales), <strong>Patrik Syvij</strong> (Operations & Warehouse), <strong>Maksym Nesterenko</strong> (Production & Quality), <strong>Yuliia Nesterenko</strong> + <strong>Nataliia Anufriieva</strong> (Production Operators).</li>
       <li data-lang="en">New team members: <strong>Alona Zheliznyk</strong> (Head of Sales), <strong>Patrik Syvij</strong> (Operations & Warehouse), <strong>Maksym Nesterenko</strong> (Production & Quality), <strong>Yuliia Nesterenko</strong> + <strong>Nataliia Anufriieva</strong> (Production Operators).</li>
+      <li data-lang="sk">Nové mená v tíme: Alona Zheliznyk (Head of Sales), Patrik Syvij (Operations & Warehouse), Maksym Nesterenko (Production & Quality), Yuliia Nesterenko + Nataliia Anufriieva (Production Operators).</li>
     </ul>
   </div>
 
@@ -5934,16 +6052,22 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk"><strong>Експортна / EU версія пакування (англомовна)</strong> — нова, 4-та категорія в галереї пакування. Поки 2 SKU: <strong>Blue Royale (14 г)</strong> і <strong>Gouda (28 г)</strong>.</li>
       <li data-lang="en"><strong>Export / EU packaging version (English)</strong> — new 4th category in the packaging gallery. Currently 2 SKUs: <strong>Blue Royale (14 g)</strong> and <strong>Gouda (28 g)</strong>.</li>
+      <li data-lang="sk">Exportná / EÚ verzia balenia (anglická) — nová, 4. kategória v galérii balenia. Zatiaľ 2 SKU: Blue Royale (14 g) a Gouda (28 g).</li>
       <li data-lang="uk">Описано відмінності від UA-версії: KETO + HIGH PROTEIN + RENEWABLE ENERGY бейджі, beige-ribbon «FROM 100% [CHEESE]», прапор/силует столиці країни сиру (Париж/Голландія), вага в OZ.+g, slogan «TASTE THE CRUNCH OF THE WORLD!».</li>
       <li data-lang="en">Documented differences vs. UA version: KETO + HIGH PROTEIN + RENEWABLE ENERGY badges, beige ribbon "FROM 100% [CHEESE]", flag/silhouette of the cheese-origin country (Paris / Dutch town), weight in OZ.+g, slogan "TASTE THE CRUNCH OF THE WORLD!".</li>
+      <li data-lang="sk">Popísané rozdiely od UA-verzie: KETO + HIGH PROTEIN + RENEWABLE ENERGY odznaky, beige-ribbon „FROM 100% [CHEESE]", vlajka/silueta hlavného mesta krajiny syra (Paríž/Holandsko), hmotnosť v OZ.+g, slogan „TASTE THE CRUNCH OF THE WORLD!".</li>
       <li data-lang="uk"><strong>⚠ Знайдено друкарську помилку</strong> у Blue Royale ENG: «CRUN<strong>C</strong>Y CHEESE BITES» → правильно <strong>CRUNCHY</strong> (як на Gouda ENG). Виправити перед тиражем.</li>
       <li data-lang="en"><strong>⚠ Typo found</strong> in Blue Royale ENG: "CRUN<strong>C</strong>Y CHEESE BITES" → correct <strong>CRUNCHY</strong> (as on Gouda ENG). Fix before press run.</li>
+      <li data-lang="sk">⚠ Nájdená tlačová chyba na Blue Royale ENG: „CRUNCY CHEESE BITES" → správne CRUNCHY (ako na Gouda ENG). Opraviť pred tlačou.</li>
       <li data-lang="uk">Файлова структура: <code>packaging/print/EN-28g/</code> для друкарських PDF, <code>packaging/small/preview/SNECO_*_ENG.jpg</code> для веб-превью.</li>
       <li data-lang="en">File structure: <code>packaging/print/EN-28g/</code> for print PDFs, <code>packaging/small/preview/SNECO_*_ENG.jpg</code> for web previews.</li>
+      <li data-lang="sk">Súborová štruktúra: packaging/print/EN-28g/ pre tlačové PDF, packaging/small/preview/SNECO_*_ENG.jpg pre web-preview.</li>
       <li data-lang="uk">Додано список «в розробці» для решти 5 ENG-SKU (Cheddar, Mozzarella, Primaggio, Smoked Suluguni, Crispy Olives).</li>
       <li data-lang="en">Added "in development" list for the remaining 5 ENG SKUs (Cheddar, Mozzarella, Primaggio, Smoked Suluguni, Crispy Olives).</li>
+      <li data-lang="sk">Pridaný zoznam „vo vývoji" pre zvyšných 5 ENG-SKU (Cheddar, Mozzarella, Primaggio, Smoked Suluguni, Crispy Olives).</li>
       <li data-lang="uk">Виправлено застарілий заголовок: <code>Brand Bible v2.10 → v2.19</code> у footer і header (changelog уже був на v2.18).</li>
       <li data-lang="en">Fixed stale label: <code>Brand Bible v2.10 → v2.19</code> in footer and header (changelog was already at v2.18).</li>
+      <li data-lang="sk">Opravená zastaraná hlavička: Brand Bible v2.10 → v2.19 vo footer a header (changelog už bol na v2.18).</li>
     </ul>
   </div>
 
@@ -5952,12 +6076,16 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk"><strong>Логістична карта Retail Showbox 28 г</strong> — повна спека для байерів і дистриб'юторів. Pack 200×150×20 мм / Showbox 210×150×380 мм / Pallet EUR 1200×800×1850 (128 boxes / 1920 pcs / 120 kg).</li>
       <li data-lang="en"><strong>Retail Showbox 28 g logistics card</strong> — full spec for buyers and distributors. Pack 200×150×20 mm / Showbox 210×150×380 mm / EUR Pallet 1200×800×1850 (128 boxes / 1920 pcs / 120 kg).</li>
+      <li data-lang="sk">Logistická mapa Retail Showbox 28 g — plná špecifikácia pre nákupcov a distribútorov. Pack 200×150×20 mm / Showbox 210×150×380 mm / Pallet EUR 1200×800×1850 (128 boxes / 1920 ks / 120 kg).</li>
       <li data-lang="uk">Додано опції контейнерної логістики: 20 ft = 11 палет / 21 120 pcs · 40 ft = 25 палет / 48 000 pcs · Truck 20 т = 33 палети / 63 360 pcs.</li>
       <li data-lang="en">Added container logistics options: 20 ft = 11 pallets / 21,120 pcs · 40 ft = 25 pallets / 48,000 pcs · 20 t Truck = 33 pallets / 63,360 pcs.</li>
+      <li data-lang="sk">Pridané možnosti kontajnerovej logistiky: 20 ft = 11 paliet / 21 120 ks · 40 ft = 25 paliet / 48 000 ks · Truck 20 t = 33 paliet / 63 360 ks.</li>
       <li data-lang="uk">Візуальний chain «Pack → Showbox → Pallet → Container» (auto-fit grid) + повна підсумкова таблиця для копіпасту в комерційні пропозиції.</li>
       <li data-lang="en">Visual chain "Pack → Showbox → Pallet → Container" (auto-fit grid) + full summary table for copy-pasting into commercial proposals.</li>
+      <li data-lang="sk">Vizuálny chain „Pack → Showbox → Pallet → Container" (auto-fit grid) + plná súhrnná tabuľka na kopírovanie do obchodných ponúk.</li>
       <li data-lang="uk">Аналогічні дані для <strong>14/20 г Compact</strong>, <strong>500 г HoReCa</strong> і <strong>tasting sets</strong> — пендінг (запит до Богдана / Валерії).</li>
       <li data-lang="en">Equivalent data for <strong>14/20 g Compact</strong>, <strong>500 g HoReCa</strong> and <strong>tasting sets</strong> — pending (request to Bohdan / Valeriia).</li>
+      <li data-lang="sk">Analogické údaje pre 14/20 g Compact, 500 g HoReCa a tasting sets — pending (žiadosť pre Bohdana / Valeriu).</li>
     </ul>
   </div>
 
@@ -5966,12 +6094,16 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk"><strong>SKU-формати: 3 → 5 карток.</strong> Додано <strong>Compact retail (14/20 г, 90×160 мм, 12 SKU)</strong> для малих магазинів, АЗС і прикасової зони — окремий формат, не плутати з 28г Showbox.</li>
       <li data-lang="en"><strong>SKU formats: 3 → 5 cards.</strong> Added <strong>Compact retail (14/20 g, 90×160 mm, 12 SKUs)</strong> for small stores, petrol and impulse — a separate format, not to be confused with the 28 g Showbox.</li>
+      <li data-lang="sk">SKU-formáty: 3 → 5 kariet. Pridaný Compact retail (14/20 g, 90×160 mm, 12 SKU) pre malé obchody, čerpacie stanice a pri pokladni — samostatný formát, nezamieňať s 28 g Showbox.</li>
       <li data-lang="uk">Додано <strong>Private Label / OEM</strong> картку: партнер отримує продукт під своєю маркою, ми — виробник. Custom: бренд, мікси, мови, розмір пачки, сертифікація. MOQ за домовленістю, lead time 6–8 тижнів.</li>
       <li data-lang="en">Added <strong>Private Label / OEM</strong> card: partner ships under their own brand, we manufacture. Custom: brand, mixes, languages, pack size, certification. MOQ by agreement, lead time 6–8 weeks.</li>
+      <li data-lang="sk">Pridaná Private Label / OEM karta: partner dostáva produkt pod svojou značkou, my — výrobca. Custom: značka, mixy, jazyky, veľkosť balenia, certifikácia. MOQ podľa dohody, lead time 6–8 týždňov.</li>
       <li data-lang="uk">Сітка переведена з фіксованого 3-колонкового на <code>auto-fill minmax(220px, 1fr)</code> — на широкому екрані 5 карток в один ряд, на вузькому переходять у кілька рядів.</li>
       <li data-lang="en">Grid switched from fixed 3-column to <code>auto-fill minmax(220px, 1fr)</code> — 5 cards in one row on wide screens, multiple rows on narrow ones.</li>
+      <li data-lang="sk">Mriežka prevedená z fixného 3-stĺpcového na auto-fill minmax(220px, 1fr) — na širokej obrazovke 5 kariet v jednom rade, na úzkej prechádzajú do viacerých radov.</li>
       <li data-lang="uk">Порядок: <strong>Compact 14/20 → Showbox 28 → HoReCa 500 → Tasting → Private Label</strong> (від найменшого до найбільшого, плюс кастомний у кінці).</li>
       <li data-lang="en">Order: <strong>Compact 14/20 → Showbox 28 → HoReCa 500 → Tasting → Private Label</strong> (smallest to largest, custom last).</li>
+      <li data-lang="sk">Poradie: Compact 14/20 → Showbox 28 → HoReCa 500 → Tasting → Private Label (od najmenšieho po najväčší, plus custom na konci).</li>
     </ul>
   </div>
 
@@ -5988,10 +6120,13 @@ h3.block-title:first-of-type { margin-top: 0; }
         </ul>
       </li>
       <li data-lang="en"><strong>New "Press Coverage" section</strong> in the Reference group. <strong>26+ publications</strong> compiled from the snEco blog and via web search. Grouped into 5 themes: SIAL Grand Prix (6), Resilience (7), Technology (7), Export (5), Sustainability (1).</li>
+      <li data-lang="sk"><strong>Nová sekcia „Médiá o nás" / Press Coverage</strong> v Servisnom bloku. <strong>26+ publikácií</strong> získaných z blogu snEco a nájdených cez web search. Zoskupené v 5 témach: SIAL Grand Prix (6), Resilience (7), Technology (7), Export (5), Sustainability (1).</li>
       <li data-lang="uk">Кожна публікація: видання, дата, заголовок, мова, прямий лінк (відкривається у новій вкладці). Розділ забезпечує базу для прес-кітів, B2B-пітчів, інвесторських матеріалів.</li>
       <li data-lang="en">Each entry: outlet, date, headline, language, direct link (opens in new tab). Provides a foundation for press kits, B2B pitches, and investor materials.</li>
+      <li data-lang="sk">Každá publikácia: vydanie, dátum, nadpis, jazyk, priamy odkaz (otvára sa v novej karte). Sekcia poskytuje základ pre press-kity, B2B-pitche, investorské materiály.</li>
       <li data-lang="uk">Доданий блок «Як використовувати в комунікації» — куди підставляти ці публікації (прес-кіт / B2B / інвестори / соцмережі).</li>
       <li data-lang="en">Added "How to use in communications" block — where to plug these publications (press kit / B2B / investors / social).</li>
+      <li data-lang="sk">Pridaný blok „Ako použiť v komunikácii" — kam dosadiť tieto publikácie (press-kit / B2B / investori / sociálne siete).</li>
     </ul>
   </div>
 
@@ -6000,10 +6135,13 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk"><strong>Виправлено EU health claims:</strong> «high protein» — допустимий claim для <strong>усієї лінійки snEco</strong>, а не тільки Fitness/Superfood. Базові сорти ≥40% білка за вагою (≈32% енергії), Fitness — до 60% (≈48% енергії). Усе вище порогу EU 1924/2006 (≥20% енергії). Прибрано хибне «source of protein для базових сортів».</li>
       <li data-lang="en"><strong>EU health claims fixed:</strong> "high protein" is allowed across the <strong>entire snEco range</strong>, not just Fitness/Superfood. Base varieties ≥40% protein by weight (≈32% of energy), Fitness up to 60% (≈48% of energy). All above the EU 1924/2006 threshold (≥20% energy). Removed the wrong "source of protein for base varieties".</li>
+      <li data-lang="sk">Opravené EU health claims: „high protein" — prípustný claim pre celú líniu snEco, nielen Fitness/Superfood. Základné druhy ≥40% bielkovín hmotnostne (≈32% energie), Fitness — až 60% (≈48% energie). Všetko nad prahom EU 1924/2006 (≥20% energie). Odstránené chybné „source of protein pre základné druhy".</li>
       <li data-lang="uk"><strong>SIAL Innovation Grand Prix 2024 — «Лауреат» → «Переможець»</strong>, плюс додано <strong>«вперше в історії України»</strong> у boilerplate 50/100/200 слів. Це принципова різниця: лауреат = у списку відзначених; переможець = взяв Grand Prix серед 2200+ продуктів.</li>
       <li data-lang="en"><strong>SIAL Innovation Grand Prix 2024 — "Laureate" → "Winner"</strong>, plus <strong>"the first ever for Ukraine"</strong> added to the 50/100/200-word boilerplate. Material difference: laureate = on the shortlist; winner = took the Grand Prix among 2200+ products.</li>
+      <li data-lang="sk">SIAL Innovation Grand Prix 2024 — „Laureát" → „Víťaz", plus pridané „prvýkrát v histórii Ukrajiny" v boilerplate 50/100/200 slov. Je to zásadný rozdiel: laureát = na zozname ocenených; víťaz = získal Grand Prix spomedzi 2200+ produktov.</li>
       <li data-lang="uk"><strong>Маніфест — додано хрусткість</strong> як ключову характеристику. Hero: «<span style="color:var(--yellow)">Хрусткий</span> сир. Лише сир.» Перший параграф розширено: «голосно відповідає, коли його їси». Нове правило <strong>04 — Хрусткість, що не вибачає</strong> (не липне, не розкисає, не гасне за 24 місяці).</li>
       <li data-lang="en"><strong>Manifesto — crunchiness added</strong> as a key trait. Hero: "<span style="color:var(--yellow)">Crunchy</span> cheese. Just cheese." First paragraph extended: "speaks loudly when bitten into". New rule <strong>04 — Crunch with no excuses</strong> (doesn't stick, doesn't go soggy, doesn't fade across 24 months).</li>
+      <li data-lang="sk">Manifest — pridaná chrumkavosť ako kľúčová charakteristika. Hero: „Chrumkavý syr. Len syr." Prvý paragraf rozšírený: „hlasno odpovedá, keď ho ješ". Nové pravidlo 04 — Chrumkavosť, ktorá neodpúšťa (nelepí, nemäkne, neslabne za 24 mesiacov).</li>
     </ul>
   </div>
 
@@ -6012,10 +6150,13 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk"><strong>Історія &amp; технологія — повне переписування timeline</strong> на основі офіційної сторінки sneco.ua/pro-nas. Додано: 2015 (Харків, ідея), 02.2022 (втрачено все), 27.02.2022 (~500 000 грн на ЗСУ і «Повернись живим»), 04–07.2022 (релокація 8 вантажівок, гранти EU4Business/GIZ/IOM/ЄБРР), 08.2022 (перезапуск Мукачево, 3 з 35 переїхали), 2023 осінь (перші експортні контракти CZ/SK/PL).</li>
       <li data-lang="en"><strong>Story &amp; technology — full timeline rewrite</strong> based on the official sneco.ua/pro-nas page. Added: 2015 (Kharkiv, the idea), 02.2022 (everything lost), 27.02.2022 (~UAH 500,000 to AFU and "Come Back Alive"), 04–07.2022 (relocation, 8 trucks, grants EU4Business/GIZ/IOM/EBRD), 08.2022 (Mukachevo restart, 3 of 35 staff moved), Fall 2023 (first export contracts CZ/SK/PL).</li>
+      <li data-lang="sk">História &amp; technológia — kompletné prepísanie timeline na základe oficiálnej stránky sneco.ua/pro-nas. Pridané: 2015 (Charkov, nápad), 02.2022 (stratené všetko), 27.02.2022 (~500 000 hrn na ozbrojené sily a „Vráť sa živý"), 04–07.2022 (relokácia 8 nákladiakov, granty EU4Business/GIZ/IOM/EBOR), 08.2022 (reštart Mukačevo, 3 z 35 sa presťahovali), jeseň 2023 (prvé exportné zmluvy CZ/SK/PL).</li>
       <li data-lang="uk">Новий блок <strong>«🇺🇦 Як війна змінила все»</strong> з реальним наративом релокації + цитата Пилипа про гранти і перші перемоги. Виділяється чорним фоном — це окрема сюжетна гілка, а не пункт timeline.</li>
       <li data-lang="en">New <strong>"🇺🇦 How the war changed everything"</strong> block — relocation narrative + Pylyp's quote about grants and first wins. Black background to set it apart as a story strand, not a timeline item.</li>
+      <li data-lang="sk">Nový blok „🇺🇦 Ako vojna všetko zmenila" so skutočnou naratívnou relokáciou + citát Pylypa o grantoch a prvých víťazstvách. Odlíšený čiernym pozadím — je to samostatná dejová vetva, nie bod timeline.</li>
       <li data-lang="uk">Уточнено NASA: у lead-параграфі прямо вказано «натхнення прийшло від технології NASA Planetary Missions Program 1970-х». Це відповідає правилу CAREFUL у Legal: «натхнення дозволено в історичному контексті, не як ярлик власної технології».</li>
       <li data-lang="en">NASA clarified: the lead paragraph explicitly states "inspiration came from a 1970s NASA Planetary Missions Program technology". This aligns with the CAREFUL rule in Legal: "inspiration is allowed in historical context, not as a label for our own technology".</li>
+      <li data-lang="sk">Spresnené NASA: v lead-paragrafe priamo uvedené „inšpirácia prišla od technológie NASA Planetary Missions Program 70. rokov". Zodpovedá pravidlu CAREFUL v Legal: „inšpirácia povolená v historickom kontexte, nie ako nálepka vlastnej technológie".</li>
     </ul>
   </div>
 
@@ -6024,12 +6165,16 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk"><strong>Sales playbook · Прайс-листи (UA · 02.03.2026)</strong> — новий блок із password-gate. 3 повні таблиці: 28 г (8 SKU), 14/20 г (12 SKU), B2B 500 г (8 SKU). Усі EAN коди + Дист / Гурт / РРЦ.</li>
       <li data-lang="en"><strong>Sales playbook · Price lists (UA · Mar 2, 2026)</strong> — new block behind a password gate. Three full tables: 28 g (8 SKUs), 14/20 g (12 SKUs), B2B 500 g (8 SKUs). All EAN codes + Dist / Wholesale / RRP.</li>
+      <li data-lang="sk">Sales playbook · Cenníky (UA · 02.03.2026) — nový blok s password-gate. 3 plné tabuľky: 28 g (8 SKU), 14/20 g (12 SKU), B2B 500 g (8 SKU). Všetky EAN kódy + Dist / Veľkoobchod / Odporúčaná maloobchodná cena.</li>
       <li data-lang="uk">Прямі завантаження 6 PDF (3 формати × 2 канали Дист/Гурт). Усі файли в <code>pricing/</code>, оригінали від директора Прайм Снек.</li>
       <li data-lang="en">Direct download of 6 PDFs (3 formats × 2 channels Dist/Wholesale). All files in <code>pricing/</code>, originals signed by Prime Snack director.</li>
+      <li data-lang="sk">Priame stiahnutia 6 PDF (3 formáty × 2 kanály Dist/Veľkoobchod). Všetky súbory v pricing/, originály od riaditeľa Prime Snack.</li>
       <li data-lang="uk">Soft password-gate на JS (base64-обфускація + localStorage). Поточний пароль: <strong>sneco2026</strong>. Зміна: відкрити консоль, обчислити <code>btoa("новий")</code>, замінити рядок у скрипті.</li>
       <li data-lang="en">Soft JS password gate (base64 obfuscation + localStorage). Current password: <strong>sneco2026</strong>. To change: open console, run <code>btoa("new")</code>, replace the string in the script.</li>
+      <li data-lang="sk">Soft password-gate v JS (base64-obfuskácia + localStorage). Aktuálne heslo: sneco2026. Zmena: otvoriť konzolu, vypočítať btoa("nové"), nahradiť riadok v skripte.</li>
       <li data-lang="uk">Прибрано блок «Кольори сортів (variety system)» — фантазійні HEX без узгодження з друкарськими PANTONE. Якщо знадобиться у v3 — додамо з реальними значеннями з паків.</li>
       <li data-lang="en">Removed the "Variety color system" block — fictional HEX values without alignment to actual print PANTONE. If needed in v3, we'll add real values from packs.</li>
+      <li data-lang="sk">Odstránený blok „Farby druhov (variety system)" — fantazijné HEX bez koordinácie s tlačovými PANTONE. Ak bude potrebné v3 — pridáme so skutočnými hodnotami z balení.</li>
     </ul>
   </div>
 
@@ -6038,10 +6183,13 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk"><strong>Sales playbook · Shelf positioning переписано</strong> з 3 спрощених карток → повна матриця з трьома рівнями: <strong>Primary</strong> (Snacks / Savoury Snacks), 9 <strong>Secondary placements</strong> (premium snacks, nuts, protein/fitness, wine snacks, beer snacks, healthy snacks, impulse/checkout, petrol, HoReCa) і блок <strong>NOT target</strong> (молочна полиця, refrigerated cheese, traditional cheese).</li>
       <li data-lang="en"><strong>Sales playbook · Shelf positioning rewritten</strong> from 3 simplified cards → full three-tier matrix: <strong>Primary</strong> (Snacks / Savoury Snacks), 9 <strong>Secondary placements</strong> (premium snacks, nuts, protein/fitness, wine, beer, healthy, impulse/checkout, petrol, HoReCa), and a <strong>NOT target</strong> block (dairy shelf, refrigerated cheese, traditional cheese).</li>
+      <li data-lang="sk">Sales playbook · Shelf positioning prepísané z 3 zjednodušených kariet → plná matica s troma úrovňami: Primary (Snacks / Savoury Snacks), 9 Secondary placements (premium snacks, nuts, protein/fitness, wine snacks, beer snacks, healthy snacks, impulse/checkout, petrol, HoReCa) a blok NOT target (mliečny regál, refrigerated cheese, traditional cheese).</li>
       <li data-lang="uk">Доданo обґрунтування «<strong>Чому саме снекова полиця</strong>» — 6 причин (28 g porтion, ambient, impulse, eating-occasion як chips/nuts, pairing-ready, snack-only competition).</li>
       <li data-lang="en">Added "<strong>Why the snack aisle</strong>" rationale — 6 reasons (28 g portion, ambient, impulse, chips/nuts eating-occasion, pairing-ready, snack-only competition).</li>
+      <li data-lang="sk">Pridané odôvodnenie „Prečo práve regál snackov" — 6 dôvodov (28 g portion, ambient, impulse, eating-occasion ako chips/nuts, pairing-ready, snack-only competition).</li>
       <li data-lang="uk">Додано пуш-бек байеру: «якщо просять у сирний відділ — м'яко переводимо у snack-зону, бо інакше повторні покупки впадуть».</li>
       <li data-lang="en">Added buyer push-back: "if asked to go in the cheese section — gently steer back to snack aisle, otherwise repeat-purchase drops".</li>
+      <li data-lang="sk">Pridaný push-back nákupcovi: „ak žiadajú do oddelenia syrov — jemne presunúť do snack-zóny, lebo inak opakované nákupy klesnú".</li>
     </ul>
   </div>
 
@@ -6050,12 +6198,16 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk"><strong>Згенеровано 12 JPG preview з UA print-PDF</strong> через pdftoppm (150 dpi → ресайз 600px → JPEG 85%). Кожен ~50 KB. Лежать у <code>packaging/small/preview/</code>.</li>
       <li data-lang="en"><strong>Generated 12 JPG previews from UA print PDFs</strong> via pdftoppm (150 dpi → resize 600px → JPEG 85%). Each ~50 KB. Stored in <code>packaging/small/preview/</code>.</li>
+      <li data-lang="sk">Vygenerovaných 12 JPG preview z UA print-PDF cez pdftoppm (150 dpi → resize 600px → JPEG 85%). Každý ~50 KB. Sú v packaging/small/preview/.</li>
       <li data-lang="uk"><strong>UA галерея 90×160 мм відновлена з реальною візуалізацією</strong> — на кожній картці превʼю самої пачки. Клік на пачку — велике превʼю в новому вікні. Кнопка <strong>⬇ PDF</strong> поряд — пряме завантаження оригінального CMYK print-ready PDF (10–15 МБ).</li>
       <li data-lang="en"><strong>UA 90×160 mm gallery restored with real pack visualization</strong> — each card shows the actual pack preview. Click the pack for a large preview in a new tab. The <strong>⬇ PDF</strong> button next to it — direct download of the original CMYK print-ready PDF (10–15 MB).</li>
+      <li data-lang="sk">UA galéria 90×160 mm obnovená so skutočnou vizualizáciou — na každej karte preview samotného balenia. Klik na balenie — veľké preview v novom okne. Tlačidlo ⬇ PDF vedľa — priame stiahnutie originálneho CMYK print-ready PDF (10–15 MB).</li>
       <li data-lang="uk">Прибрано тимчасову галерею «Експортна лінійка 28 г» — повернемось до експорту окремою задачею пізніше.</li>
       <li data-lang="en">Temporary "Export line 28 g" gallery removed — we'll revisit export as a separate task later.</li>
+      <li data-lang="sk">Odstránená dočasná galéria „Exportná línia 28 g" — vrátime sa k exportu samostatnou úlohou neskôr.</li>
       <li data-lang="uk"><strong>Friction-less workflow для друкарень</strong>: 12 PDF-оригіналів лежать у repo (<code>packaging/print/UA-14-20g/</code>), друкарня заходить на сайт → бачить пачку → клік на ⬇ PDF → готовий до друку файл.</li>
       <li data-lang="en"><strong>Friction-less workflow for printers</strong>: 12 PDF originals in the repo (<code>packaging/print/UA-14-20g/</code>), printer visits site → sees the pack → clicks ⬇ PDF → ready-to-print file.</li>
+      <li data-lang="sk">Friction-less workflow pre tlačiarne: 12 PDF-originálov je v repo (packaging/print/UA-14-20g/), tlačiareň ide na stránku → vidí balenie → klik na ⬇ PDF → pripravený na tlač súbor.</li>
     </ul>
   </div>
 
@@ -6064,12 +6216,16 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk"><strong>Галерея пакування 90×160 мм</strong> у секції «Упаковка» — 11 SKU (6 чистих сирів + 5 міксів сир+горіх): Cheddar, Gouda, Mozzarella, Primaggio, Smoked Suluguni, Blue Royale + Cheddar/Almond, Gouda/Hazelnut, Mozzarella/Cashew, Primaggio/Walnut, Suluguni/Peanut.</li>
       <li data-lang="en"><strong>Packaging gallery 90×160 mm</strong> in the "Packaging" section — 11 SKUs (6 pure cheeses + 5 cheese+nut mixes): Cheddar, Gouda, Mozzarella, Primaggio, Smoked Suluguni, Blue Royale + Cheddar/Almond, Gouda/Hazelnut, Mozzarella/Cashew, Primaggio/Walnut, Suluguni/Peanut.</li>
+      <li data-lang="sk">Galéria balenia 90×160 mm v sekcii „Balenie" — 11 SKU (6 čistých syrov + 5 mixov syr+orech): Cheddar, Gouda, Mozzarella, Primaggio, Smoked Suluguni, Blue Royale + Cheddar/Almond, Gouda/Hazelnut, Mozzarella/Cashew, Primaggio/Walnut, Suluguni/Peanut.</li>
       <li data-lang="uk">Адаптивна grid-сітка з hover-ефектом, JPG 600px (~120 KB кожен), клік — повний розмір. Картки з назвою UA + EN + SKU кодом.</li>
       <li data-lang="en">Responsive grid with hover effect, JPG 600px (~120 KB each), click for full size. Cards include UA + EN names + SKU codes.</li>
+      <li data-lang="sk">Responzívna grid-mriežka s hover-efektom, JPG 600px (~120 KB každý), klik — plná veľkosť. Karty s názvom UA + EN + SKU kódom.</li>
       <li data-lang="uk">Друкарські файли (CMYK PDF + .ai source) — за запитом на vg@sneco.ua, в repo не публікуються (~80 МБ важких raster-зображень не варто заливати в публічний brand book).</li>
       <li data-lang="en">Print files (CMYK PDF + .ai source) — available on request from vg@sneco.ua, not published to repo (~80 MB of heavy raster artwork doesn't belong in the public brand book).</li>
+      <li data-lang="sk">Tlačové súbory (CMYK PDF + .ai source) — na žiadosť na vg@sneco.ua, v repo sa nepublikujú (~80 MB ťažkých raster-obrázkov nestojí za to nahrávať do verejnej brand book).</li>
       <li data-lang="uk">Publish-script оновлено: додано excludes для <code>*.ai</code>, <code>documents/packaging/small/print|screen|png|pdf/</code>, <code>*.bak_*</code> щоб важкі/неактуальні файли не пушились у repo.</li>
       <li data-lang="en">Publish script updated: added excludes for <code>*.ai</code>, <code>documents/packaging/small/print|screen|png|pdf/</code>, <code>*.bak_*</code> to prevent heavy/legacy files from being pushed to repo.</li>
+      <li data-lang="sk">Publish-script aktualizovaný: pridané excludes pre *.ai, documents/packaging/small/print|screen|png|pdf/, *.bak_* aby sa ťažké/neaktuálne súbory nepushovali do repo.</li>
     </ul>
   </div>
 
@@ -6078,14 +6234,19 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk"><strong>Нова секція «Команда &amp; орг-структура»</strong> у блоці «Вступ» — між «Про бренд» і «Історія».</li>
       <li data-lang="en"><strong>New "Team &amp; org structure" section</strong> in the "Intro" group, between "About" and "Story".</li>
+      <li data-lang="sk">Nová sekcia „Tím &amp; org-štruktúra" v bloku „Úvod" — medzi „O značke" a „História".</li>
       <li data-lang="uk">Інтерактивна орг-схема snEco UA з 4 колонками (Виробництво / Operations / Маркетинг / Продажі) і 19 вузлами. Колірне кодування: жовтий — фундатори/COO, зелений — звичайні позиції, червоний пунктир — вакансії, сірий — аутсорс, темний з зеленим тлом — крос-функційне.</li>
       <li data-lang="en">Interactive snEco UA org chart with 4 columns (Production / Operations / Marketing / Sales) and 19 nodes. Color-coded: yellow — founders/COO, green — standard, red dashed — vacancies, gray — outsourced, dark with green tint — cross-functional.</li>
+      <li data-lang="sk">Interaktívna org-schéma snEco UA so 4 stĺpcami (Výroba / Operations / Marketing / Predaj) a 19 uzlami. Farebné kódovanie: žltá — zakladatelia/COO, zelená — bežné pozície, červená čiarkovaná — voľné miesta, sivá — outsource, tmavá so zeleným pozadím — cross-funkčné.</li>
       <li data-lang="uk"><strong>Можна редагувати імена і ролі прямо в браузері</strong> (контролі: Перегляд / Редагування, Скинути, Експорт JSON). Зміни зберігаються в localStorage; для постійних правок — експорт JSON і надсилання Вадиму.</li>
       <li data-lang="en"><strong>Edit names and roles inline in the browser</strong> (controls: View / Edit, Reset, Export JSON). Changes saved in localStorage; for permanent updates, export JSON and send to Vadym.</li>
+      <li data-lang="sk">Možno upravovať mená a úlohy priamo v prehliadači (ovládanie: Prehliadanie / Úprava, Reset, Export JSON). Zmeny sa ukladajú v localStorage; pre trvalé úpravy — export JSON a poslanie Vadymovi.</li>
       <li data-lang="uk">Додано блок-спостереження: Вадим зараз закріплений за 5 ролями — найочевидніший вектор делегування. Підсвічено вакансію SMM.</li>
       <li data-lang="en">Added an observation block: Vadym currently wears 5 hats — the most obvious delegation vector. SMM vacancy highlighted.</li>
+      <li data-lang="sk">Pridaný observačný blok: Vadym je momentálne priradený k 5 úlohám — najzrejmejší vektor delegovania. Zvýraznené voľné miesto SMM.</li>
       <li data-lang="uk">Окремі блоки: <strong>Sneco SK</strong> (структура власності) і <strong>Ключові контакти</strong> (за функціями).</li>
       <li data-lang="en">Separate blocks: <strong>Sneco SK</strong> (ownership) and <strong>Key contacts</strong> (by function).</li>
+      <li data-lang="sk">Samostatné bloky: Sneco SK (štruktúra vlastníctva) a Kľúčové kontakty (podľa funkcií).</li>
     </ul>
   </div>
 
@@ -6094,20 +6255,28 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk"><strong>Структурне «схлопування» 24 → 17 розділів.</strong> Видалено надлишкову фрагментацію, документ став компактнішим без втрати змісту.</li>
       <li data-lang="en"><strong>Structural consolidation: 24 → 17 sections.</strong> Eliminated overlap and made the document more compact without losing content.</li>
+      <li data-lang="sk">Štrukturálne „zlúčenie" 24 → 17 sekcií. Odstránená zbytočná fragmentácia, dokument je kompaktnejší bez straty obsahu.</li>
       <li data-lang="uk">«Архітектура бренду» → інтегровано в «Про бренд» як sub-блок</li>
       <li data-lang="en">"Brand architecture" → integrated into "About the brand" as a sub-block</li>
+      <li data-lang="sk">„Architektúra značky" → integrované do „O značke" ako sub-blok</li>
       <li data-lang="uk">«Друк &amp; носії» → інтегровано в «Упаковку» як sub-блок</li>
       <li data-lang="en">"Print &amp; collateral" → integrated into "Packaging" as a sub-block</li>
+      <li data-lang="sk">„Tlač &amp; nosiče" → integrované do „Balenia" ako sub-blok</li>
       <li data-lang="uk">«PR &amp; press» + «Кризові комунікації» → об'єднано в одну секцію <strong>«Зовнішні комунікації»</strong> (proactive + reactive sub-блоки)</li>
       <li data-lang="en">"PR &amp; press" + "Crisis communications" → merged into <strong>"External communications"</strong> (proactive + reactive sub-blocks)</li>
+      <li data-lang="sk">„PR &amp; press" + „Krízová komunikácia" → zlúčené do jednej sekcie „Externé komunikácie" (proactive + reactive sub-bloky)</li>
       <li data-lang="uk">«Чеклист» + «Versioning» → об'єднано в <strong>«Maintenance»</strong> (compliance check + історія версій)</li>
       <li data-lang="en">"Checklist" + "Versioning" → merged into <strong>"Maintenance"</strong> (compliance check + version history)</li>
+      <li data-lang="sk">„Checklist" + „Versioning" → zlúčené do „Maintenance" (compliance check + história verzií)</li>
       <li data-lang="uk">«Логотип» + «Кольори» + «Шрифти» → об'єднано в <strong>«Візуальну систему»</strong> з трьома sub-блоками</li>
       <li data-lang="en">"Logo" + "Colors" + "Typography" → merged into <strong>"Visual system"</strong> with three sub-blocks</li>
+      <li data-lang="sk">„Logo" + „Farby" + „Písma" → zlúčené do „Vizuálneho systému" s tromi sub-blokmi</li>
       <li data-lang="uk">«Рекомендації» (внутрішнє todo для самого документа) — винесено у <code>BACKLOG.md</code> у репо. Не місце у публічному документі.</li>
       <li data-lang="en">"Recommendations" (internal to-do for the document itself) — moved to <code>BACKLOG.md</code> in the repo. Not appropriate for the public document.</li>
+      <li data-lang="sk">„Odporúčania" (interný todo pre samotný dokument) — presunuté do BACKLOG.md v repo. Nepatrí do verejného dokumentu.</li>
       <li data-lang="uk">Sidebar порядок упорядковано: «Точки контакту» переміщено в кінець «Застосування» — відповідає реальному порядку секцій у документі</li>
       <li data-lang="en">Sidebar order tidied: "Touchpoints" moved to the end of "Application" group — matches the actual section order in the document</li>
+      <li data-lang="sk">Sidebar poradie usporiadané: „Kontaktné body" presunuté na koniec „Použitia" — zodpovedá skutočnému poradiu sekcií v dokumente</li>
     </ul>
   </div>
 
@@ -6116,20 +6285,28 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk">Нова секція <strong>Документи</strong> — публічні сертифікати, нагороди, патенти, ТМ, lab tests доступні для прямого завантаження (35 PDF, 11 MB)</li>
       <li data-lang="en">New <strong>Documents</strong> section — public certificates, awards, patents, trademarks and lab tests available for direct download (35 PDFs, 11 MB)</li>
+      <li data-lang="sk">Nová sekcia Dokumenty — verejné certifikáty, ocenenia, patenty, OZ, lab testy dostupné na priame stiahnutie (35 PDF, 11 MB)</li>
       <li data-lang="uk">snEco UA: FSSC 22000 v6/v5.1/TÜV NORD, HACCP/ISO 22000, патент №139035, ТМ №230269, CE декларація, ТУ, УКТЗЕД, SIAL Grand Prix, Retail Group 25, Germany programs, Зелений журавлик, EU PEF, USA FDA</li>
       <li data-lang="en">snEco UA: FSSC 22000 v6/v5.1/TÜV NORD, HACCP/ISO 22000, Patent No. 139035, TM No. 230269, CE declaration, TU, UKTZED, SIAL Grand Prix, Retail Group 25, Germany programs, Green Crane ecolabel, EU PEF, USA FDA</li>
+      <li data-lang="sk">snEco UA: FSSC 22000 v6/v5.1/TÜV NORD, HACCP/ISO 22000, patent č. 139035, OZ č. 230269, CE vyhlásenie, TÚ, UKTZÚED, SIAL Grand Prix, Retail Group 25, Germany programs, Zelený žeriav, EU PEF, USA FDA</li>
       <li data-lang="uk">Sneco SK: HACCP, IFS Food v8 (audit letters), GS1, Declaration of Conformity, ТМ SK/CZ/PL, 5 Eurofins lab reports</li>
       <li data-lang="en">Sneco SK: HACCP, IFS Food v8 (audit letters), GS1, Declaration of Conformity, TM SK/CZ/PL, 5 Eurofins lab reports</li>
+      <li data-lang="sk">Sneco SK: HACCP, IFS Food v8 (audit letters), GS1, Declaration of Conformity, OZ SK/CZ/PL, 5 Eurofins lab reports</li>
       <li data-lang="uk">Окремий блок «Конфіденційні документи» — список того, що надається тільки за запитом (контракти, фінанси, корпоративка, дозволи RÚVZ)</li>
       <li data-lang="en">Separate "Confidential documents" block — list of items provided only on request (contracts, financials, corporate, RÚVZ permits)</li>
+      <li data-lang="sk">Samostatný blok „Dôverné dokumenty" — zoznam toho, čo sa poskytuje len na žiadosť (zmluvy, financie, korporátne dáta, povolenia RÚVZ)</li>
       <li data-lang="uk">Виправлено застарілий заголовок у footer: <code>Brand Guide v2.1 → v2.7</code></li>
       <li data-lang="en">Fixed stale footer label: <code>Brand Guide v2.1 → v2.7</code></li>
+      <li data-lang="sk">Opravená zastaraná hlavička vo footer: Brand Guide v2.1 → v2.7</li>
       <li data-lang="uk"><strong>Header переосмислено</strong>: замість кольорового бару зі свотчами і шрифтами — тепер North Star (позиціонна заява), маленький wordmark і метадані. Кольори/шрифти і так мають окремі повноцінні секції.</li>
       <li data-lang="en"><strong>Header redesigned</strong>: replaced the color/font swatch strip with a North Star (positioning statement), small wordmark and metadata. Colors and fonts already have their own full-fledged sections.</li>
+      <li data-lang="sk">Header prepracovaný: namiesto farebného baru so swatchmi a písmami — teraz North Star (pozičné vyhlásenie), malý wordmark a metadáta. Farby/písma majú aj tak samostatné plnohodnotné sekcie.</li>
       <li data-lang="uk"><strong>Перейменовано «Brand Guide» → «Brand Bible»</strong> у title і footer — документ еволюціонує в повноцінну операційну біблію snEco, не просто бренд-довідник.</li>
       <li data-lang="en"><strong>Renamed "Brand Guide" → "Brand Bible"</strong> in title and footer — the document is evolving into a full operating bible for snEco, not just a brand reference.</li>
+      <li data-lang="sk">Premenované „Brand Guide" → „Brand Bible" v title a footer — dokument sa vyvíja do plnohodnotnej operatívnej biblie snEco, nielen brand-príručky.</li>
       <li data-lang="uk"><strong>Виправлено температуру сушки VacWave Bio Nutrition: <code>24-26°C → 36-38°C</code></strong> у всіх 17 згадках. Стара цифра була типографічною помилкою з ранніх ітерацій.</li>
       <li data-lang="en"><strong>Fixed VacWave Bio Nutrition drying temperature: <code>24-26°C → 36-38°C</code></strong> across all 17 mentions. The old figure was a typographical error from earlier iterations.</li>
+      <li data-lang="sk">Opravená teplota sušenia VacWave Bio Nutrition: 24-26°C → 36-38°C vo všetkých 17 zmienkach. Staré číslo bola typografická chyba zo skorších iterácií.</li>
     </ul>
   </div>
 
@@ -6138,10 +6315,13 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk">Маніфест переписано: голос засновників, 3 правила (Один інгредієнт / Холодна технологія / Власна енергія), підпис «— Vadym і Pylyp Gryshyn», без шаблонних списків</li>
       <li data-lang="en">Manifesto rewritten: founders' voice, 3 rules (One ingredient / Cold technology / Our own energy), signature "— Vadym and Pylyp Gryshyn", no formulaic lists</li>
+      <li data-lang="sk">Manifest prepísaný: hlas zakladateľov, 3 pravidlá (Jedna ingrediencia / Studená technológia / Vlastná energia), podpis „— Vadym a Pylyp Gryshyn", bez šablónových zoznamov</li>
       <li data-lang="uk">Avatar Mark / Favicon перероблено з нуля: без зеленого листка, mono-wordmark (B на світлому, W на темному), реальні preview 1:1, оновлені правила центрування</li>
       <li data-lang="en">Avatar Mark / Favicon rebuilt from scratch: no green leaf, mono wordmark (B on light, W on dark), real 1:1 previews, updated centering rules</li>
+      <li data-lang="sk">Avatar Mark / Favicon prerobený od nuly: bez zeleného lístka, mono-wordmark (B na svetlom, W na tmavom), skutočné preview 1:1, aktualizované pravidlá centrovania</li>
       <li data-lang="uk">Прізвище засновників: Hryshyn → <strong>Gryshyn</strong> у всіх місцях (boilerplate, цитати, email-підписи, кризова команда)</li>
       <li data-lang="en">Founder surname: Hryshyn → <strong>Gryshyn</strong> across all instances (boilerplate, quotes, email signatures, crisis team)</li>
+      <li data-lang="sk">Priezvisko zakladateľov: Hryshyn → Gryshyn vo všetkých miestach (boilerplate, citáty, email-podpisy, krízový tím)</li>
     </ul>
   </div>
 
@@ -6150,18 +6330,25 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk">Додано нову стартову секцію <strong>Маніфест</strong> — емоційне кредо бренду, у що віримо / чого не робимо / north star</li>
       <li data-lang="en">Added new opening <strong>Manifesto</strong> section — emotional brand creed, what we believe / what we don't do / north star</li>
+      <li data-lang="sk">Pridaná nová úvodná sekcia Manifest — emocionálne kredo značky, v čo veríme / čo nerobíme / north star</li>
       <li data-lang="uk">Іменна карта конкурентів у Story (Whisps, ParmCrisps, Moon Cheese, Cello, EU/UA local) з відмінностями</li>
       <li data-lang="en">Named competitor map in Story (Whisps, ParmCrisps, Moon Cheese, Cello, EU/UA local) with differentiation</li>
+      <li data-lang="sk">Pomenovaná mapa konkurentov v Story (Whisps, ParmCrisps, Moon Cheese, Cello, EÚ/UA local) s rozdielmi</li>
       <li data-lang="uk">Avatar Mark / Favicon блок у Logo: моно-знаки для соцмереж, Apple Touch Icon, favicon, OG image</li>
       <li data-lang="en">Avatar Mark / Favicon block in Logo: mono marks for social, Apple Touch Icon, favicon, OG image</li>
+      <li data-lang="sk">Avatar Mark / Favicon blok v Logo: mono-značky pre sociálne siete, Apple Touch Icon, favicon, OG image</li>
       <li data-lang="uk">Нова секція <strong>Точки контакту</strong> — мапа ритейл / digital / партнерських / людських touchpoints зі стандартами для кожної</li>
       <li data-lang="en">New <strong>Touchpoints</strong> section — retail / digital / partner / human touchpoint map with standards for each</li>
+      <li data-lang="sk">Nová sekcia Kontaktné body — mapa retail / digital / partnerských / ľudských touchpointov so štandardmi pre každý</li>
       <li data-lang="uk">Нова секція <strong>Кризові комунікації</strong> — 4 готових сценарії (recall, скарга, війна, SMM-помилка) + кризова команда</li>
       <li data-lang="en">New <strong>Crisis communications</strong> section — 4 ready scenarios (recall, complaint, war, SMM mistake) + crisis team</li>
+      <li data-lang="sk">Nová sekcia Krízová komunikácia — 4 pripravené scenáre (recall, sťažnosť, vojna, SMM-chyba) + krízový tím</li>
       <li data-lang="uk">Словник <strong>DO / CAREFUL / NEVER</strong> у Legal — конкретні слова, не абстрактні правила</li>
       <li data-lang="en"><strong>DO / CAREFUL / NEVER</strong> vocabulary in Legal — concrete words, not abstract rules</li>
+      <li data-lang="sk">Slovník DO / CAREFUL / NEVER v Legal — konkrétne slová, nie abstraktné pravidlá</li>
       <li data-lang="uk">Нова секція <strong>Стратегічний roadmap</strong> — 3 фази (укріплення EU+US → масштабування → лідерство категорії) з KPI</li>
       <li data-lang="en">New <strong>Strategic roadmap</strong> section — 3 phases (EU+US consolidation → scaling → category leadership) with KPIs</li>
+      <li data-lang="sk">Nová sekcia Strategický roadmap — 3 fázy (posilnenie EÚ+US → škálovanie → vedenie kategórie) s KPI</li>
     </ul>
   </div>
 
@@ -6170,10 +6357,13 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk">Підключено справжні фірмові шрифти: <strong>Qanelas</strong> (10 ваг від Thin до Black + 4 Italic) і <strong>HighVoltage Rough</strong></li>
       <li data-lang="en">Wired up actual brand fonts: <strong>Qanelas</strong> (10 weights from Thin to Black + 4 Italic) and <strong>HighVoltage Rough</strong></li>
+      <li data-lang="sk">Pripojené skutočné firemné písma: Qanelas (10 vah od Thin po Black + 4 Italic) a HighVoltage Rough</li>
       <li data-lang="uk">42 файли в <code>brand/fonts/</code>: WOFF2 (web) + TTF (fallback) для кожної ваги</li>
       <li data-lang="en">42 files in <code>brand/fonts/</code>: WOFF2 (web) + TTF (fallback) for every weight</li>
+      <li data-lang="sk">42 súborov v brand/fonts/: WOFF2 (web) + TTF (fallback) pre každú váhu</li>
       <li data-lang="uk">Manrope-fallback видалено з пріоритетної логіки — використовується лише при відсутності файлів</li>
       <li data-lang="en">Manrope fallback removed from primary logic — used only if files are missing</li>
+      <li data-lang="sk">Manrope-fallback odstránený z prioritnej logiky — používa sa len pri neprítomnosti súborov</li>
     </ul>
   </div>
 
@@ -6182,10 +6372,13 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk">Підключено офіційні SVG-логотипи: 4 варіанти (M / MB / B / W) × 3 формати (SVG / PDF / AI) у папці <code>brand/logo/</code></li>
       <li data-lang="en">Wired up official SVG logos: 4 variants (M / MB / B / W) × 3 formats (SVG / PDF / AI) in <code>brand/logo/</code></li>
+      <li data-lang="sk">Pripojené oficiálne SVG-logá: 4 varianty (M / MB / B / W) × 3 formáty (SVG / PDF / AI) v priečinku brand/logo/</li>
       <li data-lang="uk">Додано таблицю «Файли логотипу — система» з прямими посиланнями на завантаження</li>
       <li data-lang="en">Added "Logo files — system" table with direct download links</li>
+      <li data-lang="sk">Pridaná tabuľka „Súbory loga — systém" s priamymi linkami na stiahnutie</li>
       <li data-lang="uk">Кожен варіант відображається на правильному фоні: M (білий) / MB (чорний) / B (жовтий) / W (зелений)</li>
       <li data-lang="en">Each variant renders on its correct background: M (white) / MB (black) / B (yellow) / W (green)</li>
+      <li data-lang="sk">Každý variant sa zobrazuje na správnom pozadí: M (biele) / MB (čierne) / B (žlté) / W (zelené)</li>
     </ul>
   </div>
 
@@ -6194,20 +6387,28 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk">Тимчасовий PNG логотипу замість SVG-апроксимації (пізніше замінено на офіційні SVG)</li>
       <li data-lang="en">Temporary PNG logo instead of SVG approximation (later replaced with official SVGs)</li>
+      <li data-lang="sk">Dočasné PNG logo namiesto SVG-aproximácie (neskôr nahradené oficiálnymi SVG)</li>
       <li data-lang="uk">Нова секція <strong>Історія &amp; технологія</strong>: timeline 2016 → 2026, цитата засновників, sustainability-блок</li>
       <li data-lang="en">New <strong>Story &amp; technology</strong> section: 2016 → 2026 timeline, founders' narrative, sustainability block</li>
+      <li data-lang="sk">Nová sekcia História &amp; technológia: timeline 2016 → 2026, citát zakladateľov, sustainability-blok</li>
       <li data-lang="uk">Нова секція <strong>Меседжі &amp; слогани</strong>: claims library з фактологічним підкріпленням, формули для каналів, сценарії використання</li>
       <li data-lang="en">New <strong>Messaging &amp; slogans</strong> section: claims library with substantiation, channel formulas, usage scenarios</li>
+      <li data-lang="sk">Nová sekcia Posolstvá &amp; slogany: claims library s faktovým podkladom, formuly pre kanály, scenáre použitia</li>
       <li data-lang="uk">Нова секція <strong>PR &amp; press kit</strong>: засновники з цитатами, boilerplate (50/100/200 слів), 3 кути сторі, готові відповіді на типові питання</li>
       <li data-lang="en">New <strong>PR &amp; press kit</strong> section: founders with quotes, boilerplate (50/100/200 words), 3 story angles, Q&amp;A bank</li>
+      <li data-lang="sk">Nová sekcia PR &amp; press kit: zakladatelia s citátmi, boilerplate (50/100/200 slov), 3 uhly príbehu, pripravené odpovede na typické otázky</li>
       <li data-lang="uk">Нова секція <strong>Sales playbook</strong>: дерево заперечень, baseline комерційні умови, що sales може запропонувати</li>
       <li data-lang="en">New <strong>Sales playbook</strong> section: objection tree, commercial baseline, what sales can offer out of the box</li>
+      <li data-lang="sk">Nová sekcia Sales playbook: strom námietok, baseline obchodné podmienky, čo môže sales ponúknuť</li>
       <li data-lang="uk">Нова секція <strong>Legal &amp; substantiation</strong>: claim → доказ map, EU health claims guide, алерген-попередження, ™/® rules, NASA reconciliation</li>
       <li data-lang="en">New <strong>Legal &amp; substantiation</strong> section: claim → proof map, EU health claims guide, allergen warnings, ™/® rules, NASA reconciliation</li>
+      <li data-lang="sk">Nová sekcia Legal &amp; substantiation: claim → dôkaz mapa, EU health claims guide, alergén-upozornenia, ™/® rules, NASA reconciliation</li>
       <li data-lang="uk">Уточнення метрик: 76% online repeat (D2C) ≠ 100% reorder (B2B) — це різні KPI</li>
       <li data-lang="en">Metric disambiguation: 76% online repeat (D2C) ≠ 100% reorder (B2B) — these are different KPIs</li>
+      <li data-lang="sk">Spresnenie metrík: 76% online repeat (D2C) ≠ 100% reorder (B2B) — sú to rôzne KPI</li>
       <li data-lang="uk">EU TM кейс «Sneko» (Monolith, справа №000072423) врахований у секції Legal</li>
       <li data-lang="en">EU TM "Sneko" case (Monolith, No. 000072423) reflected in the Legal section</li>
+      <li data-lang="sk">EÚ OZ prípad „Sneko" (Monolith, prípad č. 000072423) zohľadnený v sekcii Legal</li>
     </ul>
   </div>
 
@@ -6216,36 +6417,52 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk">Додано перемикач мови UA / EN — дві паралельні версії в одному файлі</li>
       <li data-lang="en">Added UA / EN language toggle — two parallel versions in one file</li>
+      <li data-lang="sk">Pridaný prepínač jazyka UA / EN — dve paralelné verzie v jednom súbore</li>
       <li data-lang="uk">Кольори узгоджено з офіційним брендгайдом 2024: жовтий #FEBF27, зелений #96C11F</li>
       <li data-lang="en">Colors aligned with official 2024 brand guide: yellow #FEBF27, green #96C11F</li>
+      <li data-lang="sk">Farby zladené s oficiálnym brand-guideom 2024: žltá #FEBF27, zelená #96C11F</li>
       <li data-lang="uk">Додано @font-face для Qanelas + HighVoltage Rough (плюс плашка про fallback)</li>
       <li data-lang="en">Added @font-face for Qanelas + HighVoltage Rough (plus fallback notice)</li>
+      <li data-lang="sk">Pridané @font-face pre Qanelas + HighVoltage Rough (plus poznámka o fallback)</li>
       <li data-lang="uk">Прибрано згадку «NASA» з опису технології — тільки VacWave Bio Nutrition</li>
       <li data-lang="en">Removed "NASA" reference from the technology description — VacWave Bio Nutrition only</li>
+      <li data-lang="sk">Odstránená zmienka „NASA" z popisu technológie — iba VacWave Bio Nutrition</li>
       <li data-lang="uk">Додано окрему секцію «Архітектура бренду» з правилами вживання назв</li>
       <li data-lang="en">Added a "Brand architecture" section with naming rules</li>
+      <li data-lang="sk">Pridaná samostatná sekcia „Architektúra značky" s pravidlami používania názvov</li>
       <li data-lang="uk">Оновлено мапу ринків: додано SE, EE, DE; прибрано неактуальні</li>
       <li data-lang="en">Updated market map: added SE, EE, DE; removed outdated entries</li>
+      <li data-lang="sk">Aktualizovaná mapa trhov: pridané SE, EE, DE; odstránené neaktuálne</li>
       <li data-lang="uk">Повторні покупки оновлено до 76% (online)</li>
       <li data-lang="en">Repeat-purchase rate updated to 76% (online)</li>
+      <li data-lang="sk">Opakované nákupy aktualizované na 76% (online)</li>
       <li data-lang="uk">Виправлено регуляторів: Держпродспоживслужба (UA), ÚVZ SR + EU 1169/2011 (SK)</li>
       <li data-lang="en">Fixed regulators: State Service for Food Safety (UA), Public Health Authority of SR + EU 1169/2011 (SK)</li>
+      <li data-lang="sk">Opravení regulátori: Deržprodspoživsluha (UA), ÚVZ SR + EU 1169/2011 (SK)</li>
       <li data-lang="uk">Додано IFS Food v8 у сертифікати SK і чіп hero</li>
       <li data-lang="en">Added IFS Food v8 to SK certifications and the hero chip</li>
+      <li data-lang="sk">Pridané IFS Food v8 do certifikátov SK a hero čipu</li>
       <li data-lang="uk">ISO 14024 переписано як «Type I Ecolabel · ISO 14024»</li>
       <li data-lang="en">ISO 14024 rephrased as "Type I Ecolabel · ISO 14024"</li>
+      <li data-lang="sk">ISO 14024 prepísané ako „Type I Ecolabel · ISO 14024"</li>
       <li data-lang="uk">Базовий PNG логотип (~1.7МБ base64) замінено на inline SVG</li>
       <li data-lang="en">The base64 PNG logo (~1.7MB) replaced with inline SVG</li>
+      <li data-lang="sk">Základné PNG logo (~1,7 MB base64) nahradené inline SVG</li>
       <li data-lang="uk">Виправлено баги навігації: <code>event</code> передається явно, є хеш-якорі</li>
       <li data-lang="en">Navigation bugs fixed: <code>event</code> is passed explicitly, hash anchors added</li>
+      <li data-lang="sk">Opravené bugy navigácie: event sa odovzdáva explicitne, sú hash-kotvy</li>
       <li data-lang="uk">Додано бургер-меню, print-стилі, accessibility-фікси</li>
       <li data-lang="en">Added burger menu, print styles, accessibility fixes</li>
+      <li data-lang="sk">Pridané burger-menu, print-štýly, accessibility-fixy</li>
       <li data-lang="uk">Прибрано чутливі дані: імена партнерів, обсяги виробництва</li>
       <li data-lang="en">Removed sensitive data: partner names, production capacities</li>
+      <li data-lang="sk">Odstránené citlivé údaje: mená partnerov, objemy výroby</li>
       <li data-lang="uk">Розмежовано SNÉCO (логотип) і snEco (текстова назва)</li>
       <li data-lang="en">Clarified SNÉCO (logotype) vs snEco (textual brand name)</li>
+      <li data-lang="sk">Rozlíšené SNÉCO (logo) a snEco (textový názov)</li>
       <li data-lang="uk">Хештег #100cheese замінено на #realcheese</li>
       <li data-lang="en">Hashtag #100cheese replaced with #realcheese</li>
+      <li data-lang="sk">Hashtag #100cheese nahradený #realcheese</li>
     </ul>
   </div>
 
@@ -6254,6 +6471,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk">Перша інтерактивна HTML-версія брендгайда (sidebar, swatches, чеклист)</li>
       <li data-lang="en">First interactive HTML version of the brand guide (sidebar, swatches, checklist)</li>
+      <li data-lang="sk">Prvá interaktívna HTML-verzia brand-guideu (sidebar, swatches, checklist)</li>
     </ul>
   </div>
 
@@ -6262,6 +6480,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <ul class="changelog-list">
       <li data-lang="uk">Базовий PDF-брендгайд: логотип, кольори, шрифти, носії</li>
       <li data-lang="en">Original PDF brand guide: logo, colors, fonts, collateral</li>
+      <li data-lang="sk">Základný PDF-brand-guide: logo, farby, písma, nosiče</li>
     </ul>
   </div>
 </section>
@@ -6429,10 +6648,22 @@ h3.block-title:first-of-type { margin-top: 0; }
       document.body.classList.remove('lang-uk','lang-en','lang-sk');
       document.body.classList.add('lang-' + lang);
       document.documentElement.lang = lang;
-      document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b === btn));
+      // Sync active state across ALL .lang-btn elements (sidebar + floater)
+      document.querySelectorAll('.lang-btn').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-set-lang') === lang);
+      });
+      try { localStorage.setItem('sneco_lang', lang); } catch (e) {}
       applySkFallback();
     });
   });
+  // Restore last-used language on load
+  try {
+    const savedLang = localStorage.getItem('sneco_lang');
+    if (savedLang && ['uk','en','sk'].includes(savedLang) && savedLang !== 'uk') {
+      const targetBtn = document.querySelector('.lang-btn[data-set-lang="' + savedLang + '"]');
+      if (targetBtn) targetBtn.click();
+    }
+  } catch (e) {}
   applySkFallback();
 
   // burger
