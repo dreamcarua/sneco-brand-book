@@ -857,6 +857,261 @@ h3.block-title:first-of-type { margin-top: 0; }
 .status-priority { background: rgba(254,191,39,0.20); color: #7a5a00; }
 .status-new      { background: rgba(59,130,246,0.12); color: #1d4ed8; }
 
+/* Clickable market cards (v2.36) */
+.market-card.is-clickable {
+  cursor: pointer; transition: transform .12s, box-shadow .12s, border-color .12s;
+  position: relative;
+}
+.market-card.is-clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  border-color: var(--yellow);
+}
+.market-card.is-clickable::after {
+  content: '↓'; position: absolute; right: 14px; top: 14px;
+  font-size: 16px; color: var(--text-muted); font-weight: 700;
+  opacity: 0; transition: opacity .15s;
+}
+.market-card.is-clickable:hover::after { opacity: 1; }
+
+/* Market detail panel (v2.36) */
+.market-detail {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px;
+  margin-bottom: 24px;
+  scroll-margin-top: 80px;
+}
+.market-detail-header {
+  display: flex; align-items: center; gap: 16px;
+  padding-bottom: 18px; margin-bottom: 24px;
+  border-bottom: 2px solid var(--black-05);
+}
+.market-detail-flag {
+  font-size: 36px; line-height: 1;
+  width: 56px; height: 56px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--black-05); border-radius: 10px;
+}
+.market-detail-title-block { flex: 1; }
+.market-detail-title {
+  font-size: 24px; font-weight: 800; letter-spacing: -0.3px;
+  margin-bottom: 4px; line-height: 1.15;
+}
+.market-detail-meta {
+  font-size: 12px; color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+/* Distributor block */
+.distrib-block {
+  background: var(--black);
+  color: var(--white);
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.distrib-eyebrow {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--yellow);
+  margin-bottom: 6px;
+}
+.distrib-name {
+  font-size: 22px; font-weight: 800; letter-spacing: -0.3px;
+  margin-bottom: 6px; color: var(--white);
+}
+.distrib-legal {
+  font-size: 12px; color: rgba(255,255,255,0.7);
+  line-height: 1.6; margin-bottom: 18px;
+}
+.distrib-contacts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+.distrib-contact {
+  background: rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 12.5px; line-height: 1.55;
+}
+.distrib-contact-name {
+  font-weight: 700; font-size: 13.5px;
+  color: var(--white); margin-bottom: 2px;
+}
+.distrib-contact-role {
+  font-size: 11px; color: var(--yellow);
+  letter-spacing: 0.04em; margin-bottom: 8px;
+  text-transform: uppercase; font-weight: 600;
+}
+.distrib-contact-row {
+  color: rgba(255,255,255,0.85);
+  display: flex; gap: 6px; align-items: flex-start;
+}
+.distrib-contact-row a {
+  color: rgba(255,255,255,0.85); text-decoration: none;
+  border-bottom: 1px dashed rgba(255,255,255,0.25);
+}
+.distrib-contact-row a:hover { color: var(--yellow); border-color: var(--yellow); }
+.distrib-contact-icon {
+  flex-shrink: 0; width: 14px; opacity: 0.55; font-size: 11px;
+}
+
+/* Sub-block within market detail */
+.market-subblock {
+  margin-top: 28px;
+}
+.market-subblock-title {
+  font-size: 16px; font-weight: 800; letter-spacing: -0.2px;
+  margin-bottom: 4px;
+  display: flex; align-items: center; gap: 8px;
+}
+.market-subblock-meta {
+  font-size: 11px; color: var(--text-muted);
+  margin-bottom: 14px; letter-spacing: 0.04em;
+}
+
+/* KPI tiles for market summaries */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin: 14px 0 18px;
+}
+.kpi-tile {
+  background: var(--black-05);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+.kpi-tile.is-accent { background: rgba(254,191,39,0.18); }
+.kpi-tile.is-dark { background: var(--black); color: var(--white); }
+.kpi-tile-value {
+  font-size: 22px; font-weight: 800; letter-spacing: -0.4px;
+  line-height: 1.1; margin-bottom: 3px;
+}
+.kpi-tile.is-dark .kpi-tile-value { color: var(--yellow); }
+.kpi-tile-label {
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--text-muted);
+}
+.kpi-tile.is-dark .kpi-tile-label { color: rgba(255,255,255,0.7); }
+
+/* Stylized data table for sales reports */
+.sales-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 12.5px;
+  margin: 12px 0;
+}
+.sales-table th, .sales-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.sales-table th {
+  background: var(--black-05);
+  font-size: 10.5px; letter-spacing: 0.08em;
+  text-transform: uppercase; font-weight: 700;
+  color: var(--text-muted);
+}
+.sales-table td.num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.sales-table tr.total td {
+  background: var(--yellow); color: var(--black);
+  font-weight: 800;
+}
+
+/* Document download row */
+.dl-row {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  margin-top: 16px;
+}
+.dl-pdf {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 12px 16px;
+  text-decoration: none; color: var(--text);
+  transition: transform .12s, border-color .12s, box-shadow .12s;
+  font-size: 12.5px;
+  flex: 1 1 240px; max-width: 380px;
+}
+.dl-pdf:hover {
+  transform: translateY(-1px);
+  border-color: var(--yellow);
+  box-shadow: 0 4px 12px rgba(254,191,39,0.20);
+}
+.dl-pdf-icon {
+  width: 36px; height: 36px;
+  background: var(--yellow); color: var(--black);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 11px; letter-spacing: -0.04em;
+  flex-shrink: 0;
+}
+.dl-pdf-name { font-weight: 700; line-height: 1.3; }
+.dl-pdf-meta { font-size: 10.5px; color: var(--text-muted); margin-top: 2px; }
+
+/* Channel chip */
+.chan-chips {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin: 8px 0 12px;
+}
+.chan-chip {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+  background: var(--black-05); color: var(--text);
+  padding: 4px 10px; border-radius: 14px;
+}
+.chan-chip.is-yellow { background: var(--yellow); color: var(--black); font-weight: 700; }
+.chan-chip.is-dark { background: var(--black); color: var(--yellow); }
+
+/* Price segment bar */
+.seg-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 10px;
+  align-items: center;
+  margin: 6px 0;
+  font-size: 12px;
+}
+.seg-bar {
+  height: 18px; border-radius: 4px;
+  display: flex; align-items: center;
+  padding: 0 8px;
+  color: var(--text); font-weight: 700; font-size: 10.5px;
+}
+.seg-bar.is-current {
+  background: var(--yellow); color: var(--black);
+}
+.seg-bar.is-other {
+  background: var(--black-05); color: var(--text-muted);
+}
+
+/* Bar viz for sales over time */
+.bar-viz {
+  display: flex; align-items: flex-end; gap: 2px;
+  height: 80px; padding: 8px 0; margin: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.bar-viz .bar {
+  flex: 1; min-width: 4px;
+  background: var(--yellow);
+  border-radius: 2px 2px 0 0;
+  transition: opacity .12s;
+}
+.bar-viz .bar:hover { opacity: 0.75; }
+.bar-viz .bar.is-cheddar { background: var(--green); }
+.bar-viz-legend {
+  display: flex; gap: 14px;
+  font-size: 11px; color: var(--text-muted);
+  margin-top: 4px;
+}
+.bar-viz-legend-dot {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
 /* RECOMMENDATIONS */
 .rec-item {
   display: flex; gap: 16px; align-items: flex-start;
@@ -1784,7 +2039,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Bible v2.35 · 2026
+    Brand Bible v2.36 · 2026
   </div>
 </nav>
 
@@ -1798,7 +2053,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
     <span data-lang="sk">Jedna ingrediencia. <span class="qr-ns-accent">Žiadne kompromisy.</span> Syrový snack 21. storočia.</span>
   </div>
-  <div class="qr-meta">v2.35 · 2026</div>
+  <div class="qr-meta">v2.36 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -5797,12 +6052,12 @@ h3.block-title:first-of-type { margin-top: 0; }
   <div class="section-eyebrow"><span data-lang="uk">Стратегія</span><span data-lang="en">Strategy</span><span data-lang="sk">Stratégia</span></div>
   <h2 class="section-title"><span data-lang="uk">Активні та пріоритетні ринки</span><span data-lang="en">Active &amp; priority markets</span><span data-lang="sk">Aktívne a prioritné trhy</span></h2>
   <div class="section-lead">
-    <span data-lang="uk">Поточна географія snEco — 4 активних ринки (UA, SK, SE, EE) і 4 пріоритетних (PL, DE, US, ME). Snapshot оновлюється квартально. Стратегія розгортання по фазах — у наступному розділі «Стратегічний roadmap».</span>
-    <span data-lang="en">snEco's current geography — 4 active markets (UA, SK, SE, EE) and 4 priority ones (PL, DE, US, ME). Snapshot is refreshed quarterly. The phased rollout strategy lives in the next section, "Strategic roadmap".</span><span data-lang="sk">Aktuálna geografia snEco — 4 aktívne trhy (UA, SK, SE, EE) a 4 prioritné (PL, DE, US, ME). Snapshot sa obnovuje štvrťročne. Fázová stratégia rozvoja je v ďalšej sekcii „Strategický roadmap".</span>
+    <span data-lang="uk">Поточна географія snEco — 3 активних ринки (UA, SE, PL) і 6 пріоритетних (SK, CZ, HU, DE, US, ME). Клік на картку — деталі ринку: дистриб'ютор, контакти, контракти, аналіз, звіти. Snapshot оновлюється квартально.</span>
+    <span data-lang="en">snEco's current geography — 3 active markets (UA, SE, PL) and 6 priority ones (SK, CZ, HU, DE, US, ME). Click a card for market details: distributor, contacts, contracts, analysis, reports. Snapshot is refreshed quarterly.</span><span data-lang="sk">Aktuálna geografia snEco — 3 aktívne trhy (UA, SE, PL) a 6 prioritných (SK, CZ, HU, DE, US, ME). Kliknutím na kartu zobrazíte detail trhu: distribútor, kontakty, zmluvy, analýza, reporty. Snapshot sa obnovuje štvrťročne.</span>
   </div>
 
-  <h3 class="block-title"><span data-lang="uk">Активні та пріоритетні ринки</span><span data-lang="en">Active &amp; priority markets</span><span data-lang="sk">Aktívne a prioritné trhy</span></h3>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+  <h3 class="block-title">🟢 <span data-lang="uk">Активні ринки</span><span data-lang="en">Active markets</span><span data-lang="sk">Aktívne trhy</span></h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px">
     <div class="market-card">
       <div class="market-flag">🇺🇦</div>
       <div>
@@ -5811,35 +6066,47 @@ h3.block-title:first-of-type { margin-top: 0; }
         <div class="market-status status-active"><span data-lang="uk">Активний</span><span data-lang="en">Active</span><span data-lang="sk">Aktívny</span></div>
       </div>
     </div>
+    <a href="#mkt-sweden" class="market-card is-clickable" onclick="event.preventDefault();document.getElementById('mkt-sweden').scrollIntoView({behavior:'smooth',block:'start'});" style="text-decoration:none;color:inherit">
+      <div class="market-flag">🇸🇪</div>
+      <div>
+        <div class="market-name"><span data-lang="uk">Швеція</span><span data-lang="en">Sweden</span><span data-lang="sk">Švédsko</span></div>
+        <div class="market-note"><span data-lang="uk">Ексклюзивний дистриб'ютор: Arvid Nordquist HAB. Лістинг ICA + Coop з жовтня 2025. Cheddar + Gouda 28g.</span><span data-lang="en">Exclusive distributor: Arvid Nordquist HAB. Listed in ICA + Coop since October 2025. Cheddar + Gouda 28g.</span><span data-lang="sk">Exkluzívny distribútor: Arvid Nordquist HAB. Listing v ICA + Coop od októbra 2025. Cheddar + Gouda 28g.</span></div>
+        <div class="market-status status-active"><span data-lang="uk">Активний · деталі ↓</span><span data-lang="en">Active · details ↓</span><span data-lang="sk">Aktívny · detaily ↓</span></div>
+      </div>
+    </a>
+    <a href="#mkt-poland" class="market-card is-clickable" onclick="event.preventDefault();document.getElementById('mkt-poland').scrollIntoView({behavior:'smooth',block:'start'});" style="text-decoration:none;color:inherit">
+      <div class="market-flag">🇵🇱</div>
+      <div>
+        <div class="market-name"><span data-lang="uk">Польща</span><span data-lang="en">Poland</span><span data-lang="sk">Poľsko</span></div>
+        <div class="market-note"><span data-lang="uk">Ексклюзивний дистриб'ютор: Sofio Sp. z o.o. (Warszawa). ТМ зареєстровано лютий 2026.</span><span data-lang="en">Exclusive distributor: Sofio Sp. z o.o. (Warsaw). TM registered February 2026.</span><span data-lang="sk">Exkluzívny distribútor: Sofio Sp. z o.o. (Varšava). OZ zaregistrovaná február 2026.</span></div>
+        <div class="market-status status-active"><span data-lang="uk">Активний · деталі ↓</span><span data-lang="en">Active · details ↓</span><span data-lang="sk">Aktívny · detaily ↓</span></div>
+      </div>
+    </a>
+  </div>
+
+  <h3 class="block-title">🟡 <span data-lang="uk">Пріоритетні ринки</span><span data-lang="en">Priority markets</span><span data-lang="sk">Prioritné trhy</span></h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
     <div class="market-card">
       <div class="market-flag">🇸🇰</div>
       <div>
         <div class="market-name"><span data-lang="uk">Словаччина</span><span data-lang="en">Slovakia</span><span data-lang="sk">Slovensko</span></div>
-        <div class="market-note"><span data-lang="uk">Виробничий хаб + ринок. Sneco SK s.r.o.</span><span data-lang="en">Production hub + market. Sneco SK s.r.o.</span><span data-lang="sk">Výrobný hub + trh. Sneco SK s.r.o.</span></div>
-        <div class="market-status status-active"><span data-lang="uk">Активний</span><span data-lang="en">Active</span><span data-lang="sk">Aktívny</span></div>
+        <div class="market-note"><span data-lang="uk">Виробничий хаб (Sneco SK s.r.o., Гуменне) + домашній EU-ринок. Локальний листинг у розробці.</span><span data-lang="en">Production hub (Sneco SK s.r.o., Humenné) + home EU market. Local listings in development.</span><span data-lang="sk">Výrobný hub (Sneco SK s.r.o., Humenné) + domáci EÚ-trh. Lokálne listingy vo vývoji.</span></div>
+        <div class="market-status status-priority"><span data-lang="uk">Пріоритет</span><span data-lang="en">Priority</span><span data-lang="sk">Priorita</span></div>
       </div>
     </div>
     <div class="market-card">
-      <div class="market-flag">🇸🇪</div>
+      <div class="market-flag">🇨🇿</div>
       <div>
-        <div class="market-name"><span data-lang="uk">Швеція</span><span data-lang="en">Sweden</span><span data-lang="sk">Švédsko</span></div>
-        <div class="market-note"><span data-lang="uk">Активна дистрибуція через локального партнера. Скандинавський тон комунікації.</span><span data-lang="en">Active distribution via a local partner. Nordic communication tone.</span><span data-lang="sk">Aktívna distribúcia cez lokálneho partnera. Škandinávsky tón komunikácie.</span></div>
-        <div class="market-status status-active"><span data-lang="uk">Активний</span><span data-lang="en">Active</span><span data-lang="sk">Aktívny</span></div>
+        <div class="market-name"><span data-lang="uk">Чехія</span><span data-lang="en">Czech Republic</span><span data-lang="sk">Česká republika</span></div>
+        <div class="market-note"><span data-lang="uk">ТМ snEco зареєстрована (CZ №411165). Цільовий ринок для EU-розгортання через NVC GmbH і прямих партнерів.</span><span data-lang="en">snEco TM registered (CZ No. 411165). Target market for EU rollout via NVC GmbH and direct partners.</span><span data-lang="sk">OZ snEco zaregistrovaná (CZ č. 411165). Cieľový trh pre EÚ-rozvoj cez NVC GmbH a priamych partnerov.</span></div>
+        <div class="market-status status-priority"><span data-lang="uk">Пріоритет</span><span data-lang="en">Priority</span><span data-lang="sk">Priorita</span></div>
       </div>
     </div>
     <div class="market-card">
-      <div class="market-flag">🇪🇪</div>
+      <div class="market-flag">🇭🇺</div>
       <div>
-        <div class="market-name"><span data-lang="uk">Естонія</span><span data-lang="en">Estonia</span><span data-lang="sk">Estónsko</span></div>
-        <div class="market-note"><span data-lang="uk">Контракт активний з листопада 2025. Балтійський ритейл.</span><span data-lang="en">Active contract since November 2025. Baltic retail.</span><span data-lang="sk">Zmluva aktívna od novembra 2025. Pobaltský maloobchod.</span></div>
-        <div class="market-status status-active"><span data-lang="uk">Активний</span><span data-lang="en">Active</span><span data-lang="sk">Aktívny</span></div>
-      </div>
-    </div>
-    <div class="market-card">
-      <div class="market-flag">🇵🇱</div>
-      <div>
-        <div class="market-name"><span data-lang="uk">Польща</span><span data-lang="en">Poland</span><span data-lang="sk">Poľsko</span></div>
-        <div class="market-note"><span data-lang="uk">Пріоритетний EU-ринок. ТМ зареєстровано лютий 2026. Польська на упаковці.</span><span data-lang="en">Priority EU market. TM registered Feb 2026. Polish on pack.</span><span data-lang="sk">Prioritný EÚ-trh. OZ zaregistrovaná február 2026. Poľština na obale.</span></div>
+        <div class="market-name"><span data-lang="uk">Угорщина</span><span data-lang="en">Hungary</span><span data-lang="sk">Maďarsko</span></div>
+        <div class="market-note"><span data-lang="uk">EU-ринок з близькою snack-культурою. Пошук дистриб'ютора в процесі.</span><span data-lang="en">EU market with a close snack culture. Distributor search in progress.</span><span data-lang="sk">EÚ-trh s blízkou snack-kultúrou. Hľadanie distribútora prebieha.</span></div>
         <div class="market-status status-priority"><span data-lang="uk">Пріоритет</span><span data-lang="en">Priority</span><span data-lang="sk">Priorita</span></div>
       </div>
     </div>
@@ -5847,7 +6114,7 @@ h3.block-title:first-of-type { margin-top: 0; }
       <div class="market-flag">🇩🇪</div>
       <div>
         <div class="market-name"><span data-lang="uk">Німеччина</span><span data-lang="en">Germany</span><span data-lang="sk">Nemecko</span></div>
-        <div class="market-note"><span data-lang="uk">Ексклюзивна EU-дистрибуція з лютого 2026. Цільові ринки: DE / UK / FR / AT / CH.</span><span data-lang="en">Exclusive EU distribution since Feb 2026. Target markets: DE / UK / FR / AT / CH.</span><span data-lang="sk">Exkluzívna EÚ-distribúcia od februára 2026. Cieľové trhy: DE / UK / FR / AT / CH.</span></div>
+        <div class="market-note"><span data-lang="uk">Ексклюзивна EU-дистрибуція з лютого 2026 через NVC GmbH. Цільові ринки: DE / UK / FR / AT / CH.</span><span data-lang="en">Exclusive EU distribution since Feb 2026 via NVC GmbH. Target markets: DE / UK / FR / AT / CH.</span><span data-lang="sk">Exkluzívna EÚ-distribúcia od februára 2026 cez NVC GmbH. Cieľové trhy: DE / UK / FR / AT / CH.</span></div>
         <div class="market-status status-priority"><span data-lang="uk">Пріоритет</span><span data-lang="en">Priority</span><span data-lang="sk">Priorita</span></div>
       </div>
     </div>
@@ -5855,7 +6122,7 @@ h3.block-title:first-of-type { margin-top: 0; }
       <div class="market-flag">🇺🇸</div>
       <div>
         <div class="market-name">USA</div>
-        <div class="market-note"><span data-lang="uk">FDA FFR 10618353146. Кето / paleo аудиторія. Акцент на protein, clean label.</span><span data-lang="en">FDA FFR 10618353146. Keto / paleo audience. Emphasis on protein, clean label.</span><span data-lang="sk">FDA FFR 10618353146. Keto / paleo publikum. Akcent na protein, clean label.</span></div>
+        <div class="market-note"><span data-lang="uk">FDA FFR 10618353146. Кето / paleo аудиторія. Акцент на protein, clean label. Premium / specialty канали (Whole Foods, Erewhon-tier).</span><span data-lang="en">FDA FFR 10618353146. Keto / paleo audience. Emphasis on protein, clean label. Premium / specialty channels (Whole Foods, Erewhon-tier).</span><span data-lang="sk">FDA FFR 10618353146. Keto / paleo publikum. Akcent na protein, clean label. Premium / specialty kanály (Whole Foods, Erewhon-tier).</span></div>
         <div class="market-status status-priority"><span data-lang="uk">Пріоритет</span><span data-lang="en">Priority</span><span data-lang="sk">Priorita</span></div>
       </div>
     </div>
@@ -5863,10 +6130,395 @@ h3.block-title:first-of-type { margin-top: 0; }
       <div class="market-flag">🌍</div>
       <div>
         <div class="market-name"><span data-lang="uk">Близький Схід</span><span data-lang="en">Middle East</span><span data-lang="sk">Blízky východ</span></div>
-        <div class="market-note"><span data-lang="uk">Gulfood 2025 shortlisted. Halal-сертифікація у розгляді. Арабська мова.</span><span data-lang="en">Gulfood 2025 shortlisted. Halal certification under review. Arabic language.</span><span data-lang="sk">Gulfood 2025 shortlisted. Halal-certifikácia v procese. Arabský jazyk.</span></div>
-        <div class="market-status status-new"><span data-lang="uk">Новий</span><span data-lang="en">New</span><span data-lang="sk">Nový</span></div>
+        <div class="market-note"><span data-lang="uk">Gulfood 2025 shortlisted. Halal-сертифікація у розгляді. Арабська мова на упаковці.</span><span data-lang="en">Gulfood 2025 shortlisted. Halal certification under review. Arabic on pack.</span><span data-lang="sk">Gulfood 2025 shortlisted. Halal-certifikácia v procese. Arabčina na obale.</span></div>
+        <div class="market-status status-priority"><span data-lang="uk">Пріоритет</span><span data-lang="en">Priority</span><span data-lang="sk">Priorita</span></div>
       </div>
     </div>
+  </div>
+
+  <!-- ============================================================
+       SWEDEN — DETAIL DRILLDOWN (v2.36)
+       ============================================================ -->
+  <div class="market-detail" id="mkt-sweden" style="margin-top:48px">
+    <div class="market-detail-header">
+      <div class="market-detail-flag">🇸🇪</div>
+      <div class="market-detail-title-block">
+        <div class="market-detail-title"><span data-lang="uk">Швеція</span><span data-lang="en">Sweden</span><span data-lang="sk">Švédsko</span></div>
+        <div class="market-detail-meta"><span data-lang="uk">Активний з жовтня 2025 · ICA + Coop · Cheddar + Gouda 28g</span><span data-lang="en">Active since October 2025 · ICA + Coop · Cheddar + Gouda 28g</span><span data-lang="sk">Aktívny od októbra 2025 · ICA + Coop · Cheddar + Gouda 28g</span></div>
+      </div>
+    </div>
+
+    <!-- Distributor block -->
+    <div class="distrib-block">
+      <div class="distrib-eyebrow"><span data-lang="uk">Ексклюзивний дистриб'ютор</span><span data-lang="en">Exclusive distributor</span><span data-lang="sk">Exkluzívny distribútor</span></div>
+      <div class="distrib-name">ARVID NORDQUIST HAB</div>
+      <div class="distrib-legal">
+        Enköpingsvägen 100, BOX 619, SE-175 26 Järfälla, Sweden<br>
+        <a href="https://www.arvidnordquist.se" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.85)">www.arvidnordquist.se</a>
+      </div>
+      <div class="distrib-contacts">
+        <div class="distrib-contact">
+          <div class="distrib-contact-name">Helena Wellander</div>
+          <div class="distrib-contact-role">Produktchef</div>
+          <div class="distrib-contact-row"><span class="distrib-contact-icon">📞</span> <a href="tel:+46708761820">+46 708 76 18 20</a></div>
+          <div class="distrib-contact-row"><span class="distrib-contact-icon">✉</span> <a href="mailto:helena.wellander@arvidnordquist.se">helena.wellander@arvidnordquist.se</a></div>
+        </div>
+        <div class="distrib-contact">
+          <div class="distrib-contact-name">Monica Wadell</div>
+          <div class="distrib-contact-role">Business Unit Manager</div>
+          <div class="distrib-contact-row"><span class="distrib-contact-icon">📞</span> <a href="tel:+4687991835">+46 8 799 18 35</a></div>
+          <div class="distrib-contact-row"><span class="distrib-contact-icon">✉</span> <a href="mailto:monica.wadell@arvidnordquist.se">monica.wadell@arvidnordquist.se</a></div>
+        </div>
+        <div class="distrib-contact">
+          <div class="distrib-contact-name">Edward Liljeqvist</div>
+          <div class="distrib-contact-role">Produktchef</div>
+          <div class="distrib-contact-row"><span class="distrib-contact-icon">📞</span> <a href="tel:+46760390435">+46 76 039 04 35</a></div>
+          <div class="distrib-contact-row"><span class="distrib-contact-icon">✉</span> <a href="mailto:edward.liljeqvist@arvidnordquist.se">edward.liljeqvist@arvidnordquist.se</a></div>
+        </div>
+        <div class="distrib-contact">
+          <div class="distrib-contact-name">Joel Johnsson</div>
+          <div class="distrib-contact-role">Supply Planner Food</div>
+          <div class="distrib-contact-row"><span class="distrib-contact-icon">📞</span> <a href="tel:+46708760567">+46 70 876 05 67</a></div>
+          <div class="distrib-contact-row"><span class="distrib-contact-icon">✉</span> <a href="mailto:joel.johnsson@arvidnordquist.se">joel.johnsson@arvidnordquist.se</a></div>
+        </div>
+        <div class="distrib-contact">
+          <div class="distrib-contact-name">Niklas Östling Gran</div>
+          <div class="distrib-contact-role">Supply Planner Food</div>
+          <div class="distrib-contact-row"><span class="distrib-contact-icon">📞</span> <a href="tel:+46708760594">+46 70 876 05 94</a></div>
+          <div class="distrib-contact-row"><span class="distrib-contact-icon">✉</span> <a href="mailto:niklas.ostling@arvidnordquist.se">niklas.ostling@arvidnordquist.se</a></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Go-to-Market summary -->
+    <div class="market-subblock">
+      <div class="market-subblock-title">📋 <span data-lang="uk">Go-to-Market Plan — стислий аналіз</span><span data-lang="en">Go-to-Market Plan — executive summary</span><span data-lang="sk">Go-to-Market Plan — stručná analýza</span></div>
+      <div class="market-subblock-meta">Arvid Nordquist · 24.10.2024 · 31 <span data-lang="uk">сторінок</span><span data-lang="en">pages</span><span data-lang="sk">strán</span></div>
+
+      <div class="kpi-grid">
+        <div class="kpi-tile is-accent">
+          <div class="kpi-tile-value">252M</div>
+          <div class="kpi-tile-label"><span data-lang="uk">пачок снеків / рік (2023)</span><span data-lang="en">snack bags / year (2023)</span><span data-lang="sk">vrecúšok snackov / rok (2023)</span></div>
+        </div>
+        <div class="kpi-tile">
+          <div class="kpi-tile-value">~140M</div>
+          <div class="kpi-tile-label"><span data-lang="uk">кг ринок снеків</span><span data-lang="en">kg snack market</span><span data-lang="sk">kg trh snackov</span></div>
+        </div>
+        <div class="kpi-tile">
+          <div class="kpi-tile-value">52%</div>
+          <div class="kpi-tile-label"><span data-lang="uk">жінки серед покупців</span><span data-lang="en">female buyers</span><span data-lang="sk">žien medzi kupujúcimi</span></div>
+        </div>
+        <div class="kpi-tile">
+          <div class="kpi-tile-value">63%</div>
+          <div class="kpi-tile-label"><span data-lang="uk">вікова група 18-44</span><span data-lang="en">age group 18-44</span><span data-lang="sk">veková skupina 18-44</span></div>
+        </div>
+        <div class="kpi-tile">
+          <div class="kpi-tile-value">70%</div>
+          <div class="kpi-tile-label"><span data-lang="uk">middle + high income</span><span data-lang="en">middle + high income</span><span data-lang="sk">middle + high income</span></div>
+        </div>
+      </div>
+
+      <h4 style="font-size:13px;font-weight:700;margin:18px 0 6px"><span data-lang="uk">3 тренди, що підтримують категорію</span><span data-lang="en">3 trends supporting the category</span><span data-lang="sk">3 trendy podporujúce kategóriu</span></h4>
+      <div class="grid-3" style="margin-bottom:14px">
+        <div class="card card-sm">
+          <div style="font-size:22px;margin-bottom:6px">🥗</div>
+          <div style="font-weight:700;font-size:13px;margin-bottom:4px"><span data-lang="uk">Healthier options</span><span data-lang="en">Healthier options</span><span data-lang="sk">Healthier options</span></div>
+          <div style="font-size:11.5px;color:var(--text-muted);line-height:1.45"><span data-lang="uk">Споживачі шукають натуральні снеки без добавок. Уникання: палмова олія 43%, трансжири 34%, E-номери 26%.</span><span data-lang="en">Consumers seek natural snacks without additives. Avoidance: palm oil 43%, trans fats 34%, E-numbers 26%.</span><span data-lang="sk">Spotrebitelia hľadajú prírodné snacky bez prísad. Vyhýbanie: palmový olej 43%, trans-tuky 34%, E-čísla 26%.</span></div>
+        </div>
+        <div class="card card-sm">
+          <div style="font-size:22px;margin-bottom:6px">🍽</div>
+          <div style="font-weight:700;font-size:13px;margin-bottom:4px"><span data-lang="uk">Snackification</span><span data-lang="en">Snackification</span><span data-lang="sk">Snackification</span></div>
+          <div style="font-size:11.5px;color:var(--text-muted);line-height:1.45"><span data-lang="uk">Замість великих прийомів їжі — кілька малих перекусів. High-protein сирні снеки = заміна повноцінного meal.</span><span data-lang="en">Smaller snacks replacing full meals throughout the day. High-protein cheese snacks = meal replacement.</span><span data-lang="sk">Menšie snacky nahrádzajú celé jedlá počas dňa. High-protein syrové snacky = náhrada jedla.</span></div>
+        </div>
+        <div class="card card-sm">
+          <div style="font-size:22px;margin-bottom:6px">🌶</div>
+          <div style="font-weight:700;font-size:13px;margin-bottom:4px"><span data-lang="uk">Cultural flavors</span><span data-lang="en">Cultural flavors</span><span data-lang="sk">Cultural flavors</span></div>
+          <div style="font-size:11.5px;color:var(--text-muted);line-height:1.45"><span data-lang="uk">Інтеграція смаків з різних культур у снеки. Гострі та екзотичні комбінації.</span><span data-lang="en">Integrating flavors from different cultures. Spicy and exotic combinations on the rise.</span><span data-lang="sk">Integrácia chutí z rôznych kultúr. Pikantné a exotické kombinácie naberajú na popularite.</span></div>
+        </div>
+      </div>
+
+      <h4 style="font-size:13px;font-weight:700;margin:18px 0 6px"><span data-lang="uk">Топ-5 причин обирати продукт</span><span data-lang="en">Top-5 purchase drivers</span><span data-lang="sk">Top-5 dôvodov výberu produktu</span></h4>
+      <div class="chan-chips">
+        <span class="chan-chip is-yellow">1. Natural ingredients</span>
+        <span class="chan-chip is-yellow">2. Low sugar</span>
+        <span class="chan-chip">3. Low fat</span>
+        <span class="chan-chip">4. High fibre</span>
+        <span class="chan-chip">5. High protein</span>
+      </div>
+
+      <h4 style="font-size:13px;font-weight:700;margin:18px 0 6px"><span data-lang="uk">Цінові сегменти (за 1 пачку, SEK)</span><span data-lang="en">Price segments (per pack, SEK)</span><span data-lang="sk">Cenové segmenty (za balenie, SEK)</span></h4>
+      <div class="seg-row"><div style="font-weight:700;font-size:11.5px">8-19 SEK</div><div class="seg-bar is-other" style="width:25%">Mainstream · OLW</div></div>
+      <div class="seg-row"><div style="font-weight:700;font-size:11.5px">20-49 SEK</div><div class="seg-bar is-current" style="width:65%"><span data-lang="uk">Premium · snEco · Pändy · Granorlo · Groksi · ← обираємо</span><span data-lang="en">Premium · snEco · Pändy · Granorlo · Groksi · ← our segment</span><span data-lang="sk">Premium · snEco · Pändy · Granorlo · Groksi · ← náš segment</span></div></div>
+      <div class="seg-row"><div style="font-weight:700;font-size:11.5px">50-70 SEK</div><div class="seg-bar is-other" style="width:45%">Premium+ · The Drinks Bakery · Decampo</div></div>
+
+      <h4 style="font-size:13px;font-weight:700;margin:18px 0 6px"><span data-lang="uk">Структура ритейл-ринку Швеції</span><span data-lang="en">Swedish retail market structure</span><span data-lang="sk">Štruktúra švédskeho retail trhu</span></h4>
+      <div class="grid-3">
+        <div class="card card-sm">
+          <div style="font-weight:800;font-size:18px;color:var(--yellow)">53%</div>
+          <div style="font-weight:700;font-size:13px">ICA</div>
+          <div style="font-size:11px;color:var(--text-muted);line-height:1.45">Maxi · Kvantum · Supermarket · Nära</div>
+        </div>
+        <div class="card card-sm">
+          <div style="font-weight:800;font-size:18px;color:var(--yellow)">22%</div>
+          <div style="font-weight:700;font-size:13px">Coop</div>
+          <div style="font-size:11px;color:var(--text-muted);line-height:1.45"><span data-lang="uk">Member-owned, 3,7M членів</span><span data-lang="en">Member-owned, 3.7M members</span><span data-lang="sk">Member-owned, 3,7M členov</span></div>
+        </div>
+        <div class="card card-sm">
+          <div style="font-weight:800;font-size:18px;color:var(--yellow)">17%</div>
+          <div style="font-weight:700;font-size:13px">Axfood</div>
+          <div style="font-size:11px;color:var(--text-muted);line-height:1.45">Hemköp · Willys · Tempo</div>
+        </div>
+      </div>
+
+      <h4 style="font-size:13px;font-weight:700;margin:18px 0 6px"><span data-lang="uk">Рекомендовані канали продажу</span><span data-lang="en">Recommended sales channels</span><span data-lang="sk">Odporúčané predajné kanály</span></h4>
+      <div class="chan-chips">
+        <span class="chan-chip is-dark">Retail · ICA / Hemköp / Coop</span>
+        <span class="chan-chip is-dark">Deli · Urban Deli · Rot Butik</span>
+        <span class="chan-chip is-dark">Online · Amoi · Delitea · Beriksson</span>
+        <span class="chan-chip is-dark">Foodservice · Martin &amp; Servera · Menigo · Svensk Cater</span>
+        <span class="chan-chip is-dark">HoReCa · Scandic · Strawberry Hotels</span>
+        <span class="chan-chip is-dark">Convenience · Pressbyrån · 7-Eleven</span>
+        <span class="chan-chip is-dark">Travel · SSP (airports, train stations)</span>
+      </div>
+
+      <h4 style="font-size:13px;font-weight:700;margin:18px 0 6px"><span data-lang="uk">Цільові споживачі</span><span data-lang="en">Target consumers</span><span data-lang="sk">Cieľoví spotrebitelia</span></h4>
+      <div style="font-size:13px;line-height:1.65;color:var(--text-muted)">
+        <span data-lang="uk"><strong>Health-conscious</strong> + <strong>social and active</strong> + <strong>urban</strong> споживачі. Хочуть смачний снек, що відображає їхній lifestyle. Готові платити більше за натуральний продукт.</span>
+        <span data-lang="en"><strong>Health-conscious</strong> + <strong>social and active</strong> + <strong>urban</strong> consumers. Want a tasty snack that fits their lifestyle. Willing to pay more for natural products.</span>
+        <span data-lang="sk"><strong>Health-conscious</strong> + <strong>social and active</strong> + <strong>urban</strong> spotrebitelia. Chcú chutný snack, ktorý zapadne do ich lifestyle. Ochotní zaplatiť viac za prírodný produkt.</span>
+      </div>
+
+      <div class="dl-row">
+        <a class="dl-pdf" href="documents/markets/sweden/Sweden_Go-to-Market_Plan_2024-10-24.pdf" target="_blank" rel="noopener">
+          <div class="dl-pdf-icon">PDF</div>
+          <div>
+            <div class="dl-pdf-name"><span data-lang="uk">Повний Go-to-Market Plan</span><span data-lang="en">Full Go-to-Market Plan</span><span data-lang="sk">Plný Go-to-Market Plan</span></div>
+            <div class="dl-pdf-meta">31 pages · 24.10.2024 · 2.2 MB</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Sales report 2 — latest -->
+    <div class="market-subblock">
+      <div class="market-subblock-title">📊 <span data-lang="uk">Звіт продажів — оновлений</span><span data-lang="en">Sales report — updated</span><span data-lang="sk">Správa o predaji — aktualizovaná</span></div>
+      <div class="market-subblock-meta">Arvid Nordquist · 30.04.2026 (8.05.2026 publ.) · <span data-lang="uk">тижні 43 (2025) — 15 (2026), ~5 міс</span><span data-lang="en">weeks 43 (2025) — 15 (2026), ~5 months</span><span data-lang="sk">týždne 43 (2025) — 15 (2026), ~5 mesiacov</span></div>
+
+      <div style="font-size:13px;line-height:1.65;color:var(--text-muted);margin-bottom:14px">
+        <span data-lang="uk">Продажі ICA out-of-store по 4 форматах магазинів. Тренд після зимового скачка стабілізувався, Cheddar тримається на 30-50% вище ніж Gouda у форматах Supermarket / Nära. Maxi — найменший формат, Supermarket і Nära — провідні за обсягом.</span>
+        <span data-lang="en">ICA out-of-store sales across 4 store formats. After the winter spike the trend has stabilized; Cheddar stays 30-50% above Gouda in Supermarket / Nära formats. Maxi is the smallest, Supermarket and Nära lead by volume.</span>
+        <span data-lang="sk">ICA out-of-store predaje cez 4 formáty obchodov. Po zimnom skoku sa trend stabilizoval; Cheddar zostáva 30-50% nad Gouda vo formátoch Supermarket / Nära. Maxi je najmenší, Supermarket a Nära vedú v objeme.</span>
+      </div>
+
+      <h4 style="font-size:13px;font-weight:700;margin:14px 0 6px"><span data-lang="uk">ICA продажі по форматах магазинів (units, тижні 43-15)</span><span data-lang="en">ICA sales by store format (units, weeks 43-15)</span><span data-lang="sk">ICA predaje podľa formátu (jednotky, týždne 43-15)</span></h4>
+      <table class="sales-table">
+        <thead>
+          <tr>
+            <th><span data-lang="uk">Формат магазину</span><span data-lang="en">Store format</span><span data-lang="sk">Formát obchodu</span></th>
+            <th class="num"><span data-lang="uk">Пік (units/тиж)</span><span data-lang="en">Peak (units/wk)</span><span data-lang="sk">Vrchol (j/týž)</span></th>
+            <th class="num"><span data-lang="uk">Стабільний рівень</span><span data-lang="en">Stable level</span><span data-lang="sk">Stabilná úroveň</span></th>
+            <th><span data-lang="uk">Лідер за SKU</span><span data-lang="en">Leading SKU</span><span data-lang="sk">Vedúce SKU</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Total ICA</strong></td>
+            <td class="num">~280</td>
+            <td class="num">150-200</td>
+            <td>Cheddar &gt; Gouda</td>
+          </tr>
+          <tr>
+            <td>Supermarket</td>
+            <td class="num">~130</td>
+            <td class="num">70-100</td>
+            <td>Cheddar +50%</td>
+          </tr>
+          <tr>
+            <td>Nära</td>
+            <td class="num">~110</td>
+            <td class="num">50-80</td>
+            <td>Cheddar +30%</td>
+          </tr>
+          <tr>
+            <td>Kvantum</td>
+            <td class="num">~55</td>
+            <td class="num">25-40</td>
+            <td>Cheddar ≈ Gouda</td>
+          </tr>
+          <tr>
+            <td>Maxi</td>
+            <td class="num">~45</td>
+            <td class="num">15-30</td>
+            <td>Cheddar &gt; Gouda</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="dl-row">
+        <a class="dl-pdf" href="documents/markets/sweden/Sweden_Sales_Report_2026-04-30_Arvid_Nordquist.pdf" target="_blank" rel="noopener">
+          <div class="dl-pdf-icon">PDF</div>
+          <div>
+            <div class="dl-pdf-name"><span data-lang="uk">Звіт продажів — 30.04.2026</span><span data-lang="en">Sales report — 30.04.2026</span><span data-lang="sk">Správa o predaji — 30.04.2026</span></div>
+            <div class="dl-pdf-meta">6 pages · 169 KB · ICA per profile w43-15</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Sales report 1 — initial -->
+    <div class="market-subblock">
+      <div class="market-subblock-title">📊 <span data-lang="uk">Перший звіт продажів</span><span data-lang="en">First sales report</span><span data-lang="sk">Prvá správa o predaji</span></div>
+      <div class="market-subblock-meta">Arvid Nordquist · 27.02.2026 · <span data-lang="uk">з лістингу до тижня 8</span><span data-lang="en">from listing to week 8</span><span data-lang="sk">od listingu do týždňa 8</span></div>
+
+      <div class="kpi-grid">
+        <div class="kpi-tile is-dark">
+          <div class="kpi-tile-value">2 533</div>
+          <div class="kpi-tile-label"><span data-lang="uk">картонів продано</span><span data-lang="en">cartons sold</span><span data-lang="sk">kartónov predaných</span></div>
+        </div>
+        <div class="kpi-tile is-accent">
+          <div class="kpi-tile-value">1 674</div>
+          <div class="kpi-tile-label">Coop SE (66%)</div>
+        </div>
+        <div class="kpi-tile">
+          <div class="kpi-tile-value">859</div>
+          <div class="kpi-tile-label">ICA SE (34%)</div>
+        </div>
+        <div class="kpi-tile">
+          <div class="kpi-tile-value">3%</div>
+          <div class="kpi-tile-label"><span data-lang="uk">маркет. бюджет</span><span data-lang="en">marketing budget</span><span data-lang="sk">marketingový rozpočet</span></div>
+        </div>
+      </div>
+
+      <h4 style="font-size:13px;font-weight:700;margin:14px 0 6px"><span data-lang="uk">Розбивка продажів за SKU і ритейлером</span><span data-lang="en">Sales breakdown by SKU &amp; retailer</span><span data-lang="sk">Rozdelenie predaja podľa SKU a maloobchodníka</span></h4>
+      <table class="sales-table">
+        <thead>
+          <tr>
+            <th><span data-lang="uk">Ритейлер</span><span data-lang="en">Retailer</span><span data-lang="sk">Maloobchodník</span></th>
+            <th class="num">Gouda 28g</th>
+            <th class="num">Cheddar 28g</th>
+            <th class="num"><span data-lang="uk">Усього (cartons)</span><span data-lang="en">Total (cartons)</span><span data-lang="sk">Spolu (kartóny)</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>ICA SE</strong></td>
+            <td class="num">392</td>
+            <td class="num">467</td>
+            <td class="num">859</td>
+          </tr>
+          <tr>
+            <td><strong>Coop SE</strong></td>
+            <td class="num">717</td>
+            <td class="num">957</td>
+            <td class="num">1 674</td>
+          </tr>
+          <tr class="total">
+            <td>TOTAL</td>
+            <td class="num">1 109</td>
+            <td class="num">1 424</td>
+            <td class="num">2 533</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4 style="font-size:13px;font-weight:700;margin:18px 0 6px"><span data-lang="uk">In-store матеріали</span><span data-lang="en">In-store materials</span><span data-lang="sk">In-store materiály</span></h4>
+      <div class="chan-chips">
+        <span class="chan-chip">Info folder</span>
+        <span class="chan-chip">Shelf strip</span>
+        <span class="chan-chip">Vippa vobbler</span>
+        <span class="chan-chip">Half-pallet strip</span>
+        <span class="chan-chip">Coupon</span>
+        <span class="chan-chip">Pop-up vobbler</span>
+        <span class="chan-chip">Mini totem</span>
+        <span class="chan-chip is-yellow">ICA Buffé week + Ukraine bags</span>
+      </div>
+
+      <h4 style="font-size:13px;font-weight:700;margin:18px 0 6px"><span data-lang="uk">Плани активацій 2026</span><span data-lang="en">2026 activation plans</span><span data-lang="sk">Aktivačné plány 2026</span></h4>
+      <ul style="margin:0 0 12px 18px;padding:0;font-size:12.5px;color:var(--text-muted);line-height:1.7">
+        <li data-lang="uk">Продовжити in-store матеріали для зростання обізнаності про українські продукти</li>
+        <li data-lang="en">Continue in-store materials to grow awareness of Ukrainian products</li>
+        <li data-lang="sk">Pokračovať s in-store materiálmi pre rast povedomia o ukrajinských produktoch</li>
+        <li data-lang="uk">Робота з Social Media магазинів — формат «share &amp; win»</li>
+        <li data-lang="en">Work with stores' social media — "share &amp; win" format</li>
+        <li data-lang="sk">Práca so sociálnymi sieťami obchodov — formát „share &amp; win"</li>
+        <li data-lang="uk">Якщо буде бюджет — Smakbox (sampling у домогосподарства)</li>
+        <li data-lang="en">If budget allows — Smakbox (sampling to households)</li>
+        <li data-lang="sk">Ak rozpočet dovolí — Smakbox (sampling do domácností)</li>
+        <li data-lang="uk">Продовжити Ukrainian bag у магазинах</li>
+        <li data-lang="en">Continue Ukrainian bag in stores</li>
+        <li data-lang="sk">Pokračovať s Ukrainian bag v obchodoch</li>
+        <li data-lang="uk">«Compete &amp; win» конкурс для споживачів у магазинах</li>
+        <li data-lang="en">"Compete &amp; win" consumer contest in stores</li>
+        <li data-lang="sk">„Compete &amp; win" súťaž pre spotrebiteľov v obchodoch</li>
+      </ul>
+
+      <div class="dl-row">
+        <a class="dl-pdf" href="documents/markets/sweden/Sweden_Sales_Report_2026-02-27_Arvid_Nordquist.pdf" target="_blank" rel="noopener">
+          <div class="dl-pdf-icon">PDF</div>
+          <div>
+            <div class="dl-pdf-name"><span data-lang="uk">Звіт продажів — 27.02.2026</span><span data-lang="en">Sales report — 27.02.2026</span><span data-lang="sk">Správa o predaji — 27.02.2026</span></div>
+            <div class="dl-pdf-meta">21 pages · 6.1 MB · sales + in-store + plans</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       POLAND — DETAIL DRILLDOWN (v2.36)
+       ============================================================ -->
+  <div class="market-detail" id="mkt-poland">
+    <div class="market-detail-header">
+      <div class="market-detail-flag">🇵🇱</div>
+      <div class="market-detail-title-block">
+        <div class="market-detail-title"><span data-lang="uk">Польща</span><span data-lang="en">Poland</span><span data-lang="sk">Poľsko</span></div>
+        <div class="market-detail-meta"><span data-lang="uk">Активний · ТМ зареєстровано Z.590834 (13.02.2026) · польська на упаковці</span><span data-lang="en">Active · TM registered Z.590834 (13.02.2026) · Polish on pack</span><span data-lang="sk">Aktívny · OZ zaregistrovaná Z.590834 (13.02.2026) · poľština na obale</span></div>
+      </div>
+    </div>
+
+    <!-- Distributor block -->
+    <div class="distrib-block">
+      <div class="distrib-eyebrow"><span data-lang="uk">Ексклюзивний дистриб'ютор</span><span data-lang="en">Exclusive distributor</span><span data-lang="sk">Exkluzívny distribútor</span></div>
+      <div class="distrib-name">SOFIO Sp. z o.o.</div>
+      <div class="distrib-legal">
+        ul. Biała 4, lok. 84, 00-895 Warszawa, Polska<br>
+        NIP: 5252577807 · REGON: 147066278 · KRS: 0000495772
+      </div>
+      <div class="distrib-contacts">
+        <div class="distrib-contact">
+          <div class="distrib-contact-name">Maksym Żynkin</div>
+          <div class="distrib-contact-role">Prezes Zarządu</div>
+          <div class="distrib-contact-row"><span class="distrib-contact-icon">📞</span> <a href="tel:+48787777930">+48 787 777 930</a></div>
+          <div class="distrib-contact-row"><span class="distrib-contact-icon">💬</span> <a href="tel:+48797415199">+48 797 415 199</a> <span style="color:rgba(255,255,255,0.55);font-size:10.5px">(WhatsApp · Viber)</span></div>
+        </div>
+        <div class="distrib-contact">
+          <div class="distrib-contact-name">Iryna Vlasiuk</div>
+          <div class="distrib-contact-role">Import Manager</div>
+          <div class="distrib-contact-row"><span class="distrib-contact-icon">📍</span> ul. Biała 4, lok. 94, 00-895 Warszawa</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="market-subblock">
+      <div class="market-subblock-title">📋 <span data-lang="uk">Статус ринку</span><span data-lang="en">Market status</span><span data-lang="sk">Stav trhu</span></div>
+      <div style="font-size:13px;line-height:1.65;color:var(--text-muted)">
+        <span data-lang="uk"><strong>Торговельна марка:</strong> snEco зареєстрована у Польщі — Z.590834, рішення про реєстрацію 13.02.2026.<br>
+        <strong>Упаковка:</strong> польська мова на 90×160 мм паках для PL-ринку.<br>
+        <strong>Канали:</strong> старт через ритейл і HoReCa за моделлю Sofio. Деталі лістингів і обсяги — будуть додані з першими звітами дистриб'ютора.</span>
+        <span data-lang="en"><strong>Trademark:</strong> snEco registered in Poland — Z.590834, decision dated 13.02.2026.<br>
+        <strong>Packaging:</strong> Polish language on the 90×160 mm packs for the PL market.<br>
+        <strong>Channels:</strong> launch via retail and HoReCa following Sofio's model. Listing details and volumes will be added with the first distributor reports.</span>
+        <span data-lang="sk"><strong>Ochranná známka:</strong> snEco zaregistrovaná v Poľsku — Z.590834, rozhodnutie z 13.02.2026.<br>
+        <strong>Balenie:</strong> poľský jazyk na 90×160 mm baleniach pre PL-trh.<br>
+        <strong>Kanály:</strong> štart cez retail a HoReCa podľa modelu Sofio. Detaily listingov a objemov pribudnú s prvými správami distribútora.</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:32px;padding:18px 22px;background:var(--black-05);border-radius:10px;font-size:12.5px;color:var(--text-muted);line-height:1.6">
+    <span data-lang="uk">📌 Деталі по інших ринках (Словаччина, Чехія, Угорщина, Німеччина, USA, Близький Схід) — будуть додані по мірі отримання інформації від команди продажів. Запит на оновлення → vg@sneco.ua.</span>
+    <span data-lang="en">📌 Details for other markets (Slovakia, Czech Republic, Hungary, Germany, USA, Middle East) will be added as the sales team provides updates. Request updates → vg@sneco.ua.</span>
+    <span data-lang="sk">📌 Detaily k ďalším trhom (Slovensko, Česko, Maďarsko, Nemecko, USA, Blízky východ) pribudnú postupne po získaní informácií od predajného tímu. Žiadosť o aktualizáciu → vg@sneco.ua.</span>
   </div>
 </section>
 
@@ -6121,7 +6773,28 @@ h3.block-title:first-of-type { margin-top: 0; }
 
   <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span><span data-lang="sk">História verzií</span></h3>
   <div class="changelog-entry">
-    <span class="changelog-version">v2.35</span><span class="changelog-date">08.05.2026</span>
+    <span class="changelog-version">v2.36</span><span class="changelog-date">09.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>🌍 Markets перестроєно:</strong> 3 активних (UA, SE, PL) і 6 пріоритетних (SK, CZ, HU, DE, US, ME). Естонію прибрано. Словаччину переведено з «Активний» у «Пріоритет». Додано Чехію і Угорщину як нові пріоритетні. Близький Схід → Пріоритет (раніше «Новий»).</li>
+      <li data-lang="en"><strong>🌍 Markets restructured:</strong> 3 active (UA, SE, PL) and 6 priority (SK, CZ, HU, DE, US, ME). Estonia removed. Slovakia moved from "Active" to "Priority". Czech Republic and Hungary added as new priorities. Middle East → Priority (was "New").</li>
+      <li data-lang="sk"><strong>🌍 Markets reštrukturalizované:</strong> 3 aktívne (UA, SE, PL) a 6 prioritných (SK, CZ, HU, DE, US, ME). Estónsko odstránené. Slovensko presunuté z „Aktívny" do „Priorita". Pridané Česko a Maďarsko ako nové priority. Blízky východ → Priorita (predtým „Nový").</li>
+      <li data-lang="uk"><strong>🇸🇪 Швеція — повний drilldown.</strong> Ексклюзивний дистриб'ютор Arvid Nordquist HAB (Järfälla) з 5 контактами (Helena Wellander, Monica Wadell, Edward Liljeqvist, Joel Johnsson, Niklas Östling Gran). Стислий аналіз Go-to-Market Plan (24.10.2024) з KPI-плитками, 3 трендами, цільовою аудиторією, ціновими сегментами (Premium 20-49 SEK), структурою ритейл-ринку (ICA 53% / Coop 22% / Axfood 17%), рекомендованими каналами. Два звіти продажів від Arvid Nordquist: первинний 27.02.2026 (2 533 cartons: ICA 859 + Coop 1 674, Cheddar > Gouda) і оновлений 30.04.2026 (тренд по 4 форматах ICA, w43-15). Завантаження всіх 3 PDF.</li>
+      <li data-lang="en"><strong>🇸🇪 Sweden — full drilldown.</strong> Exclusive distributor Arvid Nordquist HAB (Järfälla) with 5 contacts (Helena Wellander, Monica Wadell, Edward Liljeqvist, Joel Johnsson, Niklas Östling Gran). Compact Go-to-Market Plan summary (24.10.2024) with KPI tiles, 3 trends, target audience, price segments (Premium 20-49 SEK), retail market structure (ICA 53% / Coop 22% / Axfood 17%), recommended channels. Two sales reports from Arvid Nordquist: initial 27.02.2026 (2,533 cartons: ICA 859 + Coop 1,674, Cheddar > Gouda) and updated 30.04.2026 (trend across 4 ICA formats, w43-15). All 3 PDFs downloadable.</li>
+      <li data-lang="sk"><strong>🇸🇪 Švédsko — plný drilldown.</strong> Exkluzívny distribútor Arvid Nordquist HAB (Järfälla) s 5 kontaktmi (Helena Wellander, Monica Wadell, Edward Liljeqvist, Joel Johnsson, Niklas Östling Gran). Kompaktný Go-to-Market Plan súhrn (24.10.2024) s KPI dlaždicami, 3 trendmi, cieľovým publikom, cenovými segmentmi (Premium 20-49 SEK), štruktúrou retail trhu (ICA 53% / Coop 22% / Axfood 17%), odporúčanými kanálmi. Dve správy o predaji od Arvid Nordquist: prvotná 27.02.2026 (2 533 kartónov: ICA 859 + Coop 1 674, Cheddar > Gouda) a aktualizovaná 30.04.2026 (trend cez 4 formáty ICA, w43-15). Všetky 3 PDF na stiahnutie.</li>
+      <li data-lang="uk"><strong>🇵🇱 Польща — повний drilldown.</strong> Ексклюзивний дистриб'ютор Sofio Sp. z o.o. (Warszawa, NIP 5252577807, REGON 147066278, KRS 0000495772) з 2 контактами: Maksym Żynkin (Prezes Zarządu, +48 787 777 930), Iryna Vlasiuk (Import Manager). ТМ snEco зареєстрована Z.590834 (13.02.2026). Польська на упаковці 90×160 мм.</li>
+      <li data-lang="en"><strong>🇵🇱 Poland — full drilldown.</strong> Exclusive distributor Sofio Sp. z o.o. (Warsaw, NIP 5252577807, REGON 147066278, KRS 0000495772) with 2 contacts: Maksym Żynkin (Prezes Zarządu, +48 787 777 930), Iryna Vlasiuk (Import Manager). snEco TM registered Z.590834 (13.02.2026). Polish on the 90×160 mm packs.</li>
+      <li data-lang="sk"><strong>🇵🇱 Poľsko — plný drilldown.</strong> Exkluzívny distribútor Sofio Sp. z o.o. (Varšava, NIP 5252577807, REGON 147066278, KRS 0000495772) s 2 kontaktmi: Maksym Żynkin (Prezes Zarządu, +48 787 777 930), Iryna Vlasiuk (Import Manager). OZ snEco zaregistrovaná Z.590834 (13.02.2026). Poľština na 90×160 mm baleniach.</li>
+      <li data-lang="uk"><strong>🆕 Нові UI-компоненти:</strong> clickable market-card з hover-arrow, market-detail panel зі скрол-якорем, distrib-block (чорний фон з контактами), kpi-tile (yellow / dark / regular варіанти), sales-table з total-row, dl-pdf карточки для завантаження, chan-chips (3 стилі), seg-row для price segments. Усі компоненти тримовні.</li>
+      <li data-lang="en"><strong>🆕 New UI components:</strong> clickable market-card with hover-arrow, market-detail panel with scroll-anchor, distrib-block (black bg with contacts), kpi-tile (yellow / dark / regular variants), sales-table with total-row, dl-pdf download cards, chan-chips (3 styles), seg-row for price segments. All components are trilingual.</li>
+      <li data-lang="sk"><strong>🆕 Nové UI komponenty:</strong> clickable market-card s hover-šípkou, market-detail panel so scroll-kotvou, distrib-block (čierne pozadie s kontaktmi), kpi-tile (yellow / dark / regular varianty), sales-table s total-riadkom, dl-pdf karty na stiahnutie, chan-chips (3 štýly), seg-row pre price segments. Všetky komponenty trojjazyčné.</li>
+      <li data-lang="uk"><strong>📁 Файли:</strong> 3 PDF додано у <code>brand/documents/markets/sweden/</code> (Go-to-Market Plan + 2 sales reports, разом ~8.6 МБ). Подальші ринки матимуть власні підпапки.</li>
+      <li data-lang="en"><strong>📁 Files:</strong> 3 PDFs added to <code>brand/documents/markets/sweden/</code> (Go-to-Market Plan + 2 sales reports, ~8.6 MB total). Other markets will get their own subfolders.</li>
+      <li data-lang="sk"><strong>📁 Súbory:</strong> 3 PDF pridané do <code>brand/documents/markets/sweden/</code> (Go-to-Market Plan + 2 správy o predaji, ~8,6 MB spolu). Ďalšie trhy dostanú vlastné podpriečinky.</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.35</span><span class="changelog-date">08.05.2026</span>
     <ul class="changelog-list">
       <li data-lang="uk"><strong>🌍 «Міжнародна версія» об'єднана з «Про бренд».</strong> Контент про UA + EU юр-особи (Prime Snack LLC + Sneco SK s.r.o.), правила міжнародної комунікації, EU vs UA маркування — тепер у sec-intro як sub-блок з divider'ом. Логіка: інформація про юридичні особи бренду — це частина «хто ми», а не випадковий «application-блок». Sidebar «Міжнародна версія» прибрано.</li>
       <li data-lang="en"><strong>🌍 "International" merged into "About the brand".</strong> Content about UA + EU legal entities (Prime Snack LLC + Sneco SK s.r.o.), international communication rules, EU vs UA labeling — now in sec-intro as a sub-block with a divider. Logic: brand legal-entity info is part of "who we are", not a random "application" block. "International" sidebar entry removed.</li>
