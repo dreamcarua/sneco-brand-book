@@ -894,6 +894,46 @@ h3.block-title:first-of-type { margin-top: 0; }
   display: flex; align-items: center; justify-content: center;
   background: var(--black-05); border-radius: 10px;
 }
+
+/* Equipment / production photo gallery (added v2.42) */
+.equipment-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.eq-photo {
+  display: block;
+  background: var(--black-05);
+  border-radius: 10px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid var(--border);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.eq-photo:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.12);
+  border-color: var(--yellow);
+}
+.eq-photo img {
+  display: block;
+  width: 100%; height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: #1e1e1e;
+}
+.eq-photo-caption {
+  padding: 10px 14px 12px;
+  font-size: 12.5px; line-height: 1.45;
+  color: var(--text-muted);
+}
+.eq-photo-caption strong { color: var(--text); }
+@media (max-width: 600px) {
+  .equipment-gallery { grid-template-columns: 1fr; }
+  .eq-photo img { aspect-ratio: 3 / 2; }
+}
 .market-detail-title-block { flex: 1; }
 .market-detail-title {
   font-size: 24px; font-weight: 800; letter-spacing: -0.3px;
@@ -2049,7 +2089,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Bible v2.40 · 2026
+    Brand Bible v2.42 · 2026
   </div>
 </nav>
 
@@ -2063,7 +2103,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
     <span data-lang="sk">Jedna ingrediencia. <span class="qr-ns-accent">Žiadne kompromisy.</span> Syrový snack 21. storočia.</span>
   </div>
-  <div class="qr-meta">v2.40 · 2026</div>
+  <div class="qr-meta">v2.42 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -2190,8 +2230,8 @@ h3.block-title:first-of-type { margin-top: 0; }
         <div style="font-size:28px;margin-bottom:10px">🧬</div>
         <div class="pkg-name"><span data-lang="uk">Технологія</span><span data-lang="en">Technology</span><span data-lang="sk">Technológia</span></div>
         <div class="pkg-sku" style="margin-top:6px;line-height:1.5">
-          <span data-lang="uk">VacWave Bio Nutrition — мікрохвильово-вакуумна сушка при 36-38°C. Власний патент №139035.</span>
-          <span data-lang="en">VacWave Bio Nutrition — microwave-vacuum drying at 36-38°C. Proprietary patent No. 139035.</span><span data-lang="sk">VacWave Bio Nutrition — mikrovlnno-vákuové sušenie pri 36-38°C. Vlastný patent č. 139035.</span>
+          <span data-lang="uk">VacWave Bio Nutrition — мікрохвильово-вакуумна сушка при 36-38°C. Власний патент №139035 + <a href="#sec-equipment" onclick="document.querySelector('[data-target=equipment]').click();return false">власне обладнання</a>.</span>
+          <span data-lang="en">VacWave Bio Nutrition — microwave-vacuum drying at 36-38°C. Proprietary patent No. 139035 + <a href="#sec-equipment" onclick="document.querySelector('[data-target=equipment]').click();return false">in-house equipment</a>.</span><span data-lang="sk">VacWave Bio Nutrition — mikrovlnno-vákuové sušenie pri 36-38°C. Vlastný patent č. 139035 + <a href="#sec-equipment" onclick="document.querySelector('[data-target=equipment]').click();return false">vlastné vybavenie</a>.</span>
         </div>
       </div>
       <div class="card card-sm">
@@ -3011,12 +3051,12 @@ h3.block-title:first-of-type { margin-top: 0; }
   <!-- KPI tiles -->
   <div class="grid-3" style="margin:24px 0">
     <div class="card card-sm" style="background:var(--black);color:#fff">
-      <div style="font-size:32px;font-weight:900;color:var(--yellow);line-height:1">1+</div>
+      <div style="font-size:32px;font-weight:900;color:var(--yellow);line-height:1">5+</div>
       <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:6px;letter-spacing:0.04em;text-transform:uppercase">
-        <span data-lang="uk">рік розробок</span><span data-lang="en">year of R&amp;D</span><span data-lang="sk">rok vývoja</span>
+        <span data-lang="uk">років розробок</span><span data-lang="en">years of R&amp;D</span><span data-lang="sk">rokov vývoja</span>
       </div>
       <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:4px;line-height:1.4">
-        <span data-lang="uk">Безперервної інженерної роботи перед запуском</span><span data-lang="en">Of continuous engineering work before launch</span><span data-lang="sk">Nepretržitej inžinierskej práce pred spustením</span>
+        <span data-lang="uk">Безперервної інженерної роботи: від запуску до постійного вдосконалення платформи</span><span data-lang="en">Of continuous engineering work: from launch through ongoing platform refinement</span><span data-lang="sk">Nepretržitej inžinierskej práce: od spustenia po neustále zdokonaľovanie platformy</span>
       </div>
     </div>
     <div class="card card-sm" style="background:rgba(254,191,39,0.18)">
@@ -3039,6 +3079,24 @@ h3.block-title:first-of-type { margin-top: 0; }
   </div>
 
   <!-- Challenge -->
+  <!-- Equipment photo gallery (added v2.42, more photos coming) -->
+  <h3 class="block-title">📸 <span data-lang="uk">Обладнання — фото з виробництва</span><span data-lang="en">Equipment — production floor photos</span><span data-lang="sk">Vybavenie — fotky z výroby</span></h3>
+  <div class="equipment-gallery">
+    <a href="equipment-photos/snEco_equipment_01_full.jpg" target="_blank" rel="noopener" class="eq-photo">
+      <img src="equipment-photos/snEco_equipment_01_large.jpg" alt="snEco vacuum-microwave dehydration chambers — production line" loading="lazy">
+      <div class="eq-photo-caption">
+        <span data-lang="uk">Лінія мікрохвильово-вакуумних камер snEco MARK II — виробництво у Мукачево</span>
+        <span data-lang="en">snEco MARK II microwave-vacuum chamber line — Mukachevo production floor</span>
+        <span data-lang="sk">Linka mikrovlnno-vákuových komôr snEco MARK II — výroba v Mukačeve</span>
+      </div>
+    </a>
+  </div>
+  <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:24px;line-height:1.5;font-style:italic">
+    <span data-lang="uk">📌 Більше фото — додаються по мірі надходження. Кожна камера марки <strong>snEco MARK II</strong> з власним брендуванням, мікропроцесорним керуванням і незалежними vacuum/chiller контурами. Знизу — підпис USAID (підтримка обладнання за програмою CEP).</span>
+    <span data-lang="en">📌 More photos coming. Each chamber is a <strong>snEco MARK II</strong> unit with own branding, microprocessor controls and independent vacuum/chiller loops. Bottom badge — USAID (CEP equipment support program).</span>
+    <span data-lang="sk">📌 Ďalšie fotky pribudnú. Každá komora je <strong>snEco MARK II</strong> s vlastným brandingom, mikroprocesorovým riadením a nezávislými vacuum/chiller okruhmi. Spodný odznak — USAID (program podpory vybavenia CEP).</span>
+  </div>
+
   <h3 class="block-title">⚠️ <span data-lang="uk">Виклик: чому довелося робити власне</span><span data-lang="en">The challenge: why we had to build it ourselves</span><span data-lang="sk">Výzva: prečo sme to museli postaviť sami</span></h3>
   <div class="card" style="border-left:4px solid #dc2626">
     <div style="font-size:13px;line-height:1.7;color:var(--text-muted)">
@@ -3314,6 +3372,11 @@ h3.block-title:first-of-type { margin-top: 0; }
           <td><span data-lang="uk">Технологія</span><span data-lang="en">Technology</span><span data-lang="sk">Technológia</span></td>
           <td>VacWave Bio Nutrition · patented · microwave-vacuum drying at 36-38°C</td>
           <td><a href="documents/legal/Patent_UA_139035.pdf" target="_blank" rel="noopener">📄 <span data-lang="uk">Патент №139035</span><span data-lang="en">Patent No. 139035</span><span data-lang="sk">Patent č. 139035</span></a></td>
+        </tr>
+        <tr>
+          <td><span data-lang="uk">Виробнича платформа</span><span data-lang="en">Production platform</span><span data-lang="sk">Výrobná platforma</span></td>
+          <td>in-house equipment · 5+ years R&amp;D · CE · ISO 9001 · ISO 22000 · scales beyond cheese (meat / vegetables / fruits)</td>
+          <td><a href="#sec-equipment" onclick="document.querySelector('[data-target=equipment]').click();return false">🏭 <span data-lang="uk">Виробництво &amp; R&amp;D</span><span data-lang="en">Production &amp; R&amp;D</span><span data-lang="sk">Výroba &amp; R&amp;D</span></a></td>
         </tr>
         <tr>
           <td><span data-lang="uk">Sustainability</span><span data-lang="en">Sustainability</span><span data-lang="sk">Sustainability</span></td>
@@ -4042,8 +4105,8 @@ h3.block-title:first-of-type { margin-top: 0; }
     </div>
   </div>
 
-  <h3 class="block-title"><span data-lang="uk">Три кути сторі для медіа</span><span data-lang="en">Three story angles for media</span><span data-lang="sk">Tri uhly príbehu pre médiá</span></h3>
-  <div class="grid-3">
+  <h3 class="block-title"><span data-lang="uk">Чотири кути сторі для медіа</span><span data-lang="en">Four story angles for media</span><span data-lang="sk">Štyri uhly príbehu pre médiá</span></h3>
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
     <div class="card">
       <div style="font-size:24px;margin-bottom:10px">🔬</div>
       <div style="font-weight:700;font-size:14px;margin-bottom:6px"><span data-lang="uk">Кут 1: Food-tech &amp; інновація</span><span data-lang="en">Angle 1: Food-tech &amp; innovation</span><span data-lang="sk">Uhol 1: Food-tech &amp; inovácia</span></div>
@@ -4066,6 +4129,16 @@ h3.block-title:first-of-type { margin-top: 0; }
       <div style="font-size:12px;color:var(--text-muted);line-height:1.55">
         <span data-lang="uk">Подвоєння виручки кожен рік попри війну. Завод у ЄС як стратегія диверсифікації, а не втеча.</span>
         <span data-lang="en">Revenue doubling every year through the war. The EU plant as a diversification strategy, not an escape.</span><span data-lang="sk">Zdvojnásobenie tržieb každý rok napriek vojne. Závod v EÚ ako stratégia diverzifikácie, nie útek.</span>
+      </div>
+    </div>
+    <!-- NEW Angle 4: Deep-tech engineering (added v2.41) -->
+    <div class="card" style="border-left:3px solid var(--yellow)">
+      <div style="font-size:24px;margin-bottom:10px">🏭</div>
+      <div style="font-weight:700;font-size:14px;margin-bottom:6px"><span data-lang="uk">Кут 4: Deep-tech engineering</span><span data-lang="en">Angle 4: Deep-tech engineering</span><span data-lang="sk">Uhol 4: Deep-tech engineering</span></div>
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.55">
+        <span data-lang="uk">snEco не купує обладнання — <strong>розробляє і виробляє своє</strong>. 5+ років R&amp;D, мільйонні інвестиції, CE/ISO 9001/ISO 22000. Технологічна платформа, яка масштабується далеко за межі сиру → <a href="#sec-equipment" onclick="document.querySelector('[data-target=equipment]').click();return false">деталі</a>.</span>
+        <span data-lang="en">snEco doesn't buy equipment — it <strong>designs and builds its own</strong>. 5+ years R&amp;D, multi-million investment, CE/ISO 9001/ISO 22000. A tech platform scaling far beyond cheese → <a href="#sec-equipment" onclick="document.querySelector('[data-target=equipment]').click();return false">details</a>.</span>
+        <span data-lang="sk">snEco nekupuje vybavenie — <strong>navrhuje a stavia vlastné</strong>. 5+ rokov R&amp;D, multimiliónová investícia, CE/ISO 9001/ISO 22000. Technologická platforma, ktorá sa škáluje ďaleko za syr → <a href="#sec-equipment" onclick="document.querySelector('[data-target=equipment]').click();return false">detaily</a>.</span>
       </div>
     </div>
   </div>
@@ -5034,7 +5107,7 @@ h3.block-title:first-of-type { margin-top: 0; }
       </div>
       <div>
         <div style="font-size:13px;font-weight:700;color:#dc2626;margin-bottom:4px">— <span data-lang="uk">«Ціна вища за середню»</span><span data-lang="en">"Price is above the average"</span><span data-lang="sk">„Cena vyššia ako priemer"</span></div>
-        <div style="font-size:13px;line-height:1.55"><span data-lang="uk">Це premium-категорія: один інгредієнт, до 60% протеїну, європейські сертифікати, sustainability. Маржа полиці — вище за mass-snack. <strong>+126% промо-приріст</strong> при правильній акції.</span><span data-lang="en">It's a premium category: single ingredient, up to 60% protein, European certifications, sustainability. Shelf margin is higher than for mass snacks. <strong>+126% promo lift</strong> when activated properly.</span><span data-lang="sk">Je to premium-kategória: jedna ingrediencia, až 60% bielkovín, európske certifikáty, sustainability. Marža regálu — vyššia ako mass-snack. <strong>+126% promo-prírastok</strong> pri správnej akcii.</span></div>
+        <div style="font-size:13px;line-height:1.55"><span data-lang="uk">Це premium-категорія: один інгредієнт, до 60% протеїну, європейські сертифікати, sustainability. Маржа полиці — вище за mass-snack. <strong>+126% промо-приріст</strong> при правильній акції. Конкуренти не можуть швидко скопіювати — у нас <a href="#sec-equipment" onclick="document.querySelector('[data-target=equipment]').click();return false">власна технологічна платформа</a> (5+ років R&amp;D).</span><span data-lang="en">It's a premium category: single ingredient, up to 60% protein, European certifications, sustainability. Shelf margin is higher than for mass snacks. <strong>+126% promo lift</strong> when activated properly. Competitors can't quickly copy — we own the <a href="#sec-equipment" onclick="document.querySelector('[data-target=equipment]').click();return false">tech platform</a> (5+ years R&amp;D).</span><span data-lang="sk">Je to premium-kategória: jedna ingrediencia, až 60% bielkovín, európske certifikáty, sustainability. Marža regálu — vyššia ako mass-snack. <strong>+126% promo-prírastok</strong> pri správnej akcii. Konkurenti nedokážu rýchlo kopírovať — máme <a href="#sec-equipment" onclick="document.querySelector('[data-target=equipment]').click();return false">vlastnú technologickú platformu</a> (5+ rokov R&amp;D).</span></div>
       </div>
       <div>
         <div style="font-size:13px;font-weight:700;color:#dc2626;margin-bottom:4px">— <span data-lang="uk">«Не знаємо бренд, ризиковано»</span><span data-lang="en">"We don't know the brand, it's risky"</span><span data-lang="sk">„Nepoznáme značku, riskantné"</span></div>
@@ -5042,7 +5115,7 @@ h3.block-title:first-of-type { margin-top: 0; }
       </div>
       <div>
         <div style="font-size:13px;font-weight:700;color:#dc2626;margin-bottom:4px">— <span data-lang="uk">«Як з постачанням і строками?»</span><span data-lang="en">"What about supply and lead times?"</span><span data-lang="sk">„Ako je to s dodávkami a lehotami?"</span></div>
-        <div style="font-size:13px;line-height:1.55"><span data-lang="uk">Два заводи (UA + EU), сертифікати IFS Food v8 і EU TRACES для SK-майданчика. Lead-time від замовлення — 4–6 тижнів для первинного, 2–3 тижні для повторного. Зберігання 24 міс. без холодильника знімає логістичні ризики.</span><span data-lang="en">Two plants (UA + EU), IFS Food v8 and EU TRACES for the SK site. Lead time: 4–6 weeks initial, 2–3 weeks repeat. The 24-month no-fridge shelf life removes logistical risk.</span><span data-lang="sk">Dva závody (UA + EÚ), certifikáty IFS Food v8 a EU TRACES pre SK-závod. Lead-time od objednávky — 4–6 týždňov pre prvú dodávku, 2–3 týždne pre opakovanú. Skladovanie 24 mesiacov bez chladničky odstraňuje logistické riziká.</span></div>
+        <div style="font-size:13px;line-height:1.55"><span data-lang="uk">Два заводи (UA + EU), сертифікати IFS Food v8 і EU TRACES для SK-майданчика. Lead-time від замовлення — 4–6 тижнів для первинного, 2–3 тижні для повторного. Зберігання 24 міс. без холодильника знімає логістичні ризики. <strong>+ <a href="#sec-equipment" onclick="document.querySelector('[data-target=equipment]').click();return false">власне обладнання</a> = немає залежності від сторонніх постачальників ліній чи дефіциту запчастин.</strong></span><span data-lang="en">Two plants (UA + EU), IFS Food v8 and EU TRACES for the SK site. Lead time: 4–6 weeks initial, 2–3 weeks repeat. The 24-month no-fridge shelf life removes logistical risk. <strong>+ <a href="#sec-equipment" onclick="document.querySelector('[data-target=equipment]').click();return false">in-house equipment</a> = no dependency on third-party line suppliers or spare-parts shortages.</strong></span><span data-lang="sk">Dva závody (UA + EÚ), certifikáty IFS Food v8 a EU TRACES pre SK-závod. Lead-time od objednávky — 4–6 týždňov pre prvú dodávku, 2–3 týždne pre opakovanú. Skladovanie 24 mesiacov bez chladničky odstraňuje logistické riziká. <strong>+ <a href="#sec-equipment" onclick="document.querySelector('[data-target=equipment]').click();return false">vlastné vybavenie</a> = žiadna závislosť od tretích dodávateľov liniek alebo nedostatku náhradných dielov.</strong></span></div>
       </div>
       <div>
         <div style="font-size:13px;font-weight:700;color:#dc2626;margin-bottom:4px">— <span data-lang="uk">«Made in Ukraine — конс'юмер сприйме?»</span><span data-lang="en">"Made in Ukraine — will the consumer accept it?"</span><span data-lang="sk">„Made in Ukraine — prijme to spotrebiteľ?"</span></div>
@@ -6773,7 +6846,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     </div>
     <div class="card card-sm">
       <div style="font-weight:700;font-size:13px;margin-bottom:6px">📚 <span data-lang="uk">Wikipedia / public profile</span><span data-lang="en">Wikipedia / public profile</span><span data-lang="sk">Wikipedia / verejný profil</span></div>
-      <div style="font-size:12px;color:var(--text-muted);line-height:1.55"><span data-lang="uk">Найсильніші 15-20 джерел для Wikipedia: Forbes, AIN, ШоТам, Yellow Blue, EU4Ukraine/EEF, SIAL Success Story, Export.gov.ua, Dairy Global, NewFood, AgroPortal, The Digital, Ministry of Economy, ICTV, MIND.BRAND.</span><span data-lang="en">Strongest 15-20 sources for Wikipedia: Forbes, AIN, ShoTam, Yellow Blue, EU4Ukraine/EEF, SIAL Success Story, Export.gov.ua, Dairy Global, NewFood, AgroPortal, The Digital, Ministry of Economy, ICTV, MIND.BRAND.</span><span data-lang="sk">Najsilnejšie 15-20 zdrojov pre Wikipedia: Forbes, AIN, ShoTam, Yellow Blue, EU4Ukraine/EEF, SIAL Success Story, Export.gov.ua, Dairy Global, NewFood, AgroPortal, The Digital, Ministry of Economy, ICTV, MIND.BRAND.</span></div>
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.55"><span data-lang="uk">Найсильніші 15-20 джерел для Wikipedia: Forbes, AIN, ШоТам, Yellow Blue, EU4Ukraine/EEF, SIAL Success Story, Export.gov.ua, Dairy Global, NewFood, AgroPortal, The Digital, Ministry of Economy, ICTV, MIND.BRAND. <strong>Окрема глава «Equipment / R&amp;D»</strong> — про <a href="#sec-equipment" onclick="document.querySelector('[data-target=equipment]').click();return false">власну виробничу платформу</a> (deep-tech angle, конкурентний moat).</span><span data-lang="en">Strongest 15-20 sources for Wikipedia: Forbes, AIN, ShoTam, Yellow Blue, EU4Ukraine/EEF, SIAL Success Story, Export.gov.ua, Dairy Global, NewFood, AgroPortal, The Digital, Ministry of Economy, ICTV, MIND.BRAND. <strong>Separate "Equipment / R&amp;D" chapter</strong> — covering the <a href="#sec-equipment" onclick="document.querySelector('[data-target=equipment]').click();return false">in-house production platform</a> (deep-tech angle, competitive moat).</span><span data-lang="sk">Najsilnejšie 15-20 zdrojov pre Wikipedia: Forbes, AIN, ShoTam, Yellow Blue, EU4Ukraine/EEF, SIAL Success Story, Export.gov.ua, Dairy Global, NewFood, AgroPortal, The Digital, Ministry of Economy, ICTV, MIND.BRAND. <strong>Samostatná kapitola „Equipment / R&amp;D"</strong> — o <a href="#sec-equipment" onclick="document.querySelector('[data-target=equipment]').click();return false">vlastnej výrobnej platforme</a> (deep-tech angle, konkurenčný moat).</span></div>
     </div>
   </div>
 
@@ -7333,11 +7406,19 @@ h3.block-title:first-of-type { margin-top: 0; }
         <span data-lang="uk">snEco як №1 у субкатегорії «низькотемпературний хрусткий сир» в EU. Третій виробничий майданчик у Західній Європі або Америці. Експансія категорії: продукти на основі тієї самої VacWave-технології (поза сиром).</span>
         <span data-lang="en">snEco as #1 in the "low-temperature crunchy cheese" sub-category across the EU. Third production site in Western Europe or the Americas. Category expansion: products based on the same VacWave technology beyond cheese.</span><span data-lang="sk">snEco ako №1 v subkategórii „nízkoteplotný chrumkavý syr" v EÚ. Tretí výrobný závod v Západnej Európe alebo Amerike. Expanzia kategórie: produkty založené na tej istej VacWave-technológii (mimo syra).</span>
       </div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
         <span class="mono-val">EU sub-category leader</span>
         <span class="mono-val">3rd plant</span>
         <span class="mono-val">VacWave platform expansion</span>
         <span class="mono-val">Adjacent categories</span>
+      </div>
+
+      <!-- Equipment moat callout (added v2.41) -->
+      <div style="background:rgba(254,191,39,0.12);border-left:3px solid var(--yellow);padding:12px 14px;border-radius:6px;font-size:12.5px;line-height:1.6">
+        <strong>🏭 <span data-lang="uk">Платформа, не продукт.</span><span data-lang="en">Platform, not a product.</span><span data-lang="sk">Platforma, nie produkt.</span></strong>
+        <span data-lang="uk">Завдяки <a href="#sec-equipment" onclick="document.querySelector('[data-target=equipment]').click();return false">власному обладнанню</a> платформа VacWave масштабується далеко за межі сиру: <strong>м'ясо · овочі · фрукти · інші харчові продукти</strong>. Phase III — це не просто географічна експансія, це <strong>розширення категорії</strong>.</span>
+        <span data-lang="en">Thanks to <a href="#sec-equipment" onclick="document.querySelector('[data-target=equipment]').click();return false">our own equipment</a>, the VacWave platform scales far beyond cheese: <strong>meat · vegetables · fruits · other food products</strong>. Phase III isn't just geographic — it's <strong>category expansion</strong>.</span>
+        <span data-lang="sk">Vďaka <a href="#sec-equipment" onclick="document.querySelector('[data-target=equipment]').click();return false">vlastnému vybaveniu</a> sa platforma VacWave škáluje ďaleko za syr: <strong>mäso · zelenina · ovocie · iné potraviny</strong>. Phase III nie je iba geografická expanzia, je to <strong>rozšírenie kategórie</strong>.</span>
       </div>
     </div>
   </div>
@@ -7513,7 +7594,55 @@ h3.block-title:first-of-type { margin-top: 0; }
 
   <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span><span data-lang="sk">História verzií</span></h3>
   <div class="changelog-entry">
-    <span class="changelog-version">v2.40</span><span class="changelog-date">10.05.2026</span>
+    <span class="changelog-version">v2.42</span><span class="changelog-date">10.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>📸 Перше фото обладнання у sec-equipment.</strong> Додано галерею з фотографією лінії мікрохвильово-вакуумних камер snEco MARK II (виробництво у Мукачево, USAID-підтримане обладнання). Конвертовано з HEIC у JPEG (full 1.7MB · large 240KB · thumb 22KB).</li>
+      <li data-lang="en"><strong>📸 First equipment photo in sec-equipment.</strong> Added a gallery with the snEco MARK II microwave-vacuum chamber line (Mukachevo production, USAID-supported equipment). Converted from HEIC to JPEG (full 1.7MB · large 240KB · thumb 22KB).</li>
+      <li data-lang="sk"><strong>📸 Prvá fotka vybavenia v sec-equipment.</strong> Pridaná galéria s linkou mikrovlnno-vákuových komôr snEco MARK II (výroba v Mukačeve, USAID-podporované vybavenie). Konvertované z HEIC na JPEG (full 1.7MB · large 240KB · thumb 22KB).</li>
+      <li data-lang="uk"><strong>🎨 Нові CSS класи:</strong> <code>.equipment-gallery</code> (auto-fit grid 360px+), <code>.eq-photo</code> (clickable card з hover-lift і yellow border), <code>.eq-photo-caption</code> (трилмовний підпис під фото). Адаптивно на мобільних (1 колонка, 3:2 аспект).</li>
+      <li data-lang="en"><strong>🎨 New CSS classes:</strong> <code>.equipment-gallery</code> (auto-fit grid 360px+), <code>.eq-photo</code> (clickable card with hover-lift &amp; yellow border), <code>.eq-photo-caption</code> (trilingual caption). Mobile-responsive (1 col, 3:2 ratio).</li>
+      <li data-lang="sk"><strong>🎨 Nové CSS triedy:</strong> <code>.equipment-gallery</code> (auto-fit mriežka 360px+), <code>.eq-photo</code> (klikateľná karta s hover-lift a žltým rámom), <code>.eq-photo-caption</code> (trojjazyčný popis). Responzívne na mobile (1 stĺpec, 3:2 pomer).</li>
+      <li data-lang="uk"><strong>⏳ Pending:</strong> ще 3 фото (☀️ solar panels на даху Мукачево + 🏆 SIAL booth + 🏆 SIAL ceremony з нагородою) — користувач показав скріншоти у чаті, але файли ще не завантажені через скріпку. Місця визначено: solar → sec-story (sustainability block) + sec-equipment (Power sub-block); SIAL ceremony → sec-press-coverage (top of SIAL theme); SIAL booth → sec-claims (визнання) або sec-voice (press kit visual).</li>
+      <li data-lang="en"><strong>⏳ Pending:</strong> 3 more photos (☀️ solar panels on Mukachevo roof + 🏆 SIAL booth + 🏆 SIAL ceremony with award) — user showed screenshots in chat but files aren't uploaded via paperclip yet. Placement decided: solar → sec-story (sustainability) + sec-equipment (Power sub-block); SIAL ceremony → sec-press-coverage (top of SIAL theme); SIAL booth → sec-claims (recognition) or sec-voice (press kit visual).</li>
+      <li data-lang="sk"><strong>⏳ Pending:</strong> ďalšie 3 fotky (☀️ solárne panely na streche Mukačeva + 🏆 SIAL stánok + 🏆 SIAL ceremónia s ocenením) — používateľ ukázal screenshoty v chate, ale súbory neboli nahrané cez sponku. Umiestnenie určené: solárne → sec-story (sustainability) + sec-equipment (Power sub-block); SIAL ceremónia → sec-press-coverage (vrch SIAL témy); SIAL stánok → sec-claims (uznanie) alebo sec-voice (press kit visual).</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.41</span><span class="changelog-date">10.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>🔗 Cross-references на Equipment &amp; R&amp;D у 6 інших розділах:</strong> щоб narrative «технологічна платформа» працював скрізь, не тільки у власній секції.</li>
+      <li data-lang="en"><strong>🔗 Cross-references to Equipment &amp; R&amp;D in 6 other sections:</strong> so the "tech platform" narrative carries across, not just in its own section.</li>
+      <li data-lang="sk"><strong>🔗 Cross-references na Equipment &amp; R&amp;D v 6 ďalších sekciách:</strong> aby naratív „technologická platforma" fungoval všade, nielen vo vlastnej sekcii.</li>
+
+      <li data-lang="uk"><strong>📈 Roadmap Phase III</strong> — додано yellow callout «Платформа, не продукт»: VacWave масштабується далеко за межі сиру (м'ясо · овочі · фрукти · інші), Phase III це <strong>розширення категорії</strong>, не просто географія.</li>
+      <li data-lang="en"><strong>📈 Roadmap Phase III</strong> — added yellow callout "Platform, not a product": VacWave scales far beyond cheese (meat · veg · fruit · other), Phase III is <strong>category expansion</strong>, not just geography.</li>
+      <li data-lang="sk"><strong>📈 Roadmap Phase III</strong> — pridaný žltý callout „Platforma, nie produkt": VacWave škáluje ďaleko za syr (mäso · zelenina · ovocie · iné), Phase III je <strong>rozšírenie kategórie</strong>, nie iba geografia.</li>
+
+      <li data-lang="uk"><strong>🎙 Voice / Press kit</strong> — 3 кути сторі → <strong>4 кути</strong>: новий «🏭 Кут 4: Deep-tech engineering» для журналістів («snEco не купує обладнання — розробляє і виробляє своє»).</li>
+      <li data-lang="en"><strong>🎙 Voice / Press kit</strong> — 3 story angles → <strong>4 angles</strong>: new "🏭 Angle 4: Deep-tech engineering" for journalists ("snEco doesn't buy equipment — it designs and builds its own").</li>
+      <li data-lang="sk"><strong>🎙 Voice / Press kit</strong> — 3 uhly príbehu → <strong>4 uhly</strong>: nový „🏭 Uhol 4: Deep-tech engineering" pre novinárov („snEco nekupuje vybavenie — navrhuje a stavia vlastné").</li>
+
+      <li data-lang="uk"><strong>💼 Sales playbook objections</strong> — підсилено 2 відповіді: «Як з постачанням і строками?» (немає залежності від сторонніх ліній) і «Ціна вища за середню» (конкуренти не скопіюють — у нас власна платформа, 1+ рік R&amp;D).</li>
+      <li data-lang="en"><strong>💼 Sales playbook objections</strong> — strengthened 2 rebuttals: "Supply &amp; lead times?" (no dependency on third-party lines) and "Price above average" (competitors can't copy — we own the platform, 1+ year R&amp;D).</li>
+      <li data-lang="sk"><strong>💼 Sales playbook objections</strong> — posilnené 2 odpovede: „Dodávky a lehoty?" (žiadna závislosť na tretích linkách) a „Cena vyššia ako priemer" (konkurenti nedokážu kopírovať — máme vlastnú platformu, 1+ rok R&amp;D).</li>
+
+      <li data-lang="uk"><strong>📋 Claims library (sec-claims)</strong> — нова DO-фраза «<em>Виробнича платформа</em>»: in-house equipment · 1+ year R&amp;D · CE / ISO 9001 / ISO 22000 · scales beyond cheese. Підкріплено посиланням на sec-equipment.</li>
+      <li data-lang="en"><strong>📋 Claims library (sec-claims)</strong> — new DO claim "<em>Production platform</em>": in-house equipment · 1+ year R&amp;D · CE / ISO 9001 / ISO 22000 · scales beyond cheese. Backed by link to sec-equipment.</li>
+      <li data-lang="sk"><strong>📋 Claims library (sec-claims)</strong> — nový DO claim „<em>Výrobná platforma</em>": in-house equipment · 1+ year R&amp;D · CE / ISO 9001 / ISO 22000 · scales beyond cheese. Podložené linkom na sec-equipment.</li>
+
+      <li data-lang="uk"><strong>📚 Press coverage Wikipedia tile</strong> — згадано окрему главу «Equipment / R&amp;D» як deep-tech angle і конкурентний moat для статті у Wikipedia.</li>
+      <li data-lang="en"><strong>📚 Press coverage Wikipedia tile</strong> — mentioned a separate "Equipment / R&amp;D" chapter as the deep-tech angle and competitive moat for a Wikipedia article.</li>
+      <li data-lang="sk"><strong>📚 Press coverage Wikipedia tile</strong> — spomenutá samostatná kapitola „Equipment / R&amp;D" ako deep-tech angle a konkurenčný moat pre Wikipedia článok.</li>
+
+      <li data-lang="uk"><strong>🏠 Intro «Хто ми»</strong> — у блоці «Технологія» додано «+ власне обладнання» з посиланням на sec-equipment, щоб з першої секції було зрозуміло що snEco — це не тільки рецепт, а й платформа.</li>
+      <li data-lang="en"><strong>🏠 Intro "Who we are"</strong> — in the "Technology" tile added "+ in-house equipment" with link to sec-equipment, so from the very first section it's clear snEco is not just a recipe but a platform.</li>
+      <li data-lang="sk"><strong>🏠 Intro „Kto sme"</strong> — v dlaždici „Technológia" pridané „+ vlastné vybavenie" s linkom na sec-equipment, aby od prvej sekcie bolo jasné, že snEco nie je len recept, ale platforma.</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.40</span><span class="changelog-date">10.05.2026</span>
     <ul class="changelog-list">
       <li data-lang="uk"><strong>🏭 Новий розділ «Виробництво &amp; R&amp;D»</strong> у sidebar групі «Вступ» (між «Історія &amp; технологія» і «Меседжі &amp; слогани»). Розкриває, що snEco — це <strong>не тільки бренд снеків, а технологічна компанія</strong> з повністю власною інженерною базою. Усе ключове обладнання розроблене і виготовлене всередині компанії: дегідраційні комплекси, мікрохвильово-вакуумні камери, системи автоматичного контролю, програмне забезпечення керування, лінії підготовки/обробки, QA на всіх етапах.</li>
       <li data-lang="en"><strong>🏭 New "Production &amp; R&amp;D" section</strong> in the "Introduction" sidebar group (between "Story &amp; technology" and "Claims &amp; slogans"). Reveals that snEco is <strong>not just a snack brand but a technology company</strong> with a fully in-house engineering platform. All key equipment is designed and built inside the company: dehydration complexes, microwave-vacuum chambers, automatic control systems, control software, prep/processing lines, QA at every stage.</li>
