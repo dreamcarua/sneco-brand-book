@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>snEco · EU 5-Markets Strategic Dossier · 2026</title>
+<style>
+:root {
+  --yellow: #FEBF27;
+  --yellow-soft: rgba(254,191,39,0.10);
+  --yellow-medium: rgba(254,191,39,0.18);
+  --black: #1A1A1A;
+  --black-soft: #2A2A2A;
+  --black-05: rgba(26,26,26,0.05);
+  --black-10: rgba(26,26,26,0.10);
+  --white: #FFFFFF;
+  --surface: #FAFAFA;
+  --text: #1A1A1A;
+  --text-muted: #6B6B6B;
+  --border: #E5E5E5;
+  --green: #2D6A00;
+  --red: #DC2626;
+  --blue: #2563EB;
+  --radius: 12px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04);
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  --font-mono: "SF Mono", Menlo, Monaco, Consolas, monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--surface);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Layout */
+.layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+.sidebar {
+  background: var(--black);
+  color: var(--white);
+  padding: 36px 24px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+.sidebar-logo {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+  color: var(--yellow);
+}
+.sidebar-tagline {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 32px;
+}
+.sidebar-group { margin-bottom: 24px; }
+.sidebar-group-label {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 10px;
+  padding: 0 12px;
+}
+.sidebar-link {
+  display: block;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: rgba(255,255,255,0.82);
+  text-decoration: none;
+  font-size: 13.5px;
+  margin-bottom: 2px;
+  transition: all 0.15s;
+}
+.sidebar-link:hover {
+  background: rgba(255,255,255,0.08);
+  color: var(--white);
+}
+.sidebar-link.active {
+  background: var(--yellow);
+  color: var(--black);
+  font-weight: 700;
+}
+.sidebar-link .badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+}
+.sidebar-footer {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.10);
+  font-size: 10.5px;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.5;
+}
+
+main { padding: 0; }
+.section {
+  padding: 56px 64px;
+  border-bottom: 1px solid var(--border);
+  max-width: 1200px;
+  background: var(--white);
+}
+.section-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.section-title {
+  font-size: 38px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1.15;
+  margin-bottom: 14px;
+}
+.section-lead {
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--text-muted);
+  margin-bottom: 36px;
+  max-width: 800px;
+}
+.block-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  margin: 40px 0 18px;
+}
+.sub-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 28px 0 12px;
+}
+p { margin-bottom: 12px; }
+strong { color: var(--text); font-weight: 700; }
+
+/* Hero */
+.hero {
+  background: linear-gradient(135deg, var(--black) 0%, #2A2A2A 100%);
+  color: var(--white);
+  padding: 80px 64px 64px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  top: -100px;
+  right: -100px;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(254,191,39,0.20) 0%, transparent 70%);
+}
+.hero-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--yellow);
+  margin-bottom: 16px;
+}
+.hero-title {
+  font-size: 56px;
+  font-weight: 900;
+  letter-spacing: -1.5px;
+  line-height: 1.05;
+  margin-bottom: 20px;
+  position: relative;
+}
+.hero-title .accent { color: var(--yellow); }
+.hero-subtitle {
+  font-size: 20px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.5;
+  max-width: 720px;
+  margin-bottom: 32px;
+}
+.hero-flags {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.hero-flag {
+  padding: 8px 16px;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.hero-flag.priority-1 { background: var(--yellow); color: var(--black); border-color: var(--yellow); }
+.hero-meta {
+  display: flex;
+  gap: 28px;
+  margin-top: 32px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.55);
+}
+.hero-meta strong { color: var(--white); }
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 16px 0 24px;
+  background: var(--white);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+thead { background: var(--black); color: var(--white); }
+thead th {
+  padding: 12px 14px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+tbody td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.5;
+}
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: var(--black-05); }
+.row-highlight { background: var(--yellow-soft); }
+.row-highlight:hover { background: var(--yellow-medium); }
+
+/* KPI cards */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin: 20px 0 28px;
+}
+.kpi-card {
+  padding: 20px 22px;
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+.kpi-card.dark { background: var(--black); color: var(--white); border-color: var(--black); }
+.kpi-card.yellow { background: var(--yellow); color: var(--black); border-color: var(--yellow); }
+.kpi-value {
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.kpi-card.dark .kpi-value { color: var(--yellow); }
+.kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.kpi-card.dark .kpi-label { color: rgba(255,255,255,0.6); }
+.kpi-card.yellow .kpi-label { color: rgba(30,30,30,0.7); }
+
+/* Callout */
+.callout {
+  margin: 24px 0;
+  padding: 22px 26px;
+  background: var(--yellow-soft);
+  border-left: 4px solid var(--yellow);
+  border-radius: 8px;
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+.callout.dark {
+  background: var(--black);
+  color: var(--white);
+  border-left-color: var(--yellow);
+}
+.callout.dark strong { color: var(--yellow); }
+.callout-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--yellow);
+  margin-bottom: 10px;
+}
+.callout.dark .callout-label { color: var(--yellow); }
+
+/* Market cards (cross-section) */
+.market-cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin: 20px 0;
+}
+.market-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  position: relative;
+}
+.market-card.rank-1 { border-top: 4px solid var(--yellow); }
+.market-card.rank-2 { border-top: 4px solid #3B82F6; }
+.market-card.rank-3 { border-top: 4px solid var(--green); }
+.market-card.rank-4 { border-top: 4px solid #A855F7; }
+.market-card.rank-5 { border-top: 4px solid var(--text-muted); }
+.market-card-rank {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  background: var(--black-05);
+  border-radius: 10px;
+}
+.market-card-flag { font-size: 32px; line-height: 1; margin-bottom: 8px; }
+.market-card-name { font-size: 17px; font-weight: 800; margin-bottom: 4px; }
+.market-card-tagline { font-size: 11.5px; color: var(--text-muted); line-height: 1.45; min-height: 32px; margin-bottom: 12px; }
+.market-card-stats { font-size: 12px; line-height: 1.6; }
+.market-card-stat-label { color: var(--text-muted); font-size: 11px; }
+.market-card-stat-value { font-weight: 700; font-size: 13px; }
+
+/* 9-cell matrix */
+.matrix-3x3 {
+  display: grid;
+  grid-template-columns: 90px repeat(3, 1fr);
+  grid-template-rows: 40px repeat(3, 110px);
+  gap: 6px;
+  margin: 28px 0;
+  max-width: 800px;
+}
+.matrix-3x3 .corner { background: transparent; }
+.matrix-3x3 .col-label, .matrix-3x3 .row-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+}
+.matrix-3x3 .row-label { writing-mode: vertical-lr; transform: rotate(180deg); }
+.matrix-cell {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 12px;
+}
+.matrix-cell.filled { background: var(--white); border-color: var(--yellow); box-shadow: var(--shadow); }
+.matrix-cell-flag { font-size: 28px; line-height: 1; margin-bottom: 4px; }
+.matrix-cell-name { font-weight: 800; font-size: 13px; }
+.matrix-cell-tag { font-size: 10.5px; color: var(--text-muted); margin-top: 2px; }
+
+/* Heatmap */
+.channel-heatmap th, .channel-heatmap td { text-align: center; font-size: 12px; padding: 8px 6px; }
+.channel-heatmap td:first-child, .channel-heatmap th:first-child { text-align: left; padding-left: 14px; }
+.cell-1 { background: #FEE2E2; color: #991B1B; font-weight: 700; }
+.cell-2 { background: #FED7AA; color: #9A3412; font-weight: 700; }
+.cell-3 { background: #FEF3C7; color: #92400E; font-weight: 700; }
+.cell-4 { background: #BBF7D0; color: #14532D; font-weight: 700; }
+.cell-5 { background: #86EFAC; color: #14532D; font-weight: 800; }
+
+/* Scenarios */
+.scenarios { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 20px 0; }
+.scenario { padding: 22px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--white); }
+.scenario.base { border-top: 4px solid var(--yellow); background: linear-gradient(180deg, var(--yellow-soft) 0%, var(--white) 60%); }
+.scenario.conservative { border-top: 4px solid var(--text-muted); }
+.scenario.aggressive { border-top: 4px solid var(--green); }
+.scenario-label { font-size: 11px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+.scenario-name { font-size: 18px; font-weight: 800; margin-bottom: 12px; }
+.scenario-metric { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dashed var(--border); font-size: 13px; }
+.scenario-metric:last-child { border-bottom: 0; }
+.scenario-metric strong { font-size: 14px; }
+.scenario-headline { margin-top: 14px; padding-top: 14px; border-top: 2px solid var(--text); font-size: 22px; font-weight: 900; color: var(--text); text-align: right; }
+.scenario.base .scenario-headline { color: var(--yellow); -webkit-text-stroke: 1px var(--black); }
+
+/* Action plan */
+.action-list { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
+.action-item {
+  display: grid;
+  grid-template-columns: 40px 1fr 160px 140px 200px;
+  gap: 12px;
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  align-items: center;
+}
+.action-item:last-child { border-bottom: 0; }
+.action-num { font-family: var(--font-mono); font-weight: 700; color: var(--yellow); font-size: 14px; }
+.action-text { font-weight: 600; line-height: 1.4; }
+.action-owner { font-size: 11px; color: var(--text-muted); }
+.action-deadline { font-family: var(--font-mono); font-size: 11.5px; font-weight: 700; color: var(--black); }
+.action-kpi { font-size: 11px; color: var(--text-muted); font-style: italic; }
+
+/* Risk grid */
+.risk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+.risk-card { padding: 18px; background: var(--white); border-left: 4px solid var(--red); border: 1px solid var(--border); border-left-width: 4px; border-radius: 8px; }
+.risk-card.high { border-left-color: var(--red); }
+.risk-card.med { border-left-color: #F59E0B; }
+.risk-card.low { border-left-color: var(--green); }
+.risk-title { font-weight: 800; font-size: 14px; margin-bottom: 4px; }
+.risk-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+.risk-mitigation { font-size: 12.5px; line-height: 1.5; }
+
+/* Investment */
+.investment-bar {
+  display: grid;
+  grid-template-columns: 280px 100px 100px 100px 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.investment-bar.header { background: var(--black); color: var(--white); font-weight: 700; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+.investment-bar.total { background: var(--yellow-soft); font-weight: 800; font-size: 14px; border-bottom: none; }
+.invest-line { font-weight: 600; }
+.invest-num { font-family: var(--font-mono); text-align: right; font-weight: 700; }
+.invest-note { font-size: 11.5px; color: var(--text-muted); }
+
+/* Margin bridge */
+.bridge {
+  display: grid;
+  grid-template-columns: 1fr 100px 1fr;
+  gap: 8px;
+  align-items: center;
+  margin: 16px 0;
+  max-width: 700px;
+}
+.bridge-line {
+  padding: 10px 14px;
+  background: var(--white);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  font-size: 13px;
+}
+.bridge-line.pos { border-left: 3px solid var(--green); }
+.bridge-line.neg { border-left: 3px solid var(--red); color: var(--red); }
+.bridge-line.total { background: var(--yellow); border-left: 3px solid var(--yellow); font-weight: 800; font-size: 14px; }
+.bridge-amount { font-family: var(--font-mono); text-align: right; font-weight: 700; }
+.bridge-note { font-size: 11.5px; color: var(--text-muted); line-height: 1.4; }
+
+/* Channel priority badges */
+.score-1 { color: #991B1B; }
+.score-2 { color: #9A3412; }
+.score-3 { color: #92400E; }
+.score-4 { color: #14532D; }
+.score-5 { color: #14532D; font-weight: 800; }
+
+/* Footer */
+.doc-footer {
+  background: var(--black);
+  color: rgba(255,255,255,0.7);
+  padding: 48px 64px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.doc-footer h4 { color: var(--yellow); font-size: 13px; letter-spacing: 0.10em; text-transform: uppercase; margin-bottom: 12px; }
+.doc-footer-cols { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 40px; }
+.doc-footer-meta { margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.10); font-size: 11px; color: rgba(255,255,255,0.4); }
+
+/* Print */
+@media print {
+  .sidebar { display: none; }
+  .layout { grid-template-columns: 1fr; }
+  .section { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- ============================ SIDEBAR ============================ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">snEco</div>
+  <div class="sidebar-tagline">EU 5-Markets · Strategic Dossier · 2026</div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">Огляд</div>
+    <a href="#hero" class="sidebar-link">🎯 Cover</a>
+    <a href="#exec-summary" class="sidebar-link">📋 Executive Summary</a>
+    <a href="#cross-market" class="sidebar-link">🌍 Cross-Market</a>
+    <a href="#matrix" class="sidebar-link">⚡ 9-Cell Matrix</a>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">Ринки</div>
+    <a href="#sec-de" class="sidebar-link">🇩🇪 Germany <span class="badge">#1</span></a>
+    <a href="#sec-pl" class="sidebar-link">🇵🇱 Poland <span class="badge">#2</span></a>
+    <a href="#sec-cz" class="sidebar-link">🇨🇿 Czech Rep. <span class="badge">#3</span></a>
+    <a href="#sec-fr" class="sidebar-link">🇫🇷 France <span class="badge">#4</span></a>
+    <a href="#sec-nl" class="sidebar-link">🇳🇱 Netherlands <span class="badge">#5</span></a>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">Фінанси</div>
+    <a href="#financial" class="sidebar-link">💰 P&amp;L Model</a>
+    <a href="#scenarios" class="sidebar-link">📊 3 Scenarios</a>
+    <a href="#investment" class="sidebar-link">💎 Investment</a>
+    <a href="#roi" class="sidebar-link">📈 ROI / Payback</a>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">Execution</div>
+    <a href="#risks" class="sidebar-link">⚠️ Cross-Market Risks</a>
+    <a href="#action-plan" class="sidebar-link">⚙️ 90-Day Plan</a>
+    <a href="#closing" class="sidebar-link">🏁 Closing</a>
+  </div>
+
+  <div class="sidebar-footer">
+    snEco / Prime Snack LLC<br>
+    Sneco SK s.r.o.<br>
+    Prepared: 12.05.2026<br>
+    v1.0 · Confidential
+  </div>
+</aside>
+
+<!-- ============================ MAIN ============================ -->
+<main>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-eyebrow">snEco Strategic Dossier · May 2026 · Confidential</div>
+  <h1 class="hero-title">
+    П'ять ринків ЄС.<br>
+    <span class="accent">Одна стратегія.</span>
+  </h1>
+  <p class="hero-subtitle">
+    Глибинний go-to-market аналіз для входу snEco у 5 пріоритетних ринків ЄС: Німеччина, Польща, Нідерланди, Франція, Чехія.
+    Базується на структурі Sweden GTM Plan (Arvid Nordquist, 2024), оновленій до 2026 даних.
+  </p>
+  <div class="hero-flags">
+    <span class="hero-flag priority-1">🇩🇪 Germany · #1 Engine</span>
+    <span class="hero-flag priority-1">🇵🇱 Poland · #2 Volume</span>
+    <span class="hero-flag">🇨🇿 Czech Rep. · #3 Quick Cash</span>
+    <span class="hero-flag">🇫🇷 France · #4 Prestige</span>
+    <span class="hero-flag">🇳🇱 Netherlands · #5 Beachhead</span>
+  </div>
+  <div class="hero-meta">
+    <div><strong>5</strong><br>ринків</div>
+    <div><strong>€3.05M</strong><br>investment 24 mo</div>
+    <div><strong>€15.99M</strong><br>Y2 revenue (base)</div>
+    <div><strong>~17 mo</strong><br>payback</div>
+    <div><strong>215%</strong><br>Y2 ROIC</div>
+  </div>
+</section>
+
+<!-- ============================ EXEC SUMMARY ============================ -->
+<section class="section" id="exec-summary">
+  <div class="section-eyebrow">Розділ 1</div>
+  <h2 class="section-title">Executive Summary</h2>
+  <p class="section-lead">
+    snEco має <strong>once-in-a-decade window</strong> щоб конвертувати SIAL Grand Prix 2024 + NVC GmbH ексклюзив + dual EU production у <strong>€15M+ Y2 revenue base</strong> у 5 ринках. Портфель не рівноваговий — це <strong>послідовний каскад</strong>: DE — engine, PL — volume amplifier, CZ — fastest cash, FR — prestige play, NL — strategic beachhead.
+  </p>
+
+  <div class="kpi-grid">
+    <div class="kpi-card dark">
+      <div class="kpi-value">€15.99M</div>
+      <div class="kpi-label">Y2 ex-works revenue (base)</div>
+    </div>
+    <div class="kpi-card yellow">
+      <div class="kpi-value">€3.05M</div>
+      <div class="kpi-label">Investment 24 months</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value">17 mo</div>
+      <div class="kpi-label">Payback period</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value">215%</div>
+      <div class="kpi-label">Y2 ROIC</div>
+    </div>
+  </div>
+
+  <h3 class="block-title">5 ринків — ранжування</h3>
+  <div class="market-cards">
+    <div class="market-card rank-1">
+      <div class="market-card-rank">#1</div>
+      <div class="market-card-flag">🇩🇪</div>
+      <div class="market-card-name">Germany</div>
+      <div class="market-card-tagline">Engine · NVC ексклюзив 3M→6M units</div>
+      <div class="market-card-stats">
+        <div class="market-card-stat-label">Y1 units</div>
+        <div class="market-card-stat-value">3.0M</div>
+        <div class="market-card-stat-label">Y1 rev</div>
+        <div class="market-card-stat-value">€3.45M</div>
+      </div>
+    </div>
+    <div class="market-card rank-2">
+      <div class="market-card-rank">#2</div>
+      <div class="market-card-flag">🇵🇱</div>
+      <div class="market-card-name">Poland</div>
+      <div class="market-card-tagline">Volume · Žabka 12,339 stores</div>
+      <div class="market-card-stats">
+        <div class="market-card-stat-label">Y1 units</div>
+        <div class="market-card-stat-value">1.5M</div>
+        <div class="market-card-stat-label">Y1 rev</div>
+        <div class="market-card-stat-value">€1.73M</div>
+      </div>
+    </div>
+    <div class="market-card rank-3">
+      <div class="market-card-rank">#3</div>
+      <div class="market-card-flag">🇨🇿</div>
+      <div class="market-card-name">Czech Rep.</div>
+      <div class="market-card-tagline">Quick cash · Rohlik.cz · 340 km</div>
+      <div class="market-card-stats">
+        <div class="market-card-stat-label">Y1 units</div>
+        <div class="market-card-stat-value">0.55M</div>
+        <div class="market-card-stat-label">Y1 rev</div>
+        <div class="market-card-stat-value">€0.63M</div>
+      </div>
+    </div>
+    <div class="market-card rank-4">
+      <div class="market-card-rank">#4</div>
+      <div class="market-card-flag">🇫🇷</div>
+      <div class="market-card-name">France</div>
+      <div class="market-card-tagline">Prestige · SIAL home · Apéro</div>
+      <div class="market-card-stats">
+        <div class="market-card-stat-label">Y1 units</div>
+        <div class="market-card-stat-value">0.7M</div>
+        <div class="market-card-stat-label">Y1 rev</div>
+        <div class="market-card-stat-value">€0.81M</div>
+      </div>
+    </div>
+    <div class="market-card rank-5">
+      <div class="market-card-rank">#5</div>
+      <div class="market-card-flag">🇳🇱</div>
+      <div class="market-card-name">Netherlands</div>
+      <div class="market-card-tagline">Beachhead · Crisp+Picnic+PLMA</div>
+      <div class="market-card-stats">
+        <div class="market-card-stat-label">Y1 units</div>
+        <div class="market-card-stat-value">0.2M</div>
+        <div class="market-card-stat-label">Y1 rev</div>
+        <div class="market-card-stat-value">€0.23M</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout dark">
+    <div class="callout-label">🎯 Strategic Bottom Line</div>
+    snEco's 5-market entry — <strong>послідовний каскад</strong>, не паралельні гонки:<br>
+    <strong>Q2 2026:</strong> CZ first (cash flow, 60-day to revenue) → <strong>Q2–Q3 2026:</strong> DE NVC ramp (45% budget) → <strong>Q3 2026:</strong> PL Žabka + Bio Planet → <strong>Q4 2026:</strong> FR Biocoop/Naturalia/Monoprix → <strong>2027:</strong> NL Picnic/Crisp (defer AH до Y3).<br><br>
+    Найважливіше рішення наступних 30 днів: <strong>заморозити SK plant 2nd-line CAPEX €450k</strong>. Без цього NVC Y2 commitment 6M units стає binding constraint для всього портфоліо.
+    <br><br>
+    <strong style="color:var(--yellow)">Recommended board decision date: 31.05.2026.</strong>
+  </div>
+</section>
+
+<!-- ============================ CROSS-MARKET ============================ -->
+<section class="section" id="cross-market">
+  <div class="section-eyebrow">Розділ 2</div>
+  <h2 class="section-title">Cross-Market Comparison</h2>
+  <p class="section-lead">
+    Зведена аналітика 5 ринків за ключовими параметрами: розмір, конкуренція, логістика, ритейл, ціноутворення, канали.
+  </p>
+
+  <h3 class="block-title">Table A — Market Sizing &amp; Opportunity</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Ринок</th>
+        <th>Snack market</th>
+        <th>Cheese kg/cap/yr</th>
+        <th>Y1 units</th>
+        <th>Y3 units</th>
+        <th>Risk (1–5)</th>
+        <th>Priority</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="row-highlight"><td>🇩🇪 <strong>Germany</strong></td><td><strong>€8.2B salty</strong></td><td>24.7</td><td><strong>3.0M</strong></td><td>12–15M</td><td>3 (NVC de-risks)</td><td><strong>#1</strong></td></tr>
+      <tr class="row-highlight"><td>🇵🇱 <strong>Poland</strong></td><td><strong>€6.2B (27.1B PLN)</strong></td><td>11.6</td><td>1.2–1.8M</td><td>6–8M</td><td>3</td><td><strong>#2</strong></td></tr>
+      <tr><td>🇨🇿 <strong>Czech Rep.</strong></td><td>€1.1B</td><td>16.5</td><td>0.4–0.7M</td><td>2–3M</td><td><strong>2 (lowest)</strong></td><td><strong>#3</strong></td></tr>
+      <tr><td>🇫🇷 <strong>France</strong></td><td>€5.4B apéro</td><td><strong>27.2</strong></td><td>0.6–0.8M</td><td>4–5M</td><td><strong>5 (highest)</strong></td><td><strong>#4</strong></td></tr>
+      <tr><td>🇳🇱 <strong>Netherlands</strong></td><td>€1.8B</td><td><strong>21.0</strong></td><td>0.15–0.25M</td><td>1–1.5M</td><td>4</td><td><strong>#5</strong></td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="block-title">Table B — Retail Landscape</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Ринок</th>
+        <th>Top 3 chains (combined %)</th>
+        <th>Avg listing fee/chain</th>
+        <th>Time-to-listing</th>
+        <th>Discounter share</th>
+        <th>RRP 28g (€)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>🇩🇪 DE</td><td>Edeka 25% + Rewe 19% + Schwarz 24% (~68%)</td><td>€30–50k</td><td>6–9 mo</td><td><strong>~50%</strong></td><td><strong>€2.49–2.79</strong></td></tr>
+      <tr><td>🇵🇱 PL</td><td>Biedronka 31% + Lidl 12% + Žabka 9% (~52%)</td><td>€10–15k</td><td>3–6 mo</td><td>~45%</td><td><strong>€1.99–2.49</strong></td></tr>
+      <tr><td>🇳🇱 NL</td><td>AH 38% + Jumbo 20% + Plus 7% (~65%)</td><td>€15–25k</td><td>9–12 mo</td><td>~18%</td><td><strong>€2.79–2.99</strong></td></tr>
+      <tr><td>🇫🇷 FR</td><td>Carrefour 22% + Leclerc 23% + Mousq. 18% (~63%)</td><td><strong>€100–500k</strong></td><td>12–18 mo</td><td>~12%</td><td><strong>€2.99–3.49</strong></td></tr>
+      <tr><td>🇨🇿 CZ</td><td>Albert 23% + Kaufland 16% + Lidl 14% (~53%)</td><td>€6–10k</td><td><strong>2–4 mo</strong></td><td>~35%</td><td><strong>€2.29–2.59</strong></td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="block-title">Table C — Competitive Intensity</h3>
+  <table>
+    <thead><tr><th>Ринок</th><th>Direct competitors</th><th>Closest analogue</th><th>snEco's white space</th><th>Defensive risk</th></tr></thead>
+    <tbody>
+      <tr><td>🇩🇪 DE</td><td>Cheesies (UK), Frico, Moon Cheese (US)</td><td>Cheesies</td><td>Crunchy 60% protein keto, no fridge, 10 flavors</td><td>4/5</td></tr>
+      <tr><td>🇵🇱 PL</td><td><strong>Džiugas (LT)</strong>, Mlekovita Cheesy</td><td>Džiugas (validates category)</td><td>10 flavors vs 4; SIAL trophy</td><td>3/5</td></tr>
+      <tr><td>🇳🇱 NL</td><td>Frico, Henri Willig, Old Amsterdam Bites</td><td>Frico (own supplier!)</td><td>UA/SK origin + protein angle</td><td>4/5</td></tr>
+      <tr><td>🇫🇷 FR</td><td>Apérivrais, Babybel Snack, Bel/Lactalis</td><td>Apéricube / Boursin</td><td>First crunchy patent + SIAL Grand Prix</td><td><strong>5/5</strong></td></tr>
+      <tr><td>🇨🇿 CZ</td><td>None at scale (Havlík sticks local)</td><td>Imported Frico</td><td><strong>Empty white space</strong></td><td><strong>2/5</strong></td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="block-title">Table D — Logistics from Humenné (SK)</h3>
+  <table>
+    <thead><tr><th>Ринок</th><th>Distance to capital</th><th>Days transit</th><th>Customs</th><th>Pallet cost DDP</th><th>Margin floor</th></tr></thead>
+    <tbody>
+      <tr class="row-highlight"><td>🇨🇿 CZ</td><td>340–660 km</td><td><strong>1–2</strong></td><td>None (EU)</td><td>€180</td><td><strong>highest</strong></td></tr>
+      <tr class="row-highlight"><td>🇵🇱 PL</td><td>380–700 km</td><td>1–2</td><td>None (EU)</td><td>€210</td><td>high</td></tr>
+      <tr><td>🇩🇪 DE</td><td>900–1,400 km</td><td>2–3</td><td>None (EU)</td><td>€380</td><td>medium</td></tr>
+      <tr><td>🇳🇱 NL</td><td>1,500 km</td><td>3–4</td><td>None (EU)</td><td>€450</td><td>medium-low</td></tr>
+      <tr><td>🇫🇷 FR</td><td>1,700 km</td><td>4–5</td><td>None (EU)</td><td>€520</td><td><strong>lowest</strong></td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="block-title">Table E — Channel Priorities Heatmap (1=ignore, 5=must-win)</h3>
+  <table class="channel-heatmap">
+    <thead><tr><th>Channel</th><th>🇩🇪 DE</th><th>🇵🇱 PL</th><th>🇳🇱 NL</th><th>🇫🇷 FR</th><th>🇨🇿 CZ</th></tr></thead>
+    <tbody>
+      <tr><td>Discounter PL (Lidl/Aldi/Biedronka)</td><td class="cell-5">5</td><td class="cell-5">5</td><td class="cell-2">2</td><td class="cell-2">2</td><td class="cell-3">3</td></tr>
+      <tr><td>Discounter A-brand</td><td class="cell-5">5</td><td class="cell-3">3</td><td class="cell-2">2</td><td class="cell-2">2</td><td class="cell-4">4</td></tr>
+      <tr><td>Premium retail (top-tier)</td><td class="cell-4">4</td><td class="cell-3">3</td><td class="cell-5">5</td><td class="cell-5">5</td><td class="cell-4">4</td></tr>
+      <tr><td>Bio / Organic specialty</td><td class="cell-5">5</td><td class="cell-4">4</td><td class="cell-3">3</td><td class="cell-5">5</td><td class="cell-3">3</td></tr>
+      <tr><td>Convenience c-store</td><td class="cell-3">3</td><td class="cell-5">5</td><td class="cell-2">2</td><td class="cell-2">2</td><td class="cell-3">3</td></tr>
+      <tr><td>Online premium grocer</td><td class="cell-3">3</td><td class="cell-3">3</td><td class="cell-5">5</td><td class="cell-3">3</td><td class="cell-5">5</td></tr>
+      <tr><td>HoReCa</td><td class="cell-3">3</td><td class="cell-3">3</td><td class="cell-4">4</td><td class="cell-5">5</td><td class="cell-4">4</td></tr>
+      <tr><td>Sport / Fitness / Pharmacy</td><td class="cell-5">5</td><td class="cell-4">4</td><td class="cell-3">3</td><td class="cell-3">3</td><td class="cell-3">3</td></tr>
+      <tr><td>Airport / Travel retail</td><td class="cell-4">4</td><td class="cell-3">3</td><td class="cell-4">4</td><td class="cell-4">4</td><td class="cell-3">3</td></tr>
+      <tr><td>Private label deal</td><td class="cell-5">5</td><td class="cell-4">4</td><td class="cell-3">3</td><td class="cell-3">3</td><td class="cell-3">3</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================ 9-CELL MATRIX ============================ -->
+<section class="section" id="matrix">
+  <div class="section-eyebrow">Розділ 3</div>
+  <h2 class="section-title">9-Cell Strategic Matrix</h2>
+  <p class="section-lead">Effort vs Payoff — кожен ринок на матриці. Найкраще співвідношення зусиль/винагороди — у верхній правій частині.</p>
+
+  <div class="matrix-3x3">
+    <div class="corner"></div>
+    <div class="col-label">Low Payoff</div>
+    <div class="col-label">Medium Payoff</div>
+    <div class="col-label">High Payoff</div>
+
+    <div class="row-label">Low Effort</div>
+    <div class="matrix-cell"></div>
+    <div class="matrix-cell filled">
+      <div class="matrix-cell-flag">🇨🇿</div>
+      <div class="matrix-cell-name">CZ ⚡</div>
+      <div class="matrix-cell-tag">fast cash</div>
+    </div>
+    <div class="matrix-cell"></div>
+
+    <div class="row-label">Medium Effort</div>
+    <div class="matrix-cell"></div>
+    <div class="matrix-cell filled">
+      <div class="matrix-cell-flag">🇵🇱</div>
+      <div class="matrix-cell-name">PL</div>
+      <div class="matrix-cell-tag">scalable volume</div>
+    </div>
+    <div class="matrix-cell filled">
+      <div class="matrix-cell-flag">🇩🇪</div>
+      <div class="matrix-cell-name">DE 🏆</div>
+      <div class="matrix-cell-tag">engine (NVC)</div>
+    </div>
+
+    <div class="row-label">High Effort</div>
+    <div class="matrix-cell filled">
+      <div class="matrix-cell-flag">🇳🇱</div>
+      <div class="matrix-cell-name">NL</div>
+      <div class="matrix-cell-tag">postpone</div>
+    </div>
+    <div class="matrix-cell"></div>
+    <div class="matrix-cell filled">
+      <div class="matrix-cell-flag">🇫🇷</div>
+      <div class="matrix-cell-name">FR 🌟</div>
+      <div class="matrix-cell-tag">prestige bet</div>
+    </div>
+  </div>
+
+  <h3 class="block-title">Чотири стратегічні запитання</h3>
+
+  <div class="callout">
+    <div class="callout-label">Q1 — Куди інвестувати найбільше у наступні 12 місяців?</div>
+    <strong>🇩🇪 GERMANY</strong> — non-negotiable. Score 20/20: market size 5 + win probability 5 (NVC контракт підписано) + asset readiness 5 (SK plant + IFS Food v8 + FSSC) + strategic value 5 (DE wins unlock UK/FR/AT/CH per NVC exclusive).<br>
+    <strong>→ Allocate 45% of total budget here.</strong>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">Q2 — Найшвидша перемога (≤6 місяців до доходу)?</div>
+    <strong>🇨🇿 CZECH REPUBLIC.</strong> Pitch <strong>Rohlik.cz</strong> (HQ Prague, 25k SKUs, 6–8 wk listing, no listing fee for niche brands). Geography <strong>340 km from Humenné = 1-day truck</strong>. CZ TM №411165 ✅. Albert Excellent + M&amp;S Food CZ warm targets.<br>
+    <strong>→ Realistic first invoice: 60–90 days. Y1: €480–800k. Найвища ROAS з усіх 5 ринків.</strong>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">Q3 — Найбільша довгострокова ставка (5-річна цінність)?</div>
+    <strong>🇩🇪 DE (volume) + 🇫🇷 FR (brand).</strong><br>
+    DE = volume engine: €30–50M/yr by Y5 realistic on NVC + direct retail.<br>
+    FR = brand engine: SIAL Paris home credential. Win in Carrefour Sélection + Monoprix Gourmet → unlock Harrods, Selfridges, Eataly, Whole Foods US.<br>
+    <strong>→ 5-yr value if won: €15–20M/yr + 2× brand equity multiplier.</strong>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">Q4 — Що деприоритизувати або відкласти?</div>
+    <strong>🇳🇱 NETHERLANDS.</strong> Highest cheese consumption ≠ highest opportunity. AH 38% gatekeeper, 9–12 mo to listing, FrieslandCampina is BOTH supplier AND largest competitor (channel-conflict risk), Frico already owns "Dutch crunchy cheese".<br>
+    <strong>→ Maintenance mode: Picnic + Crisp + Ekoplaza + cheese-specialty. Target €0.5–1M Y2. Defer AH/Jumbo until Y3 once DE/FR brand equity built. Save ~€200k.</strong>
+  </div>
+</section>
+
+<!-- ============================ DE GERMANY ============================ -->
+<section class="section" id="sec-de" style="background:linear-gradient(180deg, var(--yellow-soft) 0%, var(--white) 80px)">
+  <div class="section-eyebrow">Ринок #1 · Engine</div>
+  <h2 class="section-title">🇩🇪 Germany — Engine</h2>
+  <p class="section-lead">
+    Найбільший продовольчий ринок ЄС <strong>€261.6B</strong>, ~50% spend at discounters, 39% private label. Anchor — <strong>NVC GmbH ексклюзив 06.02.2026</strong> (3 роки, Lidl/Aldi/Edeka/Kaufland, DACH+UK+FR). Y1: 3M units / €6M ex-works · Y2: 6M units / €12M.
+  </p>
+
+  <div class="kpi-grid">
+    <div class="kpi-card dark"><div class="kpi-value">€8.2B</div><div class="kpi-label">salty snacks market</div></div>
+    <div class="kpi-card yellow"><div class="kpi-value">3M→6M</div><div class="kpi-label">NVC contract Y1→Y2</div></div>
+    <div class="kpi-card"><div class="kpi-value">€2.49–3.49</div><div class="kpi-label">recommended RRP 28g</div></div>
+    <div class="kpi-card"><div class="kpi-value">€12M</div><div class="kpi-label">Y2 ex-works target</div></div>
+  </div>
+
+  <h3 class="block-title">Ритейл-ландшафт</h3>
+  <table>
+    <thead><tr><th>Group</th><th>DE Revenue 2024</th><th>Stores</th><th>Format</th><th>MS</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Edeka Group + Netto MD</strong></td><td>€89.3B</td><td>~11,000</td><td>Vollsortimenter + Discounter</td><td>~27%</td></tr>
+      <tr><td><strong>Rewe Group</strong> (Rewe + Penny)</td><td>€74.0B</td><td>~7,000+</td><td>Vollsortimenter + Discounter</td><td>~19%</td></tr>
+      <tr><td><strong>Schwarz Group</strong> (Lidl + Kaufland)</td><td>€61.9B</td><td>4,021</td><td>Discounter + Hyper</td><td>~16%</td></tr>
+      <tr><td><strong>Aldi</strong> (Süd + Nord)</td><td>€38.9B</td><td>~4,270</td><td>Discounter</td><td>~10%</td></tr>
+      <tr><td>Metro AG</td><td>~€10B</td><td>~100 C+C</td><td>Wholesale</td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <p><strong>Bio specialty:</strong> Alnatura ~139 stores (€650M), denn's ~300, Bio Company ~60 (Berlin).<br>
+  <strong>Drugstores (protein adjacency):</strong> dm ~2,100, Rossmann ~2,300.<br>
+  <strong>Online quick-commerce:</strong> Knuspr + Amazon Prime alliance Nov 2024, Flink, Picnic.</p>
+
+  <h3 class="block-title">Конкуренти</h3>
+  <table>
+    <thead><tr><th>Brand</th><th>Origin</th><th>RRP</th><th>USP</th><th>Channel</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Cheesies</strong></td><td>UK</td><td>€3.50–4.50</td><td>100% cheese keto</td><td>Amazon, Rewe/Edeka pilots</td></tr>
+      <tr><td>Frico Cheese Bites</td><td>NL (FCD)</td><td>€2.50–3.50</td><td>Heritage Dutch cubes</td><td>Edeka, Rewe</td></tr>
+      <tr><td>Moon Cheese</td><td>US</td><td>€4.50–6</td><td>Premium keto</td><td>Specialty</td></tr>
+      <tr><td>Käsechips Brets</td><td>FR (Jura)</td><td>€4.39/125g</td><td>French alpine</td><td>Amazon</td></tr>
+      <tr><td>Cheez-It</td><td>US (Kellanova)</td><td>€2–4</td><td>UK/IE retail 2024</td><td>Amazon only DE</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:13px;color:var(--text-muted);font-style:italic">White space: <strong>немає 100%-cheese single-ingredient EU-internal cheese snack at scale retail у DE</strong>. snEco edge: 10+ flavors + IFS/FSSC + SIAL.</p>
+
+  <h3 class="block-title">Channel Strategy 24 mo (NVC-anchored)</h3>
+  <table>
+    <thead><tr><th>Phase</th><th>Months</th><th>Actions</th><th>Volume target</th></tr></thead>
+    <tbody>
+      <tr><td><strong>P1</strong></td><td>1–6</td><td>NVC → Aldi "Trend" + Lidl "Deluxe" PL pilot; Alnatura/denn's premium 3 SKU; Amazon Vendor Central; Knuspr Berlin+Munich; ANUGA booth Oct 2026</td><td>~750K / €1.5M</td></tr>
+      <tr><td><strong>P2</strong></td><td>7–12</td><td>Edeka regional (Südwest, Minden-Hannover, Nord); Kaufland national; dm "das gesunde Plus" Fitness 60%; Rossmann sport; Lidl national PL</td><td>+1.75M / Y1 cum €5M</td></tr>
+      <tr><td><strong>P3</strong></td><td>13–24</td><td>Transgourmet/SELGROS HoReCa; Aldi Süd Markenstark; Metro C+C; DB Bahnhof + FRA/MUC airports; AT/CH via NVC; dm/Rossmann full</td><td>Y2 6M / €12M</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout dark">
+    <div class="callout-label">⭐ Top-3 priorities DE</div>
+    1. <strong>Lidl PL</strong> (SK-produced via NVC) — single biggest volume lever, 1–2M units/yr<br>
+    2. <strong>dm + Rossmann (Fitness 60% SKU)</strong> — protein/sport aisle white space<br>
+    3. <strong>Alnatura + denn's premium bio</strong> — brand credibility anchor
+  </div>
+</section>
+
+<!-- ============================ PL POLAND ============================ -->
+<section class="section" id="sec-pl">
+  <div class="section-eyebrow">Ринок #2 · Volume Amplifier</div>
+  <h2 class="section-title">🇵🇱 Poland — Volume Amplifier</h2>
+  <p class="section-lead">
+    Найбільший CEE snack ринок <strong>27.1B PLN (~€6.3B)</strong>, salty snacks <strong>+25% YoY</strong>. Žabka <strong>12,339 stores ⭐</strong> = найбільший unlock. PL TM ✅, UMOWA ✅, Polish-pack ✅, Mlekovita supplier ✅. Direct competitor: <strong>Lithuanian Džiugas</strong>. Y1: 1.2–1.8M units · Y3: 6–8M.
+  </p>
+
+  <div class="kpi-grid">
+    <div class="kpi-card dark"><div class="kpi-value">27.1B PLN</div><div class="kpi-label">snack market</div></div>
+    <div class="kpi-card yellow"><div class="kpi-value">12,339</div><div class="kpi-label">Žabka stores end-2025</div></div>
+    <div class="kpi-card"><div class="kpi-value">9.99 PLN</div><div class="kpi-label">recommended Žabka RRP</div></div>
+    <div class="kpi-card"><div class="kpi-value">€4M</div><div class="kpi-label">Y2 ex-works target</div></div>
+  </div>
+
+  <h3 class="block-title">Ритейл-ландшафт (Top-10)</h3>
+  <table>
+    <thead><tr><th>Chain</th><th>Stores 2025</th><th>Notes</th><th>Fit</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Biedronka</strong> (JM)</td><td>~3,900</td><td>108B PLN, leader</td><td>Premium JM line possible</td></tr>
+      <tr><td>Dino Polska</td><td>~3,000</td><td>34B PLN, rural</td><td>Hard — price-driven</td></tr>
+      <tr class="row-highlight"><td><strong>Žabka</strong></td><td><strong>12,339</strong></td><td>31.1B PLN; +1,394 in 2025</td><td><strong>PRIMARY TARGET</strong></td></tr>
+      <tr><td>Lidl Polska</td><td>&gt;950</td><td>~45B PLN; #1 popularity</td><td>Tough listing, Deluxe</td></tr>
+      <tr><td>Kaufland</td><td>257 → 400</td><td>#3 grocery</td><td>Good fit premium</td></tr>
+      <tr><td>Carrefour</td><td>759 declining</td><td>1.7% LFL decline</td><td>Via NVC possible</td></tr>
+      <tr><td>Eurocash franchise</td><td>12,000+</td><td>26% wholesale</td><td>via Eurocash Dystrybucja</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="block-title">Žabka Strategy ⭐ КРИТИЧНИЙ КАНАЛ</h3>
+  <div class="callout">
+    <div class="callout-label">Чому Žabka — головний unlock</div>
+    <strong>12,339 stores end-2025</strong>, +1,394 net new in 2025, target 12–15k by 2027. <strong>31.1 bn PLN rev</strong> = direct competitor scale to Biedronka per-SKU. Convenience = impulse cheese snack home. Own-label: Foodini, Szamamm, Dobra Karma, Hirro — ~150 new SKUs/year. Hot snacks "Strefa Gastro" expanding. ~70+ autonomous Nano stores.<br><br>
+    <strong>Pitch:</strong> 2 SKUs (Cheddar 28g + Fitness 60% protein 28g) at <strong>9.99 PLN</strong>; offer 6-mo exclusive on Fitness 60%.<br>
+    <strong>Process:</strong> Pitch → 6–12 store pilot → gate metric (rotations &gt;0.8/store/day) → regional rollout → 12-mo price commitment.
+  </div>
+
+  <h3 class="block-title">Конкуренти ключові</h3>
+  <table>
+    <thead><tr><th>Brand</th><th>Pack/RRP</th><th>Positioning</th><th>Overlap</th></tr></thead>
+    <tbody>
+      <tr class="row-highlight"><td><strong>Džiugas Crunchy Cheese Balls</strong> (LT)</td><td>50g, 4 flavors, 12–18 PLN Allegro</td><td>100% hard cheese PDO, 90 awards</td><td><strong>DIRECT — main</strong></td></tr>
+      <tr><td>Cheetos (PepsiCo)</td><td>55g / ~5.31 PLN</td><td>Mass puff</td><td>Indirect</td></tr>
+      <tr><td>Mr. Snaki</td><td>60g / ~3–4 PLN</td><td>Mass puff</td><td>Indirect</td></tr>
+      <tr><td>Lay's Cheese & Onion</td><td>140g / ~7–9 PLN</td><td>Crisp</td><td>Indirect</td></tr>
+      <tr><td><strong>Crispy Natural</strong></td><td>18g apple / 4–6 PLN</td><td>Premium health GF</td><td>Adjacent</td></tr>
+      <tr><td>PL parmesan crisps (Biedronka Sole Mio, Lidl Italiamo)</td><td>60–80g / 5–8 PLN</td><td>Italian-style hard cheese</td><td>Adjacent direct neighbor</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:13px;color:var(--text-muted);font-style:italic">Džiugas edge: 9 vs 4 flavors, SIAL trophy, lower achievable retail price, Polish pack ready.</p>
+
+  <h3 class="block-title">PL-specific opportunities</h3>
+  <table>
+    <thead><tr><th>Opportunity</th><th>Reach</th><th>Margin</th><th>Lead time</th><th>Priority</th></tr></thead>
+    <tbody>
+      <tr><td>Žabka 200–500 store pilot</td><td>→ 12k stores</td><td>Premium</td><td>4–6 mo</td><td><strong>HIGH</strong></td></tr>
+      <tr><td>Bio Planet (~5,000 specialty)</td><td>5,000</td><td>Premium</td><td>2–3 mo</td><td><strong>HIGH</strong></td></tr>
+      <tr><td>HoReCa via Makro (Tyskie/Żywiec/Lech)</td><td>29 halls</td><td>High</td><td>3–4 mo</td><td><strong>HIGH</strong></td></tr>
+      <tr><td>Orlen Stop.Cafe 2,000+ stations</td><td>2,000 (PL+CZ+LT+SK)</td><td>Mid impulse</td><td>6–9 mo</td><td><strong>HIGH</strong></td></tr>
+      <tr><td>Allegro Fresh + Frisco</td><td>10–15% online</td><td>Direct</td><td>1 mo</td><td><strong>HIGH</strong></td></tr>
+      <tr><td>Biedronka Premium / JM</td><td>3,900</td><td>Vol/thin</td><td>9–12 mo</td><td>MED</td></tr>
+      <tr><td>Carrefour Selection</td><td>94 hyper + 142 super</td><td>Premium</td><td>6–9 mo</td><td>MED</td></tr>
+      <tr><td>Ski/spa HoReCa (Zakopane, Krynica)</td><td>~200</td><td>Very high</td><td>4–6 mo</td><td>MED</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout dark">
+    <div class="callout-label">⚠️ Open questions for PL</div>
+    1. <strong>UMOWA scan unreadable</strong> — confirm distributor name, exclusivity, MOQ before Phase 1<br>
+    2. <strong>Džiugas competitive prep</strong> — buy 4 packs, sensory panel; 30–40% retail price advantage at 9.99 PLN/28g<br>
+    3. <strong>Mlekovita relationship</strong> — ask PR team for warm intros to Biedronka/Lidl category buyers
+  </div>
+</section>
+
+<!-- ============================ CZ CZECH ============================ -->
+<section class="section" id="sec-cz">
+  <div class="section-eyebrow">Ринок #3 · Quick Cash</div>
+  <h2 class="section-title">🇨🇿 Czech Republic — Fastest Win</h2>
+  <p class="section-lead">
+    <strong>Humenné сидить 340–660 км від кожного великого CZ міста</strong> — найдешевша логістика з усіх 5 ринків. Czechs = #1 у світі beer per capita (~130 L/yr). Cheese = THE canonical beer snack. Rohlik.cz HQ Prague (€737M, 25k SKUs) = #1 entry. Y1: €480–800k (CZK 12–20M).
+  </p>
+
+  <div class="kpi-grid">
+    <div class="kpi-card dark"><div class="kpi-value">CZK 144B</div><div class="kpi-label">FMCG Q3 2024 (+3.3% YoY)</div></div>
+    <div class="kpi-card yellow"><div class="kpi-value">340 km</div><div class="kpi-label">Humenné → Ostrava</div></div>
+    <div class="kpi-card"><div class="kpi-value">130 L</div><div class="kpi-label">beer per capita 2024 (#1 world)</div></div>
+    <div class="kpi-card"><div class="kpi-value">€800k</div><div class="kpi-label">Y1 realistic ceiling</div></div>
+  </div>
+
+  <h3 class="block-title">Ритейл-ландшафт</h3>
+  <table>
+    <thead><tr><th>Chain</th><th>Owner</th><th>Stores</th><th>Share</th><th>Fit</th></tr></thead>
+    <tbody>
+      <tr class="row-highlight"><td><strong>Albert</strong></td><td>Ahold Delhaize</td><td>~347</td><td>~5.5%</td><td><strong>HIGH — Excellent PL</strong></td></tr>
+      <tr><td>Penny Market</td><td>REWE</td><td>~430</td><td>~4.1%</td><td>Medium</td></tr>
+      <tr><td>Lidl</td><td>Schwarz</td><td>~300</td><td>~7.8%</td><td>Medium-high (Deluxe)</td></tr>
+      <tr><td>Kaufland</td><td>Schwarz</td><td>~140</td><td>~6.5%</td><td>High</td></tr>
+      <tr><td>Billa</td><td>REWE</td><td>~300</td><td>~3.2%</td><td>Medium</td></tr>
+      <tr><td>Tesco</td><td>Tesco PLC</td><td>~185</td><td>~3.1%</td><td>High (Finest)</td></tr>
+      <tr><td>Globus</td><td>Globus SE</td><td>16</td><td>~5%</td><td>Medium-high</td></tr>
+      <tr class="row-highlight"><td><strong>M&amp;S Food</strong></td><td>M&amp;S franchise</td><td>15</td><td>&lt;1%</td><td><strong>VERY HIGH</strong></td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="block-title">Rohlík.cz ⭐⭐⭐ — критичний канал</h3>
+  <div class="callout">
+    <div class="callout-label">Чому Rohlik — #1 entry</div>
+    Group revenue <strong>€1.114B (2024, +34% YoY)</strong>; CZ 2025 <strong>~€737M = 54% group</strong>; <strong>25,000+ SKUs</strong>; profitable in CZ/HU/DE-Munich. Founder Tomáš Čupr (Slevomat, Damejidlo).<br><br>
+    <strong>Onboarding:</strong>
+    <ul style="margin:8px 0 0 24px;line-height:1.6">
+      <li>Small Producer Support Program (SPSP) — інклюзивна програма для нішевих/артизан брендів</li>
+      <li>Private label (Hello! Rohlik, Rohlik Selection) — PL opportunity Phase 2</li>
+      <li>Upcycling category (200+ products from 55 brands) — snEco's solar production on-message</li>
+    </ul>
+    <strong>Estimated Y1: €80–150k standalone.</strong>
+  </div>
+
+  <h3 class="block-title">Логістика — найкраща в усьому портфоліо</h3>
+  <table>
+    <thead><tr><th>Lane</th><th>Distance</th><th>Mode</th><th>Time</th></tr></thead>
+    <tbody>
+      <tr class="row-highlight"><td>Humenné → Ostrava</td><td>~340 km</td><td>EU truck</td><td>&lt;1 day</td></tr>
+      <tr class="row-highlight"><td>Humenné → Brno</td><td>~450 km</td><td>EU truck</td><td>&lt;1 day</td></tr>
+      <tr class="row-highlight"><td>Humenné → Prague</td><td>~660 km</td><td>EU truck</td><td>1 day</td></tr>
+      <tr><td>Mukachevo → Prague</td><td>~1,400 km</td><td>UA→EU truck</td><td>2–3 days + customs</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:13px;color:var(--text-muted);font-style:italic">SK→CZ = intra-EU, zero customs, single CMR — найгладший кордон. Ambient (24 mo., no cold-chain) = 60–70% logistics cost saving vs dairy.</p>
+
+  <h3 class="block-title">CZ-specific opportunities</h3>
+  <div class="callout">
+    <div class="callout-label">A. "Pivo a sýr" — beer-cheese co-marketing ⭐</div>
+    <strong>Smoked Suluguni + Pilsner Urquell</strong> = textbook pairing. Pop-up campaign в 50–100 Prague/Brno pubs. ~130 L/cap beer = unlimited cheese-snack opportunity. VCCP Prague (Pilsner Urquell agency) open to "Taste worth protecting" extensions.
+  </div>
+
+  <p style="margin-top:16px"><strong>B. Tourism &amp; resort retail:</strong> Karlovy Vary / Mariánské Lázně spa (DE/AT tourists premium), Krkonoše ski (Špindlerův Mlýn, Pec pod Sněžkou), Moravia wine country.<br>
+  <strong>C. Stadium / arena:</strong> O2 Arena Prague (NHL), Sparta + Slavia football, 30k+ snack rotation.<br>
+  <strong>D. Sports nutrition:</strong> ~200 fitness chains (FormFactor, BeStrong, GymPark).<br>
+  <strong>E. CZ-SK cross-listing:</strong> Sneco SK distributors often cover CZ+SK — saves 20–30% on listing fees.<br>
+  <strong>F. Albert Excellent PL co-development:</strong> Excellent line bans 100+ additives → snEco "single ingredient" on-brief.</p>
+
+  <div class="callout dark">
+    <div class="callout-label">⚠️ Critical regulatory finding</div>
+    <strong>Slovak labels NOT acceptable in CZ.</strong> Czech SZPI requires Czech-language labels on consumer-final products. Action: produce dedicated CZ SKU. Translation cost minimal (~€500–1,000 one-time). Czech can sit alongside SK on multi-language pack.
+  </div>
+</section>
+
+<!-- ============================ FR FRANCE ============================ -->
+<section class="section" id="sec-fr">
+  <div class="section-eyebrow">Ринок #4 · Prestige Bet</div>
+  <h2 class="section-title">🇫🇷 France — Prestige Bet</h2>
+  <p class="section-lead">
+    <strong>Найвища потенціал AND найвища складність</strong> з усіх 5 ринків. Cheese country #1 EU (~€8.5B retail). <strong>SIAL Grand Prix 2024 awarded IN Paris by French jury</strong> — найбільший single asset. NVC ексклюзив covers FR. Blue Royale SKU references Roquefort/Bleu d'Auvergne. Y1: 0.7M units / €0.81M.
+  </p>
+
+  <div class="kpi-grid">
+    <div class="kpi-card dark"><div class="kpi-value">€8.5B</div><div class="kpi-label">retail cheese 2024 (#1 EU)</div></div>
+    <div class="kpi-card yellow"><div class="kpi-value">27.2 kg</div><div class="kpi-label">cheese per capita (#4 world)</div></div>
+    <div class="kpi-card"><div class="kpi-value">€100–500k</div><div class="kpi-label">listing fee per top-4 chain</div></div>
+    <div class="kpi-card"><div class="kpi-value">€2.0–2.3M</div><div class="kpi-label">Y2 cumulative target</div></div>
+  </div>
+
+  <h3 class="block-title">Ритейл (Kantar 2025)</h3>
+  <table>
+    <thead><tr><th>Banner</th><th>Share</th><th>Stores FR</th><th>Fit</th></tr></thead>
+    <tbody>
+      <tr><td><strong>E.Leclerc</strong></td><td>23.5%</td><td>~725</td><td>High (Marque Repère)</td></tr>
+      <tr class="row-highlight"><td><strong>Carrefour</strong> (Hyper/Market/City/Express/Bio)</td><td>21.8%</td><td>~5,500</td><td><strong>Highest (Sélection PL)</strong></td></tr>
+      <tr><td>Intermarché (Mousquetaires)</td><td>18.1%</td><td>~1,800 + 250 ex-Casino</td><td>Medium</td></tr>
+      <tr><td>Coopérative U</td><td>12.0%</td><td>~1,600</td><td>Medium (U Saveurs)</td></tr>
+      <tr><td>Auchan</td><td>~9%</td><td>~140 + ~620</td><td>Medium</td></tr>
+      <tr><td>Lidl France</td><td>~8%</td><td>~1,580</td><td><strong>via NVC</strong></td></tr>
+      <tr><td>Aldi France</td><td>~5%</td><td>~1,300</td><td><strong>via NVC</strong></td></tr>
+      <tr class="row-highlight"><td><strong>Casino group</strong> (Monoprix, Naturalia, Franprix)</td><td>~7%</td><td>challenged 24-25</td><td><strong>High (Monoprix/Naturalia)</strong></td></tr>
+      <tr><td>Picard surgelés</td><td>n/a</td><td>1,232</td><td>Niche cross-merch</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="block-title">Premium / specialty / organic ⭐</h3>
+  <table>
+    <thead><tr><th>Chain</th><th>Stores</th><th>Position</th><th>Win prob</th></tr></thead>
+    <tbody>
+      <tr class="row-highlight"><td><strong>Monoprix</strong></td><td>~700</td><td>Urban premium</td><td><strong>5/5</strong></td></tr>
+      <tr class="row-highlight"><td><strong>Naturalia</strong> (Monoprix-owned)</td><td>219 Q1 2025</td><td>Premium organic</td><td><strong>5/5</strong></td></tr>
+      <tr><td><strong>Biocoop</strong></td><td>746 (2025)</td><td>Organic cooperative leader (+8.2% 2025)</td><td>4/5</td></tr>
+      <tr><td><strong>Nicolas wine merchants</strong></td><td>494</td><td>1,500+ wine refs — perfect cheese-wine pair</td><td>4/5</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="block-title">Конкуренти — апéro / cheese-snack landscape</h3>
+  <table>
+    <thead><tr><th>Brand</th><th>Owner</th><th>Format</th><th>RRP</th><th>Real cheese?</th></tr></thead>
+    <tbody>
+      <tr><td>Mini BabyBel</td><td>Bel</td><td>22g filet</td><td>€0.30–0.45/u</td><td>Yes processed</td></tr>
+      <tr><td>Mini BabyBel Riche en Protéines</td><td>Bel</td><td>5×22g</td><td>€3.20</td><td>Yes processed</td></tr>
+      <tr><td>Boursin Apéritif/Snack</td><td>Bel</td><td>16g cubes</td><td>€1.30–€3.50</td><td>Yes fresh</td></tr>
+      <tr><td>Apéricube</td><td>Bel</td><td>24 cubes ~125g</td><td>€2.95</td><td>Yes processed</td></tr>
+      <tr><td>Président Croûte Pop</td><td>Lactalis</td><td>100–150g</td><td>€2.50–€4</td><td>Yes</td></tr>
+      <tr><td>Galbani Mozzarella Sticks</td><td>Lactalis</td><td>50g</td><td>€2.50</td><td>Yes</td></tr>
+      <tr><td>Tipiak apéro</td><td>Tipiak</td><td>90–125g</td><td>€2.20–€3</td><td>No</td></tr>
+      <tr><td>Comté/Beaufort artisanal cubes</td><td>AOP fromagers</td><td>100–150g</td><td>€5–€8</td><td>Yes artisanal</td></tr>
+      <tr><td>HighKey, Moon Cheese (US imports)</td><td>various</td><td>28g</td><td>€3.50–€5</td><td><strong>Yes — closest direct, thin distribution</strong></td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:13px;color:var(--text-muted);font-style:italic"><strong>Strategic conclusion:</strong> No mainstream French brand offers 100% pure dehydrated cheese snack at scale. Whitespace.<br>
+  <strong>Risk:</strong> Bel Group could launch within 18–24 months (160+ launches in 2025). Move fast.</p>
+
+  <h3 class="block-title">Leveraging SIAL Paris 2024 Grand Prix</h3>
+  <div class="callout dark">
+    <div class="callout-label">🏆 SIAL — найбільший single asset у FR</div>
+    SIAL Grand Prix awarded by French jury, in Paris, at world's most influential food expo. snEco won serving 2,200+ entries — <strong>first Ukrainian Grand Prix laureate ever</strong>. French retailers explicitly track SIAL laureates in buyer reviews.<br><br>
+    <strong>Tactical playbook:</strong>
+    <ol style="margin:8px 0 0 24px;line-height:1.7">
+      <li>"SIAL Grand Prix 2024" badge на кожному FR SKU front-of-pack</li>
+      <li>Buyer pitch deck in French з jury citation</li>
+      <li><strong>Carrefour "Coup de Cœur"</strong> fast-track — submit Q3 2026 ahead of 2027 negotiations</li>
+      <li>SIAL Paris 2026 (17–21 Oct) — pre-book buyer meetings before show. Post-SIAL Nov–Jan = statutory negotiation window</li>
+      <li>French press wave to LSA Conso, LinéaireS, Process Alimentaire</li>
+    </ol>
+  </div>
+
+  <h3 class="block-title">Channel strategy 24 mo</h3>
+  <table>
+    <thead><tr><th>Phase</th><th>Months</th><th>Targets</th><th>Volume / Revenue</th></tr></thead>
+    <tbody>
+      <tr><td><strong>P1 Credential</strong></td><td>1–4 (Q3-Q4 2026)</td><td>Naturalia 50 doors + 2 fromager artisanal via Rungis + Monoprix Gourmet 30 Paris stores</td><td>40–60k / €140k</td></tr>
+      <tr><td><strong>P2 National wave</strong></td><td>5–12 (2027 H1)</td><td>Carrefour Sélection 4 SKU + E.Leclerc Marque Repère + Système U + Picard impulse + Biocoop 250</td><td>180–250k / €700k</td></tr>
+      <tr><td><strong>P3 Discount + HoReCa</strong></td><td>13–18 (2027 H2)</td><td>Lidl FR (NVC) + Aldi FR (NVC) + Pomona/Transgourmet HoReCa (500g B2B)</td><td>+200–350k retail + 60k B2B / €1.2–1.5M cum</td></tr>
+      <tr><td><strong>P4 Channel premium</strong></td><td>19–24</td><td>Air France/airports + Basic-Fit vending + parapharmacie + fine-dining + MOF/Top Chef</td><td>End-Y2 €2.0–2.3M FR</td></tr>
+    </tbody>
+  </table>
+
+  <p><strong>Risks specific to FR:</strong> French chauvinism (mitigation: Made in EU + SIAL Grand Prix), brutal listing fees €100–500k/chain, Bel/Lactalis defensive launch, Nutri-Score mandatory 7.11.2025 (cheese likely C/D — counter w/ Fitness hero), Loi Toubon mandates French-only label, Casino group financial distress.</p>
+</section>
+
+<!-- ============================ NL NETHERLANDS ============================ -->
+<section class="section" id="sec-nl">
+  <div class="section-eyebrow">Ринок #5 · Strategic Beachhead</div>
+  <h2 class="section-title">🇳🇱 Netherlands — Strategic Beachhead</h2>
+  <p class="section-lead">
+    Дбайливий choice: highest cheese consumption per capita EU (~21 kg/yr), але AH 38% gatekeeper + FrieslandCampina (supplier AND largest cheese-snack competitor via Frico) = channel-conflict risk. Strategy: <strong>maintenance mode</strong> — Crisp + Picnic + Ekoplaza + PLMA follow-up. Defer AH до Y3. Y1: €30–50k Phase 1, scaling to €1–2M/yr by Y3.
+  </p>
+
+  <div class="kpi-grid">
+    <div class="kpi-card dark"><div class="kpi-value">21 kg</div><div class="kpi-label">cheese per capita (#1 EU)</div></div>
+    <div class="kpi-card yellow"><div class="kpi-value">58%</div><div class="kpi-label">AH+Jumbo combined share</div></div>
+    <div class="kpi-card"><div class="kpi-value">€2.49</div><div class="kpi-label">recommended RRP 28g</div></div>
+    <div class="kpi-card"><div class="kpi-value">€2–3.5M</div><div class="kpi-label">36-mo cumulative target</div></div>
+  </div>
+
+  <h3 class="block-title">Ритейл (2025 shares)</h3>
+  <table>
+    <thead><tr><th>Retailer</th><th>Share 2025</th><th>Stores</th><th>Owner</th><th>Angle</th></tr></thead>
+    <tbody>
+      <tr class="row-highlight"><td><strong>Albert Heijn</strong></td><td><strong>38.2%</strong></td><td>~1,200</td><td>Ahold Delhaize</td><td><strong>Premium "Perla"/Excellent — defer to Y3</strong></td></tr>
+      <tr><td>Jumbo</td><td>~19.9%</td><td>~700</td><td>Van Eerd family</td><td>"Jumbo's" new premium PL 2025; La Place</td></tr>
+      <tr><td>Lidl NL</td><td>~10%</td><td>~440</td><td>Schwarz</td><td>Via NVC GmbH (DE→NL)</td></tr>
+      <tr><td>Aldi NL</td><td>5.9% ↑0.6pp</td><td>~480</td><td>Aldi Nord</td><td>Discounter PL</td></tr>
+      <tr><td>Plus + Coop (merged 2025)</td><td>~10%</td><td>~550</td><td>Coop/Superunie</td><td>Mid-premium</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="block-title">Channels — Phase 1 пріоритет</h3>
+  <div class="risk-grid">
+    <div class="risk-card low" style="border-left-color:var(--yellow)">
+      <div class="risk-title">⭐ Crisp <span style="background:var(--yellow);color:var(--black);padding:1px 6px;border-radius:4px;font-size:10px;margin-left:6px">5/5</span></div>
+      <div class="risk-meta">Premium curation app · 3,000 SKUs · profitable Dec 2025</div>
+      <div class="risk-mitigation">60–90 days до listing. Founder-led premium positioning. Highest fit for snEco.</div>
+    </div>
+    <div class="risk-card med">
+      <div class="risk-title">Picnic <span style="background:var(--yellow-soft);padding:1px 6px;border-radius:4px;font-size:10px;margin-left:6px">4/5</span></div>
+      <div class="risk-meta">~2M customers · €430M raise Nov 2025 · ~39% NL online</div>
+      <div class="risk-mitigation">6–9 mo category review. Snack curation = brand-builder.</div>
+    </div>
+    <div class="risk-card med">
+      <div class="risk-title">Ekoplaza (via Udea) <span style="background:var(--yellow-soft);padding:1px 6px;border-radius:4px;font-size:10px;margin-left:6px">4/5</span></div>
+      <div class="risk-meta">85 organic stores · +7% growth 2025</div>
+      <div class="risk-mitigation">3–6 mo. Clean-label fit perfect. Udea distribution.</div>
+    </div>
+    <div class="risk-card med">
+      <div class="risk-title">PLMA PL deal (Jumbo's / AH Perla) <span style="background:var(--yellow-soft);padding:1px 6px;border-radius:4px;font-size:10px;margin-left:6px">4/5</span></div>
+      <div class="risk-meta">PLMA 2025 attended · 6–12 mo cycle</div>
+      <div class="risk-mitigation">Tech patent = defensible PL economics vs commoditised PL cheese.</div>
+    </div>
+  </div>
+
+  <h3 class="block-title">Конкуренти</h3>
+  <table>
+    <thead><tr><th>Brand</th><th>Owner</th><th>Format/Price</th><th>USP</th></tr></thead>
+    <tbody>
+      <tr class="row-highlight"><td><strong>Frico Gouda Snacks</strong></td><td><strong>FrieslandCampina</strong> (snEco's supplier!)</td><td>20g × 8 grab-bag</td><td>"100 yrs Dutch tradition" mild Gouda</td></tr>
+      <tr><td>Old Amsterdam Cheese Bites</td><td>Frostkrone (DE)</td><td>Frozen breaded</td><td>Aged Gouda deep-fried prep</td></tr>
+      <tr><td>Beemster (kaasstengels)</td><td>CONO</td><td>Traditional sticks</td><td>Premium Dutch Gouda</td></tr>
+      <tr><td>Whisps</td><td>Schuman Cheese US</td><td>~€4–6/60g</td><td>Real-baked low-carb keto</td></tr>
+      <tr><td>Topking Kaastengels</td><td>NL traditional</td><td>Fried snack</td><td>Pub/borrel staple</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout dark">
+    <div class="callout-label">🎯 NL strategic angle</div>
+    <strong>FrieslandCampina partnership</strong> — already cheese supplier. Approach Corporate Innovation team:
+    <ul style="margin:8px 0 0 24px;line-height:1.6">
+      <li>JV / co-branded SKU ("Frico Crunch by snEco")</li>
+      <li>Contract manufacturing for FC-owned brands</li>
+      <li>Equity / venture angle (FC stated functional snack ambitions Dec 2025)</li>
+    </ul>
+    Borrel positioning: "Borrel-ready, fridge-free, 100% cheese" — pre-built occasion. Schiphol HMSHost (79 outlets to 2036). KLM in-flight premium European cheese.
+  </div>
+</section>
+
+<!-- ============================ FINANCIAL MODEL ============================ -->
+<section class="section" id="financial">
+  <div class="section-eyebrow">Розділ 4 · Financials</div>
+  <h2 class="section-title">Integrated 24-Month P&amp;L Model</h2>
+  <p class="section-lead">
+    5-market consolidated P&amp;L (Y1 + Y2). Прийняті assumptions: snEco ex-works 28g €1.15 average · COGS €0.55 (cheese 0.30 + pack/labor 0.15 + overhead 0.10) · GM target ~52% retail · Logistics SK→dest €0.07–0.12/unit · Distributor margin 15–25% · Fixed cost EU sales ops €180k/yr.
+  </p>
+
+  <h3 class="block-title">Per-Market P&amp;L (Base Case)</h3>
+  <table>
+    <thead><tr><th>Market</th><th>Units Y1 (k)</th><th>Units Y2 (k)</th><th>Rev Y1</th><th>Rev Y2</th><th>GP Y1</th><th>GP Y2</th><th>Mkt+Listing</th><th>Contribution Y2</th></tr></thead>
+    <tbody>
+      <tr class="row-highlight"><td>🇩🇪 <strong>DE</strong> (NVC)</td><td>3,000</td><td>6,000</td><td>€3.45M</td><td>€6.90M</td><td>€1.79M</td><td>€3.59M</td><td>€350k</td><td><strong>€3.24M</strong></td></tr>
+      <tr><td>🇵🇱 <strong>PL</strong></td><td>1,500</td><td>3,500</td><td>€1.73M</td><td>€4.03M</td><td>€0.90M</td><td>€2.10M</td><td>€280k</td><td>€1.82M</td></tr>
+      <tr><td>🇨🇿 <strong>CZ</strong></td><td>550</td><td>1,400</td><td>€0.63M</td><td>€1.61M</td><td>€0.33M</td><td>€0.84M</td><td>€95k</td><td>€0.74M</td></tr>
+      <tr><td>🇫🇷 <strong>FR</strong></td><td>700</td><td>2,200</td><td>€0.81M</td><td>€2.53M</td><td>€0.42M</td><td>€1.32M</td><td>€450k</td><td>€0.87M</td></tr>
+      <tr><td>🇳🇱 <strong>NL</strong></td><td>200</td><td>800</td><td>€0.23M</td><td>€0.92M</td><td>€0.12M</td><td>€0.48M</td><td>€110k</td><td>€0.37M</td></tr>
+      <tr style="background:var(--yellow);font-weight:800;color:var(--black)"><td><strong>TOTAL 5 MARKETS</strong></td><td><strong>5,950</strong></td><td><strong>13,900</strong></td><td><strong>€6.85M</strong></td><td><strong>€15.99M</strong></td><td><strong>€3.56M</strong></td><td><strong>€8.33M</strong></td><td><strong>€1.29M</strong></td><td><strong>€7.04M</strong></td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="block-title" id="scenarios">3 Scenarios — Consolidated View</h3>
+  <div class="scenarios">
+    <div class="scenario conservative">
+      <div class="scenario-label">Conservative</div>
+      <div class="scenario-name">Defensive scenario</div>
+      <div class="scenario-metric"><span>Y1 units</span><strong>4.2M</strong></div>
+      <div class="scenario-metric"><span>Y1 net rev</span><strong>€4.83M</strong></div>
+      <div class="scenario-metric"><span>Y1 GP</span><strong>€2.51M</strong></div>
+      <div class="scenario-metric"><span>Y2 units</span><strong>9.5M</strong></div>
+      <div class="scenario-metric"><span>Y2 net rev</span><strong>€10.92M</strong></div>
+      <div class="scenario-metric"><span>Y2 GP</span><strong>€5.69M</strong></div>
+      <div class="scenario-headline">€3.91M<br><span style="font-size:11px;font-weight:600;color:var(--text-muted)">Y2 EBITDA</span></div>
+    </div>
+    <div class="scenario base">
+      <div class="scenario-label">⭐ Base case</div>
+      <div class="scenario-name">Recommended plan</div>
+      <div class="scenario-metric"><span>Y1 units</span><strong>5.95M</strong></div>
+      <div class="scenario-metric"><span>Y1 net rev</span><strong>€6.85M</strong></div>
+      <div class="scenario-metric"><span>Y1 GP</span><strong>€3.56M</strong></div>
+      <div class="scenario-metric"><span>Y2 units</span><strong>13.9M</strong></div>
+      <div class="scenario-metric"><span>Y2 net rev</span><strong>€15.99M</strong></div>
+      <div class="scenario-metric"><span>Y2 GP</span><strong>€8.33M</strong></div>
+      <div class="scenario-headline">€6.55M<br><span style="font-size:11px;font-weight:600;color:var(--text-muted)">Y2 EBITDA</span></div>
+    </div>
+    <div class="scenario aggressive">
+      <div class="scenario-label">Aggressive</div>
+      <div class="scenario-name">Stretch upside</div>
+      <div class="scenario-metric"><span>Y1 units</span><strong>7.4M</strong></div>
+      <div class="scenario-metric"><span>Y1 net rev</span><strong>€8.51M</strong></div>
+      <div class="scenario-metric"><span>Y1 GP</span><strong>€4.43M</strong></div>
+      <div class="scenario-metric"><span>Y2 units</span><strong>18.2M</strong></div>
+      <div class="scenario-metric"><span>Y2 net rev</span><strong>€20.93M</strong></div>
+      <div class="scenario-metric"><span>Y2 GP</span><strong>€10.90M</strong></div>
+      <div class="scenario-headline">€8.86M<br><span style="font-size:11px;font-weight:600;color:var(--text-muted)">Y2 EBITDA</span></div>
+    </div>
+  </div>
+  <p style="font-size:12px;color:var(--text-muted);font-style:italic;margin-top:8px">Fixed costs Y1 €1.47M (listing+mkt+€180k ops), Y2 €1.78M.</p>
+
+  <h3 class="block-title">Margin Bridge — 28g Unit (Retail Channel Average)</h3>
+  <div class="bridge">
+    <div class="bridge-line">Ex-works SK</div>
+    <div class="bridge-amount">€1.15</div>
+    <div class="bridge-note"></div>
+
+    <div class="bridge-line neg">COGS</div>
+    <div class="bridge-amount neg">−€0.55</div>
+    <div class="bridge-note">Cheese 0.30 + pack/labor 0.15 + overhead 0.10</div>
+
+    <div class="bridge-line neg">Logistics avg</div>
+    <div class="bridge-amount neg">−€0.09</div>
+    <div class="bridge-note">Blended SK→5 destinations</div>
+
+    <div class="bridge-line total">Net Gross Profit</div>
+    <div class="bridge-amount total">€0.51</div>
+    <div class="bridge-note"><strong>44% on ex-works</strong>, ~52% retail-channel basis</div>
+  </div>
+</section>
+
+<!-- ============================ INVESTMENT ============================ -->
+<section class="section" id="investment">
+  <div class="section-eyebrow">Розділ 5 · Capital</div>
+  <h2 class="section-title">Investment Requirement (24 months)</h2>
+  <p class="section-lead">
+    Cash investment для 5-market entry. Розбивка по статтях з low/base/high діапазоном.
+  </p>
+
+  <div style="background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin:20px 0">
+    <div class="investment-bar header">
+      <div>Line item</div>
+      <div style="text-align:right">€ Low</div>
+      <div style="text-align:right">€ Base</div>
+      <div style="text-align:right">€ High</div>
+      <div>Notes</div>
+    </div>
+    <div class="investment-bar">
+      <div class="invest-line">Production capacity scale (SK 2nd line + UA overflow)</div>
+      <div class="invest-num">400k</div>
+      <div class="invest-num"><strong>450k</strong></div>
+      <div class="invest-num">600k</div>
+      <div class="invest-note">Required for Y2 NVC 6M units</div>
+    </div>
+    <div class="investment-bar">
+      <div class="invest-line">Pack design + translation (FR/NL/CZ/PL)</div>
+      <div class="invest-num">35k</div>
+      <div class="invest-num"><strong>50k</strong></div>
+      <div class="invest-num">80k</div>
+      <div class="invest-note">10 SKU × 4 lang + Nutri-Score</div>
+    </div>
+    <div class="investment-bar">
+      <div class="invest-line">Listing fees + slotting</div>
+      <div class="invest-num">450k</div>
+      <div class="invest-num"><strong>620k</strong></div>
+      <div class="invest-num">850k</div>
+      <div class="invest-note">DE 250 + FR 200 + PL 90 + NL 60 + CZ 20</div>
+    </div>
+    <div class="investment-bar">
+      <div class="invest-line">Marketing + PR + trade shows</div>
+      <div class="invest-num">480k</div>
+      <div class="invest-num"><strong>680k</strong></div>
+      <div class="invest-num">900k</div>
+      <div class="invest-note">SIAL 120 + Anuga 100 + PLMA 40 + digital 420</div>
+    </div>
+    <div class="investment-bar">
+      <div class="invest-line">Working capital (inventory + receivables)</div>
+      <div class="invest-num">550k</div>
+      <div class="invest-num"><strong>800k</strong></div>
+      <div class="invest-num">1,100k</div>
+      <div class="invest-note">60-day DSO + 30-day inventory at scale</div>
+    </div>
+    <div class="investment-bar">
+      <div class="invest-line">Sales team scaling</div>
+      <div class="invest-num">240k</div>
+      <div class="invest-num"><strong>360k</strong></div>
+      <div class="invest-num">480k</div>
+      <div class="invest-note">PL CM + DE KAM + FR agent + Iryna team</div>
+    </div>
+    <div class="investment-bar">
+      <div class="invest-line">Legal (EUTM, contracts, customs)</div>
+      <div class="invest-num">60k</div>
+      <div class="invest-num"><strong>90k</strong></div>
+      <div class="invest-num">130k</div>
+      <div class="invest-note">Sneko conflict + 5 country agreements</div>
+    </div>
+    <div class="investment-bar total">
+      <div>TOTAL 24 MONTHS</div>
+      <div class="invest-num">€2.22M</div>
+      <div class="invest-num">€3.05M</div>
+      <div class="invest-num">€4.14M</div>
+      <div></div>
+    </div>
+  </div>
+
+  <h3 class="block-title" id="roi">ROI / Payback (Base Case)</h3>
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-value">€3.05M</div><div class="kpi-label">Total investment 24 mo</div></div>
+    <div class="kpi-card"><div class="kpi-value">€11.89M</div><div class="kpi-label">Cumulative GP 24 mo</div></div>
+    <div class="kpi-card yellow"><div class="kpi-value">17 mo</div><div class="kpi-label">Payback period</div></div>
+    <div class="kpi-card dark"><div class="kpi-value">215%</div><div class="kpi-label">Y2 ROIC</div></div>
+  </div>
+  <p style="font-size:13px;color:var(--text-muted);text-align:center;margin-top:8px">
+    Y2 EBITDA after fixed: <strong>€6.55M</strong> · Y2 ex-works revenue: <strong>€15.99M</strong> · Investment as % of Y2 revenue: <strong>19%</strong>
+  </p>
+</section>
+
+<!-- ============================ RISKS ============================ -->
+<section class="section" id="risks">
+  <div class="section-eyebrow">Розділ 6 · Risk management</div>
+  <h2 class="section-title">Cross-Market Risks</h2>
+  <p class="section-lead">Top 8 ризиків, спільних для всіх 5 ринків. Owner-mitigation матриця.</p>
+
+  <div class="risk-grid">
+    <div class="risk-card high">
+      <div class="risk-title">1. EUTM "Sneko" (Monolith)</div>
+      <div class="risk-meta">Probability: High · Impact: <strong>Critical</strong> · Owner: Vadym + IP counsel</div>
+      <div class="risk-mitigation">Push case #000072423; prep "snEco by Prime Snack" fallback; secure FR/NL national TMs у паралелі.</div>
+    </div>
+    <div class="risk-card high">
+      <div class="risk-title">2. Nutri-Score mandatory FR Nov 2025 + NL AH 2025</div>
+      <div class="risk-meta">Probability: <strong>Certain</strong> · Impact: High · Owner: Pylyp + Bohdan</div>
+      <div class="risk-mitigation">Reformulate Fitness/Kids to score B; pack redesign €40k; emphasize protein angle. Cheese standard SKUs opt-out where legal.</div>
+    </div>
+    <div class="risk-card high">
+      <div class="risk-title">3. Defensive launches (Mlekovita / FCD / Bel / Lactalis)</div>
+      <div class="risk-meta">Probability: Medium · Impact: High · Owner: Yaroslav</div>
+      <div class="risk-mitigation">Patent enforcement; speed-to-shelf priority; SKU breadth (10 vs їх 2–3).</div>
+    </div>
+    <div class="risk-card high">
+      <div class="risk-title">4. SK plant capacity (500k/mo → need 1.5M for Y2 NVC)</div>
+      <div class="risk-meta">Probability: High · Impact: <strong>Critical</strong> · Owner: Pylyp</div>
+      <div class="risk-mitigation">CAPEX €450k for 2nd line by Q4 2026; UA Mukachevo as overflow; decision date 31.05.2026.</div>
+    </div>
+    <div class="risk-card med">
+      <div class="risk-title">5. Ukrainian war perception</div>
+      <div class="risk-meta">Probability: Medium · Impact: Medium · Owner: Vadym</div>
+      <div class="risk-mitigation">DE/NL more sensitive — "Made in Slovakia, EU" lead. PL/CZ supportive — lead with UA solidarity.</div>
+    </div>
+    <div class="risk-card high">
+      <div class="risk-title">6. Listing fees burn cash flow (FR €100–500k/chain)</div>
+      <div class="risk-meta">Probability: High · Impact: High · Owner: Iryna</div>
+      <div class="risk-mitigation">Stagger CZ → PL → DE → FR (cash-flow funded sequence); negotiate slotting vs free goods.</div>
+    </div>
+    <div class="risk-card med">
+      <div class="risk-title">7. FX risk (UAH inputs, EUR revenue)</div>
+      <div class="risk-meta">Probability: Medium · Impact: Medium · Owner: Pylyp + CFO</div>
+      <div class="risk-mitigation">Hedge 60% of 6-mo UAH exposure; price ex-works in EUR only.</div>
+    </div>
+    <div class="risk-card high">
+      <div class="risk-title">8. Lidl PL undermining brand premium</div>
+      <div class="risk-meta">Probability: Medium · Impact: High · Owner: Vadym</div>
+      <div class="risk-mitigation">NVC exclusive contractually blocks Lidl direct у PL; PL retail goes через different distributor з brand-pack only.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 90-DAY ACTION PLAN ============================ -->
+<section class="section" id="action-plan">
+  <div class="section-eyebrow">Розділ 7 · Execution</div>
+  <h2 class="section-title">90-Day Consolidated Action Plan</h2>
+  <p class="section-lead">15 critical actions across all 5 markets з owner, deadline і KPI. Період: 15.05–15.08.2026.</p>
+
+  <div class="action-list">
+    <div class="action-item" style="background:var(--black);color:var(--white);font-weight:700;font-size:11px;letter-spacing:0.08em;text-transform:uppercase">
+      <div>#</div>
+      <div>Action</div>
+      <div>Owner</div>
+      <div>Deadline</div>
+      <div>KPI</div>
+    </div>
+    <div class="action-item">
+      <div class="action-num">01</div>
+      <div class="action-text">Finalize NVC Y1 forecast + first PO 250k units</div>
+      <div class="action-owner">Iryna + NVC</div>
+      <div class="action-deadline">31.05.2026</div>
+      <div class="action-kpi">PO signed</div>
+    </div>
+    <div class="action-item">
+      <div class="action-num">02</div>
+      <div class="action-text">Push EUTM case #000072423 + file FR/NL nationals</div>
+      <div class="action-owner">Vadym + IP</div>
+      <div class="action-deadline">15.06.2026</div>
+      <div class="action-kpi">Filings confirmed</div>
+    </div>
+    <div class="action-item">
+      <div class="action-num">03</div>
+      <div class="action-text">Pitch Rohlik.cz + Albert Excellent CZ</div>
+      <div class="action-owner">Yaroslav</div>
+      <div class="action-deadline">20.05.2026</div>
+      <div class="action-kpi">2 listings agreed</div>
+    </div>
+    <div class="action-item">
+      <div class="action-num">04</div>
+      <div class="action-text">CZ-language pack artwork (10 SKUs)</div>
+      <div class="action-owner">Bohdan</div>
+      <div class="action-deadline">10.06.2026</div>
+      <div class="action-kpi">Files to print</div>
+    </div>
+    <div class="action-item">
+      <div class="action-num">05</div>
+      <div class="action-text">Žabka PL pilot pitch (200 stores)</div>
+      <div class="action-owner">Yaroslav + PL dist</div>
+      <div class="action-deadline">30.06.2026</div>
+      <div class="action-kpi">LOI signed</div>
+    </div>
+    <div class="action-item">
+      <div class="action-num">06</div>
+      <div class="action-text">SK plant 2nd line CAPEX greenlight</div>
+      <div class="action-owner">Pylyp + Board</div>
+      <div class="action-deadline">15.06.2026</div>
+      <div class="action-kpi">€450k approved</div>
+    </div>
+    <div class="action-item">
+      <div class="action-num">07</div>
+      <div class="action-text">dm/Rossmann DE Fitness 60% pitch</div>
+      <div class="action-owner">NVC + Iryna</div>
+      <div class="action-deadline">30.06.2026</div>
+      <div class="action-kpi">Test listing 800 stores</div>
+    </div>
+    <div class="action-item">
+      <div class="action-num">08</div>
+      <div class="action-text">FR pack reformulation Nutri-Score B</div>
+      <div class="action-owner">Pylyp + Bohdan</div>
+      <div class="action-deadline">31.07.2026</div>
+      <div class="action-kpi">Lab confirmed</div>
+    </div>
+    <div class="action-item">
+      <div class="action-num">09</div>
+      <div class="action-text">Biocoop + Naturalia FR pitch (SIAL credential)</div>
+      <div class="action-owner">Vadym + Iryna</div>
+      <div class="action-deadline">15.07.2026</div>
+      <div class="action-kpi">1 listing</div>
+    </div>
+    <div class="action-item">
+      <div class="action-num">10</div>
+      <div class="action-text">Picnic + Crisp NL pilot</div>
+      <div class="action-owner">Iryna</div>
+      <div class="action-deadline">30.07.2026</div>
+      <div class="action-kpi">5,000 units PO</div>
+    </div>
+    <div class="action-item">
+      <div class="action-num">11</div>
+      <div class="action-text">Hire PL Country Manager (Warsaw-based)</div>
+      <div class="action-owner">Bohdan</div>
+      <div class="action-deadline">31.07.2026</div>
+      <div class="action-kpi">Offer accepted</div>
+    </div>
+    <div class="action-item">
+      <div class="action-num">12</div>
+      <div class="action-text">Bio Planet PL listing</div>
+      <div class="action-owner">Yaroslav</div>
+      <div class="action-deadline">30.06.2026</div>
+      <div class="action-kpi">90 stores</div>
+    </div>
+    <div class="action-item">
+      <div class="action-num">13</div>
+      <div class="action-text">ANUGA 2026 booth booking + 200 buyer invite list</div>
+      <div class="action-owner">Iryna</div>
+      <div class="action-deadline">25.05.2026</div>
+      <div class="action-kpi">Booth confirmed</div>
+    </div>
+    <div class="action-item">
+      <div class="action-num">14</div>
+      <div class="action-text">Mlekovita supplier contract finalize (PL local sourcing)</div>
+      <div class="action-owner">Pylyp</div>
+      <div class="action-deadline">30.06.2026</div>
+      <div class="action-kpi">Contract signed</div>
+    </div>
+    <div class="action-item">
+      <div class="action-num">15</div>
+      <div class="action-text">24-mo cash-flow rolling forecast consolidated</div>
+      <div class="action-owner">CFO/Bohdan</div>
+      <div class="action-deadline">31.05.2026</div>
+      <div class="action-kpi">Board pack</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ CLOSING ============================ -->
+<section class="section" id="closing" style="background:linear-gradient(135deg, var(--black) 0%, #2A2A2A 100%);color:var(--white)">
+  <div class="section-eyebrow" style="color:var(--yellow)">Розділ 8 · Final recommendation</div>
+  <h2 class="section-title" style="color:var(--white)">Closing Recommendation</h2>
+  <p class="section-lead" style="color:rgba(255,255,255,0.75);max-width:780px">
+    snEco's 5-market entry — <strong style="color:var(--yellow)">не портфоліо рівних, а sequenced cascade</strong>. Кожен ринок виконує конкретну функцію у бізнес-моделі.
+  </p>
+
+  <div style="background:rgba(255,255,255,0.05);padding:32px;border-radius:var(--radius);margin-top:24px;border-left:4px solid var(--yellow)">
+    <h3 style="color:var(--yellow);font-size:14px;letter-spacing:0.10em;text-transform:uppercase;margin-bottom:16px">5-етапний каскад</h3>
+    <ol style="font-size:15px;line-height:1.9;padding-left:24px;color:rgba(255,255,255,0.92)">
+      <li><strong style="color:var(--yellow)">Q2 2026 — CZ first</strong> (cash flow, 60-day to revenue, lowest risk, Rohlik.cz + Albert Excellent + M&amp;S)</li>
+      <li><strong style="color:var(--yellow)">Q2–Q3 2026 — DE NVC ramp</strong> (volume engine, 45% of budget, Lidl PL + dm/Rossmann + Alnatura)</li>
+      <li><strong style="color:var(--yellow)">Q3 2026 — PL Žabka + Bio Planet</strong> (CEE volume + brand, Polish-pack ready)</li>
+      <li><strong style="color:var(--yellow)">Q4 2026 — FR Biocoop/Naturalia/Monoprix</strong> (prestige, post-SIAL momentum 17–21 Oct 2026)</li>
+      <li><strong style="color:var(--yellow)">2027 — NL Picnic/Crisp</strong> (maintenance mode, defer AH/Jumbo to Y3)</li>
+    </ol>
+  </div>
+
+  <div style="background:var(--yellow);color:var(--black);padding:32px;border-radius:var(--radius);margin-top:24px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;margin-bottom:12px">🎯 Single Most Important Decision Next 30 Days</div>
+    <div style="font-size:22px;font-weight:800;line-height:1.4">
+      Greenlight <strong>€3.05M base-case investment</strong>.<br>
+      Lock SK plant 2nd-line CAPEX <strong>€450k</strong> ⚡ — without it, NVC Y2 commitment of 6M units стає binding constraint що capping the entire portfolio.
+    </div>
+    <div style="margin-top:20px;padding-top:16px;border-top:2px solid var(--black);font-size:14px;font-weight:700">
+      📅 Recommended board decision date: <strong>31.05.2026</strong>
+    </div>
+  </div>
+
+  <div style="margin-top:32px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;text-align:center">
+    <div>
+      <div style="font-size:32px;font-weight:900;color:var(--yellow);line-height:1">€15.99M</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:6px;letter-spacing:0.04em;text-transform:uppercase">Y2 revenue (base)</div>
+    </div>
+    <div>
+      <div style="font-size:32px;font-weight:900;color:var(--yellow);line-height:1">€6.55M</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:6px;letter-spacing:0.04em;text-transform:uppercase">Y2 EBITDA</div>
+    </div>
+    <div>
+      <div style="font-size:32px;font-weight:900;color:var(--yellow);line-height:1">17 mo</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:6px;letter-spacing:0.04em;text-transform:uppercase">Payback period</div>
+    </div>
+    <div>
+      <div style="font-size:32px;font-weight:900;color:var(--yellow);line-height:1">215%</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:6px;letter-spacing:0.04em;text-transform:uppercase">Y2 ROIC</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ DOC FOOTER ============================ -->
+<footer class="doc-footer">
+  <div class="doc-footer-cols">
+    <div>
+      <h4>Document Info</h4>
+      snEco · EU 5-Markets Strategic Dossier<br>
+      Version 1.0 · Confidential<br>
+      Prepared: 12.05.2026<br>
+      Format inspired by Arvid Nordquist Sweden GTM Plan (10.2024)
+    </div>
+    <div>
+      <h4>Sources & Methodology</h4>
+      5 parallel deep-dive research agents covered:<br>
+      Statista · Mintel · NIQ · GfK · Euromonitor · Kantar · LSA · CBS · ČSÚ · CNIEL · ANIA · IRI · USDA GAIN · Innova · Glanbia · FoodNavigator · BVE · NEVI · PMR · INCOMA · official chain reports · trade press
+    </div>
+    <div>
+      <h4>Authors / Owners</h4>
+      Vadym Gryshyn — CEO, strategy<br>
+      Pylyp Gryshyn — CTO, production<br>
+      Iryna — Head of Export<br>
+      Yaroslav — Commercial Director<br>
+      Bohdan — COO<br>
+      <br>
+      Contact: <strong style="color:var(--yellow)">vg@sneco.ua</strong>
+    </div>
+  </div>
+  <div class="doc-footer-meta">
+    snEco / Prime Snack LLC · ТМ №230269 (UA) · TM №266751 (SK) · TM №411165 (CZ) · TM Z.590834 (PL)<br>
+    Patent UA №139035 · FSSC 22000 · ISO 22000 · HACCP · IFS Food v8 · EU TRACES · 🏆 SIAL Innovation Grand Prix 2024
+  </div>
+</footer>
+
+</main>
+</div>
+
+<script>
+// Sidebar active link tracking
+document.querySelectorAll('.sidebar-link').forEach(link => {
+  link.addEventListener('click', () => {
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+  });
+});
+// Default active
+window.addEventListener('scroll', () => {
+  const sections = ['hero','exec-summary','cross-market','matrix','sec-de','sec-pl','sec-cz','sec-fr','sec-nl','financial','scenarios','investment','roi','risks','action-plan','closing'];
+  let current = sections[0];
+  for (const id of sections) {
+    const el = document.getElementById(id);
+    if (el && el.getBoundingClientRect().top < 100) current = id;
+  }
+  document.querySelectorAll('.sidebar-link').forEach(l => {
+    if (l.getAttribute('href') === '#' + current) l.classList.add('active');
+    else l.classList.remove('active');
+  });
+});
+</script>
+
+</body>
+</html>
