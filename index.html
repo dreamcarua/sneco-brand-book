@@ -2113,7 +2113,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Bible v2.48 · 2026
+    Brand Bible v2.49 · 2026
   </div>
 </nav>
 
@@ -2127,7 +2127,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
     <span data-lang="sk">Jedna ingrediencia. <span class="qr-ns-accent">Žiadne kompromisy.</span> Syrový snack 21. storočia.</span>
   </div>
-  <div class="qr-meta">v2.48 · 2026</div>
+  <div class="qr-meta">v2.49 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -8570,7 +8570,28 @@ h3.block-title:first-of-type { margin-top: 0; }
 
   <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span><span data-lang="sk">História verzií</span></h3>
   <div class="changelog-entry">
-    <span class="changelog-version">v2.48</span><span class="changelog-date">13.05.2026</span>
+    <span class="changelog-version">v2.49</span><span class="changelog-date">13.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>🔐 OTP UX-фікс — чесний режим whitelist.</strong> Раніше Worker silently повертав 200 OK для будь-якого email — навіть якщо його НЕМАЄ у whitelist (класичний security pattern для public API: не leak'ати whitelist через enumeration). Для internal tool snEco це створювало погану UX: команда чекала email-кода, який ніколи не приходив, без жодного сигналу що пошта не у списку.</li>
+      <li data-lang="en"><strong>🔐 OTP UX fix — honest whitelist mode.</strong> Previously the Worker silently returned 200 OK for any email — even if NOT in the whitelist (classic security pattern for public APIs: don't leak the whitelist via enumeration). For snEco's internal tool this created bad UX: the team waited for an email code that never arrived, with no signal that the address wasn't on the list.</li>
+      <li data-lang="sk"><strong>🔐 OTP UX fix — honest whitelist mode.</strong> Predtým Worker tichom vracal 200 OK pre akýkoľvek email — aj keď nebol vo whitelist (klasický bezpečnostný pattern pre public API: neleakovať whitelist enumeráciou). Pre snEco internal tool to vytváralo zlý UX: tím čakal na email kód, ktorý nikdy neprišiel.</li>
+
+      <li data-lang="uk"><strong>Тепер:</strong> Worker повертає <code>403 { error: 'not_in_whitelist' }</code> з невеликим delay (400–700ms throttle проти enumeration). Фронтенд відображає friendly повідомлення: <em>«❌ Цього email немає у whitelist для розділу [block]. Звернись до vg@sneco.ua»</em> + одразу кнопка <strong>«✉ Надіслати запит»</strong> з prefilled mailto (subject + body з email і назвою розділу). У всіх 3 мовах.</li>
+      <li data-lang="en"><strong>Now:</strong> Worker returns <code>403 { error: 'not_in_whitelist' }</code> with a small delay (400–700ms throttle against enumeration). Frontend shows a friendly message: <em>"❌ This email is not in the whitelist for the [block] section. Contact vg@sneco.ua"</em> + a one-click <strong>"✉ Send request"</strong> button with prefilled mailto (subject + body containing email and section). All 3 languages.</li>
+      <li data-lang="sk"><strong>Teraz:</strong> Worker vracia <code>403 { error: 'not_in_whitelist' }</code> s malým delay (400–700ms throttle proti enumerácii). Frontend zobrazí friendly hlášku: <em>„❌ Tento email nie je vo whitelist pre sekciu [block]. Kontaktuj vg@sneco.ua"</em> + jedným klikom <strong>„✉ Poslať žiadosť"</strong> s prefilled mailto.</li>
+
+      <li data-lang="uk"><strong>Trade-off:</strong> публічний enumeration whitelist тепер можливий (зловмисник може per-email перевірити чи в whitelist). Для internal tool snEco це <strong>прийнятна ціна за хорошу UX</strong>. Якщо колись хочемо повернути strict mode — змінити 403 → 200 у <code>handleOtpRequest</code> у Worker'і.</li>
+      <li data-lang="en"><strong>Trade-off:</strong> public whitelist enumeration is now possible (an attacker can check whether a specific email is in the whitelist). For snEco's internal tool this is <strong>an acceptable price for good UX</strong>. To restore strict mode later — change 403 → 200 in <code>handleOtpRequest</code> in the Worker.</li>
+      <li data-lang="sk"><strong>Trade-off:</strong> verejná enumerácia whitelistu je teraz možná. Pre snEco internal tool je to <strong>akceptovateľná cena za dobrý UX</strong>. Pre návrat strict režimu — zmena 403 → 200 v <code>handleOtpRequest</code> vo Worker'i.</li>
+
+      <li data-lang="uk"><strong>⚠️ Action item:</strong> deploy оновленого Worker'а — <code>cd ~/snEco/sneco-auth &amp;&amp; wrangler deploy</code>. До цього фронтенд буде ловити 200 OK як раніше і переходити у code stage, але код не прийде.</li>
+      <li data-lang="en"><strong>⚠️ Action item:</strong> deploy the updated Worker — <code>cd ~/snEco/sneco-auth &amp;&amp; wrangler deploy</code>. Until then the frontend will keep receiving 200 OK and moving to the code stage even though no code is sent.</li>
+      <li data-lang="sk"><strong>⚠️ Action item:</strong> deploy aktualizovaný Worker — <code>cd ~/snEco/sneco-auth &amp;&amp; wrangler deploy</code>. Bez toho frontend bude naďalej dostávať 200 OK a prechádzať na code stage aj keď kód nebude odoslaný.</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.48</span><span class="changelog-date">13.05.2026</span>
     <ul class="changelog-list">
       <li data-lang="uk"><strong>📚 sec-reference перейменовано:</strong> «Довідник для входу в торгові мережі» → <strong>«Довідник SKU»</strong> (sidebar + section title + section lead). Коротше, точніше відображає зміст: він про SKU (EAN, технічні параметри, логістика, виробництво), а не лише про мережі.</li>
       <li data-lang="en"><strong>📚 sec-reference renamed:</strong> "Retail entry reference" → <strong>"SKU Reference"</strong> (sidebar + section title + lead). Shorter, more accurate: it's about SKUs (EAN, technical parameters, logistics, production), not only about retail networks.</li>
@@ -10409,9 +10430,19 @@ h3.block-title:first-of-type { margin-top: 0; }
             render();
           } catch (e) {
             msg.classList.add('is-error');
-            msg.textContent = (isEn() ? 'Send failed: ' : 'Помилка: ') + e.message;
+            const lang = (document.body.classList.contains('lang-en') ? 'en' : document.body.classList.contains('lang-sk') ? 'sk' : 'uk');
+            if (e.message === 'not_in_whitelist') {
+              const txt = {
+                uk: `❌ Цього email немає у whitelist для розділу «${block}». Звернись до vg@sneco.ua щоб додати тебе.`,
+                en: `❌ This email is not in the whitelist for the "${block}" section. Contact vg@sneco.ua to be added.`,
+                sk: `❌ Tento email nie je vo whitelist pre sekciu „${block}". Kontaktuj vg@sneco.ua, aby ťa pridali.`,
+              };
+              msg.innerHTML = txt[lang] + ' <a href="mailto:vg@sneco.ua?subject=Whitelist%20access%20for%20' + encodeURIComponent(block) + '&body=' + encodeURIComponent('Будь ласка, додай мій email ' + v + ' у whitelist для розділу "' + block + '".') + '" style="color:var(--yellow);text-decoration:underline;font-weight:600">✉ ' + (lang==='en'?'Send request':lang==='sk'?'Poslať žiadosť':'Надіслати запит') + '</a>';
+            } else {
+              msg.textContent = (lang === 'en' ? 'Send failed: ' : lang === 'sk' ? 'Chyba odoslania: ' : 'Помилка: ') + e.message;
+            }
             submit.disabled = false;
-            submit.innerHTML = isEn() ? 'Send code' : 'Надіслати код';
+            submit.innerHTML = lang === 'en' ? 'Send code' : lang === 'sk' ? 'Poslať kód' : 'Надіслати код';
           }
         } else {
           const code = input.value.trim();
