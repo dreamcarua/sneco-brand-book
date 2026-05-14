@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>snEco — <DASHBOARD_TITLE></title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --y:#FEBF27;--g:#96C11F;--d:#1E1E1E;--bg:#F4F4EF;--card:#fff;
+  --muted:#8a8a8a;--border:#E5E5DC;--red:#E84040;--blue:#3B82F6;
+  --yf:rgba(254,191,39,.13);--gf:rgba(150,193,31,.12);--rf:rgba(232,64,64,.10);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--d);font-size:14px;min-height:100vh}
+
+/* ─── TOPBAR ─── */
+.topbar{background:var(--d);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-box{width:32px;height:32px;background:var(--y);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:var(--d);letter-spacing:-0.5px}
+.logo-text{color:#fff;font-size:15px;font-weight:700;letter-spacing:-.3px}
+.logo-sub{color:rgba(255,255,255,.4);font-size:11px;margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-green{background:rgba(150,193,31,.2);color:var(--g);border:1px solid rgba(150,193,31,.3)}
+.badge-gray{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1)}
+
+/* ─── LAYOUT ─── */
+.wrap{padding:20px 24px;max-width:1440px;margin:0 auto}
+.sec{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:24px 0 12px;display:flex;align-items:center;gap:8px}
+.sec::after{content:'';flex:1;height:1px;background:var(--border)}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:960px){.g4{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}}
+@media(max-width:620px){.g4,.g2{grid-template-columns:1fr}.topbar{padding:0 12px;height:48px}.wrap{padding:12px 10px}}
+
+/* ─── KPI CARDS ─── */
+.kpi{background:var(--card);border-radius:12px;padding:16px 18px;border:1px solid var(--border)}
+.kpi-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:6px}
+.kpi-val{font-size:26px;font-weight:800;color:var(--d);line-height:1.1}
+.cc{background:var(--card);border-radius:12px;padding:18px 20px;border:1px solid var(--border)}
+.cc-title{font-size:14px;font-weight:700;color:var(--d);margin-bottom:12px}
+
+/* === OTP gate === */
+#dashauth-overlay{position:fixed;inset:0;background:#1E1E1E;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+#dashauth-overlay.is-hidden{display:none}
+.dashauth-card{background:#fff;width:100%;max-width:440px;border-radius:14px;padding:36px 30px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.dashauth-logo{font-size:24px;font-weight:900;color:#FEBF27;margin-bottom:6px;letter-spacing:-0.5px;text-align:center}
+.dashauth-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#888;text-align:center;margin-bottom:24px}
+.dashauth-icon{font-size:36px;text-align:center;margin-bottom:16px}
+.dashauth-h1{font-size:18px;font-weight:800;text-align:center;color:#1E1E1E;margin-bottom:6px}
+.dashauth-desc{font-size:13px;color:#666;text-align:center;line-height:1.55;margin-bottom:20px}
+.dashauth-input{width:100%;padding:12px 14px;border:2px solid #E5E5DC;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
+.dashauth-input:focus{border-color:#FEBF27}
+.dashauth-input.code{font-family:'SF Mono',Menlo,Consolas,monospace;letter-spacing:.4em;text-align:center;font-size:18px}
+.dashauth-btn{width:100%;padding:13px;background:#1E1E1E;color:#fff;border:0;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;margin-top:14px;font-family:inherit;transition:background .15s}
+.dashauth-btn:hover{background:#000}
+.dashauth-btn:disabled{opacity:.5;cursor:not-allowed}
+.dashauth-msg{font-size:12.5px;line-height:1.5;margin-top:12px;text-align:center;min-height:18px}
+.dashauth-msg.is-error{color:#DC2626}
+.dashauth-msg a{color:#FEBF27;font-weight:600;text-decoration:underline}
+.dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
+.dashauth-back:hover{color:#FEBF27}
+.dashauth-session{position:fixed;top:8px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-family:-apple-system,sans-serif;font-weight:600;display:flex;align-items:center;gap:8px}
+.dashauth-session button{background:none;border:0;color:#96C11F;cursor:pointer;font-size:14px;padding:0;line-height:1}
+body.dash-locked{overflow:hidden}
+</style>
+</head>
+<body class="dash-locked">
+
+<!-- ===== OTP GATE OVERLAY (DO NOT MODIFY — pattern v2.51+) ===== -->
+<div id="dashauth-overlay">
+  <div class="dashauth-card">
+    <div class="dashauth-logo">snEco</div>
+    <div class="dashauth-sub"><DASHBOARD_TITLE> · Confidential</div>
+    <div id="dashauth-stage"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const WORKER = 'https://sneco-auth.vg-ab6.workers.dev';
+  const BLOCK = '<BLOCK_NAME>';     // e.g. 'payroll-dashboard'
+  const STORAGE_KEY = 'snEco-jwt-' + BLOCK;
+  const overlay = document.getElementById('dashauth-overlay');
+  const stage = document.getElementById('dashauth-stage');
+  let email = '';
+
+  function unlock(token, em, exp){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({token, email:em, exp})); } catch(e){}
+    document.body.classList.remove('dash-locked');
+    overlay.classList.add('is-hidden');
+    showSessionBadge(em, exp);
+    // ─── Fire data load AFTER auth ───
+    if (typeof window.bootDashboard === 'function') window.bootDashboard(token);
+  }
+  function showSessionBadge(em, exp){
+    const b = document.createElement('div');
+    b.className = 'dashauth-session';
+    const mins = Math.max(0, Math.floor((exp*1000 - Date.now())/60000));
+    b.innerHTML = '✓ ' + em + ' · ' + mins + ' min <button title="Lock">🔒</button>';
+    b.querySelector('button').onclick = () => { localStorage.removeItem(STORAGE_KEY); location.reload(); };
+    document.body.appendChild(b);
+  }
+  async function verifyExisting(){
+    let s; try { s = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null'); } catch(e){}
+    if (!s || !s.token || !s.exp || s.exp*1000 < Date.now()) return null;
+    try {
+      const r = await fetch(WORKER+'/api/session/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({token: s.token, block: BLOCK})});
+      const j = await r.json();
+      return j.ok ? s : null;
+    } catch(e) { return null; }
+  }
+  function renderEmail(){
+    stage.innerHTML = `
+      <div class="dashauth-icon">📊</div>
+      <div class="dashauth-h1">Введіть email</div>
+      <div class="dashauth-desc">Якщо ваш email у whitelist — на нього надійде 6-значний код. Сесія діє 1 годину.</div>
+      <input class="dashauth-input" type="email" id="auth-em" placeholder="ім'я@sneco.ua" autocomplete="email" autofocus>
+      <button class="dashauth-btn" id="auth-send">Надіслати код</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="../" class="dashauth-back">← Brand Bible</a>
+    `;
+    const em = document.getElementById('auth-em');
+    const send = document.getElementById('auth-send');
+    const msg = document.getElementById('auth-msg');
+    em.addEventListener('keydown', e=>{ if(e.key==='Enter') send.click(); });
+    send.onclick = async () => {
+      const v = em.value.trim();
+      if (!v || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { msg.textContent='Введіть правильний email.'; msg.className='dashauth-msg is-error'; return; }
+      send.disabled = true; send.textContent = 'Надсилаємо...'; msg.textContent='';
+      try {
+        const r = await fetch(WORKER+'/api/otp/request', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email:v, block: BLOCK})});
+        if (!r.ok) {
+          const j = await r.json().catch(()=>({}));
+          if (j.error === 'not_in_whitelist') {
+            msg.innerHTML = `❌ Цього email немає у whitelist. <a href="mailto:vg@sneco.ua?subject=<DASHBOARD_TITLE>%20whitelist">✉ Запит до vg@sneco.ua</a>`;
+          } else {
+            msg.textContent = 'Помилка: ' + (j.error || r.status);
+          }
+          msg.className='dashauth-msg is-error';
+          send.disabled=false; send.textContent='Надіслати код'; return;
+        }
+        email = v;
+        renderCode();
+      } catch(e) {
+        msg.textContent = 'Помилка мережі: ' + e.message;
+        msg.className='dashauth-msg is-error';
+        send.disabled=false; send.textContent='Надіслати код';
+      }
+    };
+  }
+  function renderCode(){
+    stage.innerHTML = `
+      <div class="dashauth-icon">🔢</div>
+      <div class="dashauth-h1">Введіть код з листа</div>
+      <div class="dashauth-desc">${email}<br>Код надіслано — перевірте пошту (включно зі спамом).</div>
+      <input class="dashauth-input code" type="text" id="auth-code" inputmode="numeric" maxlength="6" placeholder="••••••" autofocus>
+      <button class="dashauth-btn" id="auth-verify">Підтвердити</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="#" class="dashauth-back" id="auth-back">← Інший email</a>
+    `;
+    const code = document.getElementById('auth-code');
+    const verify = document.getElementById('auth-verify');
+    const msg = document.getElementById('auth-msg');
+    code.addEventListener('keydown', e=>{ if(e.key==='Enter') verify.click(); });
+    document.getElementById('auth-back').onclick = e=>{ e.preventDefault(); renderEmail(); };
+    verify.onclick = async () => {
+      const c = code.value.trim();
+      if (!/^\d{6}$/.test(c)) { msg.textContent='Код — 6 цифр.'; msg.className='dashauth-msg is-error'; return; }
+      verify.disabled=true; verify.textContent='Перевіряємо...'; msg.textContent='';
+      try {
+        const r = await fetch(WORKER+'/api/otp/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, block: BLOCK, code: c})});
+        const j = await r.json();
+        if (!r.ok) { msg.textContent = 'Невірний або застарілий код.'; msg.className='dashauth-msg is-error'; verify.disabled=false; verify.textContent='Підтвердити'; return; }
+        unlock(j.token, j.email, j.exp);
+      } catch(e) {
+        msg.textContent = 'Помилка: ' + e.message; msg.className='dashauth-msg is-error';
+        verify.disabled=false; verify.textContent='Підтвердити';
+      }
+    };
+  }
+
+  (async()=>{
+    const sess = await verifyExisting();
+    if (sess) { unlock(sess.token, sess.email, sess.exp); return; }
+    renderEmail();
+  })();
+})();
+</script>
+<!-- ===== END OTP GATE ===== -->
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-box">sn</div>
+    <div>
+      <div class="logo-text">snEco · <DASHBOARD_TITLE></div>
+      <div class="logo-sub">Замініть на джерело даних · період</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span class="badge badge-green" id="syncBadge">✓ Last sync: —</span>
+    <span class="badge badge-gray" id="lastUpdate">—</span>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="wrap">
+
+  <!-- TODO: REPLACE THIS PLACEHOLDER WITH YOUR DASHBOARD UI -->
+  <div class="sec">📊 Огляд</div>
+  <div class="g4">
+    <div class="kpi"><div class="kpi-lbl">KPI 1</div><div class="kpi-val" id="kpi1">—</div></div>
+    <div class="kpi"><div class="kpi-lbl">KPI 2</div><div class="kpi-val" id="kpi2">—</div></div>
+    <div class="kpi"><div class="kpi-lbl">KPI 3</div><div class="kpi-val" id="kpi3">—</div></div>
+    <div class="kpi"><div class="kpi-lbl">KPI 4</div><div class="kpi-val" id="kpi4">—</div></div>
+  </div>
+
+  <div class="sec">📈 Графіки</div>
+  <div class="g2">
+    <div class="cc"><div class="cc-title">Графік 1</div><canvas id="chart1" height="200"></canvas></div>
+    <div class="cc"><div class="cc-title">Графік 2</div><canvas id="chart2" height="200"></canvas></div>
+  </div>
+
+</div>
+
+<script>
+// ====== Data loader (called after OTP unlock) ======
+const WORKER = 'https://sneco-auth.vg-ab6.workers.dev';
+
+window.bootDashboard = async function(token){
+  try {
+    // 1. Fetch last-sync metadata
+    const meta = await fetchJson('/api/dashboard/last-sync?block=<BLOCK_NAME>', token);
+    if (meta && meta.lastSync) {
+      document.getElementById('syncBadge').textContent = '✓ Last sync: ' + new Date(meta.lastSync).toLocaleString('uk-UA');
+    }
+
+    // 2. Fetch your data tables (приклад — заміни на свої таблиці)
+    // const data = await fetchJson('/api/dashboard/data?type=<TABLE_PREFIX>_main&from=2025-01-01&to=2026-12-31&limit=10000', token);
+    // renderKPIs(data);
+    // renderCharts(data);
+
+    document.getElementById('lastUpdate').textContent = 'Завантажено';
+  } catch(e) {
+    console.error('bootDashboard error', e);
+    document.getElementById('lastUpdate').textContent = '⚠ Помилка завантаження';
+  }
+};
+
+async function fetchJson(path, token){
+  const r = await fetch(WORKER + path, { headers: { 'Authorization': 'Bearer ' + token }});
+  if (!r.ok) throw new Error(path + ' returned ' + r.status);
+  return r.json();
+}
+
+// TODO: implement renderKPIs() and renderCharts() with your domain logic
+</script>
+
+</body>
+</html>
