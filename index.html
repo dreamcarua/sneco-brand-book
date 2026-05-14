@@ -2117,7 +2117,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Bible v2.50 · 2026
+    Brand Bible v2.51 · 2026
   </div>
 </nav>
 
@@ -2131,7 +2131,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
     <span data-lang="sk">Jedna ingrediencia. <span class="qr-ns-accent">Žiadne kompromisy.</span> Syrový snack 21. storočia.</span>
   </div>
-  <div class="qr-meta">v2.50 · 2026</div>
+  <div class="qr-meta">v2.51 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -8574,7 +8574,28 @@ h3.block-title:first-of-type { margin-top: 0; }
 
   <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span><span data-lang="sk">História verzií</span></h3>
   <div class="changelog-entry">
-    <span class="changelog-version">v2.50</span><span class="changelog-date">14.05.2026</span>
+    <span class="changelog-version">v2.51</span><span class="changelog-date">14.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>📊 Dashboard як standalone page (замість iframe).</strong> 5.7 MB inline-data dashboard.html у iframe створював подвійні скроли і вузький viewport (видно ~1100×1400 з 1568px screen). Замінено на launcher-картку у sec-dashboard + повноцінна сторінка <code>brand.sneco.ua/dashboard/</code> з власним OTP gate.</li>
+      <li data-lang="en"><strong>📊 Dashboard as standalone page (replaced iframe).</strong> The 5.7 MB inline-data dashboard.html in an iframe created nested scrolls and a narrow viewport. Replaced with a launcher card in sec-dashboard + a full-screen page at <code>brand.sneco.ua/dashboard/</code> with its own OTP gate.</li>
+      <li data-lang="sk"><strong>📊 Dashboard ako standalone page (namiesto iframe).</strong> 5.7 MB inline-data dashboard.html v iframe vytváral vnorené scrollbary a úzky viewport. Nahradené launcher kartou v sec-dashboard + plnoobrazovková stránka <code>brand.sneco.ua/dashboard/</code> s vlastným OTP gate.</li>
+
+      <li data-lang="uk"><strong>🔐 OTP gate інлайн у dashboard.html.</strong> На початок body додано overlay з email/code formою (тим самим Worker /api/otp/request + verify, block='dashboard'). Сесія зберігається у localStorage 1 год. Auto-unlock якщо session активний. Кнопка 🔒 Lock у правому верхньому куті для виходу. Ланки на whitelist помилку: «❌ Цього email немає у whitelist → ✉ Запит до vg@sneco.ua».</li>
+      <li data-lang="en"><strong>🔐 OTP gate inlined in dashboard.html.</strong> Body now starts with an overlay for email/code form (same Worker /api/otp/request + verify, block='dashboard'). Session stored in localStorage for 1 h. Auto-unlock if active. 🔒 Lock button top-right. Whitelist-error link: "❌ Email not in whitelist → ✉ Request vg@sneco.ua".</li>
+      <li data-lang="sk"><strong>🔐 OTP gate inlinovaný v dashboard.html.</strong> Body teraz začína overlay s email/code formou. Relácia v localStorage 1 h. Auto-unlock pri aktívnej. 🔒 Lock vpravo hore. Whitelist-error link.</li>
+
+      <li data-lang="uk"><strong>🚀 sec-dashboard у Brand Bible — компактний launcher</strong> (замість важкого iframe-блоку). Чорний градієнтний hero «93 KPI · 42 графіки · 17 таблиць», текст про D1 + cron 05:00, дві кнопки: <strong>«📊 Відкрити Sales Dashboard ↗»</strong> (нова вкладка, primary yellow) і <strong>«У цій вкладці»</strong> (та ж вкладка). OTP-gate у Brand Bible тепер опційний — лише для last-sync banner; реальна авторизація йде на самій сторінці dashboard.</li>
+      <li data-lang="en"><strong>🚀 sec-dashboard becomes a compact launcher</strong> (replacing the heavy iframe block). Black-gradient hero, "93 KPI · 42 charts · 17 tables", D1 + cron context, two buttons: <strong>"📊 Open Sales Dashboard ↗"</strong> (new tab, primary yellow) and <strong>"In this tab"</strong> (same tab). Brand Bible OTP gate is optional now — only for the last-sync banner; real auth happens on the dashboard page itself.</li>
+      <li data-lang="sk"><strong>🚀 sec-dashboard je teraz kompaktný launcher</strong> (namiesto ťažkého iframe). Čierny gradient hero, "93 KPI · 42 grafov · 17 tabuliek", D1 + cron kontext, dve tlačidlá: <strong>"📊 Otvoriť Sales Dashboard ↗"</strong> a <strong>"V tejto karte"</strong>.</li>
+
+      <li data-lang="uk"><strong>📐 UX wins:</strong> повна ширина екрану для дашборду · нативний browser scroll · можна відкрити в окремому вікні / закласти / shareзнати URL · окрема вкладка не блокує навігацію по Brand Bible · OTP-сесії незалежні (одна для Brand Bible, одна для Dashboard).</li>
+      <li data-lang="en"><strong>📐 UX wins:</strong> full screen width for dashboard · native browser scroll · can open in a separate window / bookmark / share URL · independent OTP sessions (one for Brand Bible, one for Dashboard).</li>
+      <li data-lang="sk"><strong>📐 UX wins:</strong> plná šírka obrazovky · natívny browser scroll · samostatná karta nezamyká navigáciu Brand Bible.</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.50</span><span class="changelog-date">14.05.2026</span>
     <ul class="changelog-list">
       <li data-lang="uk"><strong>📊 Sales Dashboard pipeline — повна автоматизація.</strong> Створено end-to-end систему: GitHub Actions cron → Python scripts → Cloudflare D1 → Brand Bible iframe. Дашборд snEco продажів на даних МойСклад тепер живе online і оновлюється сам щодня о 05:00 Київ — без участі людини. D1 база на майбутнє: будь-який новий дашборд тепер може будуватися на тих самих <code>ms_*</code> таблицях.</li>
       <li data-lang="en"><strong>📊 Sales Dashboard pipeline — full automation.</strong> Built end-to-end system: GitHub Actions cron → Python scripts → Cloudflare D1 → Brand Bible iframe. snEco sales dashboard on MoySklad data now lives online and refreshes itself daily at 05:00 Kyiv — no human involvement. D1 base for the future: any new dashboard can now be built on the same <code>ms_*</code> tables.</li>
@@ -9970,20 +9991,37 @@ h3.block-title:first-of-type { margin-top: 0; }
       </div>
     </div>
 
-    <!-- Iframe to dashboard -->
-    <div style="position:relative;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#F4F4EF">
-      <iframe
-        id="dashboard-iframe"
-        src="dashboard/dashboard.html"
-        style="width:100%;border:0;display:block;min-height:1400px"
-        loading="lazy"
-        title="snEco Sales Dashboard"></iframe>
+    <!-- Launcher card — replaces iframe (v2.51): dashboard is a standalone page -->
+    <div style="background:linear-gradient(135deg, var(--black) 0%, #2A2A2A 100%);color:#fff;padding:36px 32px;border-radius:var(--radius);position:relative;overflow:hidden;margin:8px 0 16px">
+      <div style="position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle, rgba(254,191,39,0.18) 0%, transparent 70%);pointer-events:none"></div>
+      <div style="position:relative">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--yellow);margin-bottom:10px">📊 snEco Sales Analytics</div>
+        <div style="font-size:28px;font-weight:800;letter-spacing:-0.5px;line-height:1.15;margin-bottom:14px">
+          <span data-lang="uk">93 KPI · 42 графіки · 17 таблиць<br>усе про продажі snEco на одному екрані</span>
+          <span data-lang="en">93 KPIs · 42 charts · 17 tables<br>everything about snEco sales on one screen</span>
+          <span data-lang="sk">93 KPI · 42 grafov · 17 tabuliek<br>všetko o predaji snEco na jednej obrazovke</span>
+        </div>
+        <div style="font-size:13.5px;line-height:1.65;color:rgba(255,255,255,0.78);max-width:680px;margin-bottom:24px">
+          <span data-lang="uk">Дашборд — окрема сторінка з власною авторизацією (тим самим OTP, що тут). Відкривається на повний екран — без скролів і обмежень. Дані з Cloudflare D1 (база <code style="background:rgba(255,255,255,0.10);padding:1px 6px;border-radius:3px">sneco-bible</code>) оновлюються автоматично щодня о 05:00 Київ.</span>
+          <span data-lang="en">The dashboard is a standalone page with its own auth (same OTP as here). Full-screen — no nested scrollbars. Data from Cloudflare D1 (db <code style="background:rgba(255,255,255,0.10);padding:1px 6px;border-radius:3px">sneco-bible</code>) refreshes daily at 05:00 Kyiv.</span>
+          <span data-lang="sk">Dashboard je samostatná stránka s vlastnou autorizáciou (rovnakým OTP). Plnoobrazovkový — bez vnorených scrollbarov. Dáta z Cloudflare D1 (db <code style="background:rgba(255,255,255,0.10);padding:1px 6px;border-radius:3px">sneco-bible</code>) sa obnovujú denne o 05:00 Kyjev.</span>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+          <a href="dashboard/dashboard.html" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;padding:14px 24px;background:var(--yellow);color:var(--black);text-decoration:none;font-weight:800;border-radius:8px;font-size:14px;letter-spacing:0.03em">
+            <span data-lang="uk">📊 Відкрити Sales Dashboard</span><span data-lang="en">📊 Open Sales Dashboard</span><span data-lang="sk">📊 Otvoriť Sales Dashboard</span>
+            <span style="font-size:18px">↗</span>
+          </a>
+          <a href="dashboard/dashboard.html" style="display:inline-flex;align-items:center;gap:8px;padding:14px 18px;background:rgba(255,255,255,0.10);color:#fff;text-decoration:none;font-weight:600;border-radius:8px;font-size:13px;border:1px solid rgba(255,255,255,0.20)">
+            <span data-lang="uk">У цій вкладці</span><span data-lang="en">In this tab</span><span data-lang="sk">V tejto karte</span>
+          </a>
+        </div>
+      </div>
     </div>
 
     <div style="margin-top:14px;padding:12px 16px;background:var(--black-05);border-radius:8px;font-size:11.5px;color:var(--text-muted);line-height:1.55">
-      <span data-lang="uk">📌 Дашборд відкривається в iframe. Якщо щось не вантажиться — спробуй <a href="dashboard/dashboard.html" target="_blank" rel="noopener" style="color:var(--yellow);font-weight:600">відкрити окремою вкладкою</a>. Дані живуть у Cloudflare D1 (база <code>sneco-bible</code>, таблиці <code>ms_*</code>) і оновлюються щодня. Запит на новий дашборд / нову метрику — через <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false">📩 Пропозиції</a>.</span>
-      <span data-lang="en">📌 Dashboard opens in an iframe. If something doesn't load — try <a href="dashboard/dashboard.html" target="_blank" rel="noopener" style="color:var(--yellow);font-weight:600">opening it in a new tab</a>. Data lives in Cloudflare D1 (db <code>sneco-bible</code>, tables <code>ms_*</code>) and refreshes daily. Request a new dashboard / new metric — via <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false">📩 Ideas</a>.</span>
-      <span data-lang="sk">📌 Dashboard sa otvára v iframe. Ak sa niečo nenahrá — skús <a href="dashboard/dashboard.html" target="_blank" rel="noopener" style="color:var(--yellow);font-weight:600">otvoriť v novej karte</a>. Dáta žijú v Cloudflare D1 (db <code>sneco-bible</code>, tabuľky <code>ms_*</code>) a obnovujú sa denne. Žiadosť o nový dashboard / metriku — cez <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false">📩 Návrhy</a>.</span>
+      <span data-lang="uk">📌 Дашборд має <strong>власний OTP-захист</strong> — потрібно ввести email і код один раз (сесія діє 1 год). Запит на новий дашборд / нову метрику — через <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false">📩 Пропозиції</a>.</span>
+      <span data-lang="en">📌 The dashboard has <strong>its own OTP gate</strong> — enter email + code once (session lasts 1 h). Request a new dashboard / new metric — via <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false">📩 Ideas</a>.</span>
+      <span data-lang="sk">📌 Dashboard má <strong>vlastný OTP gate</strong> — zadajte email a kód raz (relácia 1 h). Žiadosť o nový dashboard / metriku — cez <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false">📩 Návrhy</a>.</span>
     </div>
 
     <!-- Auto-fetch last-sync info on unlock -->
