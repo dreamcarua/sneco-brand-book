@@ -1,0 +1,47 @@
+# GitHub Actions cron sync для snEco <DOMAIN>-dashboard
+# Скопіюй у .github/workflows/<DOMAIN>-sync.yml
+
+name: <DOMAIN>-sync
+
+on:
+  schedule:
+    # 03:00 UTC = 05:00 Київ EEST (літо) / 06:00 Київ EET (зима)
+    # Сточуй під свій домен:
+    #   - payroll: '0 3 * * *' (раз на добу)
+    #   - production: '0 */4 * * *' (кожні 4 год)
+    #   - finance: '0 4 * * *' (раз на добу, після Sales)
+    - cron: '0 3 * * *'
+
+  workflow_dispatch:  # дозволити ручний trigger з GitHub UI
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install requests python-dotenv
+
+      - name: Run sync
+        env:
+          MOYSKLAD_TOKEN: ${{ secrets.MOYSKLAD_TOKEN }}
+          SYNC_API_KEY:   ${{ secrets.SYNC_API_KEY }}
+          WORKER_URL:     https://sneco-auth.vg-ab6.workers.dev
+        run: |
+          cd dashboard/<DOMAIN>
+          python sync.py
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "::error::<DOMAIN>-sync failed at $(date -u +%H:%M)"
+          # TODO: додати webhook / email якщо треба
