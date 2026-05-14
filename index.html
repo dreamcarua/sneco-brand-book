@@ -2109,7 +2109,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     </button>
     <button class="nav-link" data-target="dashboard" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">📊 Sales Dashboard</span><span data-lang="en">📊 Sales Dashboard</span><span data-lang="sk">📊 Sales Dashboard</span>
+      <span data-lang="uk">📊 Dashboards</span><span data-lang="en">📊 Dashboards</span><span data-lang="sk">📊 Dashboards</span>
     </button>
   </div>
 
@@ -2117,7 +2117,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Bible v2.51 · 2026
+    Brand Bible v2.52 · 2026
   </div>
 </nav>
 
@@ -2131,7 +2131,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
     <span data-lang="sk">Jedna ingrediencia. <span class="qr-ns-accent">Žiadne kompromisy.</span> Syrový snack 21. storočia.</span>
   </div>
-  <div class="qr-meta">v2.51 · 2026</div>
+  <div class="qr-meta">v2.52 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -8574,7 +8574,24 @@ h3.block-title:first-of-type { margin-top: 0; }
 
   <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span><span data-lang="sk">História verzií</span></h3>
   <div class="changelog-entry">
-    <span class="changelog-version">v2.51</span><span class="changelog-date">14.05.2026</span>
+    <span class="changelog-version">v2.52</span><span class="changelog-date">14.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>📊 sec-dashboard перейменовано</strong> з «Sales Dashboard — МойСклад» → <strong>«Dashboards»</strong> (множина) і перетворено з закритої single-dashboard сторінки на <strong>відкритий каталог</strong>. Тепер це launchpad для всіх дашбордів snEco — 1 активний (Sales Analytics) + 5 запланованих карток (Production / Finance / HR / Marketing / Export) + 1 «Запропонуй свій». Sidebar теж: 📊 Sales Dashboard → 📊 Dashboards.</li>
+      <li data-lang="en"><strong>📊 sec-dashboard renamed</strong> from "Sales Dashboard — MoySklad" → <strong>"Dashboards"</strong> (plural) and converted from a closed single-dashboard page to an <strong>open catalog</strong>. Now it's a launchpad for all snEco dashboards — 1 live (Sales Analytics) + 5 planned cards (Production / Finance / HR / Marketing / Export) + 1 "Propose your own". Sidebar updated too.</li>
+      <li data-lang="sk"><strong>📊 sec-dashboard premenované</strong> z „Sales Dashboard — MoySklad" → <strong>„Dashboards"</strong> (množné) a transformované zo zatvorenej single-dashboard stránky na <strong>otvorený katalóg</strong>.</li>
+
+      <li data-lang="uk"><strong>🧱 Стандартизований патерн дашбордів.</strong> У розділі додано блок «Як ми робимо дашборди» з 5 правилами: (1) standalone HTML page (не iframe) · (2) власний OTP-gate інлайн з окремим <code>block</code> name · (3) окремий whitelist per dashboard (можна налаштовувати індивідуально для різних ролей: продажі / виробництво / фінанси / HR / marketing / export) · (4) launcher-картки у каталозі · (5) дані у Cloudflare D1 з префіксом домена per таблиця. Patтерн зафіксовано у memory <code>project_sneco_dashboards_pattern.md</code> + у CLAUDE.md проекту як обов'язковий стандарт.</li>
+      <li data-lang="en"><strong>🧱 Standardized dashboard pattern.</strong> A new block "How we build dashboards" was added with 5 rules: (1) standalone HTML page (no iframe) · (2) inline OTP gate with separate <code>block</code> name · (3) separate whitelist per dashboard (configurable per role) · (4) launcher cards in the catalog · (5) data in Cloudflare D1 with domain prefix per table. Pattern locked into memory <code>project_sneco_dashboards_pattern.md</code> + project CLAUDE.md as a mandatory standard.</li>
+      <li data-lang="sk"><strong>🧱 Štandardizovaný vzor dashboardov.</strong> Nový blok „Ako robíme dashboardy" s 5 pravidlami. Vzor uložený do memory + CLAUDE.md ako povinný štandard.</li>
+
+      <li data-lang="uk"><strong>🔓 sec-dashboard більше не вимагає OTP</strong> на рівні Brand Bible (прибрано <code>is-locked</code> + <code>data-otp-block</code>). Catalog page тепер публічний, реальна авторизація — у самих дашбордах за їхнім окремим OTP. Kожна команда — свій набір emails.</li>
+      <li data-lang="en"><strong>🔓 sec-dashboard no longer requires OTP</strong> at the Brand Bible level (removed <code>is-locked</code> + <code>data-otp-block</code>). Catalog is now public; real auth lives on each dashboard via its own OTP. Each team — its own list of emails.</li>
+      <li data-lang="sk"><strong>🔓 sec-dashboard už nevyžaduje OTP</strong> na úrovni Brand Bible. Katalóg je teraz verejný; reálna autentizácia žije v každom dashboarde cez jeho vlastný OTP.</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.51</span><span class="changelog-date">14.05.2026</span>
     <ul class="changelog-list">
       <li data-lang="uk"><strong>📊 Dashboard як standalone page (замість iframe).</strong> 5.7 MB inline-data dashboard.html у iframe створював подвійні скроли і вузький viewport (видно ~1100×1400 з 1568px screen). Замінено на launcher-картку у sec-dashboard + повноцінна сторінка <code>brand.sneco.ua/dashboard/</code> з власним OTP gate.</li>
       <li data-lang="en"><strong>📊 Dashboard as standalone page (replaced iframe).</strong> The 5.7 MB inline-data dashboard.html in an iframe created nested scrolls and a narrow viewport. Replaced with a launcher card in sec-dashboard + a full-screen page at <code>brand.sneco.ua/dashboard/</code> with its own OTP gate.</li>
@@ -9947,49 +9964,42 @@ h3.block-title:first-of-type { margin-top: 0; }
 </section>
 
 <!-- ============================================================
-     SALES DASHBOARD (added v2.50)
-     Password-gated · iframe → /dashboard/dashboard.html
-     Data refreshed daily 05:00 EEST via GitHub Actions cron
+     DASHBOARDS catalog (v2.52, was Sales Dashboard v2.50→v2.51)
+     PUBLIC catalog page — кожен дашборд має власний OTP-gate
      ============================================================ -->
-<section class="section is-locked" id="sec-dashboard" data-otp-block="dashboard" style="padding:56px 64px">
+<section class="section" id="sec-dashboard" style="padding:56px 64px">
   <div class="section-eyebrow">🔒 <span data-lang="uk">Конфіденційне · Аналітика</span><span data-lang="en">Confidential · Analytics</span><span data-lang="sk">Dôverné · Analytika</span></div>
-  <h2 class="section-title">📊 <span data-lang="uk">Sales Dashboard — МойСклад</span><span data-lang="en">Sales Dashboard — MoySklad</span><span data-lang="sk">Sales Dashboard — MoySklad</span></h2>
+  <h2 class="section-title">📊 <span data-lang="uk">Dashboards</span><span data-lang="en">Dashboards</span><span data-lang="sk">Dashboards</span></h2>
 
-  <!-- LOCKED STATE -->
-  <div class="otp-locked">
-    <div class="section-lead">
-      <span data-lang="uk">Live дашборд продажів snEco на даних МойСклад. 93 KPI · 42 графіки · 17 таблиць. Дані оновлюються автоматично щодня о 05:00 (Київ) через GitHub Actions cron + Cloudflare D1. Доступ — лише керівництво (vg, fg, bs).</span>
-      <span data-lang="en">Live sales dashboard for snEco on top of MoySklad data. 93 KPI · 42 charts · 17 tables. Data refreshed automatically every day at 05:00 (Kyiv) via GitHub Actions cron + Cloudflare D1. Access — leadership only (vg, fg, bs).</span>
-      <span data-lang="sk">Live sales dashboard pre snEco nad dátami MoySklad. 93 KPI · 42 grafov · 17 tabuliek. Dáta sa obnovujú automaticky každý deň o 05:00 (Kyjev) cez GitHub Actions cron + Cloudflare D1. Prístup — len vedenie (vg, fg, bs).</span>
+  <div class="section-lead">
+    <span data-lang="uk">Каталог live-дашбордів snEco. Кожен дашборд — окрема standalone-сторінка з власним OTP-гейтом і своїм whitelist (доступ налаштовується індивідуально для різних ролей: продажі, виробництво, фінанси, HR тощо). Дані живуть у Cloudflare D1 і оновлюються автоматично через GitHub Actions cron'и.</span>
+    <span data-lang="en">Catalog of snEco live dashboards. Each dashboard is a standalone page with its own OTP gate and whitelist (access tuned per role: sales, production, finance, HR, etc.). Data lives in Cloudflare D1 and refreshes automatically via GitHub Actions crons.</span>
+    <span data-lang="sk">Katalóg live dashboardov snEco. Každý dashboard je samostatná stránka s vlastným OTP gate a whitelistom (prístup nastavený podľa role). Dáta v Cloudflare D1, obnovujú sa cez GitHub Actions cron'y.</span>
+  </div>
+
+  <!-- KPI strip — каталог зростає -->
+  <div class="grid-3" style="margin:24px 0 28px">
+    <div class="card card-sm" style="background:var(--black);color:#fff;text-align:center">
+      <div style="font-size:32px;font-weight:900;color:var(--yellow);line-height:1">1</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:6px;letter-spacing:0.04em;text-transform:uppercase">
+        <span data-lang="uk">live дашборд</span><span data-lang="en">live dashboard</span><span data-lang="sk">live dashboard</span>
+      </div>
     </div>
-    <div class="otp-card" data-otp-mount="dashboard"></div>
-    <div style="margin-top:14px;padding:12px 16px;background:rgba(220,38,38,0.06);border-left:3px solid #dc2626;border-radius:6px;font-size:12px;color:var(--text-muted);line-height:1.55">
-      ⚠️ <span data-lang="uk">Якщо твоєї пошти ще немає у whitelist для dashboard → напиши на <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>. Адміни (vg/fg) оновлюють список через <a href="#sec-maintenance" onclick="document.querySelector('[data-target=maintenance]')?.click();return false">Maintenance → Розподіл доступу</a>.</span>
-      <span data-lang="en">If your email isn't on the dashboard whitelist yet → contact <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>. Admins (vg/fg) update via <a href="#sec-maintenance" onclick="document.querySelector('[data-target=maintenance]')?.click();return false">Maintenance → Access control</a>.</span>
-      <span data-lang="sk">Ak váš email ešte nie je vo whitelist pre dashboard → napíšte na <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>. Admini (vg/fg) aktualizujú cez <a href="#sec-maintenance" onclick="document.querySelector('[data-target=maintenance]')?.click();return false">Maintenance → Access control</a>.</span>
+    <div class="card card-sm" style="background:var(--yellow);color:var(--black);text-align:center">
+      <div style="font-size:32px;font-weight:900;line-height:1">5+</div>
+      <div style="font-size:11px;color:rgba(30,30,30,0.7);margin-top:6px;letter-spacing:0.04em;text-transform:uppercase">
+        <span data-lang="uk">в плані</span><span data-lang="en">planned</span><span data-lang="sk">v pláne</span>
+      </div>
+    </div>
+    <div class="card card-sm" style="text-align:center">
+      <div style="font-size:32px;font-weight:900;line-height:1">D1</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:6px;letter-spacing:0.04em;text-transform:uppercase">
+        <span data-lang="uk">Cloudflare база <code>sneco-bible</code></span><span data-lang="en">Cloudflare DB <code>sneco-bible</code></span><span data-lang="sk">Cloudflare DB <code>sneco-bible</code></span>
+      </div>
     </div>
   </div>
 
-  <!-- UNLOCKED STATE -->
-  <div class="otp-unlocked">
-    <div class="otp-session-bar">
-      <span><span data-lang="uk">✓ Розблоковано для</span><span data-lang="en">✓ Unlocked for</span><span data-lang="sk">✓ Odomknuté pre</span> <span class="otp-session-email" data-otp-email-display></span> · <span data-otp-expires-display></span></span>
-      <button class="otp-logout" data-otp-logout="dashboard"><span data-lang="uk">🔒 Вийти</span><span data-lang="en">🔒 Lock</span><span data-lang="sk">🔒 Odhlásiť</span></button>
-    </div>
-
-    <!-- Last sync banner -->
-    <div id="dashboard-sync-banner" style="margin:12px 0 18px;padding:14px 18px;background:var(--yellow-soft);border-left:4px solid var(--yellow);border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;font-size:13px">
-      <div>
-        <strong>🔄 <span data-lang="uk">Останній sync:</span><span data-lang="en">Last sync:</span><span data-lang="sk">Posledný sync:</span></strong>
-        <span id="dashboard-sync-time" style="font-family:var(--font-mono)">—</span>
-        <span id="dashboard-sync-status" style="margin-left:8px"></span>
-      </div>
-      <div style="font-size:11.5px;color:var(--text-muted)">
-        <span data-lang="uk">Cron щодня 05:00 Київ · GitHub Actions → Cloudflare D1</span>
-        <span data-lang="en">Daily cron 05:00 Kyiv · GitHub Actions → Cloudflare D1</span>
-        <span data-lang="sk">Denný cron 05:00 Kyjev · GitHub Actions → Cloudflare D1</span>
-      </div>
-    </div>
+  <h3 class="block-title">🟢 <span data-lang="uk">Активні дашборди</span><span data-lang="en">Live dashboards</span><span data-lang="sk">Live dashboardy</span></h3>
 
     <!-- Launcher card — replaces iframe (v2.51): dashboard is a standalone page -->
     <div style="background:linear-gradient(135deg, var(--black) 0%, #2A2A2A 100%);color:#fff;padding:36px 32px;border-radius:var(--radius);position:relative;overflow:hidden;margin:8px 0 16px">
@@ -10018,51 +10028,67 @@ h3.block-title:first-of-type { margin-top: 0; }
       </div>
     </div>
 
-    <div style="margin-top:14px;padding:12px 16px;background:var(--black-05);border-radius:8px;font-size:11.5px;color:var(--text-muted);line-height:1.55">
-      <span data-lang="uk">📌 Дашборд має <strong>власний OTP-захист</strong> — потрібно ввести email і код один раз (сесія діє 1 год). Запит на новий дашборд / нову метрику — через <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false">📩 Пропозиції</a>.</span>
-      <span data-lang="en">📌 The dashboard has <strong>its own OTP gate</strong> — enter email + code once (session lasts 1 h). Request a new dashboard / new metric — via <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false">📩 Ideas</a>.</span>
-      <span data-lang="sk">📌 Dashboard má <strong>vlastný OTP gate</strong> — zadajte email a kód raz (relácia 1 h). Žiadosť o nový dashboard / metriku — cez <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false">📩 Návrhy</a>.</span>
+  <h3 class="block-title" style="margin-top:36px">🟡 <span data-lang="uk">У плані</span><span data-lang="en">Planned</span><span data-lang="sk">Plánované</span></h3>
+  <div class="grid-3">
+    <div class="card card-sm" style="opacity:0.85">
+      <div style="font-size:24px;margin-bottom:6px">🏭</div>
+      <div style="font-size:14px;font-weight:800;margin-bottom:4px"><span data-lang="uk">Production Dashboard</span><span data-lang="en">Production Dashboard</span><span data-lang="sk">Production Dashboard</span></div>
+      <div style="font-size:11.5px;color:var(--text-muted);line-height:1.55;margin-bottom:8px"><span data-lang="uk">OEE, downtime, batch yield, втрати на сушці per SKU. Whitelist: Pylyp, Bohdan, Valeriia, vg.</span><span data-lang="en">OEE, downtime, batch yield, drying losses per SKU. Whitelist: Pylyp, Bohdan, Valeriia, vg.</span><span data-lang="sk">OEE, downtime, batch yield, straty pri sušení per SKU. Whitelist: Pylyp, Bohdan, Valeriia, vg.</span></div>
+      <div style="font-size:10px;color:var(--text-muted);font-style:italic">block: <code>production-dashboard</code></div>
     </div>
+    <div class="card card-sm" style="opacity:0.85">
+      <div style="font-size:24px;margin-bottom:6px">💰</div>
+      <div style="font-size:14px;font-weight:800;margin-bottom:4px"><span data-lang="uk">Finance Dashboard</span><span data-lang="en">Finance Dashboard</span><span data-lang="sk">Finance Dashboard</span></div>
+      <div style="font-size:11.5px;color:var(--text-muted);line-height:1.55;margin-bottom:8px"><span data-lang="uk">Cashflow, AR/AP, monthly P&amp;L, currency exposure UAH/EUR/USD. Whitelist: vg, Pylyp, CFO.</span><span data-lang="en">Cashflow, AR/AP, monthly P&amp;L, currency exposure UAH/EUR/USD. Whitelist: vg, Pylyp, CFO.</span><span data-lang="sk">Cashflow, AR/AP, mesačné P&amp;L, currency exposure UAH/EUR/USD. Whitelist: vg, Pylyp, CFO.</span></div>
+      <div style="font-size:10px;color:var(--text-muted);font-style:italic">block: <code>finance-dashboard</code></div>
+    </div>
+    <div class="card card-sm" style="opacity:0.85">
+      <div style="font-size:24px;margin-bottom:6px">👥</div>
+      <div style="font-size:14px;font-weight:800;margin-bottom:4px"><span data-lang="uk">HR Dashboard</span><span data-lang="en">HR Dashboard</span><span data-lang="sk">HR Dashboard</span></div>
+      <div style="font-size:11.5px;color:var(--text-muted);line-height:1.55;margin-bottom:8px"><span data-lang="uk">ЗП, attendance, відпустки, лікарняні, turnover. Whitelist: vg, fg, Pylyp.</span><span data-lang="en">Payroll, attendance, vacations, sick leave, turnover. Whitelist: vg, fg, Pylyp.</span><span data-lang="sk">Mzdy, dochádzka, dovolenky, PN, turnover. Whitelist: vg, fg, Pylyp.</span></div>
+      <div style="font-size:10px;color:var(--text-muted);font-style:italic">block: <code>hr-dashboard</code></div>
+    </div>
+    <div class="card card-sm" style="opacity:0.85">
+      <div style="font-size:24px;margin-bottom:6px">📣</div>
+      <div style="font-size:14px;font-weight:800;margin-bottom:4px"><span data-lang="uk">Marketing Dashboard</span><span data-lang="en">Marketing Dashboard</span><span data-lang="sk">Marketing Dashboard</span></div>
+      <div style="font-size:11.5px;color:var(--text-muted);line-height:1.55;margin-bottom:8px"><span data-lang="uk">D2C funnel, ads ROI per channel, brand searches, social engagement. Whitelist: vg + marketing team.</span><span data-lang="en">D2C funnel, ads ROI per channel, brand searches, social engagement. Whitelist: vg + marketing team.</span><span data-lang="sk">D2C funnel, ROI per channel, brand searches, social engagement. Whitelist: vg + marketing.</span></div>
+      <div style="font-size:10px;color:var(--text-muted);font-style:italic">block: <code>marketing-dashboard</code></div>
+    </div>
+    <div class="card card-sm" style="opacity:0.85">
+      <div style="font-size:24px;margin-bottom:6px">🌍</div>
+      <div style="font-size:14px;font-weight:800;margin-bottom:4px"><span data-lang="uk">Export Dashboard</span><span data-lang="en">Export Dashboard</span><span data-lang="sk">Export Dashboard</span></div>
+      <div style="font-size:11.5px;color:var(--text-muted);line-height:1.55;margin-bottom:8px"><span data-lang="uk">Pipeline by market, expo ROI, NVC GmbH metrics, listing fees burn. Whitelist: vg, Iryna, Yaroslav.</span><span data-lang="en">Pipeline by market, expo ROI, NVC GmbH metrics, listing fees burn. Whitelist: vg, Iryna, Yaroslav.</span><span data-lang="sk">Pipeline by market, expo ROI, NVC GmbH metrics, listing fees burn. Whitelist: vg, Iryna, Yaroslav.</span></div>
+      <div style="font-size:10px;color:var(--text-muted);font-style:italic">block: <code>export-dashboard</code></div>
+    </div>
+    <div class="card card-sm" style="opacity:0.85;border:2px dashed var(--border)">
+      <div style="font-size:24px;margin-bottom:6px">➕</div>
+      <div style="font-size:14px;font-weight:800;margin-bottom:4px"><span data-lang="uk">Запропонуй свій</span><span data-lang="en">Propose your own</span><span data-lang="sk">Navrhni vlastný</span></div>
+      <div style="font-size:11.5px;color:var(--text-muted);line-height:1.55;margin-bottom:10px"><span data-lang="uk">Якщо твоїй команді потрібен новий дашборд — створи пропозицію.</span><span data-lang="en">If your team needs a new dashboard — submit a proposal.</span><span data-lang="sk">Ak váš tím potrebuje nový dashboard — pošlite návrh.</span></div>
+      <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false" style="font-size:12px;color:var(--yellow);font-weight:700;text-decoration:none">📩 <span data-lang="uk">Пропозиції</span><span data-lang="en">Ideas</span><span data-lang="sk">Návrhy</span></a>
+    </div>
+  </div>
 
-    <!-- Auto-fetch last-sync info on unlock -->
-    <script>
-      (function(){
-        const root = document.getElementById('sec-dashboard');
-        if (!root) return;
-        const timeEl = root.querySelector('#dashboard-sync-time');
-        const statusEl = root.querySelector('#dashboard-sync-status');
-        if (!timeEl) return;
-        async function loadSyncInfo() {
-          try {
-            const r = await fetch((window.SNECO_AUTH_URL || 'https://sneco-auth.vg-ab6.workers.dev') + '/api/dashboard/last-sync', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: '{}',
-            });
-            const data = await r.json();
-            const last = (data.items || [])[0];
-            if (!last) { timeEl.textContent = '— (no syncs yet)'; return; }
-            const dt = new Date(last.started_at * 1000);
-            timeEl.textContent = dt.toLocaleString('uk-UA', { dateStyle: 'short', timeStyle: 'short' });
-            const colors = { success: '#2D6A00', partial: '#F59E0B', failed: '#dc2626', running: '#2563EB' };
-            statusEl.innerHTML = `<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;background:${colors[last.status] || '#888'};color:#fff">${last.status}</span>`;
-            const ents = last.entities || {};
-            const total = Object.values(ents).reduce((a, b) => a + (Number(b) || 0), 0);
-            if (total > 0) {
-              statusEl.innerHTML += ` <span style="font-size:11px;color:var(--text-muted)">· ${total.toLocaleString('uk-UA')} rows</span>`;
-            }
-          } catch (e) {
-            timeEl.textContent = '— (sync info unavailable)';
-          }
-        }
-        // Run on unlock — polled detector
-        const observer = new MutationObserver(() => {
-          if (root.classList.contains('is-unlocked')) loadSyncInfo();
-        });
-        observer.observe(root, { attributes: true, attributeFilter: ['class'] });
-        if (root.classList.contains('is-unlocked')) loadSyncInfo();
-      })();
-    </script>
+  <!-- Pattern explanation -->
+  <h3 class="block-title" style="margin-top:36px">🧱 <span data-lang="uk">Як ми робимо дашборди (стандарт)</span><span data-lang="en">How we build dashboards (standard)</span><span data-lang="sk">Ako robíme dashboardy (štandard)</span></h3>
+  <div class="card" style="background:var(--black);color:#fff;border-left:4px solid var(--yellow)">
+    <div style="font-size:13.5px;line-height:1.7">
+      <span data-lang="uk">Усі дашборди snEco будуються за єдиним патерном:</span>
+      <span data-lang="en">All snEco dashboards follow one pattern:</span>
+      <span data-lang="sk">Všetky dashboardy snEco sa stavajú podľa jedného vzoru:</span>
+      <ol style="margin:10px 0 0 22px;line-height:1.85;color:rgba(255,255,255,0.92)">
+        <li><strong style="color:var(--yellow)">Standalone HTML page</strong> — <span data-lang="uk">не iframe; повна ширина і native scroll. URL: <code style="background:rgba(255,255,255,0.10);padding:1px 6px;border-radius:3px">brand.sneco.ua/dashboard/&lt;name&gt;/</code></span><span data-lang="en">not iframe; full width and native scroll. URL: <code style="background:rgba(255,255,255,0.10);padding:1px 6px;border-radius:3px">brand.sneco.ua/dashboard/&lt;name&gt;/</code></span><span data-lang="sk">nie iframe; plná šírka a natívny scroll.</span></li>
+        <li><strong style="color:var(--yellow)">Власний OTP-gate</strong> інлайн на сторінці — <span data-lang="uk">той самий Worker, але окремий <code>block</code> name (наприклад <code>production-dashboard</code>)</span><span data-lang="en">same Worker, but separate <code>block</code> name (e.g. <code>production-dashboard</code>)</span><span data-lang="sk">rovnaký Worker, ale samostatný <code>block</code> name</span></li>
+        <li><strong style="color:var(--yellow)">Окремий whitelist per dashboard</strong> — <span data-lang="uk">додаєш через Maintenance → Розподіл доступу. Кожна команда має свій набір emails.</span><span data-lang="en">add via Maintenance → Access control. Each team gets its own list of emails.</span><span data-lang="sk">cez Maintenance → Access control. Každý tím má svoj zoznam.</span></li>
+        <li><strong style="color:var(--yellow)">Каталог тут</strong> — <span data-lang="uk">кожен дашборд = окрема launcher-картка з описом + лінком + хто має доступ.</span><span data-lang="en">each dashboard = launcher card with description + link + who has access.</span><span data-lang="sk">každý dashboard = launcher karta s popisom + linkom + zoznamom prístupu.</span></li>
+        <li><strong style="color:var(--yellow)">Дані у Cloudflare D1</strong> — <span data-lang="uk">база <code style="background:rgba(255,255,255,0.10);padding:1px 6px;border-radius:3px">sneco-bible</code>, таблиці з префіксом домена (<code>ms_*</code> для МойСклад, <code>hr_*</code> для HR, <code>fin_*</code> для финансів). GitHub Actions cron'и наповнюють.</span><span data-lang="en">db <code style="background:rgba(255,255,255,0.10);padding:1px 6px;border-radius:3px">sneco-bible</code>, tables with domain prefix. GitHub Actions cron'i populate.</span><span data-lang="sk">db <code style="background:rgba(255,255,255,0.10);padding:1px 6px;border-radius:3px">sneco-bible</code>, tabuľky s prefixom domény. GitHub Actions cron'i napĺňajú.</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <div style="margin-top:24px;padding:14px 18px;background:var(--black-05);border-radius:8px;font-size:11.5px;color:var(--text-muted);line-height:1.55">
+    <span data-lang="uk">📌 Запит на новий дашборд / нову метрику — через <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false">📩 Пропозиції</a>. Деталі патерну для розробників: <code>memory/project_sneco_dashboards_pattern.md</code> у внутрішніх нотатках.</span>
+    <span data-lang="en">📌 Request a new dashboard / metric via <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false">📩 Ideas</a>. Pattern details for developers: <code>memory/project_sneco_dashboards_pattern.md</code> in internal notes.</span>
+    <span data-lang="sk">📌 Žiadosť o nový dashboard / metriku — cez <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false">📩 Návrhy</a>. Detaily vzoru pre vývojárov: <code>memory/project_sneco_dashboards_pattern.md</code>.</span>
   </div>
 </section>
 
