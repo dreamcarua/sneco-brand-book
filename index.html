@@ -2107,13 +2107,17 @@ h3.block-title:first-of-type { margin-top: 0; }
       <span class="dot"></span>
       <span data-lang="uk">🏭 Виробничі цикли</span><span data-lang="en">🏭 Production Cycles</span><span data-lang="sk">🏭 Výrobné cykly</span>
     </button>
+    <button class="nav-link" data-target="dashboard" type="button">
+      <span class="dot"></span>
+      <span data-lang="uk">📊 Sales Dashboard</span><span data-lang="en">📊 Sales Dashboard</span><span data-lang="sk">📊 Sales Dashboard</span>
+    </button>
   </div>
 
   <div class="sidebar-footer">
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Bible v2.49 · 2026
+    Brand Bible v2.50 · 2026
   </div>
 </nav>
 
@@ -2127,7 +2131,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
     <span data-lang="sk">Jedna ingrediencia. <span class="qr-ns-accent">Žiadne kompromisy.</span> Syrový snack 21. storočia.</span>
   </div>
-  <div class="qr-meta">v2.49 · 2026</div>
+  <div class="qr-meta">v2.50 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -8570,7 +8574,62 @@ h3.block-title:first-of-type { margin-top: 0; }
 
   <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span><span data-lang="sk">História verzií</span></h3>
   <div class="changelog-entry">
-    <span class="changelog-version">v2.49</span><span class="changelog-date">13.05.2026</span>
+    <span class="changelog-version">v2.50</span><span class="changelog-date">14.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>📊 Sales Dashboard pipeline — повна автоматизація.</strong> Створено end-to-end систему: GitHub Actions cron → Python scripts → Cloudflare D1 → Brand Bible iframe. Дашборд snEco продажів на даних МойСклад тепер живе online і оновлюється сам щодня о 05:00 Київ — без участі людини. D1 база на майбутнє: будь-який новий дашборд тепер може будуватися на тих самих <code>ms_*</code> таблицях.</li>
+      <li data-lang="en"><strong>📊 Sales Dashboard pipeline — full automation.</strong> Built end-to-end system: GitHub Actions cron → Python scripts → Cloudflare D1 → Brand Bible iframe. snEco sales dashboard on MoySklad data now lives online and refreshes itself daily at 05:00 Kyiv — no human involvement. D1 base for the future: any new dashboard can now be built on the same <code>ms_*</code> tables.</li>
+      <li data-lang="sk"><strong>📊 Sales Dashboard pipeline — plná automatizácia.</strong> Postavený end-to-end systém: GitHub Actions cron → Python scripty → Cloudflare D1 → Brand Bible iframe. snEco sales dashboard nad MoySklad dátami teraz žije online a obnovuje sa denne o 05:00 Kyjev — bez ľudského zásahu. D1 báza pre budúcnosť.</li>
+
+      <li data-lang="uk"><strong>🗄 D1 schema (9 таблиць).</strong> <code>ms_demands</code> · <code>ms_payments</code> · <code>ms_orders</code> · <code>ms_returns</code> · <code>ms_products</code> · <code>ms_counterparties</code> · <code>ms_invoices_out</code> · <code>ms_moves</code> · <code>ms_processing_plans</code> + <code>ms_sync_log</code>. Кожна таблиця 1:1 з МойСклад API, currency у копійках (integer), <code>raw_json</code> backup для майбутніх полів. Apply: <code>wrangler d1 execute sneco-bible --remote --file=schema-dashboard.sql</code>.</li>
+      <li data-lang="en"><strong>🗄 D1 schema (9 tables).</strong> <code>ms_demands</code> · <code>ms_payments</code> · <code>ms_orders</code> · <code>ms_returns</code> · <code>ms_products</code> · <code>ms_counterparties</code> · <code>ms_invoices_out</code> · <code>ms_moves</code> · <code>ms_processing_plans</code> + <code>ms_sync_log</code>. 1:1 with MoySklad API, currency in kopecks (integer), <code>raw_json</code> backup for future fields. Apply: <code>wrangler d1 execute sneco-bible --remote --file=schema-dashboard.sql</code>.</li>
+      <li data-lang="sk"><strong>🗄 D1 schema (9 tabuliek).</strong> <code>ms_demands</code> · <code>ms_payments</code> · <code>ms_orders</code> · <code>ms_returns</code> · <code>ms_products</code> · <code>ms_counterparties</code> · <code>ms_invoices_out</code> · <code>ms_moves</code> · <code>ms_processing_plans</code> + <code>ms_sync_log</code>. 1:1 s MoySklad API, mena v kopejkách (integer), <code>raw_json</code> backup pre budúce polia.</li>
+
+      <li data-lang="uk"><strong>🔌 3 нових Worker endpoints.</strong> <code>POST /api/dashboard/ingest</code> (auth: X-Sync-Key header, batch upsert до 500 rows / 50K total) · <code>POST /api/dashboard/last-sync</code> (public, повертає 5 останніх sync_log записів) · <code>POST /api/dashboard/data</code> (JWT-protected, query API для майбутніх дашбордів з фільтрами from/to/limit/offset). SUPPORTED_BLOCKS додано <code>'dashboard'</code>.</li>
+      <li data-lang="en"><strong>🔌 3 new Worker endpoints.</strong> <code>POST /api/dashboard/ingest</code> (auth: X-Sync-Key header, batch upsert up to 500 rows / 50K total) · <code>POST /api/dashboard/last-sync</code> (public, last 5 sync_log rows) · <code>POST /api/dashboard/data</code> (JWT-protected, query API for future dashboards with from/to/limit/offset filters). SUPPORTED_BLOCKS added <code>'dashboard'</code>.</li>
+      <li data-lang="sk"><strong>🔌 3 nové Worker endpoints.</strong> <code>POST /api/dashboard/ingest</code> (auth: X-Sync-Key header) · <code>POST /api/dashboard/last-sync</code> (public) · <code>POST /api/dashboard/data</code> (JWT-protected). SUPPORTED_BLOCKS pridaný <code>'dashboard'</code>.</li>
+
+      <li data-lang="uk"><strong>🐍 ingest_to_d1.py — Python ingest скрипт.</strong> Standalone, читає xlsx з <code>./data/</code> (вихід <code>moysklad_sync.py</code>), мапить колонки на D1 schema, POSTить батчами по 400 rows. На кінці пише <code>ms_sync_log</code> запис зі статусом, кількістю rows per entity, durаtion. Підтримує 9 entity types: demands, payments, orders, returns, products, counterparties, invoices_out, moves, processing_plans.</li>
+      <li data-lang="en"><strong>🐍 ingest_to_d1.py — Python ingest script.</strong> Standalone, reads xlsx from <code>./data/</code> (output of <code>moysklad_sync.py</code>), maps columns to D1 schema, POSTs in batches of 400 rows. On finish writes <code>ms_sync_log</code> row with status, per-entity row counts, duration. Supports 9 entity types.</li>
+      <li data-lang="sk"><strong>🐍 ingest_to_d1.py — Python ingest skript.</strong> Standalone, číta xlsx, mapuje stĺpce na D1 schému, POSTuje v dávkach 400 rows. Na konci zapíše <code>ms_sync_log</code> riadok. Podporuje 9 entity typov.</li>
+
+      <li data-lang="uk"><strong>⏰ GitHub Actions cron.</strong> <code>.github/workflows/moysklad-sync.yml</code> запускається <code>0 3 * * *</code> UTC = <strong>05:00 Київ EEST</strong> (06:00 EET взимку). 4 кроки: checkout → fetch MoySklad → ingest D1 → commit dashboard.html. Workflow_dispatch: можна запустити вручну через UI з параметром window_days. Timeout 25 хв. Status у GitHub Actions tab.</li>
+      <li data-lang="en"><strong>⏰ GitHub Actions cron.</strong> <code>.github/workflows/moysklad-sync.yml</code> runs <code>0 3 * * *</code> UTC = <strong>05:00 Kyiv EEST</strong> (06:00 EET in winter). 4 steps: checkout → fetch MoySklad → ingest D1 → commit dashboard.html. Workflow_dispatch: can be triggered manually via UI with window_days parameter. Timeout 25 min.</li>
+      <li data-lang="sk"><strong>⏰ GitHub Actions cron.</strong> Beží <code>0 3 * * *</code> UTC = <strong>05:00 Kyjev EEST</strong> (06:00 EET v zime). 4 kroky: checkout → fetch MoySklad → ingest D1 → commit dashboard.html. Timeout 25 min.</li>
+
+      <li data-lang="uk"><strong>📊 sec-dashboard у Brand Bible</strong> (Confidential group, поряд з HR і Production). OTP-gated через новий блок <code>'dashboard'</code>, окремий whitelist. Iframe → <code>/dashboard/dashboard.html</code> (5.7 MB inline-data). Top-banner з last-sync timestamp + status badge (success/partial/failed) + total rows синкнуто, auto-loaded після unlock.</li>
+      <li data-lang="en"><strong>📊 sec-dashboard in Brand Bible</strong> (Confidential group, next to HR and Production). OTP-gated via new <code>'dashboard'</code> block, separate whitelist. Iframe → <code>/dashboard/dashboard.html</code> (5.7 MB inline-data). Top banner with last-sync timestamp + status badge (success/partial/failed) + total synced rows, auto-loaded after unlock.</li>
+      <li data-lang="sk"><strong>📊 sec-dashboard v Brand Bible</strong> (Confidential group, vedľa HR a Production). OTP-gated cez nový blok <code>'dashboard'</code>, samostatný whitelist. Iframe → <code>/dashboard/dashboard.html</code>. Top banner s last-sync timestamp + status badge.</li>
+
+      <li data-lang="uk"><strong>📜 Setup-документація.</strong> <code>~/snEco/sneco-auth/setup-3.sh</code> — один скрипт що apply'ить D1 schema + генерує SYNC_API_KEY + deploy'ить Worker. <code>~/snEco/sneco-auth/DEPLOY-DASHBOARD.md</code> — повний step-by-step посібник з 5 кроків (Worker → GitHub Secrets → перенос Python скриптів у Brand Bible repo → whitelist → manual test).</li>
+      <li data-lang="en"><strong>📜 Setup docs.</strong> <code>~/snEco/sneco-auth/setup-3.sh</code> — one script that applies D1 schema + generates SYNC_API_KEY + deploys Worker. <code>~/snEco/sneco-auth/DEPLOY-DASHBOARD.md</code> — full step-by-step 5-step guide.</li>
+      <li data-lang="sk"><strong>📜 Setup dokumentácia.</strong> <code>setup-3.sh</code> — jeden skript + <code>DEPLOY-DASHBOARD.md</code> — plný 5-krokový sprievodca.</li>
+
+      <li data-lang="uk"><strong>📌 Action items для Вадима</strong> (~10 хв загалом):
+        <strong>1.</strong> <code>cd ~/snEco/sneco-auth &amp;&amp; bash setup-3.sh</code> (D1 + Worker + secret) ·
+        <strong>2.</strong> Скопіювати SYNC_API_KEY у GitHub Secrets (+ MOYSKLAD_TOKEN + WORKER_URL) ·
+        <strong>3.</strong> Перенести <code>moysklad_sync.py</code>, <code>ingest_to_d1.py</code>, <code>.github/workflows/</code> у <code>~/sneco-brand-book/</code> + commit/push ·
+        <strong>4.</strong> Whitelist для 'dashboard' через Maintenance UI (vg/fg/bs) ·
+        <strong>5.</strong> Run workflow manually з GitHub Actions tab (тест) ·
+        <strong>6.</strong> Перевірити <code>brand.sneco.ua/#dashboard</code>. Деталі — у <code>DEPLOY-DASHBOARD.md</code>.</li>
+      <li data-lang="en"><strong>📌 Action items for Vadym</strong> (~10 min total):
+        <strong>1.</strong> <code>cd ~/snEco/sneco-auth &amp;&amp; bash setup-3.sh</code> ·
+        <strong>2.</strong> Copy SYNC_API_KEY into GitHub Secrets (+ MOYSKLAD_TOKEN + WORKER_URL) ·
+        <strong>3.</strong> Move <code>moysklad_sync.py</code>, <code>ingest_to_d1.py</code>, <code>.github/workflows/</code> into <code>~/sneco-brand-book/</code> + commit/push ·
+        <strong>4.</strong> Whitelist for 'dashboard' via Maintenance UI (vg/fg/bs) ·
+        <strong>5.</strong> Run workflow manually from GitHub Actions tab (test) ·
+        <strong>6.</strong> Verify <code>brand.sneco.ua/#dashboard</code>. Details — in <code>DEPLOY-DASHBOARD.md</code>.</li>
+      <li data-lang="sk"><strong>📌 Action items pre Vadyma</strong> (~10 min):
+        <strong>1.</strong> <code>bash setup-3.sh</code> ·
+        <strong>2.</strong> GitHub Secrets ·
+        <strong>3.</strong> Presun Python skriptov do Brand Bible repo ·
+        <strong>4.</strong> Whitelist 'dashboard' ·
+        <strong>5.</strong> Manuálny test ·
+        <strong>6.</strong> Overiť <code>brand.sneco.ua/#dashboard</code>.</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.49</span><span class="changelog-date">13.05.2026</span>
     <ul class="changelog-list">
       <li data-lang="uk"><strong>🔐 OTP UX-фікс — чесний режим whitelist.</strong> Раніше Worker silently повертав 200 OK для будь-якого email — навіть якщо його НЕМАЄ у whitelist (класичний security pattern для public API: не leak'ати whitelist через enumeration). Для internal tool snEco це створювало погану UX: команда чекала email-кода, який ніколи не приходив, без жодного сигналу що пошта не у списку.</li>
       <li data-lang="en"><strong>🔐 OTP UX fix — honest whitelist mode.</strong> Previously the Worker silently returned 200 OK for any email — even if NOT in the whitelist (classic security pattern for public APIs: don't leak the whitelist via enumeration). For snEco's internal tool this created bad UX: the team waited for an email code that never arrived, with no signal that the address wasn't on the list.</li>
@@ -9863,6 +9922,109 @@ h3.block-title:first-of-type { margin-top: 0; }
       <span data-lang="en">📌 Based on Bohdan's proposal (Ideas #4, 12.05.2026). Quote: <em>"general information on the production cycle of EACH type of SKU... a roadmap of the overall production cycle for each product variety... This information must be password-protected."</em> Structure based on the 6-stage flow.</span>
       <span data-lang="sk">📌 Na základe Bohdanovho návrhu (Ideas #4, 12.05.2026). Citát: <em>„všeobecné informácie o výrobnom cykle KAŽDÉHO druhu SKU... cestovná mapa celkového výrobného cyklu pre každý druh výrobku... Táto informácia musí byť chránená heslom."</em> Štruktúra na 6 etapách toku.</span>
     </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SALES DASHBOARD (added v2.50)
+     Password-gated · iframe → /dashboard/dashboard.html
+     Data refreshed daily 05:00 EEST via GitHub Actions cron
+     ============================================================ -->
+<section class="section is-locked" id="sec-dashboard" data-otp-block="dashboard" style="padding:56px 64px">
+  <div class="section-eyebrow">🔒 <span data-lang="uk">Конфіденційне · Аналітика</span><span data-lang="en">Confidential · Analytics</span><span data-lang="sk">Dôverné · Analytika</span></div>
+  <h2 class="section-title">📊 <span data-lang="uk">Sales Dashboard — МойСклад</span><span data-lang="en">Sales Dashboard — MoySklad</span><span data-lang="sk">Sales Dashboard — MoySklad</span></h2>
+
+  <!-- LOCKED STATE -->
+  <div class="otp-locked">
+    <div class="section-lead">
+      <span data-lang="uk">Live дашборд продажів snEco на даних МойСклад. 93 KPI · 42 графіки · 17 таблиць. Дані оновлюються автоматично щодня о 05:00 (Київ) через GitHub Actions cron + Cloudflare D1. Доступ — лише керівництво (vg, fg, bs).</span>
+      <span data-lang="en">Live sales dashboard for snEco on top of MoySklad data. 93 KPI · 42 charts · 17 tables. Data refreshed automatically every day at 05:00 (Kyiv) via GitHub Actions cron + Cloudflare D1. Access — leadership only (vg, fg, bs).</span>
+      <span data-lang="sk">Live sales dashboard pre snEco nad dátami MoySklad. 93 KPI · 42 grafov · 17 tabuliek. Dáta sa obnovujú automaticky každý deň o 05:00 (Kyjev) cez GitHub Actions cron + Cloudflare D1. Prístup — len vedenie (vg, fg, bs).</span>
+    </div>
+    <div class="otp-card" data-otp-mount="dashboard"></div>
+    <div style="margin-top:14px;padding:12px 16px;background:rgba(220,38,38,0.06);border-left:3px solid #dc2626;border-radius:6px;font-size:12px;color:var(--text-muted);line-height:1.55">
+      ⚠️ <span data-lang="uk">Якщо твоєї пошти ще немає у whitelist для dashboard → напиши на <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>. Адміни (vg/fg) оновлюють список через <a href="#sec-maintenance" onclick="document.querySelector('[data-target=maintenance]')?.click();return false">Maintenance → Розподіл доступу</a>.</span>
+      <span data-lang="en">If your email isn't on the dashboard whitelist yet → contact <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>. Admins (vg/fg) update via <a href="#sec-maintenance" onclick="document.querySelector('[data-target=maintenance]')?.click();return false">Maintenance → Access control</a>.</span>
+      <span data-lang="sk">Ak váš email ešte nie je vo whitelist pre dashboard → napíšte na <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>. Admini (vg/fg) aktualizujú cez <a href="#sec-maintenance" onclick="document.querySelector('[data-target=maintenance]')?.click();return false">Maintenance → Access control</a>.</span>
+    </div>
+  </div>
+
+  <!-- UNLOCKED STATE -->
+  <div class="otp-unlocked">
+    <div class="otp-session-bar">
+      <span><span data-lang="uk">✓ Розблоковано для</span><span data-lang="en">✓ Unlocked for</span><span data-lang="sk">✓ Odomknuté pre</span> <span class="otp-session-email" data-otp-email-display></span> · <span data-otp-expires-display></span></span>
+      <button class="otp-logout" data-otp-logout="dashboard"><span data-lang="uk">🔒 Вийти</span><span data-lang="en">🔒 Lock</span><span data-lang="sk">🔒 Odhlásiť</span></button>
+    </div>
+
+    <!-- Last sync banner -->
+    <div id="dashboard-sync-banner" style="margin:12px 0 18px;padding:14px 18px;background:var(--yellow-soft);border-left:4px solid var(--yellow);border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;font-size:13px">
+      <div>
+        <strong>🔄 <span data-lang="uk">Останній sync:</span><span data-lang="en">Last sync:</span><span data-lang="sk">Posledný sync:</span></strong>
+        <span id="dashboard-sync-time" style="font-family:var(--font-mono)">—</span>
+        <span id="dashboard-sync-status" style="margin-left:8px"></span>
+      </div>
+      <div style="font-size:11.5px;color:var(--text-muted)">
+        <span data-lang="uk">Cron щодня 05:00 Київ · GitHub Actions → Cloudflare D1</span>
+        <span data-lang="en">Daily cron 05:00 Kyiv · GitHub Actions → Cloudflare D1</span>
+        <span data-lang="sk">Denný cron 05:00 Kyjev · GitHub Actions → Cloudflare D1</span>
+      </div>
+    </div>
+
+    <!-- Iframe to dashboard -->
+    <div style="position:relative;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#F4F4EF">
+      <iframe
+        id="dashboard-iframe"
+        src="dashboard/dashboard.html"
+        style="width:100%;border:0;display:block;min-height:1400px"
+        loading="lazy"
+        title="snEco Sales Dashboard"></iframe>
+    </div>
+
+    <div style="margin-top:14px;padding:12px 16px;background:var(--black-05);border-radius:8px;font-size:11.5px;color:var(--text-muted);line-height:1.55">
+      <span data-lang="uk">📌 Дашборд відкривається в iframe. Якщо щось не вантажиться — спробуй <a href="dashboard/dashboard.html" target="_blank" rel="noopener" style="color:var(--yellow);font-weight:600">відкрити окремою вкладкою</a>. Дані живуть у Cloudflare D1 (база <code>sneco-bible</code>, таблиці <code>ms_*</code>) і оновлюються щодня. Запит на новий дашборд / нову метрику — через <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false">📩 Пропозиції</a>.</span>
+      <span data-lang="en">📌 Dashboard opens in an iframe. If something doesn't load — try <a href="dashboard/dashboard.html" target="_blank" rel="noopener" style="color:var(--yellow);font-weight:600">opening it in a new tab</a>. Data lives in Cloudflare D1 (db <code>sneco-bible</code>, tables <code>ms_*</code>) and refreshes daily. Request a new dashboard / new metric — via <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false">📩 Ideas</a>.</span>
+      <span data-lang="sk">📌 Dashboard sa otvára v iframe. Ak sa niečo nenahrá — skús <a href="dashboard/dashboard.html" target="_blank" rel="noopener" style="color:var(--yellow);font-weight:600">otvoriť v novej karte</a>. Dáta žijú v Cloudflare D1 (db <code>sneco-bible</code>, tabuľky <code>ms_*</code>) a obnovujú sa denne. Žiadosť o nový dashboard / metriku — cez <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false">📩 Návrhy</a>.</span>
+    </div>
+
+    <!-- Auto-fetch last-sync info on unlock -->
+    <script>
+      (function(){
+        const root = document.getElementById('sec-dashboard');
+        if (!root) return;
+        const timeEl = root.querySelector('#dashboard-sync-time');
+        const statusEl = root.querySelector('#dashboard-sync-status');
+        if (!timeEl) return;
+        async function loadSyncInfo() {
+          try {
+            const r = await fetch((window.SNECO_AUTH_URL || 'https://sneco-auth.vg-ab6.workers.dev') + '/api/dashboard/last-sync', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: '{}',
+            });
+            const data = await r.json();
+            const last = (data.items || [])[0];
+            if (!last) { timeEl.textContent = '— (no syncs yet)'; return; }
+            const dt = new Date(last.started_at * 1000);
+            timeEl.textContent = dt.toLocaleString('uk-UA', { dateStyle: 'short', timeStyle: 'short' });
+            const colors = { success: '#2D6A00', partial: '#F59E0B', failed: '#dc2626', running: '#2563EB' };
+            statusEl.innerHTML = `<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;background:${colors[last.status] || '#888'};color:#fff">${last.status}</span>`;
+            const ents = last.entities || {};
+            const total = Object.values(ents).reduce((a, b) => a + (Number(b) || 0), 0);
+            if (total > 0) {
+              statusEl.innerHTML += ` <span style="font-size:11px;color:var(--text-muted)">· ${total.toLocaleString('uk-UA')} rows</span>`;
+            }
+          } catch (e) {
+            timeEl.textContent = '— (sync info unavailable)';
+          }
+        }
+        // Run on unlock — polled detector
+        const observer = new MutationObserver(() => {
+          if (root.classList.contains('is-unlocked')) loadSyncInfo();
+        });
+        observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+        if (root.classList.contains('is-unlocked')) loadSyncInfo();
+      })();
+    </script>
   </div>
 </section>
 
