@@ -2117,7 +2117,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Bible v2.52 · 2026
+    Brand Bible v2.53 · 2026
   </div>
 </nav>
 
@@ -2131,7 +2131,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
     <span data-lang="sk">Jedna ingrediencia. <span class="qr-ns-accent">Žiadne kompromisy.</span> Syrový snack 21. storočia.</span>
   </div>
-  <div class="qr-meta">v2.52 · 2026</div>
+  <div class="qr-meta">v2.53 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -8573,8 +8573,26 @@ h3.block-title:first-of-type { margin-top: 0; }
   </div>
 
   <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span><span data-lang="sk">História verzií</span></h3>
+
   <div class="changelog-entry">
-    <span class="changelog-version">v2.52</span><span class="changelog-date">14.05.2026</span>
+    <span class="changelog-version">v2.53</span><span class="changelog-date">14.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>📦🏭 Inventory + Production винесені в окремі дашборди.</strong> «Склад та закупки» (вкладка 4) і «Виробництво» (вкладка 5) колишнього Sales Analytics тепер живуть як окремі standalone сторінки <code>brand.sneco.ua/dashboard/inventory/</code> і <code>brand.sneco.ua/dashboard/production/</code> — кожен з власним OTP-gate і своїм whitelist. Sales Analytics тепер має 3 вкладки (Огляд, Динаміка, Клієнти&Товари) — для комерційної команди (vg/fg/bs). Inventory — для операційної (vg+fg+bs+Bohdan). Production — для виробничої (Pylyp+Bohdan+Valeriia+vg).</li>
+      <li data-lang="en"><strong>📦🏭 Inventory + Production split into separate dashboards.</strong> "Stock &amp; Purchases" (tab 4) and "Production" (tab 5) of the former Sales Analytics now live as separate standalone pages <code>brand.sneco.ua/dashboard/inventory/</code> and <code>brand.sneco.ua/dashboard/production/</code> — each with its own OTP gate and whitelist. Sales Analytics now has 3 tabs (Overview, Dynamics, Clients&amp;Products) — for the commercial team (vg/fg/bs). Inventory — for operations (vg+fg+bs+Bohdan). Production — for manufacturing (Pylyp+Bohdan+Valeriia+vg).</li>
+      <li data-lang="sk"><strong>📦🏭 Inventory + Production rozdelené do samostatných dashboardov.</strong> Každý so svojím OTP-gate a whitelistom. Sales Analytics má teraz 3 záložky.</li>
+
+      <li data-lang="uk"><strong>🔧 Worker SUPPORTED_BLOCKS розширено.</strong> Додано <code>inventory-dashboard</code> + <code>production-dashboard</code>. Усі 3 дашборд-блоки тепер можуть викликати <code>/api/dashboard/data</code> (та сама D1 база <code>sneco-bible</code>, ті самі ms_* таблиці). KV whitelists окремі. Email-OTP subject у відповідній мові.</li>
+      <li data-lang="en"><strong>🔧 Worker SUPPORTED_BLOCKS extended.</strong> Added <code>inventory-dashboard</code> + <code>production-dashboard</code>. All 3 dashboard blocks can call <code>/api/dashboard/data</code> (same D1 <code>sneco-bible</code>, same ms_* tables). Separate KV whitelists. Email-OTP subject in proper language.</li>
+      <li data-lang="sk"><strong>🔧 Worker SUPPORTED_BLOCKS rozšírené.</strong></li>
+
+      <li data-lang="uk"><strong>🟢 sec-dashboard caталог: 3 active cards.</strong> Sales Analytics + Inventory + Production як активні launcher-картки. Production видалено з «У плані». KPI strip зверху: 3 live · 4+ planned.</li>
+      <li data-lang="en"><strong>🟢 sec-dashboard catalog: 3 active cards.</strong> Sales Analytics + Inventory + Production as live launcher cards. Production removed from "Planned". Top KPI strip: 3 live · 4+ planned.</li>
+      <li data-lang="sk"><strong>🟢 sec-dashboard katalóg: 3 aktívne karty.</strong></li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.52</span><span class="changelog-date">14.05.2026</span>
     <ul class="changelog-list">
       <li data-lang="uk"><strong>📊 sec-dashboard перейменовано</strong> з «Sales Dashboard — МойСклад» → <strong>«Dashboards»</strong> (множина) і перетворено з закритої single-dashboard сторінки на <strong>відкритий каталог</strong>. Тепер це launchpad для всіх дашбордів snEco — 1 активний (Sales Analytics) + 5 запланованих карток (Production / Finance / HR / Marketing / Export) + 1 «Запропонуй свій». Sidebar теж: 📊 Sales Dashboard → 📊 Dashboards.</li>
       <li data-lang="en"><strong>📊 sec-dashboard renamed</strong> from "Sales Dashboard — MoySklad" → <strong>"Dashboards"</strong> (plural) and converted from a closed single-dashboard page to an <strong>open catalog</strong>. Now it's a launchpad for all snEco dashboards — 1 live (Sales Analytics) + 5 planned cards (Production / Finance / HR / Marketing / Export) + 1 "Propose your own". Sidebar updated too.</li>
@@ -9980,13 +9998,13 @@ h3.block-title:first-of-type { margin-top: 0; }
   <!-- KPI strip — каталог зростає -->
   <div class="grid-3" style="margin:24px 0 28px">
     <div class="card card-sm" style="background:var(--black);color:#fff;text-align:center">
-      <div style="font-size:32px;font-weight:900;color:var(--yellow);line-height:1">1</div>
+      <div style="font-size:32px;font-weight:900;color:var(--yellow);line-height:1">3</div>
       <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:6px;letter-spacing:0.04em;text-transform:uppercase">
-        <span data-lang="uk">live дашборд</span><span data-lang="en">live dashboard</span><span data-lang="sk">live dashboard</span>
+        <span data-lang="uk">live дашборди</span><span data-lang="en">live dashboards</span><span data-lang="sk">live dashboardy</span>
       </div>
     </div>
     <div class="card card-sm" style="background:var(--yellow);color:var(--black);text-align:center">
-      <div style="font-size:32px;font-weight:900;line-height:1">5+</div>
+      <div style="font-size:32px;font-weight:900;line-height:1">4+</div>
       <div style="font-size:11px;color:rgba(30,30,30,0.7);margin-top:6px;letter-spacing:0.04em;text-transform:uppercase">
         <span data-lang="uk">в плані</span><span data-lang="en">planned</span><span data-lang="sk">v pláne</span>
       </div>
@@ -10028,14 +10046,50 @@ h3.block-title:first-of-type { margin-top: 0; }
       </div>
     </div>
 
+  <!-- v2.53: Inventory + Production launcher cards -->
+  <div class="grid-2" style="margin-top:18px">
+    <a href="dashboard/inventory/" target="_blank" rel="noopener" style="display:block;background:linear-gradient(135deg, #1E1E1E 0%, #2A2A2A 100%);color:#fff;padding:24px 22px;border-radius:var(--radius);text-decoration:none;position:relative;overflow:hidden;border:1px solid rgba(254,191,39,0.2)">
+      <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle, rgba(254,191,39,0.12) 0%, transparent 70%);pointer-events:none"></div>
+      <div style="position:relative">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--yellow);margin-bottom:8px">📦 Inventory</div>
+        <div style="font-size:20px;font-weight:800;letter-spacing:-0.3px;line-height:1.2;margin-bottom:10px">
+          <span data-lang="uk">Склад та закупки snEco</span><span data-lang="en">Stock &amp; Purchases</span><span data-lang="sk">Sklad a nákup</span>
+        </div>
+        <div style="font-size:13px;line-height:1.55;color:rgba(255,255,255,0.78);margin-bottom:14px">
+          <span data-lang="uk">Залишки складу (поточні + історія), ABC-аналіз, оборотність, графіки приходу від постачальників, динаміка сировини. Whitelist: vg, fg, bs, Bohdan.</span>
+          <span data-lang="en">Stock balances (current + history), ABC analysis, turnover, supplier intake charts, raw materials dynamics. Whitelist: vg, fg, bs, Bohdan.</span>
+          <span data-lang="sk">Skladové zostatky (súčasné + história), ABC analýza, obrátkovosť, grafy prijímania od dodávateľov, dynamika surovín. Whitelist: vg, fg, bs, Bohdan.</span>
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:9px 16px;background:var(--yellow);color:var(--black);font-weight:800;border-radius:6px;font-size:13px;letter-spacing:0.02em">
+          <span data-lang="uk">Відкрити Inventory</span><span data-lang="en">Open Inventory</span><span data-lang="sk">Otvoriť Inventory</span>
+          <span style="font-size:16px">↗</span>
+        </div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);font-style:italic;margin-top:10px">block: <code style="background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:3px;color:var(--yellow)">inventory-dashboard</code></div>
+      </div>
+    </a>
+    <a href="dashboard/production/" target="_blank" rel="noopener" style="display:block;background:linear-gradient(135deg, #1E1E1E 0%, #2A2A2A 100%);color:#fff;padding:24px 22px;border-radius:var(--radius);text-decoration:none;position:relative;overflow:hidden;border:1px solid rgba(150,193,31,0.2)">
+      <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle, rgba(150,193,31,0.13) 0%, transparent 70%);pointer-events:none"></div>
+      <div style="position:relative">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--green);margin-bottom:8px">🏭 Production</div>
+        <div style="font-size:20px;font-weight:800;letter-spacing:-0.3px;line-height:1.2;margin-bottom:10px">
+          <span data-lang="uk">Виробництво snEco</span><span data-lang="en">Production</span><span data-lang="sk">Výroba</span>
+        </div>
+        <div style="font-size:13px;line-height:1.55;color:rgba(255,255,255,0.78);margin-bottom:14px">
+          <span data-lang="uk">Виробництво сушеного сиру (кг), MoM динаміка, розбивка по SKU, закупки vs виробництво, перелік техкарт. Whitelist: Pylyp, Bohdan, Valeriia, vg.</span>
+          <span data-lang="en">Dried cheese production (kg), MoM dynamics, SKU breakdown, supply vs production, techcards list. Whitelist: Pylyp, Bohdan, Valeriia, vg.</span>
+          <span data-lang="sk">Výroba sušeného syra (kg), MoM dynamika, rozbitie po SKU, nákup vs výroba, zoznam tech-kariet. Whitelist: Pylyp, Bohdan, Valeriia, vg.</span>
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:9px 16px;background:var(--green);color:#fff;font-weight:800;border-radius:6px;font-size:13px;letter-spacing:0.02em">
+          <span data-lang="uk">Відкрити Production</span><span data-lang="en">Open Production</span><span data-lang="sk">Otvoriť Production</span>
+          <span style="font-size:16px">↗</span>
+        </div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);font-style:italic;margin-top:10px">block: <code style="background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:3px;color:var(--green)">production-dashboard</code></div>
+      </div>
+    </a>
+  </div>
+
   <h3 class="block-title" style="margin-top:36px">🟡 <span data-lang="uk">У плані</span><span data-lang="en">Planned</span><span data-lang="sk">Plánované</span></h3>
   <div class="grid-3">
-    <div class="card card-sm" style="opacity:0.85">
-      <div style="font-size:24px;margin-bottom:6px">🏭</div>
-      <div style="font-size:14px;font-weight:800;margin-bottom:4px"><span data-lang="uk">Production Dashboard</span><span data-lang="en">Production Dashboard</span><span data-lang="sk">Production Dashboard</span></div>
-      <div style="font-size:11.5px;color:var(--text-muted);line-height:1.55;margin-bottom:8px"><span data-lang="uk">OEE, downtime, batch yield, втрати на сушці per SKU. Whitelist: Pylyp, Bohdan, Valeriia, vg.</span><span data-lang="en">OEE, downtime, batch yield, drying losses per SKU. Whitelist: Pylyp, Bohdan, Valeriia, vg.</span><span data-lang="sk">OEE, downtime, batch yield, straty pri sušení per SKU. Whitelist: Pylyp, Bohdan, Valeriia, vg.</span></div>
-      <div style="font-size:10px;color:var(--text-muted);font-style:italic">block: <code>production-dashboard</code></div>
-    </div>
     <div class="card card-sm" style="opacity:0.85">
       <div style="font-size:24px;margin-bottom:6px">💰</div>
       <div style="font-size:14px;font-weight:800;margin-bottom:4px"><span data-lang="uk">Finance Dashboard</span><span data-lang="en">Finance Dashboard</span><span data-lang="sk">Finance Dashboard</span></div>
