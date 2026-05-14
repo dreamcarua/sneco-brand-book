@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>snEco — Sales Analytics</title>
+<title>snEco — Inventory Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -219,7 +219,7 @@ body.dash-locked{overflow:hidden}
 <div id="dashauth-overlay">
   <div class="dashauth-card">
     <div class="dashauth-logo">snEco</div>
-    <div class="dashauth-sub">Sales Dashboard · Confidential</div>
+    <div class="dashauth-sub">Inventory Dashboard · Confidential</div>
     <div id="dashauth-stage"></div>
   </div>
 </div>
@@ -227,7 +227,7 @@ body.dash-locked{overflow:hidden}
 <script>
 (function(){
   const WORKER = 'https://sneco-auth.vg-ab6.workers.dev';
-  const BLOCK = 'dashboard';
+  const BLOCK = 'inventory-dashboard';
   const STORAGE_KEY = 'snEco-jwt-' + BLOCK;
   const overlay = document.getElementById('dashauth-overlay');
   const stage = document.getElementById('dashauth-stage');
@@ -339,8 +339,8 @@ body.dash-locked{overflow:hidden}
   <div class="logo">
     <div class="logo-box">sn</div>
     <div>
-      <div class="logo-text">snEco Analytics</div>
-      <div class="logo-sub">МойСклад · 2023–2026</div>
+      <div class="logo-text">snEco Inventory</div>
+      <div class="logo-sub">Склад &amp; закупки · МойСклад</div>
     </div>
   </div>
   <div class="topbar-right">
@@ -351,10 +351,10 @@ body.dash-locked{overflow:hidden}
 
 <!-- TAB NAV -->
 <div class="tabnav">
-  <button class="tab-btn on" id="tabbtn-1" onclick="showTab(1)"><span class="tab-icon">📊</span>Огляд</button>
-  <button class="tab-btn" id="tabbtn-2" onclick="showTab(2)"><span class="tab-icon">📈</span>Динаміка</button>
-  <button class="tab-btn" id="tabbtn-3" onclick="showTab(3)"><span class="tab-icon">👥</span>Клієнти & Товари</button>
-  <button class="tab-btn" style="display:none" id="tabbtn-4" onclick="showTab(4)"><span class="tab-icon">📦</span>Склад та закупки</button>
+  <button class="tab-btn" style="display:none" id="tabbtn-1" onclick="showTab(1)"><span class="tab-icon">📊</span>Огляд</button>
+  <button class="tab-btn" style="display:none" id="tabbtn-2" onclick="showTab(2)"><span class="tab-icon">📈</span>Динаміка</button>
+  <button class="tab-btn" style="display:none" id="tabbtn-3" onclick="showTab(3)"><span class="tab-icon">👥</span>Клієнти & Товари</button>
+  <button class="tab-btn on" id="tabbtn-4" onclick="showTab(4)"><span class="tab-icon">📦</span>Склад та закупки</button>
   <button class="tab-btn" style="display:none" id="tabbtn-5" onclick="showTab(5)"><span class="tab-icon">🏭</span>Виробництво</button>
 </div>
 
@@ -399,7 +399,7 @@ body.dash-locked{overflow:hidden}
 <div class="wrap">
 
 <!-- ══════════ TAB 1: ОГЛЯД ══════════ -->
-<div class="tab-content active" id="tab-1">
+<div class="tab-content" id="tab-1">
 
 <!-- CURRENT MONTH KPIs -->
 <div class="sec">Поточний стан — <span id="overviewMonthLabel"></span></div>
@@ -863,7 +863,7 @@ body.dash-locked{overflow:hidden}
 </div><!-- /tab-3 -->
 
 <!-- ══════════ TAB 4: СКЛАД ══════════ -->
-<div class="tab-content" id="tab-4">
+<div class="tab-content active" id="tab-4">
 
 <!-- STOCK KPIs -->
 <div class="sec">Загальний зріз складу</div>
@@ -1075,7 +1075,7 @@ body.dash-locked{overflow:hidden}
 </div><!-- /wrap -->
 
 <div class="footer">
-  snEco Analytics v2 · МойСклад API · Джерело правди: оплати ✅ та відвантаження ✅ · Оновлення: щодня 06:00
+  snEco Inventory · МойСклад API · Джерело правди: оплати ✅ та відвантаження ✅ · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -3081,7 +3081,7 @@ buildPeriodCompare();
 buildAnnualKpis();
 syncMetricControls();
 // Show tab 1 (triggers full init for tab 1 content, others load on click)
-showTab(1);
+showTab(4);
 
 // Update badge
 const now=new Date();
