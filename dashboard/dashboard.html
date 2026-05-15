@@ -3088,7 +3088,7 @@ showTab(1);
   const statusEl = document.getElementById('syncStatus');
   const updateEl = document.getElementById('lastUpdate');
   try {
-    const r = await fetch('https://sneco-auth.vg-ab6.workers.dev/api/dashboard/last-sync');
+    const r = await fetch('https://sneco-auth.vg-ab6.workers.dev/api/dashboard/last-sync', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'});
     if (!r.ok) throw new Error('HTTP '+r.status);
     const j = await r.json();
     const items = j.items || [];
