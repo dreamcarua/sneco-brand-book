@@ -1,0 +1,7 @@
+# snEco MoySklad sync — Python deps
+# Used by .github/workflows/moysklad-sync.yml + local dev
+
+requests>=2.31.0
+pandas>=2.1.0
+openpyxl>=3.1.0
+python-dotenv>=1.0.0
