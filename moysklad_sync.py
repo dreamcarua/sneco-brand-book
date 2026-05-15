@@ -13,12 +13,21 @@ snEco — МойСклад Data Sync v2
 """
 
 import os
+import sys
 import json
 import requests
 import pandas as pd
 from datetime import datetime, timedelta
 from pathlib import Path
 from dotenv import load_dotenv
+
+# Force unbuffered stdout — critical for GitHub Actions where tee buffers print()
+# Without this, our progress / SYNC_MODE logs only appear at the end of the run.
+try:
+    sys.stdout.reconfigure(line_buffering=True, write_through=True)
+    sys.stderr.reconfigure(line_buffering=True, write_through=True)
+except Exception:
+    pass
 
 # ── Конфігурація ──────────────────────────────────────────────────────────────
 
@@ -63,17 +72,25 @@ def _get_incremental_cursor():
 
 if SYNC_MODE == "full":
     _sync_from = datetime.now() - timedelta(days=WINDOW_DAYS)
-    print(f"🔄 SYNC_MODE=full → window: last {WINDOW_DAYS} days from {_sync_from.isoformat()}")
+    _master_from = datetime.now() - timedelta(days=WINDOW_DAYS)
+    print(f"🔄 SYNC_MODE=full → window: last {WINDOW_DAYS} days from {_sync_from.isoformat()}", flush=True)
 else:
     _cursor = _get_incremental_cursor()
     if _cursor:
         _sync_from = _cursor - timedelta(hours=SAFETY_OVERLAP_HOURS)
-        print(f"⚡ SYNC_MODE=incremental → cursor {_cursor.isoformat()}, fetch from {_sync_from.isoformat()} (overlap {SAFETY_OVERLAP_HOURS}h)")
+        # Master entities (products/counterparties/processingplans) — 7-day overlap для безпеки
+        # на випадок late updates / clock drift / випадково deleted-but-restored entities
+        _master_from = _cursor - timedelta(days=7)
+        print(f"⚡ SYNC_MODE=incremental → cursor {_cursor.isoformat()}", flush=True)
+        print(f"   Transactional from: {_sync_from.isoformat()} (overlap {SAFETY_OVERLAP_HOURS}h)", flush=True)
+        print(f"   Master from:        {_master_from.isoformat()} (overlap 7d)", flush=True)
     else:
         _sync_from = datetime.now() - timedelta(days=WINDOW_DAYS)
-        print(f"⚠️  No prior sync cursor → fallback: last {WINDOW_DAYS} days from {_sync_from.isoformat()}")
+        _master_from = datetime.now() - timedelta(days=WINDOW_DAYS)
+        print(f"⚠️  No prior sync cursor → fallback: last {WINDOW_DAYS} days from {_sync_from.isoformat()}", flush=True)
 
 DATE_FROM = _sync_from.strftime("%Y-%m-%d %H:%M:%S")
+DATE_FROM_MASTER = _master_from.strftime("%Y-%m-%d %H:%M:%S")
 
 OUTPUT_DIR  = Path(__file__).parent / "data"
 OUTPUT_DIR.mkdir(exist_ok=True)
@@ -86,31 +103,46 @@ HEADERS = {
 
 # ── Утиліти ───────────────────────────────────────────────────────────────────
 
-def fetch_all(endpoint: str, params: dict = None, date_filter: bool = True, expand: str = None) -> list:
-    """Тягне всі записи з пагінацією (фільтр по moment)."""
+def fetch_all(endpoint: str, params: dict = None, date_filter: bool = True, expand: str = None,
+              filter_field: str = "moment") -> list:
+    """Тягне всі записи з пагінацією.
+
+    Args:
+        date_filter: якщо True — додає filter за `filter_field` >= DATE_FROM (transactional)
+                     або DATE_FROM_MASTER (для master entities з filter_field='updated').
+        filter_field: 'moment' (default, для transactional) або 'updated' (для master entities).
+                      'updated' працює для всіх MoySklad entities + дозволяє incremental sync
+                      master entities (products/counterparties/processingplan/processing).
+    """
     url = f"{BASE_URL}/{endpoint}"
     all_rows, offset, limit = [], 0, 1000
     base_params = {"limit": limit}
     if date_filter:
-        base_params["filter"] = f"moment>={DATE_FROM}"
+        # Master entities (filter_field='updated') використовують 7-day overlap
+        from_str = DATE_FROM_MASTER if filter_field == "updated" else DATE_FROM
+        base_params["filter"] = f"{filter_field}>={from_str}"
     if expand:
         base_params["expand"] = expand
     if params:
         base_params.update(params)
+    t0 = datetime.now()
     while True:
         base_params["offset"] = offset
         resp = requests.get(url, headers=HEADERS, params=base_params)
         if resp.status_code != 200:
-            print(f"  ⚠️  {endpoint} → HTTP {resp.status_code}: {resp.text[:200]}")
+            print(f"  ⚠️  {endpoint} → HTTP {resp.status_code}: {resp.text[:200]}", flush=True)
             break
         data  = resp.json()
         rows  = data.get("rows", [])
         total = data.get("meta", {}).get("size", 0)
         all_rows.extend(rows)
         offset += limit
-        print(f"  {endpoint}: {min(offset, total)}/{total}")
+        print(f"  {endpoint}: {min(offset, total)}/{total}", flush=True)
         if offset >= total:
             break
+    elapsed = (datetime.now() - t0).total_seconds()
+    if elapsed > 5:
+        print(f"    ⏱  {endpoint} took {elapsed:.1f}s · {len(all_rows)} rows", flush=True)
     return all_rows
 
 
@@ -558,16 +590,16 @@ def main():
     rows = fetch_all("entity/salesreturn", expand="agent,store,state")
     save_excel(pd.DataFrame(parse_salesreturns(rows)), "sales_returns", reliable=True)
 
-    print("\n👥 Контрагенти...")
-    rows = fetch_all("entity/counterparty", date_filter=False)
+    print("\n👥 Контрагенти...", flush=True)
+    rows = fetch_all("entity/counterparty", filter_field="updated")
     save_excel(pd.DataFrame(parse_counterparties(rows)), "counterparties", reliable=True)
 
-    print("\n🏷️  Товари...")
-    rows = fetch_all("entity/product", date_filter=False)
+    print("\n🏷️  Товари...", flush=True)
+    rows = fetch_all("entity/product", filter_field="updated")
     save_excel(pd.DataFrame(parse_products(rows)), "products", reliable=True)
 
-    print("\n📁 Групи товарів...")
-    rows = fetch_all("entity/productfolder", date_filter=False)
+    print("\n📁 Групи товарів...", flush=True)
+    rows = fetch_all("entity/productfolder", filter_field="updated")
     save_excel(pd.DataFrame(parse_productfolders(rows)), "product_folders", reliable=True)
 
     print("\n🧾 Рахунки покупцям...")
@@ -643,22 +675,22 @@ def main():
     rows = fetch_all("entity/processingorder", expand="processingPlan,materialsStore,productsStore,state")
     save_excel(pd.DataFrame(parse_processing(rows)), "production_orders", reliable=False)
 
-    print("\n🏭 Виробництво (виконані — повна історія для Техкарта ID)...")
-    # date_filter=False — тягнемо ВСЮ історію щоб коректно заповнити Техкарта ID
-    # Upsert по id гарантує що дублів не буде
-    rows = fetch_all("entity/processing", date_filter=False,
+    print("\n🏭 Виробництво (incremental — тільки нові/змінені, upsert по id)...", flush=True)
+    # Incremental по `updated` — тільки операції змінені після cursor (з 7d overlap для безпеки).
+    # Upsert по id у Worker гарантує що дублів не буде, а старі записи лишаються.
+    rows = fetch_all("entity/processing", filter_field="updated",
                      expand="processingPlan,materialsStore,productsStore,state,products,products.assortment")
     # Діагностика: перевіряємо чи є processingPlan у відповіді
     sample_with_plan = [r for r in rows[:50] if r.get("processingPlan")]
     sample_null_plan = [r for r in rows[:50] if not r.get("processingPlan")]
-    print(f"  🔍 Перші 50 операцій: {len(sample_with_plan)} мають processingPlan, {len(sample_null_plan)} — null")
+    print(f"  🔍 Перші 50 операцій: {len(sample_with_plan)} мають processingPlan, {len(sample_null_plan)} — null", flush=True)
     if sample_with_plan:
         plan_obj = sample_with_plan[0].get("processingPlan", {})
-        print(f"  🔍 Приклад processingPlan: {str(plan_obj)[:200]}")
+        print(f"  🔍 Приклад processingPlan: {str(plan_obj)[:200]}", flush=True)
     save_excel(pd.DataFrame(parse_processing(rows)), "production_done", reliable=False)
 
-    print("\n📋 Технологічні карти...")
-    rows = fetch_all("entity/processingplan", date_filter=False, expand="materials,products")
+    print("\n📋 Технологічні карти...", flush=True)
+    rows = fetch_all("entity/processingplan", filter_field="updated", expand="materials,products")
     save_excel(pd.DataFrame(parse_processingplans(rows)), "processing_plans", reliable=False)
 
     print("\n📈 Звіт: прибутковість по товарах...")
