@@ -53,10 +53,11 @@ jobs:
           python3 ingest_to_d1.py --trigger cron --window-days ${{ github.event.inputs.window_days || '30' }}
 
       - name: Commit + push regenerated dashboard.html
+        continue-on-error: true
         run: |
           git config user.name  "snEco-sync-bot"
           git config user.email "noreply@sneco.ua"
-          git add dashboard.html
+          git add dashboard/dashboard.html dashboard.html 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No dashboard changes to commit."
           else
