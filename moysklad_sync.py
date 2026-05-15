@@ -27,9 +27,53 @@ load_dotenv(Path(__file__).parent / ".env")
 TOKEN       = os.getenv("MOYSKLAD_TOKEN")
 BASE_URL    = "https://api.moysklad.ru/api/remap/1.2"
 
-# Інкрементальний режим: тягнемо тільки останні 30 днів
-_sync_from  = datetime.now() - timedelta(days=30)
-DATE_FROM   = _sync_from.strftime("%Y-%m-%d 00:00:00")
+# === Incremental sync mode (v2.57) ===========================================
+# SYNC_MODE=incremental (default for cron) → читаємо cursor з Worker last-sync,
+# беремо лише дані які з'явилися/змінились ПІСЛЯ останнього успішного sync.
+# Очікувана економія часу: 90-95% (з 16 хв → ~30-90 секунд).
+#
+# SYNC_MODE=full → fallback на DATA_WINDOW_DAYS (default 30) — для manual
+# workflow_dispatch коли треба повний reload (наприклад після schema зміни).
+# ============================================================================
+SYNC_MODE   = os.getenv("SYNC_MODE", "incremental").lower()
+WORKER_URL  = os.getenv("WORKER_URL", "https://sneco-auth.vg-ab6.workers.dev")
+WINDOW_DAYS = int(os.getenv("DATA_WINDOW_DAYS", "30"))
+SAFETY_OVERLAP_HOURS = 1   # 1 година overlap на випадок clock drift / late writes
+
+def _get_incremental_cursor():
+    """Повертає datetime останнього успішного sync, або None якщо не вдалося."""
+    try:
+        r = requests.post(
+            f"{WORKER_URL}/api/dashboard/last-sync",
+            headers={"Content-Type": "application/json"},
+            json={}, timeout=10,
+        )
+        if not r.ok:
+            return None
+        items = r.json().get("items", [])
+        # Шукаємо найновіший SUCCESS run з валідним finished_at
+        ok = next(
+            (x for x in items if x.get("status") == "success" and x.get("finished_at")),
+            None,
+        )
+        return datetime.fromtimestamp(ok["finished_at"]) if ok else None
+    except Exception as e:
+        print(f"  ⚠️  Cursor fetch failed: {e}")
+        return None
+
+if SYNC_MODE == "full":
+    _sync_from = datetime.now() - timedelta(days=WINDOW_DAYS)
+    print(f"🔄 SYNC_MODE=full → window: last {WINDOW_DAYS} days from {_sync_from.isoformat()}")
+else:
+    _cursor = _get_incremental_cursor()
+    if _cursor:
+        _sync_from = _cursor - timedelta(hours=SAFETY_OVERLAP_HOURS)
+        print(f"⚡ SYNC_MODE=incremental → cursor {_cursor.isoformat()}, fetch from {_sync_from.isoformat()} (overlap {SAFETY_OVERLAP_HOURS}h)")
+    else:
+        _sync_from = datetime.now() - timedelta(days=WINDOW_DAYS)
+        print(f"⚠️  No prior sync cursor → fallback: last {WINDOW_DAYS} days from {_sync_from.isoformat()}")
+
+DATE_FROM = _sync_from.strftime("%Y-%m-%d %H:%M:%S")
 
 OUTPUT_DIR  = Path(__file__).parent / "data"
 OUTPUT_DIR.mkdir(exist_ok=True)
