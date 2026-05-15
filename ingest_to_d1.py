@@ -211,6 +211,17 @@ def df_to_rows(df: pd.DataFrame, col_map: dict) -> list:
     return out
 
 
+def _raise_with_body(r: requests.Response, context: str):
+    """Print response body before raising — surfaces Worker's {error, detail} JSON in logs."""
+    try:
+        body = r.text[:1000]
+    except Exception:
+        body = "<unreadable body>"
+    print(f"❌ {context}: HTTP {r.status_code}", file=sys.stderr)
+    print(f"   response body: {body}", file=sys.stderr)
+    r.raise_for_status()
+
+
 def post_batch(worker_url: str, sync_key: str, entity: str, rows: list) -> dict:
     url = f"{worker_url.rstrip('/')}/api/dashboard/ingest"
     payload = {"entity": entity, "rows": rows}
@@ -220,7 +231,12 @@ def post_batch(worker_url: str, sync_key: str, entity: str, rows: list) -> dict:
         headers={"X-Sync-Key": sync_key, "Origin": "https://dreamcarua.github.io"},
         timeout=30,
     )
-    r.raise_for_status()
+    if not r.ok:
+        # Show first row sample so we can see if the data triggered SQL exception
+        sample = rows[0] if rows else None
+        sample_preview = json.dumps(sample, ensure_ascii=False, default=str)[:500] if sample else None
+        print(f"   first row sample: {sample_preview}", file=sys.stderr)
+        _raise_with_body(r, f"post_batch entity={entity} rows={len(rows)}")
     return r.json()
 
 
@@ -232,7 +248,8 @@ def post_sync_log(worker_url: str, sync_key: str, log: dict) -> dict:
         headers={"X-Sync-Key": sync_key, "Origin": "https://dreamcarua.github.io"},
         timeout=15,
     )
-    r.raise_for_status()
+    if not r.ok:
+        _raise_with_body(r, "post_sync_log")
     return r.json()
 
 
