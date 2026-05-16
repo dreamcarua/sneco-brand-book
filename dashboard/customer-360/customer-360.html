@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>snEco — Customer 360</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --y:#FEBF27;--g:#96C11F;--d:#1E1E1E;--bg:#F4F4EF;--card:#fff;
+  --muted:#8a8a8a;--border:#E5E5DC;--red:#E84040;--blue:#3B82F6;
+  --yf:rgba(254,191,39,.13);--gf:rgba(150,193,31,.12);--rf:rgba(232,64,64,.10);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--d);font-size:14px;min-height:100vh}
+
+/* ─── TOPBAR ─── */
+.topbar{background:var(--d);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-box{width:32px;height:32px;background:var(--y);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:var(--d);letter-spacing:-0.5px}
+.logo-text{color:#fff;font-size:15px;font-weight:700;letter-spacing:-.3px}
+.logo-sub{color:rgba(255,255,255,.4);font-size:11px;margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-green{background:rgba(150,193,31,.2);color:var(--g);border:1px solid rgba(150,193,31,.3)}
+.badge-gray{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1)}
+
+/* ─── SELECTOR ─── */
+.selector-bar{background:#fff;border-bottom:1px solid var(--border);padding:14px 24px;position:sticky;top:56px;z-index:150;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.search-wrap{position:relative;max-width:600px;margin:0 auto}
+.search-input{width:100%;padding:11px 16px 11px 42px;border:2px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s;background:#fff}
+.search-input:focus{border-color:var(--y)}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px;pointer-events:none}
+.search-results{position:absolute;top:48px;left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);max-height:400px;overflow-y:auto;z-index:200;display:none}
+.search-results.open{display:block}
+.search-result-item{padding:10px 16px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.search-result-item:hover{background:#FAFAF5}
+.search-result-item:last-child{border:none}
+.search-result-name{font-weight:600;color:var(--d)}
+.search-result-meta{font-size:11px;color:var(--muted);white-space:nowrap}
+.quick-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;justify-content:center}
+.quick-pill{padding:5px 12px;background:var(--yf);color:#996600;font-size:11px;font-weight:600;border-radius:14px;cursor:pointer;border:1px solid transparent;transition:all .15s}
+.quick-pill:hover{background:var(--y);color:var(--d);border-color:var(--y)}
+
+/* ─── LAYOUT ─── */
+.wrap{padding:20px 24px;max-width:1400px;margin:0 auto}
+.empty-hero{padding:80px 20px;text-align:center;color:var(--muted)}
+.empty-hero .eh-icon{font-size:60px;margin-bottom:14px;opacity:.5}
+.empty-hero .eh-title{font-size:18px;font-weight:700;color:var(--d);margin-bottom:6px}
+.empty-hero .eh-sub{font-size:13px;line-height:1.5}
+.sec{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:24px 0 12px;display:flex;align-items:center;gap:8px}
+.sec::after{content:'';flex:1;height:1px;background:var(--border)}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media(max-width:960px){.g4{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}}
+@media(max-width:620px){.g4,.g3,.g2{grid-template-columns:1fr}.topbar{padding:0 12px;height:48px}.wrap{padding:12px 10px}.selector-bar{padding:10px 12px;top:48px}}
+
+/* ─── HEADER CARD (customer info) ─── */
+.cust-header{background:linear-gradient(135deg, #1E1E1E 0%, #2A2A2A 100%);color:#fff;border-radius:14px;padding:24px 28px;margin-bottom:20px;position:relative;overflow:hidden}
+.cust-header::after{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle, rgba(254,191,39,0.15) 0%, transparent 70%);pointer-events:none}
+.cust-name{font-size:26px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px;line-height:1.2}
+.cust-meta{display:flex;flex-wrap:wrap;gap:12px 18px;font-size:13px;color:rgba(255,255,255,.75);margin-bottom:14px}
+.cust-meta-item{display:flex;align-items:center;gap:6px}
+.cust-meta-item a{color:var(--y);text-decoration:none}
+.cust-meta-item a:hover{text-decoration:underline}
+.cust-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.cust-tag{padding:3px 10px;background:rgba(254,191,39,.18);color:var(--y);font-size:11px;font-weight:600;border-radius:10px;border:1px solid rgba(254,191,39,.3)}
+
+/* ─── KPI CARDS ─── */
+.kpi{background:var(--card);border-radius:12px;padding:16px 18px;border:1px solid var(--border);position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px}
+.kpi.cy::after{background:var(--y)}
+.kpi.cg::after{background:var(--g)}
+.kpi.cr::after{background:var(--red)}
+.kpi.cb::after{background:var(--blue)}
+.kpi-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:6px}
+.kpi-val{font-size:24px;font-weight:800;color:var(--d);line-height:1.1}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:6px}
+
+/* ─── CHART CARDS ─── */
+.cc{background:var(--card);border-radius:12px;padding:18px 20px;border:1px solid var(--border)}
+.cc-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.cc-title{font-size:14px;font-weight:700;color:var(--d)}
+.cc-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.chart-h220{height:220px;position:relative}
+.chart-h280{height:280px;position:relative}
+
+/* ─── INSIGHTS ─── */
+.insight{padding:14px 18px;border-radius:10px;font-size:13px;line-height:1.55;display:flex;align-items:flex-start;gap:10px}
+.insight.green{background:rgba(150,193,31,.08);color:#4a7000;border-left:3px solid var(--g)}
+.insight.yellow{background:rgba(254,191,39,.08);color:#996600;border-left:3px solid var(--y)}
+.insight.red{background:rgba(232,64,64,.06);color:#a00;border-left:3px solid var(--red)}
+.insight-icon{font-size:18px;flex-shrink:0;margin-top:-2px}
+.insights-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:620px){.insights-grid{grid-template-columns:1fr}}
+
+/* ─── TIMELINE ─── */
+.timeline{padding:6px 0}
+.tl-item{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);align-items:flex-start}
+.tl-item:last-child{border:none}
+.tl-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.tl-icon.demand{background:rgba(150,193,31,.15);color:#4a7000}
+.tl-icon.payment{background:rgba(254,191,39,.18);color:#996600}
+.tl-icon.order{background:rgba(59,130,246,.13);color:#1d5fa6}
+.tl-icon.return{background:rgba(232,64,64,.12);color:var(--red)}
+.tl-icon.invoice{background:rgba(138,138,138,.15);color:#555}
+.tl-body{flex:1;min-width:0}
+.tl-meta{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+.tl-title{font-size:13px;font-weight:600;color:var(--d);margin-top:2px;line-height:1.4}
+.tl-amount{font-size:13px;font-weight:700;color:var(--d);text-align:right;white-space:nowrap}
+.tl-amount.neg{color:var(--red)}
+.tl-amount.pos{color:#4a7000}
+
+/* ─── DATA TABLE ─── */
+.dt{width:100%;border-collapse:collapse;font-size:13px}
+.dt th{text-align:left;padding:8px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:2px solid var(--border)}
+.dt td{padding:8px 12px;border-bottom:1px solid var(--border)}
+.dt tr:last-child td{border:none}
+.dt tr:hover td{background:#FAFAF5}
+.rank{font-weight:800;color:var(--y);font-size:13px;width:28px}
+
+/* ─── QUICK ACTIONS ─── */
+.actions-bar{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.act-btn{padding:8px 14px;border-radius:8px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:600;color:var(--d);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s;text-decoration:none}
+.act-btn:hover{border-color:var(--y);background:var(--yf)}
+.act-btn.primary{background:var(--y);color:var(--d);border-color:var(--y)}
+.act-btn.primary:hover{background:#e4ab1f}
+
+/* ─── NOTES ─── */
+.notes-block{background:#FFFBE6;border:1px solid #F5E5A5;border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.6;color:#5c4400}
+.notes-block .nb-title{font-size:11px;text-transform:uppercase;letter-spacing:.6px;font-weight:700;color:#7a5a00;margin-bottom:8px}
+.notes-block pre{font-family:inherit;white-space:pre-wrap;word-wrap:break-word;margin:0;font-size:13px}
+
+/* ─── EMPTY STATE ─── */
+.empty-state{padding:36px 20px;text-align:center;color:var(--muted)}
+.empty-state .es-icon{font-size:30px;margin-bottom:8px}
+.empty-state .es-title{font-weight:600;color:#666;margin-bottom:5px;font-size:13px}
+.empty-state .es-sub{font-size:12px}
+
+/* ─── LOADER ─── */
+.loader{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--y);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ─── FOOTER ─── */
+.footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:20px}
+
+/* === OTP gate === */
+#dashauth-overlay{position:fixed;inset:0;background:#1E1E1E;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+#dashauth-overlay.is-hidden{display:none}
+.dashauth-card{background:#fff;width:100%;max-width:440px;border-radius:14px;padding:36px 30px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.dashauth-logo{font-size:24px;font-weight:900;color:#FEBF27;margin-bottom:6px;letter-spacing:-0.5px;text-align:center}
+.dashauth-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#888;text-align:center;margin-bottom:24px}
+.dashauth-icon{font-size:36px;text-align:center;margin-bottom:16px}
+.dashauth-h1{font-size:18px;font-weight:800;text-align:center;color:#1E1E1E;margin-bottom:6px}
+.dashauth-desc{font-size:13px;color:#666;text-align:center;line-height:1.55;margin-bottom:20px}
+.dashauth-input{width:100%;padding:12px 14px;border:2px solid #E5E5DC;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
+.dashauth-input:focus{border-color:#FEBF27}
+.dashauth-input.code{font-family:'SF Mono',Menlo,Consolas,monospace;letter-spacing:.4em;text-align:center;font-size:18px}
+.dashauth-btn{width:100%;padding:13px;background:#1E1E1E;color:#fff;border:0;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;margin-top:14px;font-family:inherit;transition:background .15s}
+.dashauth-btn:hover{background:#000}
+.dashauth-btn:disabled{opacity:.5;cursor:not-allowed}
+.dashauth-msg{font-size:12.5px;line-height:1.5;margin-top:12px;text-align:center;min-height:18px}
+.dashauth-msg.is-error{color:#DC2626}
+.dashauth-msg a{color:#FEBF27;font-weight:600;text-decoration:underline}
+.dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
+.dashauth-back:hover{color:#FEBF27}
+.dashauth-session{position:fixed;top:64px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-family:-apple-system,sans-serif;font-weight:600;display:flex;align-items:center;gap:8px}
+.dashauth-session button{background:none;border:0;color:#96C11F;cursor:pointer;font-size:14px;padding:0;line-height:1}
+body.dash-locked{overflow:hidden}
+</style>
+</head>
+<body class="dash-locked">
+
+<!-- ===== OTP GATE OVERLAY ===== -->
+<div id="dashauth-overlay">
+  <div class="dashauth-card">
+    <div class="dashauth-logo">snEco</div>
+    <div class="dashauth-sub">Customer 360 · Confidential</div>
+    <div id="dashauth-stage"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const WORKER = 'https://sneco-auth.vg-ab6.workers.dev';
+  const BLOCK = 'customer-dashboard';
+  const STORAGE_KEY = 'snEco-jwt-' + BLOCK;
+  const overlay = document.getElementById('dashauth-overlay');
+  const stage = document.getElementById('dashauth-stage');
+  let email = '';
+
+  function unlock(token, em, exp){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({token, email:em, exp})); } catch(e){}
+    document.body.classList.remove('dash-locked');
+    overlay.classList.add('is-hidden');
+    showSessionBadge(em, exp);
+    if (typeof window.bootCustomer360 === 'function') window.bootCustomer360(token);
+  }
+  function showSessionBadge(em, exp){
+    const b = document.createElement('div');
+    b.className = 'dashauth-session';
+    const mins = Math.max(0, Math.floor((exp*1000 - Date.now())/60000));
+    b.innerHTML = '✓ ' + em + ' · ' + mins + ' min <button title="Lock">🔒</button>';
+    b.querySelector('button').onclick = () => { localStorage.removeItem(STORAGE_KEY); location.reload(); };
+    document.body.appendChild(b);
+  }
+  async function verifyExisting(){
+    let s; try { s = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null'); } catch(e){}
+    if (!s || !s.token || !s.exp || s.exp*1000 < Date.now()) return null;
+    try {
+      const r = await fetch(WORKER+'/api/session/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({token: s.token, block: BLOCK})});
+      const j = await r.json();
+      return j.ok ? s : null;
+    } catch(e) { return null; }
+  }
+  function renderEmail(){
+    stage.innerHTML = `
+      <div class="dashauth-icon">👥</div>
+      <div class="dashauth-h1">Введіть email</div>
+      <div class="dashauth-desc">Customer 360 — детальний аналіз кожного клієнта. Якщо ваш email у whitelist — на нього надійде 6-значний код. Сесія діє 1 годину.</div>
+      <input class="dashauth-input" type="email" id="auth-em" placeholder="ім'я@sneco.ua" autocomplete="email" autofocus>
+      <button class="dashauth-btn" id="auth-send">Надіслати код</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="../" class="dashauth-back">← Каталог дашбордів</a>
+    `;
+    const em = document.getElementById('auth-em');
+    const send = document.getElementById('auth-send');
+    const msg = document.getElementById('auth-msg');
+    em.addEventListener('keydown', e=>{ if(e.key==='Enter') send.click(); });
+    send.onclick = async () => {
+      const v = em.value.trim();
+      if (!v || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { msg.textContent='Введіть правильний email.'; msg.className='dashauth-msg is-error'; return; }
+      send.disabled = true; send.textContent = 'Надсилаємо...'; msg.textContent='';
+      try {
+        const r = await fetch(WORKER+'/api/otp/request', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email:v, block: BLOCK})});
+        if (!r.ok) {
+          const j = await r.json().catch(()=>({}));
+          if (j.error === 'not_in_whitelist') {
+            msg.innerHTML = `❌ Цього email немає у whitelist. <a href="mailto:vg@sneco.ua?subject=Customer%20360%20whitelist">✉ Запит до vg@sneco.ua</a>`;
+          } else {
+            msg.textContent = 'Помилка: ' + (j.error || r.status);
+          }
+          msg.className='dashauth-msg is-error';
+          send.disabled=false; send.textContent='Надіслати код'; return;
+        }
+        email = v;
+        renderCode();
+      } catch(e) {
+        msg.textContent = 'Помилка мережі: ' + e.message;
+        msg.className='dashauth-msg is-error';
+        send.disabled=false; send.textContent='Надіслати код';
+      }
+    };
+  }
+  function renderCode(){
+    stage.innerHTML = `
+      <div class="dashauth-icon">🔢</div>
+      <div class="dashauth-h1">Введіть код з листа</div>
+      <div class="dashauth-desc">${email}<br>Код надіслано — перевірте пошту (включно зі спамом).</div>
+      <input class="dashauth-input code" type="text" id="auth-code" inputmode="numeric" maxlength="6" placeholder="••••••" autofocus>
+      <button class="dashauth-btn" id="auth-verify">Підтвердити</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="#" class="dashauth-back" id="auth-back">← Інший email</a>
+    `;
+    const code = document.getElementById('auth-code');
+    const verify = document.getElementById('auth-verify');
+    const msg = document.getElementById('auth-msg');
+    code.addEventListener('keydown', e=>{ if(e.key==='Enter') verify.click(); });
+    document.getElementById('auth-back').onclick = e=>{ e.preventDefault(); renderEmail(); };
+    verify.onclick = async () => {
+      const c = code.value.trim();
+      if (!/^\d{6}$/.test(c)) { msg.textContent='Код — 6 цифр.'; msg.className='dashauth-msg is-error'; return; }
+      verify.disabled=true; verify.textContent='Перевіряємо...'; msg.textContent='';
+      try {
+        const r = await fetch(WORKER+'/api/otp/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, block: BLOCK, code: c})});
+        const j = await r.json();
+        if (!r.ok) { msg.textContent = 'Невірний або застарілий код.'; msg.className='dashauth-msg is-error'; verify.disabled=false; verify.textContent='Підтвердити'; return; }
+        unlock(j.token, j.email, j.exp);
+      } catch(e) {
+        msg.textContent = 'Помилка: ' + e.message; msg.className='dashauth-msg is-error';
+        verify.disabled=false; verify.textContent='Підтвердити';
+      }
+    };
+  }
+
+  (async()=>{
+    const sess = await verifyExisting();
+    if (sess) { unlock(sess.token, sess.email, sess.exp); return; }
+    renderEmail();
+  })();
+})();
+</script>
+<!-- ===== END OTP GATE ===== -->
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-box">sn</div>
+    <div>
+      <div class="logo-text">snEco · Customer 360</div>
+      <div class="logo-sub">Детальний профіль клієнта</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span class="badge badge-green" id="syncStatus">✓ Перевіряємо sync...</span>
+    <span class="badge badge-gray" id="lastUpdate">—</span>
+  </div>
+</div>
+
+<!-- SELECTOR -->
+<div class="selector-bar">
+  <div class="search-wrap">
+    <div class="search-icon">🔍</div>
+    <input type="text" class="search-input" id="custSearch" placeholder="Знайди клієнта за назвою / ЄДРПОУ / email…" autocomplete="off">
+    <div class="search-results" id="searchResults"></div>
+  </div>
+  <div class="quick-pills" id="quickPills">
+    <span style="color:var(--muted);font-size:11px;padding:5px 0">Завантажуємо TOP-10 клієнтів…</span>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="wrap" id="contentWrap">
+  <div class="empty-hero">
+    <div class="eh-icon">👥</div>
+    <div class="eh-title">Оберіть клієнта</div>
+    <div class="eh-sub">Введіть назву або ЄДРПОУ у пошуку зверху,<br>або клікніть на швидкий вибір нижче.</div>
+  </div>
+</div>
+
+<div class="footer">
+  snEco Customer 360 · МойСклад API · Оновлення: щодня 06:00
+</div>
+
+<script>
+// ============================================================================
+// CUSTOMER 360 — main logic
+// ============================================================================
+const WORKER = 'https://sneco-auth.vg-ab6.workers.dev';
+const STORAGE_KEY = 'snEco-jwt-customer-dashboard';
+
+// Global data caches
+let allCounterparties = [];   // for search/select
+let allDemands = [];          // for revenue, timeline
+let allPayments = [];         // for AR, payment cadence
+let allOrders = [];           // for pipeline (unshipped)
+let allInvoices = [];         // for AR overdue
+let allReturns = [];          // for return rate
+
+let _token = null;
+let _charts = {};
+
+// Number formatters
+const nf  = n => Number(n||0).toLocaleString('uk-UA');
+const nfm = n => (Math.abs(n) >= 1e6 ? (n/1e6).toFixed(1) + 'M' : Math.abs(n) >= 1e3 ? (n/1e3).toFixed(0) + 'K' : Math.round(n));
+const df  = d => { try { return new Date(d).toLocaleDateString('uk-UA', {day:'2-digit', month:'2-digit', year:'numeric'}); } catch(e){ return d; }};
+const dfShort = d => { try { return new Date(d).toLocaleDateString('uk-UA', {day:'2-digit', month:'2-digit'}); } catch(e){ return d; }};
+
+async function fetchJson(type, opts){
+  const body = Object.assign({ type, limit: 50000 }, opts || {});
+  const r = await fetch(WORKER + '/api/dashboard/data', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + _token },
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) throw new Error(`${type}: HTTP ${r.status}`);
+  const j = await r.json();
+  return j.rows || j.results || [];
+}
+
+// === Boot ===
+window.bootCustomer360 = async function(token){
+  _token = token;
+  updateSyncBadge();
+  document.getElementById('quickPills').innerHTML = '<span style="color:var(--muted);font-size:11px;padding:5px 0">⏳ Завантажуємо дані з D1…</span>';
+
+  try {
+    // Parallel fetch all data
+    const [cp, dem, pay, ord, inv, ret] = await Promise.all([
+      fetchJson('counterparties'),
+      fetchJson('demands'),
+      fetchJson('payments'),
+      fetchJson('orders'),
+      fetchJson('invoices_out'),
+      fetchJson('returns'),
+    ]);
+    allCounterparties = cp || [];
+    allDemands = dem || [];
+    allPayments = pay || [];
+    allOrders = ord || [];
+    allInvoices = inv || [];
+    allReturns = ret || [];
+
+    // Compute aggregated revenue per client for ranking
+    const revMap = {};
+    allDemands.forEach(d => {
+      const k = d.agent || '';
+      if (!k) return;
+      revMap[k] = (revMap[k]||0) + (d.sum_kop||0)/100;
+    });
+    // Attach revenue to counterparties
+    allCounterparties.forEach(c => {
+      c.__revenue = revMap[c.name] || 0;
+      c.__lastOrder = null;
+    });
+    allDemands.forEach(d => {
+      const c = allCounterparties.find(x => x.name === d.agent);
+      if (c) {
+        const dt = d.ms_moment;
+        if (!c.__lastOrder || dt > c.__lastOrder) c.__lastOrder = dt;
+      }
+    });
+
+    renderQuickPills();
+    setupSearch();
+    console.log(`Loaded: ${allCounterparties.length} clients, ${allDemands.length} demands, ${allPayments.length} payments`);
+  } catch(e) {
+    console.error('Boot error', e);
+    document.getElementById('contentWrap').innerHTML = `
+      <div class="empty-hero">
+        <div class="eh-icon">⚠️</div>
+        <div class="eh-title">Не вдалось завантажити дані</div>
+        <div class="eh-sub">${e.message}<br><br>Перевір що Worker задеплоєний з блоком <code>customer-dashboard</code> і що cron sync пройшов.</div>
+      </div>`;
+  }
+};
+
+function renderQuickPills(){
+  const top = [...allCounterparties]
+    .filter(c => c.__revenue > 0 && !c.archived)
+    .sort((a,b) => b.__revenue - a.__revenue)
+    .slice(0, 12);
+  const html = top.map(c => `<span class="quick-pill" onclick="selectCustomer('${escapeAttr(c.name)}')">${escapeHtml(c.name)}</span>`).join('');
+  document.getElementById('quickPills').innerHTML = top.length
+    ? html
+    : '<span style="color:var(--muted);font-size:11px;padding:5px 0">Жодного клієнта з даними</span>';
+}
+
+function setupSearch(){
+  const input = document.getElementById('custSearch');
+  const results = document.getElementById('searchResults');
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    if (q.length < 2) { results.classList.remove('open'); return; }
+    const matches = allCounterparties
+      .filter(c => {
+        const blob = `${c.name||''} ${c.inn||''} ${c.edrpou||''} ${c.email||''} ${c.code||''}`.toLowerCase();
+        return blob.includes(q);
+      })
+      .sort((a,b) => (b.__revenue||0) - (a.__revenue||0))
+      .slice(0, 20);
+    if (matches.length === 0) {
+      results.innerHTML = '<div class="search-result-item" style="color:var(--muted);cursor:default">Нічого не знайдено</div>';
+    } else {
+      results.innerHTML = matches.map(c => `
+        <div class="search-result-item" onclick="selectCustomer('${escapeAttr(c.name)}')">
+          <div>
+            <div class="search-result-name">${escapeHtml(c.name)}</div>
+            <div class="search-result-meta">${c.inn ? 'ІНН ' + c.inn + ' · ' : ''}${c.email || ''}</div>
+          </div>
+          <div class="search-result-meta">${nfm(c.__revenue)} ₴</div>
+        </div>
+      `).join('');
+    }
+    results.classList.add('open');
+  });
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.search-wrap')) results.classList.remove('open');
+  });
+}
+
+window.selectCustomer = function(name){
+  const c = allCounterparties.find(x => x.name === name);
+  if (!c) {
+    alert('Клієнт не знайдений: ' + name);
+    return;
+  }
+  document.getElementById('custSearch').value = c.name;
+  document.getElementById('searchResults').classList.remove('open');
+  renderCustomerView(c);
+  window.scrollTo({top: document.querySelector('.selector-bar').offsetHeight + 60, behavior: 'smooth'});
+};
+
+function renderCustomerView(c){
+  // Filter all data for this customer (by agent name match)
+  const dems = allDemands.filter(d => d.agent === c.name).sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''));
+  const pays = allPayments.filter(p => p.agent === c.name).sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''));
+  const ords = allOrders.filter(o => o.agent === c.name).sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''));
+  const invs = allInvoices.filter(i => i.agent === c.name).sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''));
+  const rets = allReturns.filter(r => r.agent === c.name).sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''));
+
+  // === KPIs ===
+  const ltv = dems.reduce((a,d) => a + (d.sum_kop||0)/100, 0);
+  const ordersCount = dems.length;
+  const aov = ordersCount ? ltv / ordersCount : 0;
+  const lastOrder = dems.length ? dems[0].ms_moment : null;
+  const daysSinceLast = lastOrder ? Math.floor((Date.now() - new Date(lastOrder).getTime()) / 86400000) : null;
+  const arBalance = dems.reduce((a,d) => a + ((d.sum_kop||0) - (d.payed_sum_kop||0))/100, 0);
+  const totalReturns = rets.reduce((a,r) => a + (r.sum_kop||0)/100, 0);
+  const returnRate = ltv > 0 ? (totalReturns/ltv*100) : 0;
+
+  // === Cadence ===
+  let avgCadenceDays = null;
+  if (dems.length >= 2) {
+    const dates = dems.map(d => new Date(d.ms_moment).getTime()).sort((a,b) => a-b);
+    const gaps = [];
+    for (let i=1; i<dates.length; i++) gaps.push((dates[i]-dates[i-1])/86400000);
+    avgCadenceDays = Math.round(gaps.reduce((a,x) => a+x, 0) / gaps.length);
+  }
+
+  // === Churn risk ===
+  let churnRisk = 'low', churnRiskLabel = '🟢 Активний';
+  if (daysSinceLast !== null && avgCadenceDays) {
+    const ratio = daysSinceLast / avgCadenceDays;
+    if (ratio > 3) { churnRisk = 'high'; churnRiskLabel = '🔴 Високий ризик відходу'; }
+    else if (ratio > 1.5) { churnRisk = 'medium'; churnRiskLabel = '🟡 Уже мав би замовити'; }
+  } else if (daysSinceLast > 90) {
+    churnRisk = 'high'; churnRiskLabel = '🔴 Високий ризик відходу';
+  }
+
+  // === Rank vs others ===
+  const allClientsByRev = allCounterparties.filter(x => x.__revenue > 0).sort((a,b) => b.__revenue - a.__revenue);
+  const rank = allClientsByRev.findIndex(x => x.name === c.name) + 1;
+  const totalClients = allClientsByRev.length;
+  const totalRevAll = allClientsByRev.reduce((a,x) => a+x.__revenue, 0);
+  const sharePct = totalRevAll ? (ltv/totalRevAll*100) : 0;
+
+  // === Revenue trend ===
+  const revByMonth = {};
+  dems.forEach(d => {
+    const ym = (d.ms_moment||'').slice(0,7);
+    if (!ym) return;
+    revByMonth[ym] = (revByMonth[ym]||0) + (d.sum_kop||0)/100;
+  });
+  const revMonths = Object.keys(revByMonth).sort();
+
+  // === Product mix (from raw_json positions) ===
+  const productMap = {};
+  dems.forEach(d => {
+    let raw = {};
+    try { raw = typeof d.raw_json === 'string' ? JSON.parse(d.raw_json) : (d.raw_json||{}); } catch(e){}
+    const prod = raw['Товар'] || raw['product'] || null;
+    if (prod) {
+      productMap[prod] = (productMap[prod]||0) + (d.sum_kop||0)/100;
+    }
+  });
+  const topProducts = Object.entries(productMap)
+    .sort((a,b) => b[1]-a[1])
+    .slice(0, 10);
+
+  // === Payment cadence (DSO per customer) ===
+  let custDSO = null;
+  if (invs.length) {
+    const paidInvs = invs.filter(i => i.payed_sum_kop && i.payment_planned_moment);
+    if (paidInvs.length) {
+      const avg = paidInvs.reduce((a,i) => {
+        const planned = new Date(i.payment_planned_moment).getTime();
+        // approximate payment date from raw or just use ms_moment of invoice + payment_planned
+        return a + Math.max(0, (Date.now() - planned)/86400000);
+      }, 0) / paidInvs.length;
+      custDSO = Math.round(avg);
+    }
+  }
+
+  // === Build HTML ===
+  const tags = (c.tags||'').split(',').map(t=>t.trim()).filter(Boolean);
+  const html = `
+    <!-- HEADER CARD -->
+    <div class="cust-header">
+      <div class="cust-name">${escapeHtml(c.name)}</div>
+      <div class="cust-meta">
+        ${c.company_type ? `<span class="cust-meta-item">📋 ${escapeHtml(c.company_type)}</span>` : ''}
+        ${c.inn ? `<span class="cust-meta-item">🧾 ІНН: ${escapeHtml(c.inn)}</span>` : ''}
+        ${c.edrpou ? `<span class="cust-meta-item">🏢 ЄДРПОУ: ${escapeHtml(c.edrpou)}</span>` : ''}
+        ${c.code ? `<span class="cust-meta-item">№ ${escapeHtml(c.code)}</span>` : ''}
+        ${c.email ? `<span class="cust-meta-item">✉ <a href="mailto:${escapeAttr(c.email)}">${escapeHtml(c.email)}</a></span>` : ''}
+        ${c.phone ? `<span class="cust-meta-item">📞 <a href="tel:${escapeAttr(c.phone)}">${escapeHtml(c.phone)}</a></span>` : ''}
+        ${c.legal_address ? `<span class="cust-meta-item">📍 ${escapeHtml(c.legal_address.slice(0,80))}${c.legal_address.length>80?'…':''}</span>` : ''}
+      </div>
+      ${tags.length ? `<div class="cust-tags">${tags.map(t => `<span class="cust-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+      <div class="actions-bar">
+        ${c.email ? `<a href="mailto:${escapeAttr(c.email)}" class="act-btn primary">✉ Написати лист</a>` : ''}
+        ${c.phone ? `<a href="tel:${escapeAttr(c.phone)}" class="act-btn">📞 Подзвонити</a>` : ''}
+        <button class="act-btn" onclick="window.print()">🖨 Print / PDF</button>
+        <button class="act-btn" onclick="copySummary('${escapeAttr(c.name)}')">📋 Copy summary</button>
+      </div>
+    </div>
+
+    <!-- KPI STRIP -->
+    <div class="g4">
+      <div class="kpi cg">
+        <div class="kpi-lbl">Lifetime Revenue</div>
+        <div class="kpi-val">${nfm(ltv)} ₴</div>
+        <div class="kpi-sub">${nf(Math.round(ltv))} ₴ точно</div>
+      </div>
+      <div class="kpi cy">
+        <div class="kpi-lbl">Кількість замовлень</div>
+        <div class="kpi-val">${nf(ordersCount)}</div>
+        <div class="kpi-sub">${avgCadenceDays ? 'кожні ' + avgCadenceDays + ' дн' : 'mало даних'}</div>
+      </div>
+      <div class="kpi cb">
+        <div class="kpi-lbl">Останнє замовлення</div>
+        <div class="kpi-val" style="font-size:18px">${lastOrder ? df(lastOrder) : '—'}</div>
+        <div class="kpi-sub">${daysSinceLast !== null ? daysSinceLast + ' днів тому' : '—'}</div>
+      </div>
+      <div class="kpi ${arBalance>0?'cr':'cg'}">
+        <div class="kpi-lbl">Дебіторка</div>
+        <div class="kpi-val">${nfm(arBalance)} ₴</div>
+        <div class="kpi-sub">${arBalance > 0 ? '⚠ є борг' : '✓ оплачено'}</div>
+      </div>
+    </div>
+
+    <!-- AOV + Rank + ReturnRate + Pipeline -->
+    <div class="g4" style="margin-top:14px">
+      <div class="kpi">
+        <div class="kpi-lbl">Avg Order Value</div>
+        <div class="kpi-val">${nfm(aov)} ₴</div>
+      </div>
+      <div class="kpi cy">
+        <div class="kpi-lbl">Rank vs усіх клієнтів</div>
+        <div class="kpi-val">#${rank} <span style="font-size:13px;color:var(--muted)">з ${totalClients}</span></div>
+        <div class="kpi-sub">${sharePct.toFixed(2)}% загальної виручки</div>
+      </div>
+      <div class="kpi ${returnRate>5?'cr':'cg'}">
+        <div class="kpi-lbl">Return rate</div>
+        <div class="kpi-val">${returnRate.toFixed(1)}%</div>
+        <div class="kpi-sub">${nf(Math.round(totalReturns))} ₴ повернень</div>
+      </div>
+      <div class="kpi cb">
+        <div class="kpi-lbl">Активні замовлення</div>
+        <div class="kpi-val">${nf(ords.filter(o => ((o.sum_kop||0) - (o.shipped_sum_kop||0)) > 0).length)}</div>
+        <div class="kpi-sub">не відвантажені</div>
+      </div>
+    </div>
+
+    <!-- INSIGHTS -->
+    <div class="sec">🧠 Auto-insights</div>
+    <div class="insights-grid">
+      <div class="insight ${churnRisk==='high'?'red':churnRisk==='medium'?'yellow':'green'}">
+        <div class="insight-icon">${churnRisk==='high'?'⚠️':churnRisk==='medium'?'🟡':'✅'}</div>
+        <div><strong>${churnRiskLabel}</strong>
+          ${daysSinceLast !== null && avgCadenceDays ? `<br><span style="color:var(--muted)">Зазвичай замовляє кожні ${avgCadenceDays} днів, минуло ${daysSinceLast}</span>` : ''}
+        </div>
+      </div>
+      <div class="insight ${arBalance > aov ? 'red' : arBalance > 0 ? 'yellow' : 'green'}">
+        <div class="insight-icon">${arBalance > aov ? '💸' : arBalance > 0 ? '💰' : '✅'}</div>
+        <div><strong>${arBalance > aov ? `Висока дебіторка: ${nfm(arBalance)} ₴ (більше ніж AOV)` : arBalance > 0 ? `Невелика дебіторка ${nfm(arBalance)} ₴` : 'Усе оплачено вчасно'}</strong>
+          ${arBalance > 0 ? `<br><span style="color:var(--muted)">Подзвонити з нагадуванням</span>` : ''}
+        </div>
+      </div>
+      <div class="insight ${sharePct > 5 ? 'yellow' : 'green'}">
+        <div class="insight-icon">${sharePct > 10 ? '🎯' : sharePct > 5 ? '⭐' : '👤'}</div>
+        <div><strong>${sharePct > 10 ? 'Strategic account' : sharePct > 5 ? 'Top-tier client' : 'Стандартний клієнт'}</strong>
+          <br><span style="color:var(--muted)">${sharePct.toFixed(2)}% загальної виручки snEco · rank #${rank}</span>
+        </div>
+      </div>
+      <div class="insight ${returnRate > 10 ? 'red' : returnRate > 5 ? 'yellow' : 'green'}">
+        <div class="insight-icon">${returnRate > 5 ? '↩️' : '👍'}</div>
+        <div><strong>${returnRate > 10 ? 'Високий return rate' : returnRate > 5 ? 'Помірні повернення' : 'Низькі повернення'}</strong>
+          <br><span style="color:var(--muted)">${returnRate.toFixed(1)}% від виручки</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVENUE TREND -->
+    <div class="sec">📈 Динаміка виручки</div>
+    <div class="cc">
+      <div class="cc-head">
+        <div>
+          <div class="cc-title">Виручка по місяцях</div>
+          <div class="cc-sub">${revMonths.length ? `${revMonths[0]} → ${revMonths[revMonths.length-1]}` : 'Немає даних'}</div>
+        </div>
+      </div>
+      <div class="chart-h280"><canvas id="revChart"></canvas></div>
+    </div>
+
+    <!-- PRODUCT MIX + TIMELINE -->
+    <div class="g2" style="margin-top:14px">
+      <div class="cc">
+        <div class="cc-head">
+          <div>
+            <div class="cc-title">🛒 ТОП-10 продуктів</div>
+            <div class="cc-sub">За загальною виручкою</div>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="dt">
+            <thead><tr><th style="width:30px">#</th><th>Продукт</th><th style="text-align:right">Виручка</th></tr></thead>
+            <tbody>
+              ${topProducts.length
+                ? topProducts.map(([p,r],i) => `<tr><td class="rank">${i+1}</td><td style="font-size:12px">${escapeHtml(p)}</td><td style="text-align:right;font-weight:600">${nfm(r)} ₴</td></tr>`).join('')
+                : `<tr><td colspan="3"><div class="empty-state"><div class="es-icon">🛒</div><div class="es-title">Немає деталізації</div><div class="es-sub">Демонстрації не мали position rows</div></div></td></tr>`
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="cc">
+        <div class="cc-head">
+          <div>
+            <div class="cc-title">🕐 Останні 20 подій</div>
+            <div class="cc-sub">Хронологія активності</div>
+          </div>
+        </div>
+        <div class="timeline" id="timelineBody"></div>
+      </div>
+    </div>
+
+    <!-- NOTES from raw_json -->
+    ${renderNotes(c)}
+
+    <!-- COMPARISON -->
+    <div class="sec">📊 Порівняння з усіма клієнтами</div>
+    <div class="g3">
+      <div class="kpi">
+        <div class="kpi-lbl">Avg клієнт</div>
+        <div class="kpi-val">${nfm(totalRevAll/totalClients)} ₴</div>
+        <div class="kpi-sub">середня LTV</div>
+      </div>
+      <div class="kpi cy">
+        <div class="kpi-lbl">Цей клієнт</div>
+        <div class="kpi-val">${nfm(ltv)} ₴</div>
+        <div class="kpi-sub">${(ltv / (totalRevAll/totalClients)).toFixed(1)}× від середнього</div>
+      </div>
+      <div class="kpi cg">
+        <div class="kpi-lbl">Percentile</div>
+        <div class="kpi-val">${Math.round((1 - (rank-1)/totalClients) * 100)}%</div>
+        <div class="kpi-sub">кращий за ${Math.round((1 - (rank-1)/totalClients) * 100)}% клієнтів</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('contentWrap').innerHTML = html;
+
+  // Render chart after DOM ready
+  setTimeout(() => {
+    const ctx = document.getElementById('revChart');
+    if (ctx && revMonths.length) {
+      if (_charts.rev) _charts.rev.destroy();
+      _charts.rev = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: revMonths,
+          datasets: [{
+            label: 'Виручка, ₴',
+            data: revMonths.map(m => revByMonth[m]),
+            backgroundColor: 'rgba(254,191,39,.7)',
+            borderColor: '#FEBF27',
+            borderWidth: 1,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { ticks: { callback: v => nfm(v) + ' ₴' } } }
+        }
+      });
+    }
+
+    // Render timeline
+    const events = [
+      ...dems.slice(0, 30).map(d => ({type:'demand', date: d.ms_moment, title: `Відвантаження ${d.name||''}`, amount: (d.sum_kop||0)/100, icon:'📦'})),
+      ...pays.slice(0, 30).map(p => ({type:'payment', date: p.ms_moment, title: `Оплата ${p.payment_type||''} ${p.name||''}`, amount: (p.sum_kop||0)/100, icon:'💰'})),
+      ...ords.slice(0, 20).map(o => ({type:'order', date: o.ms_moment, title: `Замовлення ${o.name||''}`, amount: (o.sum_kop||0)/100, icon:'📋'})),
+      ...rets.slice(0, 10).map(r => ({type:'return', date: r.ms_moment, title: `Повернення ${r.name||''}`, amount: -(r.sum_kop||0)/100, icon:'↩️'})),
+      ...invs.slice(0, 10).map(i => ({type:'invoice', date: i.ms_moment, title: `Рахунок ${i.name||''}`, amount: (i.sum_kop||0)/100, icon:'🧾'})),
+    ].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 20);
+
+    document.getElementById('timelineBody').innerHTML = events.length
+      ? events.map(e => `
+        <div class="tl-item">
+          <div class="tl-icon ${e.type}">${e.icon}</div>
+          <div class="tl-body">
+            <div class="tl-meta">${dfShort(e.date)} · ${e.type}</div>
+            <div class="tl-title">${escapeHtml(e.title)}</div>
+          </div>
+          <div class="tl-amount ${e.amount<0?'neg':e.type==='payment'?'pos':''}">${nf(Math.round(e.amount))} ₴</div>
+        </div>
+      `).join('')
+      : `<div class="empty-state"><div class="es-icon">📭</div><div class="es-title">Немає історії</div></div>`;
+  }, 50);
+}
+
+function renderNotes(c){
+  // Extract notes from raw_json — МойСклад description / custom attributes
+  let raw = {};
+  try { raw = typeof c.raw_json === 'string' ? JSON.parse(c.raw_json) : (c.raw_json||{}); } catch(e) {}
+
+  const notes = raw['Коментар'] || raw['description'] || '';
+  const attrs = raw['attributes'] || [];
+  const balance = raw['Баланс, грн'] || raw['balance'] || null;
+  const overdue = raw['Борг прострочений'] || raw['overdueDebt'] || null;
+  const status = raw['Статус'] || raw['state'] || null;
+
+  if (!notes && !attrs.length && balance == null && !status) return '';
+
+  return `
+    <div class="sec">📝 Деталі картки контрагента (МойСклад)</div>
+    <div class="g2">
+      ${notes ? `
+        <div class="notes-block">
+          <div class="nb-title">📌 Коментар</div>
+          <pre>${escapeHtml(String(notes))}</pre>
+        </div>` : ''}
+      ${(balance !== null || overdue !== null || status) ? `
+        <div class="cc">
+          <div class="cc-title" style="margin-bottom:8px">Фінансові показники</div>
+          <table class="dt">
+            ${balance !== null ? `<tr><td>Баланс МойСклад</td><td style="text-align:right;font-weight:600">${nf(Math.round(parseFloat(balance)||0))} ₴</td></tr>` : ''}
+            ${overdue !== null && overdue > 0 ? `<tr><td>Прострочений борг</td><td style="text-align:right;color:var(--red);font-weight:600">${nf(Math.round(parseFloat(overdue)||0))} ₴</td></tr>` : ''}
+            ${status ? `<tr><td>Статус</td><td style="text-align:right">${escapeHtml(String(status))}</td></tr>` : ''}
+          </table>
+        </div>` : ''}
+    </div>
+    ${attrs.length ? `
+      <div style="margin-top:14px" class="cc">
+        <div class="cc-title" style="margin-bottom:8px">Додаткові атрибути</div>
+        <table class="dt">
+          ${attrs.map(a => `<tr><td>${escapeHtml(a.name||'')}</td><td>${escapeHtml(typeof a.value === 'object' ? (a.value.name||JSON.stringify(a.value)) : String(a.value||''))}</td></tr>`).join('')}
+        </table>
+      </div>` : ''}
+  `;
+}
+
+window.copySummary = function(name){
+  const c = allCounterparties.find(x => x.name === name);
+  if (!c) return;
+  const dems = allDemands.filter(d => d.agent === name);
+  const ltv = dems.reduce((a,d) => a + (d.sum_kop||0)/100, 0);
+  const lastOrder = dems.length ? dems.sort((a,b)=>(b.ms_moment||'').localeCompare(a.ms_moment||''))[0].ms_moment : null;
+  const text = `Клієнт: ${c.name}
+ЄДРПОУ/ІНН: ${c.edrpou || c.inn || '—'}
+Email: ${c.email || '—'}
+Телефон: ${c.phone || '—'}
+Lifetime revenue: ${nf(Math.round(ltv))} ₴
+Кількість замовлень: ${dems.length}
+Останнє замовлення: ${lastOrder ? df(lastOrder) : '—'}
+Дата виписки: ${new Date().toLocaleDateString('uk-UA')}`;
+  navigator.clipboard.writeText(text).then(() => {
+    alert('✓ Скопійовано у буфер обміну');
+  }).catch(err => alert('Помилка копіювання: ' + err));
+};
+
+// === Helpers ===
+function escapeHtml(s){return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);}
+function escapeAttr(s){return escapeHtml(s).replace(/"/g,'&quot;');}
+
+// === Last-sync badge ===
+async function updateSyncBadge(){
+  const statusEl = document.getElementById('syncStatus');
+  const updateEl = document.getElementById('lastUpdate');
+  try {
+    const r = await fetch(WORKER + '/api/dashboard/last-sync', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'});
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    const j = await r.json();
+    const items = j.items || [];
+    const ok = items.find(x => x.status === 'success');
+    if (!ok) { statusEl.textContent = '⚠ Sync не успішний'; return; }
+    const d = new Date(ok.finished_at * 1000);
+    const fmt = d.toLocaleString('uk-UA', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+    const ageH = Math.round((Date.now() - d.getTime()) / 36e5);
+    statusEl.textContent = `✓ Sync: ${fmt}`;
+    updateEl.textContent = ageH < 1 ? 'щойно' : ageH < 24 ? ageH + ' год тому' : Math.round(ageH/24) + ' дн. тому';
+  } catch(e) {
+    statusEl.textContent = '⚠ Sync info недоступне';
+  }
+}
+</script>
+
+</body>
+</html>
