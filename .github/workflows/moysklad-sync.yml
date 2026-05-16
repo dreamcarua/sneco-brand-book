@@ -27,7 +27,7 @@ jobs:
   sync:
     name: Fetch MoySklad → write D1 → regen dashboard
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 120         # було 25 → не вистачило для full sync з 2023-01-01
     permissions:
       contents: write          # so we can git commit + push regenerated dashboard
 
