@@ -392,29 +392,64 @@ window.bootCustomer360 = async function(token){
     allInvoices = inv || [];
     allReturns = ret || [];
 
-    // Compute aggregated revenue per client for ranking
-    const revMap = {};
+    // === Aggregate revenue per agent name (FROM DEMANDS, ground truth) ===
+    // Compute both: lifetime revenue and last-month revenue.
+    const now = new Date();
+    const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const prevMonthYM = prevMonth.toISOString().slice(0, 7);   // "2026-04"
+    const currMonthYM = now.toISOString().slice(0, 7);
+
+    const lifetimeMap = {};      // agent → total revenue
+    const lastMonthMap = {};     // agent → last month revenue
+    const last30Map = {};        // agent → last 30 days revenue (fallback)
+    const lastOrderMap = {};     // agent → max ms_moment
+    const cutoff30 = new Date(now.getTime() - 30*86400000).toISOString().slice(0,10);
+
     allDemands.forEach(d => {
-      const k = d.agent || '';
+      const k = (d.agent||'').trim();
       if (!k) return;
-      revMap[k] = (revMap[k]||0) + (d.sum_kop||0)/100;
+      const amt = (d.sum_kop||0)/100;
+      lifetimeMap[k] = (lifetimeMap[k]||0) + amt;
+      const ym = (d.ms_moment||'').slice(0,7);
+      if (ym === prevMonthYM) lastMonthMap[k] = (lastMonthMap[k]||0) + amt;
+      const dt = (d.ms_moment||'').slice(0,10);
+      if (dt >= cutoff30) last30Map[k] = (last30Map[k]||0) + amt;
+      if (!lastOrderMap[k] || d.ms_moment > lastOrderMap[k]) lastOrderMap[k] = d.ms_moment;
     });
-    // Attach revenue to counterparties
+
+    // === Build merged customer index ===
+    // Start with all counterparties from D1, then add agent-only virtual records
+    // for agents who appear in demands but missing from counterparties (incremental
+    // sync gap, archived, deleted from MoySklad, etc.).
+    const byName = {};
     allCounterparties.forEach(c => {
-      c.__revenue = revMap[c.name] || 0;
-      c.__lastOrder = null;
+      const k = (c.name||'').trim();
+      if (!k) return;
+      c.__revenue = lifetimeMap[k] || 0;
+      c.__lastMonthRev = lastMonthMap[k] || 0;
+      c.__last30Rev = last30Map[k] || 0;
+      c.__lastOrder = lastOrderMap[k] || null;
+      byName[k] = c;
     });
-    allDemands.forEach(d => {
-      const c = allCounterparties.find(x => x.name === d.agent);
-      if (c) {
-        const dt = d.ms_moment;
-        if (!c.__lastOrder || dt > c.__lastOrder) c.__lastOrder = dt;
+    // Add virtual records for agents missing from counterparties
+    Object.keys(lifetimeMap).forEach(name => {
+      if (!byName[name]) {
+        byName[name] = {
+          name: name,
+          __virtual: true,
+          __revenue: lifetimeMap[name] || 0,
+          __lastMonthRev: lastMonthMap[name] || 0,
+          __last30Rev: last30Map[name] || 0,
+          __lastOrder: lastOrderMap[name] || null,
+        };
       }
     });
+    allCounterparties = Object.values(byName);
 
     renderQuickPills();
     setupSearch();
-    console.log(`Loaded: ${allCounterparties.length} clients, ${allDemands.length} demands, ${allPayments.length} payments`);
+    console.log(`Loaded: ${allCounterparties.length} merged customers (${Object.values(byName).filter(c=>c.__virtual).length} virtual), ${allDemands.length} demands, ${allPayments.length} payments`);
+    console.log(`Period: prev month=${prevMonthYM}, last30 since ${cutoff30}`);
   } catch(e) {
     console.error('Boot error', e);
     document.getElementById('contentWrap').innerHTML = `
@@ -427,14 +462,40 @@ window.bootCustomer360 = async function(token){
 };
 
 function renderQuickPills(){
-  const top = [...allCounterparties]
-    .filter(c => c.__revenue > 0 && !c.archived)
-    .sort((a,b) => b.__revenue - a.__revenue)
-    .slice(0, 12);
-  const html = top.map(c => `<span class="quick-pill" onclick="selectCustomer('${escapeAttr(c.name)}')">${escapeHtml(c.name)}</span>`).join('');
-  document.getElementById('quickPills').innerHTML = top.length
-    ? html
-    : '<span style="color:var(--muted);font-size:11px;padding:5px 0">Жодного клієнта з даними</span>';
+  // PRIMARY: TOP-25 by LAST CALENDAR MONTH revenue (most actionable for sales reps)
+  // FALLBACK 1: TOP-25 by last 30 days (if last month has 0 — early in current month)
+  // FALLBACK 2: TOP-25 by lifetime revenue (if no recent activity at all)
+  let basis = 'last month';
+  let pool = allCounterparties.filter(c => (c.__lastMonthRev||0) > 0);
+  if (pool.length === 0) { basis = 'last 30 days'; pool = allCounterparties.filter(c => (c.__last30Rev||0) > 0); }
+  if (pool.length === 0) { basis = 'lifetime'; pool = allCounterparties.filter(c => (c.__revenue||0) > 0); }
+
+  const sortKey = basis === 'last month' ? '__lastMonthRev' : basis === 'last 30 days' ? '__last30Rev' : '__revenue';
+  const top = pool
+    .filter(c => !c.archived)
+    .sort((a,b) => (b[sortKey]||0) - (a[sortKey]||0))
+    .slice(0, 25);
+
+  if (top.length === 0) {
+    document.getElementById('quickPills').innerHTML = '<span style="color:var(--muted);font-size:11px;padding:5px 0">Жодного клієнта з даними. Перевір що sync пройшов.</span>';
+    return;
+  }
+
+  const label = basis === 'last month'
+    ? `ТОП-${top.length} за минулий місяць (за виручкою)`
+    : basis === 'last 30 days'
+      ? `ТОП-${top.length} за останні 30 днів`
+      : `ТОП-${top.length} за весь час`;
+
+  const html = `
+    <div style="width:100%;text-align:center;margin-bottom:6px;font-size:10.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px">${label}</div>
+    ${top.map(c => {
+      const rev = c[sortKey] || 0;
+      const tag = c.__virtual ? ' <span style="font-size:9px;opacity:.7">⚠</span>' : '';
+      return `<span class="quick-pill" onclick="selectCustomer('${escapeAttr(c.name)}')" title="${nf(Math.round(rev))} ₴">${escapeHtml(c.name)}${tag} <span style="opacity:.65">· ${nfm(rev)}₴</span></span>`;
+    }).join('')}
+  `;
+  document.getElementById('quickPills').innerHTML = html;
 }
 
 function setupSearch(){
