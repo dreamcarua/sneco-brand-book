@@ -200,8 +200,11 @@ body.dash-locked{overflow:hidden}
   function showSessionBadge(em, exp){
     const b = document.createElement('div');
     b.className = 'dashauth-session';
-    const mins = Math.max(0, Math.floor((exp*1000 - Date.now())/60000));
-    b.innerHTML = '✓ ' + em + ' · ' + mins + ' min <button title="Lock">🔒</button>';
+    const totalMins = Math.max(0, Math.floor((exp*1000 - Date.now())/60000));
+    const timeLabel = totalMins >= 60
+      ? Math.floor(totalMins/60) + 'h ' + (totalMins%60 ? (totalMins%60) + 'm' : '')
+      : totalMins + 'min';
+    b.innerHTML = '✓ ' + em + ' · ' + timeLabel.trim() + ' <button title="Lock">🔒</button>';
     b.querySelector('button').onclick = () => { localStorage.removeItem(STORAGE_KEY); location.reload(); };
     document.body.appendChild(b);
   }
