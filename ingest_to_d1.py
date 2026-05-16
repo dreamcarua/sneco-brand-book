@@ -13,12 +13,8 @@ Env (required):
   SYNC_API_KEY        secret matching env.SYNC_API_KEY in the Worker
 
 Reads xlsx from ./data/ (or --data-dir):
-  demands.xlsx · payments.xlsx · customer_orders.xlsx · sales_returns.xlsx
+  demands.xlsx · payments.xlsx · customer_orders.xlsx · salesreturns.xlsx
   products.xlsx · counterparties.xlsx · invoices_out.xlsx · moves.xlsx · processing_plans.xlsx
-
-NOTE: moysklad_sync.py writes columns in Ukrainian (Дата, Номер, Контрагент, Сума грн, …)
-and converts copecks → grн (divide by 100). This file maps UA→D1 cols and converts grн back
-to copecks for *_kop columns (multiply by 100). EN aliases kept for backwards-compat.
 
 Posts a final ms_sync_log row at the end.
 """
@@ -42,37 +38,19 @@ except ImportError:
 
 BATCH_SIZE = 400  # rows per HTTP POST (Worker limit 500, leave margin)
 
-# === Columns that store kopecks in D1 — multiply grн value × 100 on ingest ===
-# moysklad_sync.py writes Сума, грн = MS sum_kop / 100 (so 618750 коп → 6187.50 грн).
-# Worker schema is sum_kop (integer kopecks). Reverse the conversion here.
-KOP_COLS = {
-    "sum_kop", "payed_sum_kop", "shipped_sum_kop",
-    "sale_price_kop", "buy_price_kop", "min_price_kop",
-}
-
-# Map xlsx file → entity slug + column rename map (xlsx header → D1 column).
-# Ukrainian columns are what moysklad_sync.py actually writes (verified line-by-line).
-# English aliases kept as fallbacks for backwards-compat / Pylyp's local script.
+# Map xlsx file → entity slug + column rename map (from xlsx header → D1 column)
 ENTITY_MAP = {
     "demands": {
         "file": "demands.xlsx",
         "cols": {
-            # UA (real) ────────────────────────
-            "Дата": "ms_moment",
-            "Номер": "name",
-            "Контрагент": "agent",
-            "Організація": "organization",
-            "Склад": "store",
-            "Сума, грн": "sum_kop",
-            "Оплачено, грн": "payed_sum_kop",
-            "Стан": "state",
-            # EN aliases (fallback) ────────────
+            # xlsx header → D1 col name. Best-effort; missing = NULL.
             "id": "id",
             "moment": "ms_moment",
             "name": "name",
             "sum": "sum_kop",
-            "organization_name": "organization", "organization": "organization",
-            "agent_name": "agent", "agent": "agent",
+            "organization_name": "organization", "organization": "organization", "Організація": "organization",
+            "agent_name": "agent", "agent": "agent", "Контрагент": "agent",
+            "Контрагент ID": "agent_id",
             "store_name": "store", "store": "store",
             "contract_name": "contract", "contract": "contract",
             "state_name": "state", "state": "state",
@@ -85,20 +63,14 @@ ENTITY_MAP = {
     "payments": {
         "file": "payments.xlsx",
         "cols": {
-            # UA (real) ────────────────────────
-            "Дата": "ms_moment",
-            "Номер": "name",
-            "Тип": "payment_type",
-            "Контрагент": "agent",
-            "Сума, грн": "sum_kop",
-            # EN aliases ───────────────────────
             "id": "id",
             "moment": "ms_moment",
             "type": "payment_type", "payment_type": "payment_type",
             "name": "name",
             "sum": "sum_kop",
             "organization_name": "organization", "organization": "organization",
-            "agent_name": "agent", "agent": "agent",
+            "agent_name": "agent", "agent": "agent", "Контрагент": "agent",
+            "Контрагент ID": "agent_id",
             "account_name": "account", "account": "account",
             "expenseItem_name": "expense_item", "expenseItem": "expense_item",
         },
@@ -106,16 +78,6 @@ ENTITY_MAP = {
     "orders": {
         "file": "customer_orders.xlsx",
         "cols": {
-            # UA (real) ────────────────────────
-            "Дата": "ms_moment",
-            "Номер": "name",
-            "Контрагент": "agent",
-            "Організація": "organization",
-            "Сума, грн": "sum_kop",
-            "Оплачено, грн": "payed_sum_kop",
-            "Відвантажено, грн": "shipped_sum_kop",
-            "Стан": "state",
-            # EN aliases ───────────────────────
             "id": "id",
             "moment": "ms_moment",
             "name": "name",
@@ -123,7 +85,8 @@ ENTITY_MAP = {
             "shippedSum": "shipped_sum_kop", "shipped_sum": "shipped_sum_kop",
             "payedSum": "payed_sum_kop", "payed_sum": "payed_sum_kop",
             "organization_name": "organization", "organization": "organization",
-            "agent_name": "agent", "agent": "agent",
+            "agent_name": "agent", "agent": "agent", "Контрагент": "agent",
+            "Контрагент ID": "agent_id",
             "store_name": "store", "store": "store",
             "contract_name": "contract", "contract": "contract",
             "state_name": "state", "state": "state",
@@ -131,22 +94,15 @@ ENTITY_MAP = {
         },
     },
     "returns": {
-        # FIXED: moysklad_sync.py writes sales_returns.xlsx (was salesreturns.xlsx)
-        "file": "sales_returns.xlsx",
+        "file": "salesreturns.xlsx",
         "cols": {
-            # UA (real) ────────────────────────
-            "Дата": "ms_moment",
-            "Номер": "name",
-            "Контрагент": "agent",
-            "Склад": "store",
-            "Сума, грн": "sum_kop",
-            # EN aliases ───────────────────────
             "id": "id",
             "moment": "ms_moment",
             "name": "name",
             "sum": "sum_kop",
             "organization_name": "organization", "organization": "organization",
-            "agent_name": "agent", "agent": "agent",
+            "agent_name": "agent", "agent": "agent", "Контрагент": "agent",
+            "Контрагент ID": "agent_id",
             "store_name": "store", "store": "store",
             "demand_id": "demand_id",
         },
@@ -154,17 +110,6 @@ ENTITY_MAP = {
     "products": {
         "file": "products.xlsx",
         "cols": {
-            # UA (real) ────────────────────────
-            "Назва": "name",
-            "Код": "code",
-            "Артикул": "article",
-            "Штрихкод": "ean_codes",
-            "Група": "product_folder",
-            "Одиниця": "uom",
-            "Ціна продажу": "sale_price_kop",
-            "Ціна закупки": "buy_price_kop",
-            "Архів": "archived",
-            # EN aliases ───────────────────────
             "id": "id",
             "name": "name",
             "code": "code",
@@ -184,15 +129,6 @@ ENTITY_MAP = {
     "counterparties": {
         "file": "counterparties.xlsx",
         "cols": {
-            # UA (real) ────────────────────────
-            "Назва": "name",
-            "Тип": "company_type",
-            "Код": "code",
-            "ЄДРПОУ/ІНН": "inn",
-            "Телефон": "phone",
-            "Email": "email",
-            "Теги": "tags",
-            # EN aliases ───────────────────────
             "id": "id",
             "name": "name",
             "code": "code",
@@ -211,20 +147,13 @@ ENTITY_MAP = {
     "invoices_out": {
         "file": "invoices_out.xlsx",
         "cols": {
-            # UA (real) ────────────────────────
-            "Дата": "ms_moment",
-            "Номер": "name",
-            "Контрагент": "agent",
-            "Сума, грн": "sum_kop",
-            "Оплачено, грн": "payed_sum_kop",
-            "Стан": "state",
-            # EN aliases ───────────────────────
             "id": "id",
             "moment": "ms_moment",
             "name": "name",
             "sum": "sum_kop",
             "organization_name": "organization", "organization": "organization",
-            "agent_name": "agent", "agent": "agent",
+            "agent_name": "agent", "agent": "agent", "Контрагент": "agent",
+            "Контрагент ID": "agent_id",
             "paymentPlannedMoment": "payment_planned_moment",
             "payedSum": "payed_sum_kop", "payed_sum": "payed_sum_kop",
             "state_name": "state", "state": "state",
@@ -233,12 +162,6 @@ ENTITY_MAP = {
     "moves": {
         "file": "moves.xlsx",
         "cols": {
-            # UA (real) ────────────────────────
-            "Дата": "ms_moment",
-            "Номер": "name",
-            "Зі складу": "source_store",
-            "На склад": "target_store",
-            # EN aliases ───────────────────────
             "id": "id",
             "moment": "ms_moment",
             "name": "name",
@@ -250,11 +173,6 @@ ENTITY_MAP = {
     "processing_plans": {
         "file": "processing_plans.xlsx",
         "cols": {
-            # UA (real) ────────────────────────
-            "Назва": "name",
-            "Код": "code",
-            "Продукт": "parent_product",
-            # EN aliases ───────────────────────
             "id": "id",
             "name": "name",
             "code": "code",
@@ -276,9 +194,9 @@ def normalise_value(v):
 
 
 def df_to_rows(df: pd.DataFrame, col_map: dict) -> list:
-    """Convert DataFrame rows → list of dicts using col_map (xlsx_col → d1_col).
-    For columns in KOP_COLS the value is multiplied × 100 (грн → коп)."""
+    """Convert DataFrame rows → list of dicts using col_map (xlsx_col → d1_col)."""
     out = []
+    cols_present = [c for c in df.columns if c in col_map]
     for _, row in df.iterrows():
         d = {}
         # raw_json: store the entire row as fallback
@@ -290,30 +208,12 @@ def df_to_rows(df: pd.DataFrame, col_map: dict) -> list:
                 target = col_map[col]
                 # First mapping wins (col_map may have aliases)
                 if target not in d or d[target] is None:
-                    # KOP conversion: source value is in грн (float), target is integer kopecks
-                    if target in KOP_COLS and isinstance(v, (int, float)):
-                        try:
-                            d[target] = int(round(float(v) * 100))
-                        except (ValueError, TypeError):
-                            d[target] = None
-                    else:
-                        d[target] = v
+                    d[target] = v
         d["raw_json"] = json.dumps(raw, ensure_ascii=False, default=str)
         # Skip rows without id
         if not d.get("id"): continue
         out.append(d)
     return out
-
-
-def _raise_with_body(r: requests.Response, context: str):
-    """Print response body before raising — surfaces Worker's {error, detail} JSON in logs."""
-    try:
-        body = r.text[:1000]
-    except Exception:
-        body = "<unreadable body>"
-    print(f"❌ {context}: HTTP {r.status_code}", file=sys.stderr)
-    print(f"   response body: {body}", file=sys.stderr)
-    r.raise_for_status()
 
 
 def post_batch(worker_url: str, sync_key: str, entity: str, rows: list) -> dict:
@@ -325,12 +225,7 @@ def post_batch(worker_url: str, sync_key: str, entity: str, rows: list) -> dict:
         headers={"X-Sync-Key": sync_key, "Origin": "https://dreamcarua.github.io"},
         timeout=30,
     )
-    if not r.ok:
-        # Show first row sample so we can see if the data triggered SQL exception
-        sample = rows[0] if rows else None
-        sample_preview = json.dumps(sample, ensure_ascii=False, default=str)[:500] if sample else None
-        print(f"   first row sample: {sample_preview}", file=sys.stderr)
-        _raise_with_body(r, f"post_batch entity={entity} rows={len(rows)}")
+    r.raise_for_status()
     return r.json()
 
 
@@ -342,8 +237,7 @@ def post_sync_log(worker_url: str, sync_key: str, log: dict) -> dict:
         headers={"X-Sync-Key": sync_key, "Origin": "https://dreamcarua.github.io"},
         timeout=15,
     )
-    if not r.ok:
-        _raise_with_body(r, "post_sync_log")
+    r.raise_for_status()
     return r.json()
 
 
