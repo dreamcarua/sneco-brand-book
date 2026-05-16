@@ -397,63 +397,85 @@ window.bootCustomer360 = async function(token){
     allInvoices = inv || [];
     allReturns = ret || [];
 
-    // === Aggregate revenue per agent name (FROM DEMANDS, ground truth) ===
-    // Compute both: lifetime revenue and last-month revenue.
+    // === Aggregate revenue per agent ID + name (v2.61 — використовуємо ID коли є) ===
     const now = new Date();
     const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const prevMonthYM = prevMonth.toISOString().slice(0, 7);   // "2026-04"
+    const prevMonthYM = prevMonth.toISOString().slice(0, 7);
     const currMonthYM = now.toISOString().slice(0, 7);
-
-    const lifetimeMap = {};      // agent → total revenue
-    const lastMonthMap = {};     // agent → last month revenue
-    const last30Map = {};        // agent → last 30 days revenue (fallback)
-    const lastOrderMap = {};     // agent → max ms_moment
     const cutoff30 = new Date(now.getTime() - 30*86400000).toISOString().slice(0,10);
 
-    allDemands.forEach(d => {
-      const k = (d.agent||'').trim();
-      if (!k) return;
-      const amt = (d.sum_kop||0)/100;
-      lifetimeMap[k] = (lifetimeMap[k]||0) + amt;
-      const ym = (d.ms_moment||'').slice(0,7);
-      if (ym === prevMonthYM) lastMonthMap[k] = (lastMonthMap[k]||0) + amt;
-      const dt = (d.ms_moment||'').slice(0,10);
-      if (dt >= cutoff30) last30Map[k] = (last30Map[k]||0) + amt;
-      if (!lastOrderMap[k] || d.ms_moment > lastOrderMap[k]) lastOrderMap[k] = d.ms_moment;
+    // Build CP lookup tables: by ID (primary) and by name (fallback)
+    const cpById = {};
+    const cpByName = {};
+    allCounterparties.forEach(c => {
+      if (c.id) cpById[c.id] = c;
+      const nm = (c.name||'').trim();
+      if (nm) cpByName[nm] = c;
     });
 
-    // === Build merged customer index ===
-    // Start with all counterparties from D1, then add agent-only virtual records
-    // for agents who appear in demands but missing from counterparties (incremental
-    // sync gap, archived, deleted from MoySklad, etc.).
-    const byName = {};
+    // For each demand: figure out which CP it belongs to
+    // Priority: 1) d.agent_id matches c.id, 2) d.agent matches c.name, 3) unknown
+    const lifetimeMap = {};
+    const lastMonthMap = {};
+    const last30Map = {};
+    const lastOrderMap = {};
+    const virtualByKey = {};  // for demands whose CP isn't in counterparties
+
+    function _accumulate(map, key, amt) { map[key] = (map[key]||0) + amt; }
+
+    allDemands.forEach(d => {
+      const amt = (d.sum_kop||0)/100;
+      const cp = (d.agent_id && cpById[d.agent_id]) || (d.agent && cpByName[(d.agent||'').trim()]);
+      let key;
+      if (cp) {
+        key = cp.id || cp.name;
+        if (!cp.__keyForMap) cp.__keyForMap = key;
+      } else {
+        // No matching CP — create virtual under best available identifier
+        key = d.agent_id || d.agent || '__unknown__';
+        if (!virtualByKey[key]) {
+          virtualByKey[key] = {
+            id: d.agent_id || null,
+            name: (d.agent && d.agent.trim()) || ('UUID ' + (d.agent_id||'').slice(0,8) + '…'),
+            __virtual: true,
+          };
+        }
+      }
+      _accumulate(lifetimeMap, key, amt);
+      const ym = (d.ms_moment||'').slice(0,7);
+      if (ym === prevMonthYM) _accumulate(lastMonthMap, key, amt);
+      const dt = (d.ms_moment||'').slice(0,10);
+      if (dt >= cutoff30) _accumulate(last30Map, key, amt);
+      if (!lastOrderMap[key] || d.ms_moment > lastOrderMap[key]) lastOrderMap[key] = d.ms_moment;
+    });
+
+    // Merge: start with all known CPs, attach revenue; then add virtuals
+    const merged = {};
     allCounterparties.forEach(c => {
-      const k = (c.name||'').trim();
+      const k = c.id || c.name;
       if (!k) return;
+      c.__key = k;
       c.__revenue = lifetimeMap[k] || 0;
       c.__lastMonthRev = lastMonthMap[k] || 0;
       c.__last30Rev = last30Map[k] || 0;
       c.__lastOrder = lastOrderMap[k] || null;
-      byName[k] = c;
+      merged[k] = c;
     });
-    // Add virtual records for agents missing from counterparties
-    Object.keys(lifetimeMap).forEach(name => {
-      if (!byName[name]) {
-        byName[name] = {
-          name: name,
-          __virtual: true,
-          __revenue: lifetimeMap[name] || 0,
-          __lastMonthRev: lastMonthMap[name] || 0,
-          __last30Rev: last30Map[name] || 0,
-          __lastOrder: lastOrderMap[name] || null,
-        };
+    Object.entries(virtualByKey).forEach(([k, v]) => {
+      if (!merged[k]) {
+        v.__key = k;
+        v.__revenue = lifetimeMap[k] || 0;
+        v.__lastMonthRev = lastMonthMap[k] || 0;
+        v.__last30Rev = last30Map[k] || 0;
+        v.__lastOrder = lastOrderMap[k] || null;
+        merged[k] = v;
       }
     });
-    allCounterparties = Object.values(byName);
+    allCounterparties = Object.values(merged);
 
     renderQuickPills();
     setupSearch();
-    console.log(`Loaded: ${allCounterparties.length} merged customers (${Object.values(byName).filter(c=>c.__virtual).length} virtual), ${allDemands.length} demands, ${allPayments.length} payments`);
+    console.log(`Loaded: ${allCounterparties.length} merged customers (${allCounterparties.filter(c=>c.__virtual).length} virtual), ${allDemands.length} demands, ${allPayments.length} payments`);
     console.log(`Period: prev month=${prevMonthYM}, last30 since ${cutoff30}`);
   } catch(e) {
     console.error('Boot error', e);
@@ -497,7 +519,7 @@ function renderQuickPills(){
     ${top.map(c => {
       const rev = c[sortKey] || 0;
       const tag = c.__virtual ? ' <span style="font-size:9px;opacity:.7">⚠</span>' : '';
-      return `<span class="quick-pill" onclick="selectCustomer('${escapeAttr(c.name)}')" title="${nf(Math.round(rev))} ₴">${escapeHtml(c.name)}${tag} <span style="opacity:.65">· ${nfm(rev)}₴</span></span>`;
+      return `<span class="quick-pill" onclick="selectCustomer('${escapeAttr(c.__key || c.name)}')" title="${nf(Math.round(rev))} ₴">${escapeHtml(c.name)}${tag} <span style="opacity:.65">· ${nfm(rev)}₴</span></span>`;
     }).join('')}
   `;
   document.getElementById('quickPills').innerHTML = html;
@@ -537,7 +559,7 @@ function setupSearch(){
 }
 
 window.selectCustomer = function(name){
-  const c = allCounterparties.find(x => x.name === name);
+  const c = allCounterparties.find(x => x.__key === name || x.name === name);
   if (!c) {
     alert('Клієнт не знайдений: ' + name);
     return;
@@ -549,12 +571,15 @@ window.selectCustomer = function(name){
 };
 
 function renderCustomerView(c){
-  // Filter all data for this customer (by agent name match)
-  const dems = allDemands.filter(d => d.agent === c.name).sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''));
-  const pays = allPayments.filter(p => p.agent === c.name).sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''));
-  const ords = allOrders.filter(o => o.agent === c.name).sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''));
-  const invs = allInvoices.filter(i => i.agent === c.name).sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''));
-  const rets = allReturns.filter(r => r.agent === c.name).sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''));
+  // Match by ID first (canonical), fallback to name
+  const matchCP = (item) =>
+    (c.id && item.agent_id && item.agent_id === c.id) ||
+    (item.agent && item.agent === c.name);
+  const dems = allDemands.filter(matchCP).sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''));
+  const pays = allPayments.filter(matchCP).sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''));
+  const ords = allOrders.filter(matchCP).sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''));
+  const invs = allInvoices.filter(matchCP).sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''));
+  const rets = allReturns.filter(matchCP).sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''));
 
   // === KPIs ===
   const ltv = dems.reduce((a,d) => a + (d.sum_kop||0)/100, 0);
