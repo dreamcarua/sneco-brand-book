@@ -70,10 +70,21 @@ def _get_incremental_cursor():
         print(f"  ⚠️  Cursor fetch failed: {e}")
         return None
 
+_START_DATE_OVERRIDE = os.getenv("DATA_START_DATE", "").strip()
 if SYNC_MODE == "full":
-    _sync_from = datetime.now() - timedelta(days=WINDOW_DAYS)
-    _master_from = datetime.now() - timedelta(days=WINDOW_DAYS)
-    print(f"🔄 SYNC_MODE=full → window: last {WINDOW_DAYS} days from {_sync_from.isoformat()}", flush=True)
+    if _START_DATE_OVERRIDE:
+        try:
+            _sync_from = datetime.fromisoformat(_START_DATE_OVERRIDE)
+            _master_from = _sync_from
+            print(f"🔄 SYNC_MODE=full → DATA_START_DATE={_START_DATE_OVERRIDE} ({_sync_from.isoformat()})", flush=True)
+        except ValueError:
+            print(f"⚠️  DATA_START_DATE='{_START_DATE_OVERRIDE}' invalid ISO, fallback to window_days={WINDOW_DAYS}", flush=True)
+            _sync_from = datetime.now() - timedelta(days=WINDOW_DAYS)
+            _master_from = datetime.now() - timedelta(days=WINDOW_DAYS)
+    else:
+        _sync_from = datetime.now() - timedelta(days=WINDOW_DAYS)
+        _master_from = datetime.now() - timedelta(days=WINDOW_DAYS)
+        print(f"🔄 SYNC_MODE=full → window: last {WINDOW_DAYS} days from {_sync_from.isoformat()}", flush=True)
 else:
     _cursor = _get_incremental_cursor()
     if _cursor:
@@ -217,6 +228,7 @@ def parse_demands(rows):
             "Дата":             r.get("moment", "")[:10],
             "Номер":            r.get("name"),
             "Контрагент":       safe(r.get("agent")),
+            "Контрагент ID":    _extract_id(r.get("agent")),
             "Організація":      safe(r.get("organization")),
             "Склад":            safe(r.get("store")),
             "Сума, грн":        r.get("sum", 0) / 100,
@@ -252,6 +264,7 @@ def parse_customerorders(rows):
             "Дата":                 r.get("moment", "")[:10],
             "Номер":                r.get("name"),
             "Контрагент":           safe(r.get("agent")),
+            "Контрагент ID":        _extract_id(r.get("agent")),
             "Організація":          safe(r.get("organization")),
             "Сума, грн":            r.get("sum", 0) / 100,
             "Оплачено, грн":        r.get("payedSum", 0) / 100,
@@ -283,6 +296,7 @@ def parse_salesreturns(rows):
             "Дата":         r.get("moment", "")[:10],
             "Номер":        r.get("name"),
             "Контрагент":   safe(r.get("agent")),
+            "Контрагент ID": _extract_id(r.get("agent")),
             "Склад":        safe(r.get("store")),
             "Сума, грн":    r.get("sum", 0) / 100,
             "Стан":         safe(r.get("state")),
@@ -388,6 +402,7 @@ def parse_payments(rows, ptype):
         "Дата":         r.get("moment", "")[:10],
         "Номер":        r.get("name"),
         "Контрагент":   safe(r.get("agent")),
+        "Контрагент ID": _extract_id(r.get("agent")),
         "Сума, грн":    r.get("sum", 0) / 100,
         "Призначення":  r.get("paymentPurpose", ""),
         "Проект":       safe(r.get("project")),
@@ -400,6 +415,7 @@ def parse_invoicesout(rows):
         "Дата":         r.get("moment", "")[:10],
         "Номер":        r.get("name"),
         "Контрагент":   safe(r.get("agent")),
+        "Контрагент ID": _extract_id(r.get("agent")),
         "Сума, грн":    r.get("sum", 0) / 100,
         "Оплачено, грн":r.get("payedSum", 0) / 100,
         "Стан":         safe(r.get("state")),
@@ -591,11 +607,20 @@ def main():
     save_excel(pd.DataFrame(parse_salesreturns(rows)), "sales_returns", reliable=True)
 
     print("\n👥 Контрагенти...", flush=True)
-    rows = fetch_all("entity/counterparty", filter_field="updated")
+    # При SYNC_MODE=full витягуємо ВСІХ контрагентів (не тільки updated за вікно),
+    # бо багато активних клієнтів не оновлюються місяцями.
+    if SYNC_MODE == "full":
+        rows = fetch_all("entity/counterparty", date_filter=False)
+    else:
+        rows = fetch_all("entity/counterparty", filter_field="updated")
     save_excel(pd.DataFrame(parse_counterparties(rows)), "counterparties", reliable=True)
 
     print("\n🏷️  Товари...", flush=True)
-    rows = fetch_all("entity/product", filter_field="updated")
+    # Аналогічно — при full тягнемо всі products без фільтра по updated.
+    if SYNC_MODE == "full":
+        rows = fetch_all("entity/product", date_filter=False)
+    else:
+        rows = fetch_all("entity/product", filter_field="updated")
     save_excel(pd.DataFrame(parse_products(rows)), "products", reliable=True)
 
     print("\n📁 Групи товарів...", flush=True)
