@@ -2117,7 +2117,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Bible v2.55 · 2026
+    Brand Bible v2.60 · 2026
   </div>
 </nav>
 
@@ -2131,7 +2131,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
     <span data-lang="sk">Jedna ingrediencia. <span class="qr-ns-accent">Žiadne kompromisy.</span> Syrový snack 21. storočia.</span>
   </div>
-  <div class="qr-meta">v2.53 · 2026</div>
+  <div class="qr-meta">v2.60 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -9386,7 +9386,32 @@ h3.block-title:first-of-type { margin-top: 0; }
   <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span><span data-lang="sk">História verzií</span></h3>
 
   <div class="changelog-entry">
-    <span class="changelog-version">v2.55</span><span class="changelog-date">15.05.2026</span>
+    <span class="changelog-version">v2.60</span><span class="changelog-date">15.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>👥 Customer 360 — нова standalone сторінка</strong> з власним OTP-gate (<code>customer-dashboard</code>). Дозволяє вибрати будь-якого клієнта і побачити: header card (контакти, ЄДРПОУ, теги), 8 KPI (LTV, кількість замовлень, AOV, остання дата, дебіторка, rank vs cohort, return rate, активні замовлення), auto-insights (churn risk, висока дебіторка, strategic account, return rate alert), revenue trend chart, TOP-10 продуктів цього клієнта, timeline 20 останніх подій (demands+payments+orders+returns+invoices), comparison vs avg, нотатки з картки МойСклад. Quick actions: ✉ mailto, 📞 tel, 🖨 print/PDF, 📋 copy summary. Worker SUPPORTED_BLOCKS += customer-dashboard.</li>
+      <li data-lang="en"><strong>👥 Customer 360 — new standalone page</strong> with own OTP-gate. Pick any customer and see: header card, 8 KPIs, auto-insights, revenue trend, top products, 20-event timeline, comparison vs avg, MoySklad notes. Quick actions: mailto/tel/print/copy summary.</li>
+      <li data-lang="sk"><strong>👥 Customer 360 — nová standalone stránka</strong> s vlastnou OTP-gate. Hĺbkový profil zákazníka s 8 KPI, auto-insights a timeline.</li>
+
+      <li data-lang="uk"><strong>🎯 Action Items tab у Sales dashboard (v2.59)</strong> — 4 блоки для daily операційного використання: revival list (sleeping clients), AR overdue + DSO + chart, funnel (orders→shipments→payments), concentration risk (TOP-10/20 + Pareto). Тримовний tip як читати з 3 позицій (KAM/Head/Director).</li>
+      <li data-lang="en"><strong>🎯 Action Items tab in Sales dashboard (v2.59)</strong> — 4 blocks for daily ops: revival list, AR overdue, funnel, concentration risk.</li>
+      <li data-lang="sk"><strong>🎯 Action Items tab v Sales dashboard (v2.59).</strong></li>
+
+      <li data-lang="uk"><strong>⚡ Incremental sync (v2.57+58)</strong> — moysklad_sync.py читає cursor з останнього успішного sync і тягне лише змінене. Master entities (products, counterparties, processing, processingplan) — теж incremental з 7d overlap. <code>sys.stdout.reconfigure(line_buffering=True)</code> щоб логи з'являлись одразу. Час cron: 17м → ~6-10м.</li>
+      <li data-lang="en"><strong>⚡ Incremental sync (v2.57+58)</strong> — cursor-based fetch saves 50%+ time. Cron 17m → ~6-10m.</li>
+      <li data-lang="sk"><strong>⚡ Incremental sync (v2.57+58).</strong></li>
+
+      <li data-lang="uk"><strong>📊 Last-sync badge у дашбордах (v2.56)</strong> — реальний час останнього sync через <code>/api/dashboard/last-sync</code>, кольорове кодування (✓ зелений &lt;36h / ⚠ жовтий / ✗ червоний fail).</li>
+      <li data-lang="en"><strong>📊 Real last-sync badge in dashboards (v2.56)</strong> — colored by status.</li>
+      <li data-lang="sk"><strong>📊 Real last-sync badge (v2.56).</strong></li>
+
+      <li data-lang="uk"><strong>🔧 Bug fixes:</strong> requirements.txt для setup-python cache (cron fail #62), UA→EN column mapping + грн→коп conversion для ingest_to_d1.py (v2.50 sync nikoly не працював!), filename mismatch salesreturns.xlsx → sales_returns.xlsx, workflow git add для нового path dashboard/dashboard.html, CSS overlap OTP badge → topbar.</li>
+      <li data-lang="en"><strong>🔧 Bug fixes:</strong> requirements.txt for setup-python cache, UA→EN column mapping + grн→коп for ingest, filename mismatch fix, workflow git add path fix, CSS overlap fix.</li>
+      <li data-lang="sk"><strong>🔧 Bug fixes.</strong></li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry" style="border-left-color:var(--text-muted);opacity:.92">
+    <span class="changelog-version" style="color:var(--text-muted);background:var(--black-05)">v2.55</span><span class="changelog-date">15.05.2026</span>
     <ul class="changelog-list">
       <li data-lang="uk"><strong>🇨🇿 CZ market deep-dive у sec-markets:</strong> 8 ключових food-ритейлерів (топ-пріоритет Albert+Globus, високий Tesco, уникати Lidl/COOP); онлайн-ринок CZ (Rohlík #1 — найрелевантніший для snEco, Košík #2, Tesco #3); стратегія Прага-first (Rohlík+Albert+Tesco у 100+ магазинах концентровано → 7–10K покупців); GymBeam модель (bottom-up через спортзали); потреба у Nielsen/GfK даних до серйозного входу.</li>
       <li data-lang="en"><strong>🇨🇿 CZ market deep-dive in sec-markets:</strong> 8 key food retailers (top-priority Albert+Globus, high Tesco, avoid Lidl/COOP); CZ online market (Rohlík #1 — most relevant for snEco, Košík #2, Tesco #3); Prague-first strategy (Rohlík+Albert+Tesco in 100+ stores concentrated → 7–10K buyers); GymBeam bottom-up model (via gyms); need Nielsen/GfK data before serious entry.</li>
@@ -10859,13 +10884,13 @@ h3.block-title:first-of-type { margin-top: 0; }
   <!-- KPI strip — каталог зростає -->
   <div class="grid-3" style="margin:24px 0 28px">
     <div class="card card-sm" style="background:var(--black);color:#fff;text-align:center">
-      <div style="font-size:32px;font-weight:900;color:var(--yellow);line-height:1">3</div>
+      <div style="font-size:32px;font-weight:900;color:var(--yellow);line-height:1">4</div>
       <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:6px;letter-spacing:0.04em;text-transform:uppercase">
         <span data-lang="uk">live дашборди</span><span data-lang="en">live dashboards</span><span data-lang="sk">live dashboardy</span>
       </div>
     </div>
     <div class="card card-sm" style="background:var(--yellow);color:var(--black);text-align:center">
-      <div style="font-size:32px;font-weight:900;line-height:1">4+</div>
+      <div style="font-size:32px;font-weight:900;line-height:1">3+</div>
       <div style="font-size:11px;color:rgba(30,30,30,0.7);margin-top:6px;letter-spacing:0.04em;text-transform:uppercase">
         <span data-lang="uk">в плані</span><span data-lang="en">planned</span><span data-lang="sk">v pláne</span>
       </div>
@@ -10948,6 +10973,33 @@ h3.block-title:first-of-type { margin-top: 0; }
       </div>
     </a>
   </div>
+
+  <!-- v2.60: Customer 360 launcher (full-width since it's a special-purpose tool) -->
+  <a href="dashboard/customer-360/" target="_blank" rel="noopener" style="display:block;background:linear-gradient(135deg, #1E1E1E 0%, #2A2A2A 100%);color:#fff;padding:28px 28px;border-radius:var(--radius);text-decoration:none;position:relative;overflow:hidden;margin-top:14px;border:1px solid rgba(59,130,246,0.25)">
+    <div style="position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 70%);pointer-events:none"></div>
+    <div style="position:relative;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap">
+      <div style="flex:1;min-width:300px">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#60A5FA;margin-bottom:8px">👥 Customer 360</div>
+        <div style="font-size:22px;font-weight:800;letter-spacing:-0.3px;line-height:1.2;margin-bottom:10px">
+          <span data-lang="uk">Картка клієнта «під мікроскопом»</span>
+          <span data-lang="en">Deep-dive customer profile</span>
+          <span data-lang="sk">Profil zákazníka „pod mikroskopom"</span>
+        </div>
+        <div style="font-size:13px;line-height:1.55;color:rgba(255,255,255,0.78);max-width:780px">
+          <span data-lang="uk">Обери будь-якого клієнта — і побач його <strong>LTV, історію замовлень, динаміку, дебіторку, asset mix, churn-ризик, ranks vs cohort, коментарі з МойСклад</strong>. Auto-insights (sleeping?, strategic?, high AR?). Для KAM при підготовці до дзвінка, для керівників — board-prep. Whitelist: vg+fg+bs+Ярослав+Валентина.</span>
+          <span data-lang="en">Pick any customer — see their <strong>LTV, order history, trends, AR balance, product mix, churn risk, rank vs cohort, MoySklad notes</strong>. Auto-insights. For KAMs prepping a call, for managers — board prep. Whitelist: vg+fg+bs+Yaroslav+Valentyna.</span>
+          <span data-lang="sk">Vybrať akéhokoľvek zákazníka — vidieť jeho <strong>LTV, históriu, trendy, AR, product mix, churn risk, rank, poznámky z MoySklad</strong>. Auto-insights pre KAM aj manažérov.</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:11px 20px;background:#60A5FA;color:#fff;font-weight:800;border-radius:8px;font-size:13px;letter-spacing:0.02em">
+          <span data-lang="uk">Відкрити Customer 360</span><span data-lang="en">Open Customer 360</span><span data-lang="sk">Otvoriť Customer 360</span>
+          <span style="font-size:16px">↗</span>
+        </div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);font-style:italic">block: <code style="background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:3px;color:#60A5FA">customer-dashboard</code></div>
+      </div>
+    </div>
+  </a>
 
   <h3 class="block-title" style="margin-top:36px">🟡 <span data-lang="uk">У плані</span><span data-lang="en">Planned</span><span data-lang="sk">Plánované</span></h3>
   <div class="grid-3">
