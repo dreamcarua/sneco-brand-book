@@ -26,7 +26,7 @@ const MAX_TITLE_LEN = 200;
 const MAX_BODY_LEN = 10000;
 const MAX_ATTACHMENTS_PER_ITEM = 6;
 const OTP_TTL_MS = 10 * 60 * 1000;       // 10 min for OTP itself
-const SESSION_TTL_S = 60 * 60;            // 1 h JWT
+const SESSION_TTL_S = 24 * 60 * 60;       // 24 h JWT (was 1h до v2.61)
 const ENC = new TextEncoder();
 const DEC = new TextDecoder();
 
