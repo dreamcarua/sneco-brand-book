@@ -6,10 +6,22 @@ on:
     - cron: '0 3 * * *'
   workflow_dispatch:           # Manual trigger from Actions tab
     inputs:
+      sync_mode:
+        description: 'incremental (cursor delta) or full (re-fetch everything)'
+        required: false
+        default: 'incremental'
+        type: choice
+        options:
+          - incremental
+          - full
       window_days:
-        description: 'How many days back to sync'
+        description: 'Скільки днів назад тягнути (тільки якщо start_date порожній)'
         required: false
         default: '30'
+      start_date:
+        description: 'Опціонально: ISO дата, з якої тягнути (наприклад 2023-01-01). Перекриває window_days.'
+        required: false
+        default: ''
 
 jobs:
   sync:
@@ -39,7 +51,9 @@ jobs:
       - name: Fetch from MoySklad + save xlsx + regenerate dashboard.html
         env:
           MOYSKLAD_TOKEN: ${{ secrets.MOYSKLAD_TOKEN }}
+          SYNC_MODE: ${{ github.event.inputs.sync_mode || 'incremental' }}
           DATA_WINDOW_DAYS: ${{ github.event.inputs.window_days || '30' }}
+          DATA_START_DATE: ${{ github.event.inputs.start_date || '' }}
         run: |
           mkdir -p data logs
           python3 moysklad_sync.py 2>&1 | tee logs/cron_$(date -u +%Y%m%d_%H%M).log
@@ -53,11 +67,10 @@ jobs:
           python3 ingest_to_d1.py --trigger cron --window-days ${{ github.event.inputs.window_days || '30' }}
 
       - name: Commit + push regenerated dashboard.html
-        continue-on-error: true
         run: |
           git config user.name  "snEco-sync-bot"
           git config user.email "noreply@sneco.ua"
-          git add dashboard/dashboard.html dashboard.html 2>/dev/null || true
+          git add dashboard.html
           if git diff --cached --quiet; then
             echo "No dashboard changes to commit."
           else
