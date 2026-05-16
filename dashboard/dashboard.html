@@ -208,7 +208,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .dashauth-msg a{color:#FEBF27;font-weight:600;text-decoration:underline}
 .dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
 .dashauth-back:hover{color:#FEBF27}
-.dashauth-session{position:fixed;top:8px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-family:-apple-system,sans-serif;font-weight:600;display:flex;align-items:center;gap:8px}
+.dashauth-session{position:fixed;top:64px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-family:-apple-system,sans-serif;font-weight:600;display:flex;align-items:center;gap:8px}
 .dashauth-session button{background:none;border:0;color:#96C11F;cursor:pointer;font-size:14px;padding:0;line-height:1}
 body.dash-locked{overflow:hidden}
 </style>
@@ -356,6 +356,7 @@ body.dash-locked{overflow:hidden}
   <button class="tab-btn" id="tabbtn-3" onclick="showTab(3)"><span class="tab-icon">👥</span>Клієнти & Товари</button>
   <button class="tab-btn" style="display:none" id="tabbtn-4" onclick="showTab(4)"><span class="tab-icon">📦</span>Склад та закупки</button>
   <button class="tab-btn" style="display:none" id="tabbtn-5" onclick="showTab(5)"><span class="tab-icon">🏭</span>Виробництво</button>
+  <button class="tab-btn" id="tabbtn-6" onclick="showTab(6)"><span class="tab-icon">🎯</span>Action Items</button>
 </div>
 
 <!-- FILTER BAR -->
@@ -1072,6 +1073,132 @@ body.dash-locked{overflow:hidden}
 
 </div><!-- /tab-5 -->
 
+<!-- ══════════════════════════════════════════════════════════════════════════
+     TAB 6: ACTION ITEMS (v2.59 MIN — added 15.05.2026)
+     Daily-use tab для лінійних менеджерів і керівників продажів
+     4 блоки: revival list · overdue AR · unshipped orders · concentration
+     ══════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-6">
+  <div class="alert" style="background:rgba(232,64,64,0.07);border-color:rgba(232,64,64,0.3);color:#a00;font-size:13px;line-height:1.55">
+    ⚠️ <strong>Список дій що вимагають вашої уваги.</strong> Дані оновлюються щодня о 06:00. Сортовано за пріоритетом.
+  </div>
+
+  <!-- BLOCK 1: REVIVAL LIST -->
+  <div class="sec">😴 Revival list — клієнти що раніше платили, але мовчать цього місяця</div>
+  <div class="cc">
+    <div class="cc-head">
+      <div>
+        <div class="cc-title">Sleeping clients <span id="revivalCount" style="color:var(--muted);font-weight:500"></span></div>
+        <div class="cc-sub">Клієнти з lifetime &gt;10 000 ₴ без замовлень у поточному місяці. Відсортовано за історичною виручкою.</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);font-weight:600">📞 ДЗВОНИТИ</div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="dt">
+        <thead>
+          <tr>
+            <th style="width:40px">#</th>
+            <th>Клієнт</th>
+            <th style="text-align:right">Lifetime revenue</th>
+            <th style="text-align:right">% від ТОП-20</th>
+          </tr>
+        </thead>
+        <tbody id="revivalBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- BLOCK 2: OVERDUE AR -->
+  <div class="sec">💰 Дебіторка — гроші які мають заплатити, але ще не заплатили</div>
+  <div class="g3" style="margin-bottom:14px">
+    <div class="kpi cr">
+      <div class="kpi-lbl">Загальна дебіторка</div>
+      <div class="kpi-val" id="arTotal">—</div>
+      <div class="kpi-foot"><span class="kpi-sub">UAH станом на сьогодні</span></div>
+    </div>
+    <div class="kpi cy">
+      <div class="kpi-lbl">DSO (днів обороту)</div>
+      <div class="kpi-val" id="dsoDays">—</div>
+      <div class="kpi-foot"><span class="kpi-sub">Days Sales Outstanding</span></div>
+    </div>
+    <div class="kpi cg">
+      <div class="kpi-lbl">Середньомісячна AR</div>
+      <div class="kpi-val" id="arAvgMonth">—</div>
+      <div class="kpi-foot"><span class="kpi-sub">За останні 12 міс</span></div>
+    </div>
+  </div>
+  <div class="cc">
+    <div class="cc-head">
+      <div>
+        <div class="cc-title">Динаміка дебіторки по місяцях</div>
+        <div class="cc-sub">Зростання червоного = більше неоплачено вчасно. Рухається разом з обсягом продажів.</div>
+      </div>
+    </div>
+    <div class="chart-h240"><canvas id="arChart"></canvas></div>
+  </div>
+
+  <!-- BLOCK 3: ORDERS NOT SHIPPED -->
+  <div class="sec">📦 Funnel: Замовлення → Відвантаження — є розрив?</div>
+  <div class="cc">
+    <div class="cc-head">
+      <div>
+        <div class="cc-title">Conversion рівень: orders → shipments → payments</div>
+        <div class="cc-sub">Чим менший gap між рівнями — тим швидше гроші у касі. Якщо orders &gt;&gt; shipments — щось «застрягло» на складі.</div>
+      </div>
+    </div>
+    <div class="chart-h280"><canvas id="funnelChart2"></canvas></div>
+  </div>
+
+  <!-- BLOCK 4: CONCENTRATION RISK -->
+  <div class="sec">🎯 Концентрація ризику — наскільки залежимо від ТОП клієнтів</div>
+  <div class="g3" style="margin-bottom:14px">
+    <div class="kpi cy">
+      <div class="kpi-lbl">ТОП-10 клієнтів =</div>
+      <div class="kpi-val" id="concTop10">—</div>
+      <div class="kpi-foot"><span class="kpi-sub">від загальної виручки</span></div>
+    </div>
+    <div class="kpi cy">
+      <div class="kpi-lbl">ТОП-20 клієнтів =</div>
+      <div class="kpi-val" id="concTop20">—</div>
+      <div class="kpi-foot"><span class="kpi-sub">від загальної виручки</span></div>
+    </div>
+    <div class="kpi cr">
+      <div class="kpi-lbl">Концентраційний ризик</div>
+      <div class="kpi-val" id="concRisk" style="font-size:18px">—</div>
+      <div class="kpi-foot"><span class="kpi-sub">Pareto-аналіз</span></div>
+    </div>
+  </div>
+  <div class="cc">
+    <div class="cc-head">
+      <div>
+        <div class="cc-title">ТОП-20 клієнтів — внесок у виручку</div>
+        <div class="cc-sub">Якщо ТОП-1 → 25%+ — це single point of failure. Якщо ТОП-10 → &lt;50% — health is OK.</div>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="dt">
+        <thead>
+          <tr>
+            <th style="width:40px">#</th>
+            <th>Клієнт</th>
+            <th style="text-align:right">Виручка</th>
+            <th style="text-align:right">Частка</th>
+            <th style="text-align:right">Кумулятив</th>
+          </tr>
+        </thead>
+        <tbody id="concBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="margin-top:18px;padding:14px 18px;background:rgba(150,193,31,.06);border-left:3px solid var(--g);border-radius:8px;font-size:12.5px;line-height:1.6;color:#4a7000">
+    💡 <strong>Як читати цю вкладку:</strong>
+    Лінійний менеджер — натискай на revival list, дзвони перші 5–10 ім'я.
+    Керівник відділу — слідкуй за DSO (норма 30–45 днів) і концентрацією (норма ТОП-10 &lt;55%).
+    Директор — використовуй для board-meeting презентацій про здоров'я бази.
+  </div>
+</div><!-- /tab-6 -->
+
 </div><!-- /wrap -->
 
 <div class="footer">
@@ -1242,6 +1369,7 @@ function showTab(n){
     if(n===2){buildMainChart();buildCashflow();buildQuarter();buildAnnual();buildReturns();buildAvgOrder();buildOrders();buildSeason();buildHist();}
     if(n===3){buildTopClients();buildTopProducts();buildTopClientsMargin();buildTopProductsMargin();buildTopClientsAbsMargin();buildTopProductsAbsMargin();buildFunnel();buildGeoChart();buildChannelChart();buildCohort();buildSleeping();}
     if(n===4){buildStock();buildABC();buildStockHistory();buildSupplyChart();buildTurnover();buildRawMaterial();}
+    if(n===6){buildActionItems();}
     if(n===5){buildDriedKpis();buildDriedVolumeChart();buildDriedMomChart();buildDriedByProductChart();buildDriedProductTable();buildSupplyVsProd();buildTechcards();}
   },30);
 }
@@ -3080,6 +3208,134 @@ buildAlerts();
 buildPeriodCompare();
 buildAnnualKpis();
 syncMetricControls();
+
+// === Action Items builder (v2.59 MIN) =====================================
+// Renders 4 blocks in tab-6: revival list · AR overdue · funnel · concentration.
+// All data comes from D (embedded JSON refreshed by moysklad_sync.py).
+let actionItemsChart = null, funnelChart2Inst = null;
+function buildActionItems(){
+  const nf = n => Number(n||0).toLocaleString('uk-UA');
+
+  // === 1. Revival list ===
+  const sleeping = (D.sleeping_clients || []).slice(0, 20);
+  document.getElementById('revivalCount').textContent = sleeping.length ? `· ${sleeping.length} клієнтів` : '· немає даних';
+  const sleepingTop20Sum = sleeping.reduce((a,x)=>a+(x.revenue||0), 0);
+  document.getElementById('revivalBody').innerHTML = sleeping.length
+    ? sleeping.map((c,i) => `
+        <tr>
+          <td class="rank">${i+1}</td>
+          <td>${c.name||''}</td>
+          <td style="text-align:right;font-weight:600">${nf(c.revenue)} ₴</td>
+          <td style="text-align:right;color:var(--muted)">${sleepingTop20Sum ? Math.round(c.revenue/sleepingTop20Sum*100) : 0}%</td>
+        </tr>`).join('')
+    : `<tr><td colspan="4" style="padding:24px;text-align:center;color:var(--muted)">Жодного «сплячого» клієнта — усі активні цього місяця 🎉</td></tr>`;
+
+  // === 2. Overdue AR ===
+  document.getElementById('arTotal').textContent = nf(D.ar_current || 0) + ' ₴';
+  document.getElementById('dsoDays').textContent = (D.dso_days || 0) + ' дн';
+  const arMonthly = D.ar_monthly || [];
+  const arAvg = arMonthly.length ? Math.round(arMonthly.reduce((a,x)=>a+(x.ar||x.amount||0), 0) / arMonthly.length) : 0;
+  document.getElementById('arAvgMonth').textContent = nf(arAvg) + ' ₴';
+
+  // AR chart
+  const arCtx = document.getElementById('arChart');
+  if (arCtx && arMonthly.length) {
+    if (actionItemsChart) actionItemsChart.destroy();
+    actionItemsChart = new Chart(arCtx, {
+      type: 'bar',
+      data: {
+        labels: arMonthly.map(x => x.ym || x.month),
+        datasets: [{
+          label: 'Дебіторка, ₴',
+          data: arMonthly.map(x => x.ar || x.amount || 0),
+          backgroundColor: 'rgba(232,64,64,.7)',
+          borderColor: '#E84040',
+          borderWidth: 1,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { ticks: { callback: v => (v/1000).toFixed(0) + 'K' } }
+        }
+      }
+    });
+  }
+
+  // === 3. Funnel chart (orders → shipments → payments) ===
+  const fm = (D.funnel_monthly || []).slice(-12);
+  const funnelCtx = document.getElementById('funnelChart2');
+  if (funnelCtx && fm.length) {
+    if (funnelChart2Inst) funnelChart2Inst.destroy();
+    funnelChart2Inst = new Chart(funnelCtx, {
+      type: 'line',
+      data: {
+        labels: fm.map(x => x.ym),
+        datasets: [
+          { label: 'Замовлення', data: fm.map(x => x.orders||0), borderColor:'#3B82F6', backgroundColor:'rgba(59,130,246,.1)', tension: 0.3 },
+          { label: 'Відвантаження', data: fm.map(x => x.shipments||x.shipped||0), borderColor:'#96C11F', backgroundColor:'rgba(150,193,31,.1)', tension: 0.3 },
+          { label: 'Оплати', data: fm.map(x => x.payments||x.paid||0), borderColor:'#FEBF27', backgroundColor:'rgba(254,191,39,.1)', tension: 0.3 },
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } },
+        scales: {
+          y: { ticks: { callback: v => (v/1000).toFixed(0) + 'K' } }
+        }
+      }
+    });
+  } else if (funnelCtx) {
+    funnelCtx.parentElement.innerHTML = '<div class="empty-state"><div class="es-icon">📊</div><div class="es-title">Funnel дані недоступні</div><div class="es-sub">Перевір наступний sync</div></div>';
+  }
+
+  // === 4. Concentration ===
+  const tc = D.top_clients || [];
+  // top_clients може бути об'єкт {year: [...]} або array
+  let allClients = [];
+  if (Array.isArray(tc)) {
+    allClients = tc;
+  } else if (typeof tc === 'object') {
+    // Aggregate across years
+    const agg = {};
+    Object.values(tc).forEach(arr => (arr||[]).forEach(c => {
+      const n = c.name || c.client || '';
+      agg[n] = (agg[n]||0) + (c.revenue || c.sum || 0);
+    }));
+    allClients = Object.entries(agg).sort((a,b) => b[1]-a[1]).map(([name,revenue]) => ({name, revenue}));
+  }
+  const totalRev = allClients.reduce((a,c) => a + (c.revenue||0), 0);
+  const top10 = allClients.slice(0, 10).reduce((a,c) => a + (c.revenue||0), 0);
+  const top20 = allClients.slice(0, 20).reduce((a,c) => a + (c.revenue||0), 0);
+  const top10pct = totalRev ? Math.round(top10/totalRev*100) : 0;
+  const top20pct = totalRev ? Math.round(top20/totalRev*100) : 0;
+  document.getElementById('concTop10').textContent = top10pct + '%';
+  document.getElementById('concTop20').textContent = top20pct + '%';
+
+  let risk = '🟢 Низький';
+  if (top10pct > 70) risk = '🔴 Високий';
+  else if (top10pct > 55) risk = '🟡 Середній';
+  document.getElementById('concRisk').textContent = risk;
+
+  let cum = 0;
+  document.getElementById('concBody').innerHTML = allClients.slice(0, 20).length
+    ? allClients.slice(0, 20).map((c,i) => {
+        cum += c.revenue || 0;
+        const pct = totalRev ? (c.revenue/totalRev*100).toFixed(1) : '0';
+        const cumPct = totalRev ? (cum/totalRev*100).toFixed(1) : '0';
+        return `
+          <tr>
+            <td class="rank">${i+1}</td>
+            <td>${c.name||''}</td>
+            <td style="text-align:right;font-weight:600">${nf(Math.round(c.revenue||0))} ₴</td>
+            <td style="text-align:right">${pct}%</td>
+            <td style="text-align:right;color:var(--muted)">${cumPct}%</td>
+          </tr>`;
+      }).join('')
+    : `<tr><td colspan="5" style="padding:24px;text-align:center;color:var(--muted)">Top clients дані недоступні</td></tr>`;
+}
+
 // Show tab 1 (triggers full init for tab 1 content, others load on click)
 showTab(1);
 
