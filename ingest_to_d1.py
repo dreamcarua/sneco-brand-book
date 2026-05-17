@@ -219,6 +219,7 @@ ENTITY_MAP = {
             "Сума, грн": "sum_kop",
             "Оплачено, грн": "payed_sum_kop",
             "Стан": "state",
+            "Очікувана оплата": "payment_planned_moment",
             # EN aliases ─────────
             "id": "id",
             "moment": "ms_moment",
