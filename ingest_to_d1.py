@@ -43,6 +43,7 @@ BATCH_SIZE = 50   # Зменшили з 400 → 50 (v2.63) щоб уникнут
 KOP_COLS = {
     "sum_kop", "payed_sum_kop", "shipped_sum_kop",
     "sale_price_kop", "buy_price_kop", "min_price_kop",
+    "balance_kop", "overdue_debt_kop",  # NEW v2.67
 }
 
 # Map xlsx file → entity slug + column rename map (xlsx header → D1 column).
@@ -184,14 +185,23 @@ ENTITY_MAP = {
     "counterparties": {
         "file": "counterparties.xlsx",
         "cols": {
-            # UA (real) ─────────
+            # UA (real headers from moysklad_sync) ─────────
             "Назва": "name",
+            "Повна назва": "full_name",                    # NEW v2.67
             "Тип": "company_type",
             "Код": "code",
             "ЄДРПОУ/ІНН": "inn",
             "Телефон": "phone",
+            "Факс": "fax",                                  # NEW v2.67
             "Email": "email",
+            "Юр.адреса": "legal_address",                  # NEW v2.67
+            "Юр.адреса коментар": "legal_address_comment", # NEW v2.67
+            "Факт.адреса": "actual_address",                # NEW v2.67
             "Теги": "tags",
+            "Баланс, грн": "balance_kop",                   # NEW v2.67 (KOP conversion)
+            "Борг прострочений": "overdue_debt_kop",        # NEW v2.67 (KOP conversion)
+            "Статус": "state",                              # NEW v2.67
+            "Коментар": "description",                      # NEW v2.67
             # EN aliases ─────────
             "id": "id",
             "name": "name",
@@ -203,9 +213,13 @@ ENTITY_MAP = {
             "actualAddress": "actual_address", "actual_address": "actual_address",
             "email": "email",
             "phone": "phone",
+            "fax": "fax",
             "tags": "tags",
             "companyType": "company_type", "company_type": "company_type",
             "archived": "archived",
+            "description": "description",
+            "balance": "balance_kop",
+            "overdueDebt": "overdue_debt_kop",
         },
     },
     "invoices_out": {
