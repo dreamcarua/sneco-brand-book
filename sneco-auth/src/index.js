@@ -18,9 +18,9 @@
  *   - ALLOWED_ORIGIN (var, default "https://dreamcarua.github.io")
  */
 
-const SUPPORTED_BLOCKS = ['hr', 'prices', 'admin', 'production', 'dashboard', 'inventory-dashboard', 'production-dashboard', 'customer-dashboard'];
+const SUPPORTED_BLOCKS = ['hr', 'prices', 'admin', 'production', 'dashboard', 'inventory-dashboard', 'production-dashboard', 'customer-dashboard', 'finance-dashboard'];
 // Dashboard-family blocks (всі мають доступ до /api/dashboard/data — той самий D1)
-const DASHBOARD_BLOCKS = new Set(['dashboard', 'inventory-dashboard', 'production-dashboard', 'customer-dashboard']);
+const DASHBOARD_BLOCKS = new Set(['dashboard', 'inventory-dashboard', 'production-dashboard', 'customer-dashboard', 'finance-dashboard']);
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;       // 10 MB per file
 const MAX_TITLE_LEN = 200;
 const MAX_BODY_LEN = 10000;
@@ -197,6 +197,7 @@ async function sendOtpEmail(env, email, code, block) {
     'inventory-dashboard': { uk: 'Inventory Dashboard', en: 'Inventory Dashboard', sk: 'Inventory Dashboard' },
     'production-dashboard': { uk: 'Production Dashboard', en: 'Production Dashboard', sk: 'Production Dashboard' },
     'customer-dashboard': { uk: 'Customer 360', en: 'Customer 360', sk: 'Customer 360' },
+    'finance-dashboard': { uk: 'Finance Dashboard', en: 'Finance Dashboard', sk: 'Finance Dashboard' },
   }[block] || { uk: block.toUpperCase(), en: block.toUpperCase(), sk: block.toUpperCase() };
   const subject = `Код доступу / Access code / Prístupový kód · ${blockNice.uk} · snEco`;
   const codeBlock = `
