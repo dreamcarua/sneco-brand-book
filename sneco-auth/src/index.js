@@ -614,7 +614,7 @@ const DASHBOARD_TABLES = {
   },
   counterparties: {
     table: 'ms_counterparties',
-    cols: ['id','name','code','external_code','inn','edrpou','legal_address','actual_address','email','phone','tags','company_type','archived','raw_json','ingested_at'],
+    cols: ['id','name','full_name','code','external_code','inn','edrpou','legal_address','legal_address_comment','actual_address','email','phone','fax','tags','company_type','balance_kop','overdue_debt_kop','state','description','archived','raw_json','ingested_at'],
   },
   invoices_out: {
     table: 'ms_invoices_out',
