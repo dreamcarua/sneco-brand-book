@@ -419,6 +419,8 @@ def parse_invoicesout(rows):
         "Сума, грн":    r.get("sum", 0) / 100,
         "Оплачено, грн":r.get("payedSum", 0) / 100,
         "Стан":         safe(r.get("state")),
+        # v2.65: planned payment date — критично для AR aging у Finance Dashboard
+        "Очікувана оплата": (r.get("paymentPlannedMoment") or "")[:10],
     } for r in rows]
 
 
@@ -628,8 +630,10 @@ def main():
     save_excel(pd.DataFrame(parse_productfolders(rows)), "product_folders", reliable=True)
 
     print("\n🧾 Рахунки покупцям...")
-    rows = fetch_all("entity/invoiceout")
+    # v2.65: expand=agent,state інакше agent.name = ""; paymentPlannedMoment приходить без expand
+    rows = fetch_all("entity/invoiceout", expand="agent,state")
     save_excel(pd.DataFrame(parse_invoicesout(rows)), "invoices_out", reliable=True)
+    print(f"   📋 Завантажено рахунків: {len(rows)}", flush=True)
 
     print("\n📊 Залишки (поточні)...")
     all_rows, offset = [], 0
