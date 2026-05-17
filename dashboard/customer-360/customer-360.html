@@ -493,8 +493,8 @@ window.bootCustomer360 = async function(token){
 
 function renderQuickPills(){
   // PRIMARY: TOP-25 by LAST CALENDAR MONTH revenue (most actionable for sales reps)
-  // FALLBACK 1: TOP-25 by last 30 days (if last month has 0 — early in current month)
-  // FALLBACK 2: TOP-25 by lifetime revenue (if no recent activity at all)
+  // FALLBACK 1: TOP-25 by last 30 days
+  // FALLBACK 2: TOP-25 by lifetime revenue
   let basis = 'last month';
   let pool = allCounterparties.filter(c => (c.__lastMonthRev||0) > 0);
   if (pool.length === 0) { basis = 'last 30 days'; pool = allCounterparties.filter(c => (c.__last30Rev||0) > 0); }
@@ -517,13 +517,47 @@ function renderQuickPills(){
       ? `ТОП-${top.length} за останні 30 днів`
       : `ТОП-${top.length} за весь час`;
 
+  // Render as a sleek list/table — name | revenue period | LTV | last order
+  const sumPeriod = top.reduce((a,c)=>a+(c[sortKey]||0),0);
   const html = `
-    <div style="width:100%;text-align:center;margin-bottom:6px;font-size:10.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px">${label}</div>
-    ${top.map(c => {
-      const rev = c[sortKey] || 0;
-      const tag = c.__virtual ? ' <span style="font-size:9px;opacity:.7">⚠</span>' : '';
-      return `<span class="quick-pill" onclick="selectCustomer('${escapeAttr(c.__key || c.name)}')" title="${nf(Math.round(rev))} ₴">${escapeHtml(c.name)}${tag} <span style="opacity:.65">· ${nfm(rev)}₴</span></span>`;
-    }).join('')}
+    <div style="width:100%;text-align:left;margin-bottom:6px;font-size:10.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between;align-items:baseline;gap:10px">
+      <span>${label}</span>
+      <span style="font-size:10px;color:var(--muted);font-weight:600">Σ ${nfm(sumPeriod)}₴</span>
+    </div>
+    <div style="width:100%;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden">
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+        <thead>
+          <tr style="background:#FAFAF5;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700">
+            <th style="width:26px;padding:7px 8px;text-align:right">#</th>
+            <th style="padding:7px 10px;text-align:left">Клієнт</th>
+            <th style="padding:7px 10px;text-align:right;white-space:nowrap">За ${basis === 'last month' ? 'місяць' : basis === 'last 30 days' ? '30 днів' : 'весь час'}</th>
+            <th style="padding:7px 10px;text-align:right;white-space:nowrap">LTV</th>
+            <th style="padding:7px 10px;text-align:right;white-space:nowrap">Остання продаж</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${top.map((c,i) => {
+            const rev = c[sortKey] || 0;
+            const ltv = c.__revenue || 0;
+            const last = c.__lastOrder ? dfShort(c.__lastOrder) : '—';
+            const tag = c.__virtual ? ' <span style="font-size:9px;opacity:.7" title="Контрагент відсутній у master-таблиці">⚠</span>' : '';
+            const ediz = c.edrpou || c.inn || '';
+            return `
+              <tr onclick="selectCustomer('${escapeAttr(c.__key || c.name)}')" style="cursor:pointer;border-top:1px solid var(--border);transition:background .12s" onmouseover="this.style.background='#FFF9E5'" onmouseout="this.style.background=''">
+                <td style="padding:8px 8px;text-align:right;color:var(--y);font-weight:800">${i+1}</td>
+                <td style="padding:8px 10px">
+                  <div style="font-weight:600;color:var(--d);line-height:1.3">${escapeHtml(c.name)}${tag}</div>
+                  ${ediz ? `<div style="font-size:10.5px;color:var(--muted);margin-top:1px">${ediz}</div>` : ''}
+                </td>
+                <td style="padding:8px 10px;text-align:right;font-weight:700;color:#4a7000">${nf(Math.round(rev))} ₴</td>
+                <td style="padding:8px 10px;text-align:right;color:#555">${nfm(ltv)} ₴</td>
+                <td style="padding:8px 10px;text-align:right;color:var(--muted);font-size:11px;white-space:nowrap">${last}</td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
   `;
   document.getElementById('quickPills').innerHTML = html;
 }
