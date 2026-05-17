@@ -36,7 +36,7 @@ try:
 except ImportError:
     pass
 
-BATCH_SIZE = 400  # rows per HTTP POST (Worker limit 500, leave margin)
+BATCH_SIZE = 50   # Зменшили з 400 → 50 (v2.63) щоб уникнути CF Worker payload/D1 batch limits
 
 # Map xlsx file → entity slug + column rename map (from xlsx header → D1 column)
 ENTITY_MAP = {
@@ -223,8 +223,20 @@ def post_batch(worker_url: str, sync_key: str, entity: str, rows: list) -> dict:
         url,
         json=payload,
         headers={"X-Sync-Key": sync_key, "Origin": "https://dreamcarua.github.io"},
-        timeout=30,
+        timeout=60,
     )
+    if not r.ok:
+        # КРИТИЧНО: лог body Worker'а перед raise, інакше неможливо діагностувати 500.
+        try:
+            body = r.text[:1500]
+        except Exception:
+            body = "<unreadable>"
+        sample_keys = list((rows[0] if rows else {}).keys())
+        sample_preview = json.dumps(rows[0] if rows else None, ensure_ascii=False, default=str)[:800]
+        print(f"\n❌ post_batch {entity} rows={len(rows)} → HTTP {r.status_code}", file=sys.stderr, flush=True)
+        print(f"   response body: {body}", file=sys.stderr, flush=True)
+        print(f"   sample row keys: {sample_keys}", file=sys.stderr, flush=True)
+        print(f"   sample row preview: {sample_preview}", file=sys.stderr, flush=True)
     r.raise_for_status()
     return r.json()
 
@@ -237,6 +249,9 @@ def post_sync_log(worker_url: str, sync_key: str, log: dict) -> dict:
         headers={"X-Sync-Key": sync_key, "Origin": "https://dreamcarua.github.io"},
         timeout=15,
     )
+    if not r.ok:
+        try: print(f"❌ sync_log → HTTP {r.status_code}: {r.text[:500]}", file=sys.stderr, flush=True)
+        except: pass
     r.raise_for_status()
     return r.json()
 
