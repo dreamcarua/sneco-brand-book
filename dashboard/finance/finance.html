@@ -441,6 +441,8 @@ function renderDashboard(){
   const overdueTotal = overdueInvoices.reduce((a,i) => a + ((i.sum_kop||0) - (i.payed_sum_kop||0))/100, 0);
 
   // DSO — average days from invoice date to payment date
+  // Use only fully-paid invoices (payed_sum_kop >= sum_kop), compare ms_moment vs payment_planned_moment as approximation
+  // Better: for paid invoices, days = (payment_planned_moment - ms_moment). If we have payment_planned_moment as a proxy.
   let dso = null;
   const paidInvs = allInvoices.filter(i => (i.payed_sum_kop||0) >= (i.sum_kop||0) && i.sum_kop > 0 && i.ms_moment && i.payment_planned_moment);
   if (paidInvs.length) {
@@ -452,7 +454,7 @@ function renderDashboard(){
     dso = Math.round(totalDays / paidInvs.length);
   }
 
-  // Forecast cash next 30d
+  // Forecast cash next 30d — open invoices with planned date in next 30d
   const forecastCash = openInvoices.filter(i => {
     const planned = (i.payment_planned_moment||'').slice(0,10);
     return planned && planned >= today && planned <= future30;
@@ -488,7 +490,7 @@ function renderDashboard(){
   });
 
   // === SECTION 3: AR aging buckets ===
-  const buckets = { b0: 0, b30: 0, b60: 0, b90: 0 };
+  const buckets = { b0: 0, b30: 0, b60: 0, b90: 0 };  // 0-30 / 31-60 / 61-90 / 90+
   const bucketsCount = { b0: 0, b30: 0, b60: 0, b90: 0 };
   overdueInvoices.forEach(i => {
     const planned = new Date(i.payment_planned_moment).getTime();
@@ -500,8 +502,9 @@ function renderDashboard(){
     else { buckets.b90 += balance; bucketsCount.b90++; }
   });
 
-  // === SECTION 4: TOP-10 debtors ===
-  const debtorMap = {};
+  // === SECTION 4: TOP-10 debtors (overdue, with contacts) ===
+  // Aggregate overdue balance per CP
+  const debtorMap = {};  // key -> { cp, balance, maxDaysOverdue, invoices }
   overdueInvoices.forEach(i => {
     const cp = matchCP(i);
     if (!cp) return;
@@ -533,8 +536,9 @@ function renderDashboard(){
     };
   }).sort((a,b) => (a.date||'').localeCompare(b.date||''));
 
-  // === Concentration ===
-  const top1Share = (overdueTotal > 0 && topDebtors[0]) ? (topDebtors[0].balance / overdueTotal * 100) : 0;
+  // === Concentration: TOP debtor share ===
+  const totalOverdue = topDebtors.reduce((a,d) => a + d.balance, 0);
+  const top1Share = (totalOverdue > 0 && topDebtors[0]) ? (topDebtors[0].balance / overdueTotal * 100) : 0;
   const debtorsOver90 = topDebtors.filter(d => d.maxDays > 90).length;
   const totalOver90 = topDebtors.filter(d => d.maxDays > 90).reduce((a,d) => a + d.balance, 0);
 
@@ -547,11 +551,13 @@ function renderDashboard(){
   };
 
   const html = `
+    <!-- HEADER -->
     <div class="fin-header">
       <div class="fin-title">💰 Finance Dashboard</div>
       <div class="fin-sub">Cash flow · AR aging · Дебіторка · Прогноз надходжень</div>
     </div>
 
+    <!-- HERO KPI ROW 1 -->
     <div class="g4">
       <div class="kpi cg">
         <div class="kpi-lbl">Виручка (30 днів)</div>
@@ -575,6 +581,7 @@ function renderDashboard(){
       </div>
     </div>
 
+    <!-- HERO KPI ROW 2 -->
     <div class="g4" style="margin-top:14px">
       <div class="kpi cb">
         <div class="kpi-lbl">DSO — Days Sales Outstanding</div>
@@ -598,6 +605,7 @@ function renderDashboard(){
       </div>
     </div>
 
+    <!-- SECTION 2: CASH FLOW CHART -->
     <div class="sec">💸 Грошовий потік</div>
     <div class="cc">
       <div class="cc-head">
@@ -609,6 +617,7 @@ function renderDashboard(){
       <div class="chart-h320"><canvas id="cashFlowChart"></canvas></div>
     </div>
 
+    <!-- SECTION 3: AR AGING -->
     <div class="sec">📊 AR aging — старіння дебіторки</div>
     <div class="g2">
       <div class="cc">
@@ -639,6 +648,7 @@ function renderDashboard(){
       </div>
     </div>
 
+    <!-- SECTION 4: TOP-10 DEBTORS -->
     <div class="sec">📞 ТОП-10 поточних дебіторів — контакти готові</div>
     <div class="cc">
       ${topDebtors.length === 0 ? `
@@ -688,6 +698,7 @@ function renderDashboard(){
       `}
     </div>
 
+    <!-- SECTION 5: UPCOMING PAYMENTS -->
     <div class="sec">⏳ Очікувані надходження — наступні 30 днів</div>
     <div class="cc">
       ${upcomingInvoices.length === 0 ? `
@@ -726,6 +737,7 @@ function renderDashboard(){
       `}
     </div>
 
+    <!-- SECTION 6: AUTO-INSIGHTS -->
     <div class="sec">🧠 Auto-insights</div>
     <div class="insights-grid">
       <div class="insight ${debtorsOver90 > 0 ? 'red' : 'green'}">
@@ -773,7 +785,9 @@ function renderDashboard(){
 
   document.getElementById('contentWrap').innerHTML = html;
 
+  // === Render charts ===
   setTimeout(() => {
+    // Cash flow chart
     const cfCtx = document.getElementById('cashFlowChart');
     if (cfCtx) {
       if (_charts.cf) _charts.cf.destroy();
@@ -806,6 +820,7 @@ function renderDashboard(){
       });
     }
 
+    // AR aging doughnut
     const agCtx = document.getElementById('agingChart');
     if (agCtx) {
       if (_charts.ag) _charts.ag.destroy();
@@ -836,9 +851,11 @@ function renderDashboard(){
   }, 50);
 }
 
+// === Helpers ===
 function escapeHtml(s){return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);}
 function escapeAttr(s){return escapeHtml(s).replace(/"/g,'&quot;');}
 
+// === Last-sync badge ===
 async function updateSyncBadge(){
   const statusEl = document.getElementById('syncStatus');
   const updateEl = document.getElementById('lastUpdate');
