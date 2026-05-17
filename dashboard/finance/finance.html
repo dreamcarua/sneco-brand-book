@@ -294,7 +294,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Finance Dashboard · МойСклад API · Оновлення: щодня 06:00
+  snEco Finance Dashboard v2.65 · МойСклад API · AR на основі demands · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -347,22 +347,21 @@ window.bootFinance = async function(token){
   updateSyncBadge();
 
   try {
-    const [cp, dem, pay, ord, inv, ret] = await Promise.all([
+    const [cp, dem, pay, ord, ret] = await Promise.all([
       fetchJson('counterparties'),
       fetchJson('demands'),
       fetchJson('payments'),
       fetchJson('orders'),
-      fetchJson('invoices_out'),
       fetchJson('returns'),
     ]);
     allCounterparties = cp || [];
     allDemands = dem || [];
     allPayments = pay || [];
     allOrders = ord || [];
-    allInvoices = inv || [];
+    allInvoices = []; // snEco не виставляє invoices_out — AR будується з ms_demands
     allReturns = ret || [];
 
-    console.log(`Loaded: ${allCounterparties.length} CPs, ${allDemands.length} demands, ${allPayments.length} payments, ${allInvoices.length} invoices`);
+    console.log(`Loaded: ${allCounterparties.length} CPs, ${allDemands.length} demands, ${allPayments.length} payments, ${allOrders.length} orders`);
     renderDashboard();
   } catch(e) {
     console.error('Boot error', e);
@@ -413,7 +412,14 @@ function renderDashboard(){
   }
 
   // === SECTION 1: HERO KPIs ===
-  // Revenue last 30d vs prev 30d
+  // snEco НЕ виставляє рахунки в МойСклад — AR будуємо з ms_demands.
+  // outstanding per demand = sum_kop - payed_sum_kop (if > 0).
+  // Overdue: ms_moment + 30d credit term <= today.
+  const CREDIT_DAYS = 30;
+  const todayMs = Date.now();
+  const dueCutoff = new Date(now.getTime() - CREDIT_DAYS*86400000).toISOString().slice(0,10);
+
+  // Revenue last 30d vs prev 30d (из demand)
   const revLast30 = allDemands.filter(d => (d.ms_moment||'').slice(0,10) >= c30).reduce((a,d) => a + (d.sum_kop||0)/100, 0);
   const revPrev30 = allDemands.filter(d => {
     const dt = (d.ms_moment||'').slice(0,10);
@@ -429,36 +435,52 @@ function renderDashboard(){
   }).reduce((a,p) => a + (p.sum_kop||0)/100, 0);
   const cashDelta = cashPrev30 > 0 ? ((cashLast30 - cashPrev30)/cashPrev30*100) : null;
 
-  // Open invoices (sum - payed > 0)
-  const openInvoices = allInvoices.filter(i => ((i.sum_kop||0) - (i.payed_sum_kop||0)) > 0);
-  const openInvoicesTotal = openInvoices.reduce((a,i) => a + ((i.sum_kop||0) - (i.payed_sum_kop||0))/100, 0);
+  // Open AR: demands with sum > payed
+  const openDemands = allDemands.filter(d => ((d.sum_kop||0) - (d.payed_sum_kop||0)) > 0);
+  const openARTotal = openDemands.reduce((a,d) => a + ((d.sum_kop||0) - (d.payed_sum_kop||0))/100, 0);
 
-  // Overdue AR (planned date passed)
-  const overdueInvoices = openInvoices.filter(i => {
-    const planned = (i.payment_planned_moment||'').slice(0,10);
-    return planned && planned < today;
+  // Overdue AR: open demands with ms_moment <= today - CREDIT_DAYS
+  const overdueDemands = openDemands.filter(d => {
+    const dt = (d.ms_moment||'').slice(0,10);
+    return dt && dt <= dueCutoff;
   });
-  const overdueTotal = overdueInvoices.reduce((a,i) => a + ((i.sum_kop||0) - (i.payed_sum_kop||0))/100, 0);
+  const overdueTotal = overdueDemands.reduce((a,d) => a + ((d.sum_kop||0) - (d.payed_sum_kop||0))/100, 0);
 
-  // DSO — average days from invoice date to payment date
-  // Use only fully-paid invoices (payed_sum_kop >= sum_kop), compare ms_moment vs payment_planned_moment as approximation
-  // Better: for paid invoices, days = (payment_planned_moment - ms_moment). If we have payment_planned_moment as a proxy.
+  // DSO — для paid demands: середня різниця між ms_moment і датою першого inbound payment того ж агента
+  // approximation: збираємо paid demands (payed >= sum), беремо перший платіж агента >= ms_moment
   let dso = null;
-  const paidInvs = allInvoices.filter(i => (i.payed_sum_kop||0) >= (i.sum_kop||0) && i.sum_kop > 0 && i.ms_moment && i.payment_planned_moment);
-  if (paidInvs.length) {
-    const totalDays = paidInvs.reduce((a,i) => {
-      const issued = new Date(i.ms_moment).getTime();
-      const planned = new Date(i.payment_planned_moment).getTime();
-      return a + Math.max(0, (planned - issued)/86400000);
-    }, 0);
-    dso = Math.round(totalDays / paidInvs.length);
+  const paidDemands = allDemands.filter(d => (d.payed_sum_kop||0) >= (d.sum_kop||0) && (d.sum_kop||0) > 0 && d.ms_moment);
+  if (paidDemands.length) {
+    // group inbound payments by agent_id
+    const payByAgent = {};
+    allPayments.forEach(p => {
+      if (!isInbound(p) || !p.ms_moment) return;
+      const k = p.agent_id || p.agent || '';
+      if (!k) return;
+      (payByAgent[k] = payByAgent[k] || []).push(p.ms_moment);
+    });
+    Object.keys(payByAgent).forEach(k => payByAgent[k].sort());
+    let totalDays = 0, n = 0;
+    paidDemands.forEach(d => {
+      const k = d.agent_id || d.agent || '';
+      const list = payByAgent[k];
+      if (!list) return;
+      // знаходимо перший payment >= ms_moment
+      const dDate = d.ms_moment;
+      const next = list.find(t => t >= dDate);
+      if (!next) return;
+      const days = (new Date(next).getTime() - new Date(dDate).getTime())/86400000;
+      if (days < 0 || days > 365) return; // skip outliers
+      totalDays += days; n++;
+    });
+    dso = n > 0 ? Math.round(totalDays / n) : null;
   }
 
-  // Forecast cash next 30d — open invoices with planned date in next 30d
-  const forecastCash = openInvoices.filter(i => {
-    const planned = (i.payment_planned_moment||'').slice(0,10);
-    return planned && planned >= today && planned <= future30;
-  }).reduce((a,i) => a + ((i.sum_kop||0) - (i.payed_sum_kop||0))/100, 0);
+  // Forecast cash next 30d — на основі історичного avg revenue per day × 30
+  // (snEco не має planned dates у MoySklad, тож прогноз = середній денний прибуток × 30)
+  // База: revenue last 90 days / 90 * 30
+  const rev90 = allDemands.filter(d => (d.ms_moment||'').slice(0,10) >= c90).reduce((a,d) => a + (d.sum_kop||0)/100, 0);
+  const forecastCash = (rev90 / 90) * 30;
 
   // Active customers (unique agents in demands last 90d)
   const activeAgents = new Set();
@@ -467,8 +489,8 @@ function renderDashboard(){
   });
   const activeCount = activeAgents.size;
 
-  // Avg invoice value
-  const avgInv = allInvoices.length ? (allInvoices.reduce((a,i) => a + (i.sum_kop||0)/100, 0) / allInvoices.length) : 0;
+  // Avg sale value
+  const avgSale = allDemands.length ? (allDemands.reduce((a,d) => a + (d.sum_kop||0)/100, 0) / allDemands.length) : 0;
 
   // === SECTION 2: Cash flow 12 months ===
   const months = [];
@@ -490,57 +512,61 @@ function renderDashboard(){
   });
 
   // === SECTION 3: AR aging buckets ===
-  const buckets = { b0: 0, b30: 0, b60: 0, b90: 0 };  // 0-30 / 31-60 / 61-90 / 90+
+  // Buckets по днях ВІД ms_moment (дата відвантаження).
+  // 1-30 = fresh (ще не overdue, але вже AR); 31-60 / 61-90 / 90+ — overdue по terms 30d.
+  const buckets = { b0: 0, b30: 0, b60: 0, b90: 0 };
   const bucketsCount = { b0: 0, b30: 0, b60: 0, b90: 0 };
-  overdueInvoices.forEach(i => {
-    const planned = new Date(i.payment_planned_moment).getTime();
-    const daysOver = Math.floor((Date.now() - planned)/86400000);
-    const balance = ((i.sum_kop||0) - (i.payed_sum_kop||0))/100;
-    if (daysOver <= 30) { buckets.b0 += balance; bucketsCount.b0++; }
-    else if (daysOver <= 60) { buckets.b30 += balance; bucketsCount.b30++; }
-    else if (daysOver <= 90) { buckets.b60 += balance; bucketsCount.b60++; }
+  openDemands.forEach(d => {
+    if (!d.ms_moment) return;
+    const dt = new Date(d.ms_moment).getTime();
+    const daysSince = Math.floor((todayMs - dt)/86400000);
+    const balance = ((d.sum_kop||0) - (d.payed_sum_kop||0))/100;
+    if (daysSince <= 30) { buckets.b0 += balance; bucketsCount.b0++; }
+    else if (daysSince <= 60) { buckets.b30 += balance; bucketsCount.b30++; }
+    else if (daysSince <= 90) { buckets.b60 += balance; bucketsCount.b60++; }
     else { buckets.b90 += balance; bucketsCount.b90++; }
   });
 
-  // === SECTION 4: TOP-10 debtors (overdue, with contacts) ===
-  // Aggregate overdue balance per CP
-  const debtorMap = {};  // key -> { cp, balance, maxDaysOverdue, invoices }
-  overdueInvoices.forEach(i => {
-    const cp = matchCP(i);
+  // === SECTION 4: TOP-10 debtors — за outstanding AR (не лише overdue) ===
+  const debtorMap = {};  // key -> { cp, balance, maxDaysSince, count }
+  openDemands.forEach(d => {
+    const cp = matchCP(d);
     if (!cp) return;
     const key = cp.id || cp.name;
-    const balance = ((i.sum_kop||0) - (i.payed_sum_kop||0))/100;
-    const planned = new Date(i.payment_planned_moment).getTime();
-    const daysOver = Math.floor((Date.now() - planned)/86400000);
+    const balance = ((d.sum_kop||0) - (d.payed_sum_kop||0))/100;
+    const dt = d.ms_moment ? new Date(d.ms_moment).getTime() : todayMs;
+    const daysSince = Math.floor((todayMs - dt)/86400000);
     if (!debtorMap[key]) debtorMap[key] = { cp, balance: 0, maxDays: 0, count: 0 };
     debtorMap[key].balance += balance;
     debtorMap[key].count++;
-    if (daysOver > debtorMap[key].maxDays) debtorMap[key].maxDays = daysOver;
+    if (daysSince > debtorMap[key].maxDays) debtorMap[key].maxDays = daysSince;
   });
   const topDebtors = Object.values(debtorMap).sort((a,b) => b.balance - a.balance).slice(0, 10);
 
-  // === SECTION 5: Upcoming payments next 30d ===
-  const upcomingInvoices = openInvoices.filter(i => {
-    const planned = (i.payment_planned_moment||'').slice(0,10);
-    return planned && planned >= today && planned <= future30;
-  }).map(i => {
-    const cp = matchCP(i);
-    const planned = new Date(i.payment_planned_moment);
-    const daysUntil = Math.floor((planned.getTime() - Date.now())/86400000);
+  // === SECTION 5: Upcoming — orders з delivery_planned_moment у наступні 30d ===
+  const upcomingInvoices = (allOrders || []).filter(o => {
+    const dp = (o.delivery_planned_moment||'').slice(0,10);
+    if (!dp) return false;
+    return dp >= today && dp <= future30;
+  }).map(o => {
+    const cp = matchCP(o);
+    const dp = new Date(o.delivery_planned_moment);
+    const daysUntil = Math.floor((dp.getTime() - todayMs)/86400000);
     return {
-      date: i.payment_planned_moment,
-      cpName: cp ? cp.name : (i.agent || '—'),
-      amount: ((i.sum_kop||0) - (i.payed_sum_kop||0))/100,
+      date: o.delivery_planned_moment,
+      cpName: cp ? cp.name : (o.agent || '—'),
+      amount: ((o.sum_kop||0) - (o.payed_sum_kop||0))/100 || ((o.sum_kop||0)/100),
       daysUntil,
-      invName: i.name || '',
+      invName: o.name || '',
     };
   }).sort((a,b) => (a.date||'').localeCompare(b.date||''));
 
-  // === Concentration: TOP debtor share ===
-  const totalOverdue = topDebtors.reduce((a,d) => a + d.balance, 0);
-  const top1Share = (totalOverdue > 0 && topDebtors[0]) ? (topDebtors[0].balance / overdueTotal * 100) : 0;
-  const debtorsOver90 = topDebtors.filter(d => d.maxDays > 90).length;
-  const totalOver90 = topDebtors.filter(d => d.maxDays > 90).reduce((a,d) => a + d.balance, 0);
+  // === Concentration: TOP debtor share of total AR ===
+  const top1Share = (openARTotal > 0 && topDebtors[0]) ? (topDebtors[0].balance / openARTotal * 100) : 0;
+  // "Over 90" = maxDays since shipment > 120 (тобто прострочено > 90d з врахуванням 30d credit term)
+  const OVERDUE_90 = 120;
+  const debtorsOver90 = topDebtors.filter(d => d.maxDays > OVERDUE_90).length;
+  const totalOver90 = topDebtors.filter(d => d.maxDays > OVERDUE_90).reduce((a,d) => a + d.balance, 0);
 
   // === BUILD HTML ===
   const deltaPill = (val) => {
@@ -569,15 +595,15 @@ function renderDashboard(){
         <div class="kpi-val">${nfm(cashLast30)} ₴</div>
         ${deltaPill(cashDelta)}
       </div>
-      <div class="kpi ${openInvoicesTotal > 0 ? 'co' : 'cg'}">
-        <div class="kpi-lbl">Відкриті рахунки</div>
-        <div class="kpi-val">${nfm(openInvoicesTotal)} ₴</div>
-        <div class="kpi-sub">${openInvoices.length} шт · не оплачено</div>
+      <div class="kpi ${openARTotal > 0 ? 'co' : 'cg'}">
+        <div class="kpi-lbl">Поточна дебіторка</div>
+        <div class="kpi-val">${nfm(openARTotal)} ₴</div>
+        <div class="kpi-sub">${openDemands.length} відвантажень · не оплачено</div>
       </div>
       <div class="kpi ${overdueTotal > 0 ? 'cr' : 'cg'}">
-        <div class="kpi-lbl">Прострочена дебіторка</div>
+        <div class="kpi-lbl">Прострочено (&gt;30 днів)</div>
         <div class="kpi-val">${nfm(overdueTotal)} ₴</div>
-        <div class="kpi-sub">${overdueInvoices.length} шт прострочено</div>
+        <div class="kpi-sub">${overdueDemands.length} відвантажень прострочено</div>
       </div>
     </div>
 
@@ -586,12 +612,12 @@ function renderDashboard(){
       <div class="kpi cb">
         <div class="kpi-lbl">DSO — Days Sales Outstanding</div>
         <div class="kpi-val">${dso !== null ? dso + ' дн' : '—'}</div>
-        <div class="kpi-sub">${paidInvs.length} оплачених рахунків</div>
+        <div class="kpi-sub">avg dni відвантаж.→оплата</div>
       </div>
       <div class="kpi cp">
-        <div class="kpi-lbl">Прогноз ₴ (30 днів)</div>
+        <div class="kpi-lbl">Прогноз надходжень (30 днів)</div>
         <div class="kpi-val">${nfm(forecastCash)} ₴</div>
-        <div class="kpi-sub">Очікувані надходження</div>
+        <div class="kpi-sub">avg revenue / day × 30 (істор.)</div>
       </div>
       <div class="kpi cg">
         <div class="kpi-lbl">Активні клієнти</div>
@@ -599,9 +625,9 @@ function renderDashboard(){
         <div class="kpi-sub">за останні 90 днів</div>
       </div>
       <div class="kpi cy">
-        <div class="kpi-lbl">Avg рахунок</div>
-        <div class="kpi-val">${nfm(avgInv)} ₴</div>
-        <div class="kpi-sub">${nf(allInvoices.length)} рахунків загалом</div>
+        <div class="kpi-lbl">Avg продаж</div>
+        <div class="kpi-val">${nfm(avgSale)} ₴</div>
+        <div class="kpi-sub">${nf(allDemands.length)} відвантажень загалом</div>
       </div>
     </div>
 
@@ -618,13 +644,13 @@ function renderDashboard(){
     </div>
 
     <!-- SECTION 3: AR AGING -->
-    <div class="sec">📊 AR aging — старіння дебіторки</div>
+    <div class="sec">📊 AR aging — старіння дебіторки (від дати відвантаження, credit term 30 днів)</div>
     <div class="g2">
       <div class="cc">
         <div class="cc-head">
           <div>
-            <div class="cc-title">Розподіл прострочки</div>
-            <div class="cc-sub">${overdueInvoices.length} рахунків · ${nfm(overdueTotal)} ₴ загалом</div>
+            <div class="cc-title">Розподіл дебіторки</div>
+            <div class="cc-sub">${openDemands.length} відвантажень · ${nfm(openARTotal)} ₴ загалом</div>
           </div>
         </div>
         <div class="chart-h280"><canvas id="agingChart"></canvas></div>
@@ -633,23 +659,23 @@ function renderDashboard(){
         <div class="cc-head">
           <div>
             <div class="cc-title">Buckets — деталізація</div>
-            <div class="cc-sub">Сума та кількість рахунків</div>
+            <div class="cc-sub">Сума та кількість відвантажень</div>
           </div>
         </div>
         <table class="dt">
-          <thead><tr><th>Bucket</th><th style="text-align:right">Рахунків</th><th style="text-align:right">Сума ₴</th><th style="text-align:right">% борги</th></tr></thead>
+          <thead><tr><th>Bucket</th><th style="text-align:right">Відвантаж.</th><th style="text-align:right">Сума ₴</th><th style="text-align:right">% AR</th></tr></thead>
           <tbody>
-            <tr><td><span class="bucket-pill b0">🟢 1-30 днів</span></td><td style="text-align:right">${bucketsCount.b0}</td><td style="text-align:right;font-weight:600">${nf(buckets.b0)}</td><td style="text-align:right;color:var(--muted)">${overdueTotal > 0 ? (buckets.b0/overdueTotal*100).toFixed(1) : '0'}%</td></tr>
-            <tr><td><span class="bucket-pill b30">🟡 31-60 днів</span></td><td style="text-align:right">${bucketsCount.b30}</td><td style="text-align:right;font-weight:600">${nf(buckets.b30)}</td><td style="text-align:right;color:var(--muted)">${overdueTotal > 0 ? (buckets.b30/overdueTotal*100).toFixed(1) : '0'}%</td></tr>
-            <tr><td><span class="bucket-pill b60">🟠 61-90 днів</span></td><td style="text-align:right">${bucketsCount.b60}</td><td style="text-align:right;font-weight:600">${nf(buckets.b60)}</td><td style="text-align:right;color:var(--muted)">${overdueTotal > 0 ? (buckets.b60/overdueTotal*100).toFixed(1) : '0'}%</td></tr>
-            <tr><td><span class="bucket-pill b90">🔴 90+ днів</span></td><td style="text-align:right">${bucketsCount.b90}</td><td style="text-align:right;font-weight:600;color:var(--red)">${nf(buckets.b90)}</td><td style="text-align:right;color:var(--red)">${overdueTotal > 0 ? (buckets.b90/overdueTotal*100).toFixed(1) : '0'}%</td></tr>
+            <tr><td><span class="bucket-pill b0">🟢 1-30 днів (свіже)</span></td><td style="text-align:right">${bucketsCount.b0}</td><td style="text-align:right;font-weight:600">${nf(buckets.b0)}</td><td style="text-align:right;color:var(--muted)">${openARTotal > 0 ? (buckets.b0/openARTotal*100).toFixed(1) : '0'}%</td></tr>
+            <tr><td><span class="bucket-pill b30">🟡 31-60 днів</span></td><td style="text-align:right">${bucketsCount.b30}</td><td style="text-align:right;font-weight:600">${nf(buckets.b30)}</td><td style="text-align:right;color:var(--muted)">${openARTotal > 0 ? (buckets.b30/openARTotal*100).toFixed(1) : '0'}%</td></tr>
+            <tr><td><span class="bucket-pill b60">🟠 61-90 днів</span></td><td style="text-align:right">${bucketsCount.b60}</td><td style="text-align:right;font-weight:600">${nf(buckets.b60)}</td><td style="text-align:right;color:var(--muted)">${openARTotal > 0 ? (buckets.b60/openARTotal*100).toFixed(1) : '0'}%</td></tr>
+            <tr><td><span class="bucket-pill b90">🔴 90+ днів</span></td><td style="text-align:right">${bucketsCount.b90}</td><td style="text-align:right;font-weight:600;color:var(--red)">${nf(buckets.b90)}</td><td style="text-align:right;color:var(--red)">${openARTotal > 0 ? (buckets.b90/openARTotal*100).toFixed(1) : '0'}%</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
     <!-- SECTION 4: TOP-10 DEBTORS -->
-    <div class="sec">📞 ТОП-10 поточних дебіторів — контакти готові</div>
+    <div class="sec">📞 ТОП-10 дебіторів — контакти готові</div>
     <div class="cc">
       ${topDebtors.length === 0 ? `
         <div class="empty-state">
@@ -663,9 +689,9 @@ function renderDashboard(){
             <tr>
               <th style="width:30px">#</th>
               <th>Контрагент</th>
-              <th style="text-align:center;width:70px">Дні</th>
+              <th style="text-align:center;width:70px" title="Днів від найдавнішого неоплаченого відвантаження">Днів</th>
               <th style="text-align:right">Сума ₴</th>
-              <th style="text-align:right">Рах.</th>
+              <th style="text-align:right">Відв.</th>
               <th style="text-align:right;width:230px">Action</th>
             </tr>
           </thead>
@@ -674,7 +700,8 @@ function renderDashboard(){
               const c = d.cp;
               const phone = c.phone || '';
               const em = c.email || '';
-              const daysClass = d.maxDays > 90 ? 'b90' : d.maxDays > 60 ? 'b60' : d.maxDays > 30 ? 'b30' : 'b0';
+              // days since shipment: <=30 fresh, 31-60 / 61-90 / 90+ overdue (з 30d credit term)
+              const daysClass = d.maxDays > 120 ? 'b90' : d.maxDays > 90 ? 'b60' : d.maxDays > 60 ? 'b30' : 'b0';
               return `
                 <tr>
                   <td class="rank">${i+1}</td>
@@ -698,25 +725,25 @@ function renderDashboard(){
       `}
     </div>
 
-    <!-- SECTION 5: UPCOMING PAYMENTS -->
-    <div class="sec">⏳ Очікувані надходження — наступні 30 днів</div>
+    <!-- SECTION 5: UPCOMING DELIVERIES -->
+    <div class="sec">⏳ Заплановані відвантаження — наступні 30 днів</div>
     <div class="cc">
       ${upcomingInvoices.length === 0 ? `
         <div class="empty-state">
           <div class="es-icon">📭</div>
-          <div class="es-title">Немає запланованих надходжень</div>
-          <div class="es-sub">Жоден рахунок не має planned date у наступні 30 днів</div>
+          <div class="es-title">Немає запланованих відвантажень</div>
+          <div class="es-sub">Жоден ордер не має delivery date у наступні 30 днів.<br>Прогноз надходжень нижче базується на історичній середній виручці.</div>
         </div>
       ` : `
         <div class="cc-head" style="margin-bottom:8px">
-          <div class="cc-sub">${upcomingInvoices.length} рахунків · ${nfm(upcomingInvoices.reduce((a,u) => a+u.amount, 0))} ₴ очікується</div>
+          <div class="cc-sub">${upcomingInvoices.length} ордерів · ${nfm(upcomingInvoices.reduce((a,u) => a+u.amount, 0))} ₴ очікується</div>
         </div>
         <table class="dt">
           <thead>
             <tr>
               <th style="width:90px">Дата</th>
               <th>Контрагент</th>
-              <th>Рахунок</th>
+              <th>Ордер</th>
               <th style="text-align:right">Сума ₴</th>
               <th style="text-align:right;width:80px">Днів</th>
             </tr>
@@ -758,22 +785,22 @@ function renderDashboard(){
             ? (dso > 60 ? `Високий DSO: ${dso} днів` : dso > 30 ? `Середній DSO: ${dso} днів` : `Низький DSO: ${dso} днів — швидко платять`)
             : 'DSO недостатньо даних'}</strong>
           ${dso !== null
-            ? `<br><span style="color:#666">Середній термін від виставлення до планової оплати</span>`
-            : '<br><span style="color:#666">Потрібно більше оплачених рахунків з planned moment</span>'}
+            ? `<br><span style="color:#666">Avg dni від ms_moment до першого inbound payment</span>`
+            : '<br><span style="color:#666">Потрібно більше fully-paid demands</span>'}
         </div>
       </div>
       <div class="insight blue">
         <div class="insight-icon">📈</div>
         <div>
-          <strong>Очікуємо ${nfm(forecastCash)} ₴ надходжень у найближчі 30 днів</strong>
-          <br><span style="color:#666">З ${upcomingInvoices.length} відкритих рахунків з planned date</span>
+          <strong>Прогноз ${nfm(forecastCash)} ₴ у найближчі 30 днів</strong>
+          <br><span style="color:#666">На основі історичної середньої виручки за останні 90 днів</span>
         </div>
       </div>
       <div class="insight ${top1Share > 25 ? 'yellow' : 'green'}">
         <div class="insight-icon">${top1Share > 50 ? '🎯' : top1Share > 25 ? '⚠️' : '👥'}</div>
         <div>
           <strong>${top1Share > 25
-            ? `Концентрація: TOP-1 дебітор = ${top1Share.toFixed(1)}% усіх боргів`
+            ? `Концентрація: TOP-1 дебітор = ${top1Share.toFixed(1)}% усієї AR`
             : 'Низька концентрація — борги розподілені'}</strong>
           ${top1Share > 25 && topDebtors[0]
             ? `<br><span style="color:#666">${escapeHtml(topDebtors[0].cp.name)} — ${nfm(topDebtors[0].balance)} ₴</span>`
