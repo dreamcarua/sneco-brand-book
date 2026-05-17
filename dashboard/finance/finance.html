@@ -124,6 +124,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .cc-title-tag.red{background:rgba(232,64,64,.13);color:#a00}
 .cc-title-tag.green{background:rgba(150,193,31,.15);color:#4a7000}
 
+/* ─── PAYMENT TIMELINE ─── */
+.pay-tl{padding:6px 0}
+.pay-tl-item{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid var(--border);align-items:center}
+.pay-tl-item:last-child{border:none}
+.pay-tl-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.pay-tl-icon.inb{background:rgba(150,193,31,.18);color:#4a7000}
+.pay-tl-icon.outb{background:rgba(232,64,64,.13);color:var(--red)}
+.pay-tl-date{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:600;width:80px;flex-shrink:0;white-space:nowrap}
+.pay-tl-body{flex:1;min-width:0}
+.pay-tl-title{font-size:13px;font-weight:600;color:var(--d);line-height:1.35}
+.pay-tl-meta{font-size:11px;color:var(--muted);margin-top:1px}
+.pay-tl-amount{font-size:14px;font-weight:800;text-align:right;white-space:nowrap}
+.pay-tl-amount.pos{color:#4a7000}
+.pay-tl-amount.neg{color:var(--red)}
+
 /* ─── EMPTY STATE ─── */
 .empty-state{padding:36px 20px;text-align:center;color:var(--muted)}
 .empty-state .es-icon{font-size:30px;margin-bottom:8px}
@@ -132,6 +147,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .empty-state.hero{padding:48px 20px}
 .empty-state.hero .es-icon{font-size:42px;margin-bottom:10px}
 .empty-state.hero .es-title{font-size:15px;color:#4a7000}
+.empty-state.dashed{border:1px dashed var(--border);border-radius:10px;background:#FAFAF5}
 
 /* ─── LOADER ─── */
 .loader{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--y);border-radius:50%;animation:spin .6s linear infinite}
@@ -297,7 +313,7 @@ body.dash-locked{overflow:hidden}
     <div class="logo-box">sn</div>
     <div>
       <div class="logo-text">snEco · Finance</div>
-      <div class="logo-sub">Cash flow, AR, debtors</div>
+      <div class="logo-sub">Рахунки · Гроші · Витрати по напрямах</div>
     </div>
   </div>
   <div class="topbar-right">
@@ -311,39 +327,39 @@ body.dash-locked{overflow:hidden}
   <div class="empty-hero">
     <div class="eh-icon">💰</div>
     <div class="eh-title">Завантажуємо фінансові дані…</div>
-    <div class="eh-sub"><span class="loader"></span> Виручка, оплати, рахунки з МойСклад</div>
+    <div class="eh-sub"><span class="loader"></span> Рахунки, надходження, витрати з МойСклад</div>
   </div>
 </div>
 
 <div class="footer">
-  snEco Finance Dashboard v2.66 · МойСклад API · AR на основі demands · Credit term 30 днів · Оновлення: щодня 06:00
+  snEco Finance Dashboard v2.68 · MoySklad → D1 → Worker · Оновлення: щодня 06:00
 </div>
 
 <script>
 // ============================================================================
-// FINANCE DASHBOARD — main logic (v2.66 — overdue / within-term split)
+// FINANCE DASHBOARD — main logic (v2.68 — переписано на ФІНАНСОВУ модель)
 // ============================================================================
+// Дані:
+//   • РАХУНКИ (ms_invoices_out) — джерело правди про дебіторку, planned dates.
+//   • ГРОШІ (ms_payments) — фактичні надходження (inbound) і витрати (outbound).
+//   • expense_item — стаття витрат для outbound paymentout (КРИТИЧНО для блоку
+//     "Витрати по напрямах").
+//
+// Стан v2.68: invoices_out у D1 поки що = 0 (fix v2.65 пушений, але ефекту нема).
+// Дашборд УМІЄ показувати порожній стан і автоматично оживе після наступного sync.
+// ============================================================================
+
 const WORKER = 'https://sneco-auth.vg-ab6.workers.dev';
 const STORAGE_KEY = 'snEco-jwt-finance-dashboard';
 
-// === BUSINESS RULES ===
-// snEco працює з відстрочкою платежу 30 днів.
-// "В межах терміну" = open AR, де (today - ms_moment) <= 30 днів
-// "Протерміновано"  = open AR, де (today - ms_moment) >  30 днів
-const CREDIT_DAYS = 30;
-
-// Global data caches
 let allCounterparties = [];
-let allDemands = [];
-let allPayments = [];
-let allOrders = [];
-let allInvoices = [];
-let allReturns = [];
+let allInvoices = [];    // РАХУНКИ — invoices_out
+let allPayments = [];    // ГРОШІ — paymentin + paymentout
 
 let _token = null;
 let _charts = {};
 
-// Number formatters
+// === Number formatters ===
 const nf  = n => Number(Math.round(n)||0).toLocaleString('uk-UA');
 const nfm = n => {
   const abs = Math.abs(n);
@@ -352,6 +368,7 @@ const nfm = n => {
   return String(Math.round(n));
 };
 const df  = d => { try { return new Date(d).toLocaleDateString('uk-UA', {day:'2-digit', month:'2-digit', year:'numeric'}); } catch(e){ return d; }};
+const dfShort = d => { try { return new Date(d).toLocaleDateString('uk-UA', {day:'2-digit', month:'2-digit'}); } catch(e){ return d; }};
 
 async function fetchJson(type, opts){
   const body = Object.assign({ type, limit: 50000 }, opts || {});
@@ -375,21 +392,16 @@ window.bootFinance = async function(token){
   updateSyncBadge();
 
   try {
-    const [cp, dem, pay, ord, ret] = await Promise.all([
+    const [cp, inv, pay] = await Promise.all([
       fetchJson('counterparties'),
-      fetchJson('demands'),
+      fetchJson('invoices_out'),
       fetchJson('payments'),
-      fetchJson('orders'),
-      fetchJson('returns'),
     ]);
     allCounterparties = cp || [];
-    allDemands = dem || [];
+    allInvoices = inv || [];
     allPayments = pay || [];
-    allOrders = ord || [];
-    allInvoices = []; // snEco не виставляє invoices_out — AR будується з ms_demands
-    allReturns = ret || [];
 
-    console.log(`Loaded: ${allCounterparties.length} CPs, ${allDemands.length} demands, ${allPayments.length} payments, ${allOrders.length} orders`);
+    console.log(`Loaded: ${allCounterparties.length} CPs, ${allInvoices.length} invoices_out, ${allPayments.length} payments`);
     renderDashboard();
   } catch(e) {
     console.error('Boot error', e);
@@ -402,6 +414,42 @@ window.bootFinance = async function(token){
   }
 };
 
+// === Helpers — payment direction ===
+function isInbound(p) {
+  const t = String(p.payment_type||'').toLowerCase();
+  if (t.includes('вхід') || t.includes('incoming') || t.includes('paymentin')) return true;
+  if (t.includes('вих') || t.includes('outgoing') || t.includes('paymentout')) return false;
+  try {
+    const raw = typeof p.raw_json === 'string' ? JSON.parse(p.raw_json) : (p.raw_json||{});
+    const metaType = raw?.meta?.type || raw?.type || '';
+    if (String(metaType).toLowerCase() === 'paymentin') return true;
+    if (String(metaType).toLowerCase() === 'paymentout') return false;
+  } catch(e) {}
+  return true;
+}
+function isOutbound(p) {
+  const t = String(p.payment_type||'').toLowerCase();
+  if (t.includes('вих') || t.includes('outgoing') || t.includes('paymentout')) return true;
+  if (t.includes('вхід') || t.includes('incoming') || t.includes('paymentin')) return false;
+  try {
+    const raw = typeof p.raw_json === 'string' ? JSON.parse(p.raw_json) : (p.raw_json||{});
+    const metaType = raw?.meta?.type || raw?.type || '';
+    if (String(metaType).toLowerCase() === 'paymentout') return true;
+  } catch(e) {}
+  return false;
+}
+
+function getExpenseItem(p) {
+  if (p.expense_item && String(p.expense_item).trim()) return String(p.expense_item).trim();
+  try {
+    const raw = typeof p.raw_json === 'string' ? JSON.parse(p.raw_json) : (p.raw_json||{});
+    const ei = raw['Стаття витрат'] || raw['expenseItem'] || raw?.expenseItem?.name || '';
+    if (ei && String(ei).trim()) return String(ei).trim();
+  } catch(e){}
+  return '(не вказано)';
+}
+
+// === Main render ===
 function renderDashboard(){
   // === Build CP lookup ===
   const cpById = {};
@@ -415,182 +463,234 @@ function renderDashboard(){
 
   const now = new Date();
   const today = now.toISOString().slice(0,10);
+  const todayMs = Date.now();
   const c30 = new Date(now.getTime() - 30*86400000).toISOString().slice(0,10);
   const c60 = new Date(now.getTime() - 60*86400000).toISOString().slice(0,10);
   const c90 = new Date(now.getTime() - 90*86400000).toISOString().slice(0,10);
   const future30 = new Date(now.getTime() + 30*86400000).toISOString().slice(0,10);
 
-  // === Helper: detect inbound payment ===
-  function isInbound(p) {
-    const t = String(p.payment_type||'').toLowerCase();
-    if (t.includes('вхід') || t.includes('incoming') || t.includes('paymentin')) return true;
-    if (t.includes('вихід') || t.includes('outgoing') || t.includes('paymentout')) return false;
-    try {
-      const raw = typeof p.raw_json === 'string' ? JSON.parse(p.raw_json) : (p.raw_json||{});
-      const metaType = raw?.meta?.type || raw?.type || '';
-      if (String(metaType).toLowerCase() === 'paymentin') return true;
-      if (String(metaType).toLowerCase() === 'paymentout') return false;
-    } catch(e) {}
-    return true;
-  }
+  // ─── FLAG: empty invoices? ───────────────────────────────────────────────
+  const hasInvoices = allInvoices.length > 0;
+  const invoicesEmptyMsg = `Чекаємо синхронізацію рахунків з MoySklad`;
 
-  // === AR на базі demands ===
-  // outstanding per demand = sum_kop - payed_sum_kop (if > 0).
-  // Overdue cutoff: ms_moment + 30d <= today  ⇔  ms_moment <= today - 30d (dueCutoff).
-  const todayMs = Date.now();
-  const dueCutoff = new Date(now.getTime() - CREDIT_DAYS*86400000).toISOString().slice(0,10);
+  // ============================================================================
+  // SECTION 1 — KPIs (Row 1 + Row 2)
+  // ============================================================================
 
-  // Revenue 30d / prev 30d
-  const revLast30 = allDemands.filter(d => (d.ms_moment||'').slice(0,10) >= c30).reduce((a,d) => a + (d.sum_kop||0)/100, 0);
-  const revPrev30 = allDemands.filter(d => {
-    const dt = (d.ms_moment||'').slice(0,10);
+  // Row 1 — за останні 30 днів
+  const invLast30 = allInvoices.filter(i => (i.ms_moment||'').slice(0,10) >= c30)
+    .reduce((a,i) => a + (i.sum_kop||0)/100, 0);
+  const invPrev30 = allInvoices.filter(i => {
+    const dt = (i.ms_moment||'').slice(0,10);
     return dt >= c60 && dt < c30;
-  }).reduce((a,d) => a + (d.sum_kop||0)/100, 0);
-  const revDelta = revPrev30 > 0 ? ((revLast30 - revPrev30)/revPrev30*100) : null;
+  }).reduce((a,i) => a + (i.sum_kop||0)/100, 0);
+  const invDelta = invPrev30 > 0 ? ((invLast30 - invPrev30)/invPrev30*100) : null;
 
-  // Cash collected
-  const cashLast30 = allPayments.filter(p => isInbound(p) && (p.ms_moment||'').slice(0,10) >= c30).reduce((a,p) => a + (p.sum_kop||0)/100, 0);
+  const cashLast30 = allPayments.filter(p => isInbound(p) && (p.ms_moment||'').slice(0,10) >= c30)
+    .reduce((a,p) => a + (p.sum_kop||0)/100, 0);
   const cashPrev30 = allPayments.filter(p => {
     const dt = (p.ms_moment||'').slice(0,10);
     return isInbound(p) && dt >= c60 && dt < c30;
   }).reduce((a,p) => a + (p.sum_kop||0)/100, 0);
   const cashDelta = cashPrev30 > 0 ? ((cashLast30 - cashPrev30)/cashPrev30*100) : null;
 
-  // Open AR
-  const openDemands = allDemands.filter(d => ((d.sum_kop||0) - (d.payed_sum_kop||0)) > 0);
-  const openARTotal = openDemands.reduce((a,d) => a + ((d.sum_kop||0) - (d.payed_sum_kop||0))/100, 0);
+  const expLast30 = allPayments.filter(p => isOutbound(p) && (p.ms_moment||'').slice(0,10) >= c30)
+    .reduce((a,p) => a + (p.sum_kop||0)/100, 0);
+  const expPrev30 = allPayments.filter(p => {
+    const dt = (p.ms_moment||'').slice(0,10);
+    return isOutbound(p) && dt >= c60 && dt < c30;
+  }).reduce((a,p) => a + (p.sum_kop||0)/100, 0);
+  const expDelta = expPrev30 > 0 ? ((expLast30 - expPrev30)/expPrev30*100) : null;
 
-  // === SPLIT: overdue vs within term ===
-  const overdueDemands = openDemands.filter(d => {
-    const dt = (d.ms_moment||'').slice(0,10);
-    return dt && dt <= dueCutoff;   // ms_moment <= today-30d  =>  термін сплив
-  });
-  const freshDemands = openDemands.filter(d => {
-    const dt = (d.ms_moment||'').slice(0,10);
-    return dt && dt > dueCutoff;    // ще в межах 30-денного credit term
-  });
-  const overdueTotal = overdueDemands.reduce((a,d) => a + ((d.sum_kop||0) - (d.payed_sum_kop||0))/100, 0);
-  const freshTotal   = freshDemands.reduce((a,d) => a + ((d.sum_kop||0) - (d.payed_sum_kop||0))/100, 0);
-  const overduePct   = openARTotal > 0 ? (overdueTotal/openARTotal*100) : 0;
-  const freshPct     = openARTotal > 0 ? (freshTotal/openARTotal*100) : 0;
+  const netCashFlow = cashLast30 - expLast30;
+  const netPrev = cashPrev30 - expPrev30;
+  const netDelta = netPrev !== 0 ? ((netCashFlow - netPrev)/Math.abs(netPrev)*100) : null;
 
-  // DSO — для paid demands
+  // Row 2 — поточний стан AR (з invoices)
+  const openInvoices = allInvoices.filter(i => ((i.sum_kop||0) - (i.payed_sum_kop||0)) > 0);
+
+  const freshAR = openInvoices.filter(i => {
+    const planned = (i.payment_planned_moment||'').slice(0,10);
+    return planned && planned >= today;
+  });
+  const overdueAR = openInvoices.filter(i => {
+    const planned = (i.payment_planned_moment||'').slice(0,10);
+    return planned && planned < today;
+  });
+  const freshARTotal = freshAR.reduce((a,i) => a + ((i.sum_kop||0)-(i.payed_sum_kop||0))/100, 0);
+  const overdueARTotal = overdueAR.reduce((a,i) => a + ((i.sum_kop||0)-(i.payed_sum_kop||0))/100, 0);
+
+  // Заплановано до оплати у наступні 30 днів
+  const plannedNext30 = openInvoices.filter(i => {
+    const planned = (i.payment_planned_moment||'').slice(0,10);
+    return planned && planned >= today && planned <= future30;
+  });
+  const plannedNext30Total = plannedNext30.reduce((a,i) => a + ((i.sum_kop||0)-(i.payed_sum_kop||0))/100, 0);
+
+  // DSO — invoices, що повністю оплачені, avg днів від ms_moment до повної оплати.
+  // Approx: бо payment date не лінкована до конкретного invoice, беремо payment_planned_moment - ms_moment
+  // для повністю-сплачених invoices як proxy для DSO (плановий цикл).
   let dso = null;
-  const paidDemands = allDemands.filter(d => (d.payed_sum_kop||0) >= (d.sum_kop||0) && (d.sum_kop||0) > 0 && d.ms_moment);
-  if (paidDemands.length) {
-    const payByAgent = {};
-    allPayments.forEach(p => {
-      if (!isInbound(p) || !p.ms_moment) return;
-      const k = p.agent_id || p.agent || '';
-      if (!k) return;
-      (payByAgent[k] = payByAgent[k] || []).push(p.ms_moment);
+  const paidInvoices = allInvoices.filter(i => (i.payed_sum_kop||0) >= (i.sum_kop||0) && (i.sum_kop||0) > 0 && i.ms_moment && i.payment_planned_moment);
+  if (paidInvoices.length) {
+    let total = 0, n = 0;
+    paidInvoices.forEach(i => {
+      const days = (new Date(i.payment_planned_moment).getTime() - new Date(i.ms_moment).getTime())/86400000;
+      if (days >= 0 && days <= 365) { total += days; n++; }
     });
-    Object.keys(payByAgent).forEach(k => payByAgent[k].sort());
-    let totalDays = 0, n = 0;
-    paidDemands.forEach(d => {
-      const k = d.agent_id || d.agent || '';
-      const list = payByAgent[k];
-      if (!list) return;
-      const dDate = d.ms_moment;
-      const next = list.find(t => t >= dDate);
-      if (!next) return;
-      const days = (new Date(next).getTime() - new Date(dDate).getTime())/86400000;
-      if (days < 0 || days > 365) return;
-      totalDays += days; n++;
-    });
-    dso = n > 0 ? Math.round(totalDays / n) : null;
+    dso = n > 0 ? Math.round(total / n) : null;
   }
 
-  // Forecast & misc
-  const rev90 = allDemands.filter(d => (d.ms_moment||'').slice(0,10) >= c90).reduce((a,d) => a + (d.sum_kop||0)/100, 0);
-  const forecastCash = (rev90 / 90) * 30;
-  const activeAgents = new Set();
-  allDemands.filter(d => (d.ms_moment||'').slice(0,10) >= c90).forEach(d => activeAgents.add(d.agent_id || d.agent || ''));
-  const activeCount = activeAgents.size;
-  const avgSale = allDemands.length ? (allDemands.reduce((a,d) => a + (d.sum_kop||0)/100, 0) / allDemands.length) : 0;
-
-  // === CASH FLOW 12 months ===
+  // ============================================================================
+  // SECTION 2 — CASH FLOW 12 months: invoices + inbound + outbound
+  // ============================================================================
   const months = [];
   for (let i=11; i>=0; i--) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     months.push(d.toISOString().slice(0,7));
   }
-  const revByMonth = {};
-  const cashByMonth = {};
-  months.forEach(m => { revByMonth[m] = 0; cashByMonth[m] = 0; });
-  allDemands.forEach(d => {
-    const ym = (d.ms_moment||'').slice(0,7);
-    if (ym in revByMonth) revByMonth[ym] += (d.sum_kop||0)/100;
+  const invByMonth = {}, cashByMonth = {}, expByMonth = {};
+  months.forEach(m => { invByMonth[m] = 0; cashByMonth[m] = 0; expByMonth[m] = 0; });
+
+  allInvoices.forEach(i => {
+    const ym = (i.ms_moment||'').slice(0,7);
+    if (ym in invByMonth) invByMonth[ym] += (i.sum_kop||0)/100;
   });
   allPayments.forEach(p => {
-    if (!isInbound(p)) return;
     const ym = (p.ms_moment||'').slice(0,7);
-    if (ym in cashByMonth) cashByMonth[ym] += (p.sum_kop||0)/100;
+    if (!(ym in cashByMonth)) return;
+    if (isInbound(p)) cashByMonth[ym] += (p.sum_kop||0)/100;
+    else if (isOutbound(p)) expByMonth[ym] += (p.sum_kop||0)/100;
   });
 
-  // === AR aging buckets ===
-  // 1-30 = у межах терміну (credit term 30d не вийшов)
-  // 31-60 / 61-90 / 90+ = ПРОТЕРМІНОВАНО (різні tier)
+  // ============================================================================
+  // SECTION 3 — Витрати по напрямах (expense_item)
+  // ============================================================================
+  const outbound90 = allPayments.filter(p => isOutbound(p) && (p.ms_moment||'').slice(0,10) >= c90);
+  const outboundLastM = allPayments.filter(p => {
+    const dt = (p.ms_moment||'').slice(0,10);
+    return isOutbound(p) && dt >= c60 && dt < c30;
+  });
+
+  const expByItem = {};
+  const expByItemLastM = {};
+  outbound90.forEach(p => {
+    const k = getExpenseItem(p);
+    expByItem[k] = (expByItem[k]||0) + (p.sum_kop||0)/100;
+  });
+  outboundLastM.forEach(p => {
+    const k = getExpenseItem(p);
+    expByItemLastM[k] = (expByItemLastM[k]||0) + (p.sum_kop||0)/100;
+  });
+  const expByItemSorted = Object.entries(expByItem).sort((a,b) => b[1]-a[1]);
+  const expTotal90 = expByItemSorted.reduce((a,[,v]) => a+v, 0);
+  // TOP-8 для doughnut, решта в "Інші"
+  const top8 = expByItemSorted.slice(0, 8);
+  const others = expByItemSorted.slice(8);
+  const othersSum = others.reduce((a,[,v]) => a+v, 0);
+  const doughnutLabels = [...top8.map(([k]) => k), ...(othersSum > 0 ? ['Інші'] : [])];
+  const doughnutData = [...top8.map(([,v]) => v), ...(othersSum > 0 ? [othersSum] : [])];
+
+  // ============================================================================
+  // SECTION 4 — AR Aging (на основі payment_planned_moment)
+  // ============================================================================
+  // Buckets:
+  //   b0  — в межах терміну   (planned >= today)
+  //   b30 — 1-30 днів прострочено   (today - planned ∈ [1, 30])
+  //   b60 — 31-60
+  //   b90 — 60+
   const buckets = { b0: 0, b30: 0, b60: 0, b90: 0 };
   const bucketsCount = { b0: 0, b30: 0, b60: 0, b90: 0 };
-  openDemands.forEach(d => {
-    if (!d.ms_moment) return;
-    const dt = new Date(d.ms_moment).getTime();
-    const daysSince = Math.floor((todayMs - dt)/86400000);
-    const balance = ((d.sum_kop||0) - (d.payed_sum_kop||0))/100;
-    if (daysSince <= 30) { buckets.b0 += balance; bucketsCount.b0++; }
-    else if (daysSince <= 60) { buckets.b30 += balance; bucketsCount.b30++; }
-    else if (daysSince <= 90) { buckets.b60 += balance; bucketsCount.b60++; }
+  openInvoices.forEach(i => {
+    const planned = (i.payment_planned_moment||'').slice(0,10);
+    if (!planned) return;
+    const daysOverdue = Math.floor((todayMs - new Date(planned).getTime())/86400000);
+    const balance = ((i.sum_kop||0) - (i.payed_sum_kop||0))/100;
+    if (daysOverdue <= 0) { buckets.b0 += balance; bucketsCount.b0++; }
+    else if (daysOverdue <= 30) { buckets.b30 += balance; bucketsCount.b30++; }
+    else if (daysOverdue <= 60) { buckets.b60 += balance; bucketsCount.b60++; }
     else { buckets.b90 += balance; bucketsCount.b90++; }
   });
+  const openARTotal = openInvoices.reduce((a,i) => a + ((i.sum_kop||0)-(i.payed_sum_kop||0))/100, 0);
 
-  // === DEBTORS — окремо overdue vs fresh ===
-  function buildDebtors(demandsSubset) {
+  // ============================================================================
+  // SECTION 5 — TOP-10 Дебіторів (split)
+  // ============================================================================
+  function buildDebtors(invoicesSubset) {
     const map = {};
-    demandsSubset.forEach(d => {
-      const cp = matchCP(d);
-      if (!cp) return;
-      const key = cp.id || cp.name;
-      const balance = ((d.sum_kop||0) - (d.payed_sum_kop||0))/100;
-      const dt = d.ms_moment ? new Date(d.ms_moment).getTime() : todayMs;
-      const daysSince = Math.floor((todayMs - dt)/86400000);
-      if (!map[key]) map[key] = { cp, balance: 0, maxDays: 0, count: 0 };
+    invoicesSubset.forEach(i => {
+      const cp = matchCP(i);
+      const key = cp ? (cp.id || cp.name) : (i.agent_id || i.agent || 'unknown');
+      const balance = ((i.sum_kop||0) - (i.payed_sum_kop||0))/100;
+      const planned = (i.payment_planned_moment||'').slice(0,10);
+      const daysOverdue = planned ? Math.max(0, Math.floor((todayMs - new Date(planned).getTime())/86400000)) : 0;
+      if (!map[key]) map[key] = {
+        cp: cp || { name: i.agent || 'Невідомий', __virtual: true },
+        balance: 0, maxDaysOverdue: 0, count: 0
+      };
       map[key].balance += balance;
       map[key].count++;
-      if (daysSince > map[key].maxDays) map[key].maxDays = daysSince;
+      if (daysOverdue > map[key].maxDaysOverdue) map[key].maxDaysOverdue = daysOverdue;
     });
     return Object.values(map).sort((a,b) => b.balance - a.balance);
   }
-  const overdueDebtors = buildDebtors(overdueDemands).slice(0, 10);
-  const freshDebtors   = buildDebtors(freshDemands).slice(0, 10);
+  const overdueDebtors = buildDebtors(overdueAR).slice(0, 10);
+  const freshDebtors = buildDebtors(freshAR).slice(0, 10);
 
-  // === Upcoming deliveries ===
-  const upcomingInvoices = (allOrders || []).filter(o => {
-    const dp = (o.delivery_planned_moment||'').slice(0,10);
-    if (!dp) return false;
-    return dp >= today && dp <= future30;
-  }).map(o => {
-    const cp = matchCP(o);
-    const dp = new Date(o.delivery_planned_moment);
-    const daysUntil = Math.floor((dp.getTime() - todayMs)/86400000);
+  // ============================================================================
+  // SECTION 6 — Очікувані надходження наступні 30 днів
+  // ============================================================================
+  const upcomingReceipts = plannedNext30.map(i => {
+    const cp = matchCP(i);
+    const planned = i.payment_planned_moment;
+    const daysUntil = Math.max(0, Math.floor((new Date(planned).getTime() - todayMs)/86400000));
     return {
-      date: o.delivery_planned_moment,
-      cpName: cp ? cp.name : (o.agent || '—'),
-      amount: ((o.sum_kop||0) - (o.payed_sum_kop||0))/100 || ((o.sum_kop||0)/100),
+      planned,
+      cpName: cp ? cp.name : (i.agent || '—'),
+      amount: ((i.sum_kop||0) - (i.payed_sum_kop||0))/100,
       daysUntil,
-      invName: o.name || '',
+      invName: i.name || ''
     };
-  }).sort((a,b) => (a.date||'').localeCompare(b.date||''));
+  }).sort((a,b) => (a.planned||'').localeCompare(b.planned||''));
 
-  // === Concentration metrics ===
-  const allOpenDebtors = buildDebtors(openDemands);
-  const top1Share = (openARTotal > 0 && allOpenDebtors[0]) ? (allOpenDebtors[0].balance / openARTotal * 100) : 0;
-  const top1OverdueShare = (overdueTotal > 0 && overdueDebtors[0]) ? (overdueDebtors[0].balance / overdueTotal * 100) : 0;
-  // "критично прострочено" = > 90 днів від ms_moment (тобто bucket b90)
+  // ============================================================================
+  // SECTION 7 — Останні 20 платежів
+  // ============================================================================
+  const last20Payments = [...allPayments]
+    .filter(p => p.ms_moment)
+    .sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''))
+    .slice(0, 20)
+    .map(p => {
+      const cp = matchCP(p);
+      const inb = isInbound(p);
+      const outb = isOutbound(p);
+      return {
+        date: p.ms_moment,
+        type: inb ? 'inbound' : (outb ? 'outbound' : 'other'),
+        cpName: cp ? cp.name : (p.agent || '—'),
+        expenseItem: outb ? getExpenseItem(p) : '',
+        amount: (p.sum_kop||0)/100,
+        name: p.name || ''
+      };
+    });
+
+  // ============================================================================
+  // SECTION 8 — Concentration / insights data
+  // ============================================================================
+  const top1ExpenseShare = expTotal90 > 0 && expByItemSorted[0] ? (expByItemSorted[0][1] / expTotal90 * 100) : 0;
+  const top1ExpenseName = expByItemSorted[0] ? expByItemSorted[0][0] : null;
+
+  const allDebtors = buildDebtors(openInvoices);
+  const top1DebtorShare = openARTotal > 0 && allDebtors[0] ? (allDebtors[0].balance / openARTotal * 100) : 0;
+  const top1DebtorName = allDebtors[0] ? allDebtors[0].cp.name : null;
+
   const criticalOverdueTotal = buckets.b90;
   const criticalOverdueCount = bucketsCount.b90;
 
-  // === BUILD HTML ===
+  // ============================================================================
+  // BUILD HTML
+  // ============================================================================
+
   const deltaPill = (val) => {
     if (val === null) return '<span class="kpi-delta flat">— н/д</span>';
     const sign = val >= 0 ? '↑' : '↓';
@@ -598,16 +698,33 @@ function renderDashboard(){
     return `<span class="kpi-delta ${cls}">${sign} ${Math.abs(val).toFixed(1)}%</span>`;
   };
 
-  // Debtors table renderer (overdue or fresh)
+  // KPI helper — graceful empty state коли invoices = 0
+  function invKpi(label, val, sub, colorClass, emptyOverride){
+    if (!hasInvoices && emptyOverride) {
+      return `
+        <div class="kpi ${colorClass}">
+          <div class="kpi-lbl">${label}</div>
+          <div class="kpi-val">0 ₴</div>
+          <div class="kpi-sub">${invoicesEmptyMsg}</div>
+        </div>`;
+    }
+    return `
+      <div class="kpi ${colorClass}">
+        <div class="kpi-lbl">${label}</div>
+        <div class="kpi-val">${val}</div>
+        <div class="kpi-sub">${sub}</div>
+      </div>`;
+  }
+
+  // Debtors table renderer
   function renderDebtorsTable(list, variant){
-    // variant: 'overdue' or 'fresh'
     const isOverdue = variant === 'overdue';
     if (list.length === 0) {
       return `
         <div class="empty-state hero">
           <div class="es-icon">${isOverdue ? '✅' : '🎉'}</div>
           <div class="es-title">${isOverdue ? 'Усі рахунки в строк!' : 'Нема відкритої дебіторки у межах терміну'}</div>
-          <div class="es-sub">${isOverdue ? 'Жодного клієнта з простроченою дебіторкою' : 'Усі поточні рахунки — або в overdue, або сплачені'}</div>
+          <div class="es-sub">${!hasInvoices ? invoicesEmptyMsg : (isOverdue ? 'Жодного клієнта з простроченою дебіторкою' : 'Усі поточні рахунки — або в overdue, або сплачені')}</div>
         </div>
       `;
     }
@@ -618,7 +735,7 @@ function renderDashboard(){
             <th style="width:30px">#</th>
             <th>Контрагент</th>
             <th style="text-align:right">Борг ₴</th>
-            <th style="text-align:center;width:60px" title="Максимум днів від відвантаження">Днів</th>
+            <th style="text-align:center;width:60px" title="Днів прострочки від payment_planned_moment">Днів</th>
             <th style="text-align:right;width:140px">Контакт</th>
           </tr>
         </thead>
@@ -627,8 +744,8 @@ function renderDashboard(){
             const c = d.cp;
             const phone = c.phone || '';
             const em = c.email || '';
-            // days since shipment color: >120 critical, 91-120 high, 61-90 mid, 31-60 mild, <=30 fresh
-            const daysClass = d.maxDays > 120 ? 'b90' : d.maxDays > 90 ? 'b60' : d.maxDays > 60 ? 'b30' : 'b0';
+            const desc = c.description || '';
+            const daysClass = d.maxDaysOverdue > 60 ? 'b90' : d.maxDaysOverdue > 30 ? 'b60' : d.maxDaysOverdue > 0 ? 'b30' : 'b0';
             const rankCls = isOverdue ? 'rank' : 'rank green';
             const sumColor = isOverdue ? 'var(--red)' : '#4a7000';
             const subject = isOverdue
@@ -639,10 +756,10 @@ function renderDashboard(){
                 <td class="${rankCls}">${i+1}</td>
                 <td>
                   <div style="font-weight:600">${escapeHtml(c.name)}</div>
-                  <div style="font-size:11px;color:var(--muted)">${d.count} відвантаж.${c.edrpou ? ' · ЄДРПОУ ' + escapeHtml(c.edrpou) : c.inn ? ' · ІНН ' + escapeHtml(c.inn) : ''}</div>
+                  <div style="font-size:11px;color:var(--muted)">${d.count} рахунк${d.count===1?'.':d.count<5?'и.':'ів.'}${em ? ' · ' + escapeHtml(em) : ''}${phone ? ' · ' + escapeHtml(phone) : ''}</div>
                 </td>
                 <td style="text-align:right;font-weight:700;color:${sumColor}">${nf(d.balance)}</td>
-                <td style="text-align:center"><span class="bucket-pill ${daysClass}">${d.maxDays}</span></td>
+                <td style="text-align:center"><span class="bucket-pill ${daysClass}">${d.maxDaysOverdue}</span></td>
                 <td style="text-align:right;white-space:nowrap">
                   ${phone ? `<a href="tel:${escapeAttr(phone)}" class="act-btn tel" title="${escapeAttr(phone)}">📞</a>` : ''}
                   ${em ? `<a href="mailto:${escapeAttr(em)}?subject=${subject}" class="act-btn mail" title="${escapeAttr(em)}">✉</a>` : ''}
@@ -656,144 +773,198 @@ function renderDashboard(){
     `;
   }
 
+  // Expense items table
+  function renderExpenseTable(){
+    const top10 = expByItemSorted.slice(0, 10);
+    if (top10.length === 0) {
+      return `<div class="empty-state"><div class="es-icon">💸</div><div class="es-title">Немає витрат за 90 днів</div><div class="es-sub">Перевір що paymentout sync з MoySklad працює</div></div>`;
+    }
+    return `
+      <table class="dt">
+        <thead>
+          <tr>
+            <th style="width:30px">#</th>
+            <th>Стаття витрат</th>
+            <th style="text-align:right">90 днів ₴</th>
+            <th style="text-align:right">Минулий міс. ₴</th>
+            <th style="text-align:right;width:70px">% усіх</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${top10.map(([item, sum], i) => {
+            const lastM = expByItemLastM[item] || 0;
+            const pct = expTotal90 > 0 ? (sum/expTotal90*100) : 0;
+            return `
+              <tr>
+                <td class="rank">${i+1}</td>
+                <td><div style="font-weight:600">${escapeHtml(item)}</div></td>
+                <td style="text-align:right;font-weight:700;color:var(--red)">${nf(sum)}</td>
+                <td style="text-align:right;color:#666">${nf(lastM)}</td>
+                <td style="text-align:right;color:var(--muted)">${pct.toFixed(1)}%</td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  // ============================================================================
+  // HTML compose
+  // ============================================================================
   const html = `
     <!-- HEADER -->
     <div class="fin-header">
       <div class="fin-title">💰 Finance Dashboard</div>
-      <div class="fin-sub">Cash flow · AR aging · Дебіторка · Прогноз надходжень · Credit term ${CREDIT_DAYS} днів</div>
+      <div class="fin-sub">Рахунки · Гроші · Витрати по напрямах · AR aging · Очікувані надходження</div>
     </div>
 
-    <!-- HERO KPI ROW 1 — revenue + cash + AR split -->
+    <!-- SECTION 1 — KPI ROW 1: за останні 30 днів -->
     <div class="g4">
+      ${invKpi(
+        '💰 Виставлено рахунків (30д)',
+        `${nfm(invLast30)} ₴`,
+        deltaPill(invDelta),
+        'cy',
+        true
+      )}
       <div class="kpi cg">
-        <div class="kpi-lbl">Виручка (30 днів)</div>
-        <div class="kpi-val">${nfm(revLast30)} ₴</div>
-        ${deltaPill(revDelta)}
-      </div>
-      <div class="kpi cy">
-        <div class="kpi-lbl">Надходження (30 днів)</div>
+        <div class="kpi-lbl">✅ Надходження (30д)</div>
         <div class="kpi-val">${nfm(cashLast30)} ₴</div>
         ${deltaPill(cashDelta)}
       </div>
-      <div class="kpi cg">
-        <div class="kpi-lbl">📋 Дебіторка в межах терміну</div>
-        <div class="kpi-val">${nfm(freshTotal)} ₴</div>
-        <div class="kpi-sub">${freshDemands.length} відвантаж. · ≤ ${CREDIT_DAYS} днів · OK</div>
+      <div class="kpi cr">
+        <div class="kpi-lbl">💸 Витрати (30д)</div>
+        <div class="kpi-val">${nfm(expLast30)} ₴</div>
+        ${deltaPill(expDelta)}
       </div>
-      <div class="kpi ${overdueTotal > 0 ? 'cr' : 'cg'}">
-        <div class="kpi-lbl">🔴 ПРОТЕРМІНОВАНО</div>
-        <div class="kpi-val">${nfm(overdueTotal)} ₴</div>
-        <div class="kpi-sub">${overdueDemands.length} відвантаж. · &gt; ${CREDIT_DAYS} днів · alert</div>
+      <div class="kpi ${netCashFlow >= 0 ? 'cg' : 'cr'}">
+        <div class="kpi-lbl">📊 Net Cash Flow (30д)</div>
+        <div class="kpi-val" style="color:${netCashFlow >= 0 ? '#4a7000' : 'var(--red)'}">${netCashFlow >= 0 ? '+' : ''}${nfm(netCashFlow)} ₴</div>
+        ${deltaPill(netDelta)}
       </div>
     </div>
 
-    <!-- HERO KPI ROW 2 — DSO + forecast + activity -->
+    <!-- KPI ROW 2: поточний стан AR -->
     <div class="g4" style="margin-top:14px">
+      ${invKpi(
+        '📋 Дебіторка в межах терміну',
+        `${nfm(freshARTotal)} ₴`,
+        `${freshAR.length} рахунк${freshAR.length===1?'.':freshAR.length<5?'и.':'ів.'} · planned ≥ today`,
+        'cg',
+        true
+      )}
+      ${invKpi(
+        '🔴 ПРОТЕРМІНОВАНО',
+        `${nfm(overdueARTotal)} ₴`,
+        `${overdueAR.length} рахунк${overdueAR.length===1?'.':overdueAR.length<5?'и.':'ів.'} · planned &lt; today`,
+        overdueARTotal > 0 ? 'cr' : 'cg',
+        true
+      )}
+      ${invKpi(
+        '📅 Заплановано до оплати (30д)',
+        `${nfm(plannedNext30Total)} ₴`,
+        `${plannedNext30.length} рахунк${plannedNext30.length===1?'.':plannedNext30.length<5?'и.':'ів.'} у наступні 30 днів`,
+        'cp',
+        true
+      )}
       <div class="kpi cb">
-        <div class="kpi-lbl">DSO — Days Sales Outstanding</div>
+        <div class="kpi-lbl">📈 DSO — днів</div>
         <div class="kpi-val">${dso !== null ? dso + ' дн' : '—'}</div>
-        <div class="kpi-sub">avg днів відвантаж.→оплата</div>
-      </div>
-      <div class="kpi cp">
-        <div class="kpi-lbl">Прогноз надходжень (30 днів)</div>
-        <div class="kpi-val">${nfm(forecastCash)} ₴</div>
-        <div class="kpi-sub">avg revenue / day × 30 (істор.)</div>
-      </div>
-      <div class="kpi cg">
-        <div class="kpi-lbl">Активні клієнти</div>
-        <div class="kpi-val">${nf(activeCount)}</div>
-        <div class="kpi-sub">за останні 90 днів</div>
-      </div>
-      <div class="kpi cy">
-        <div class="kpi-lbl">Avg продаж</div>
-        <div class="kpi-val">${nfm(avgSale)} ₴</div>
-        <div class="kpi-sub">${nf(allDemands.length)} відвантажень загалом</div>
+        <div class="kpi-sub">${dso !== null ? 'avg ms_moment→планова оплата' : 'нема повністю-оплачених рахунків'}</div>
       </div>
     </div>
 
-    <!-- SECTION 2: CASH FLOW CHART -->
-    <div class="sec">💸 Грошовий потік</div>
+    <!-- SECTION 2 — CASH FLOW CHART -->
+    <div class="sec">💸 Грошовий потік — рахунки, надходження, витрати</div>
     <div class="cc">
       <div class="cc-head">
         <div>
-          <div class="cc-title">Грошовий потік — останні 12 місяців</div>
-          <div class="cc-sub">Виручка (₴) vs. фактичні надходження (₴)</div>
+          <div class="cc-title">12 місяців · 3 dataset</div>
+          <div class="cc-sub">Виставлено рахунків (yellow) · Надходження (green) · Витрати (red, negative)${!hasInvoices ? ' · ⚠ рахунки = 0' : ''}</div>
         </div>
       </div>
       <div class="chart-h320"><canvas id="cashFlowChart"></canvas></div>
     </div>
 
-    <!-- SECTION 3: AR AGING -->
-    <div class="sec">📊 AR aging — старіння дебіторки (credit term ${CREDIT_DAYS} днів від відвантаження)</div>
+    <!-- SECTION 3 — ВИТРАТИ ПО НАПРЯМАХ -->
+    <div class="sec">📊 Витрати по напрямах — останні 90 днів</div>
     <div class="g2">
       <div class="cc">
         <div class="cc-head">
           <div>
-            <div class="cc-title">Розподіл дебіторки</div>
-            <div class="cc-sub">${openDemands.length} відвантажень · ${nfm(openARTotal)} ₴ загалом</div>
+            <div class="cc-title">Структура витрат</div>
+            <div class="cc-sub">TOP-8 категорій + Інші · Σ ${nfm(expTotal90)} ₴ за 90 днів</div>
           </div>
         </div>
-        <div class="chart-h280"><canvas id="agingChart"></canvas></div>
+        <div class="chart-h320"><canvas id="expDoughnut"></canvas></div>
+      </div>
+      <div class="cc">
+        <div class="cc-head">
+          <div>
+            <div class="cc-title">TOP-10 статей витрат</div>
+            <div class="cc-sub">Сума за 90д, минулий місяць, % від всіх</div>
+          </div>
+        </div>
+        ${renderExpenseTable()}
+      </div>
+    </div>
+
+    <!-- SECTION 4 — AR AGING -->
+    <div class="sec">📊 AR aging — на основі payment_planned_moment</div>
+    <div class="g2">
+      <div class="cc">
+        <div class="cc-head">
+          <div>
+            <div class="cc-title">Розподіл відкритої дебіторки</div>
+            <div class="cc-sub">${openInvoices.length} рахунк${openInvoices.length===1?'.':openInvoices.length<5?'и.':'ів.'} · ${nfm(openARTotal)} ₴ загалом</div>
+          </div>
+        </div>
+        ${hasInvoices ? `<div class="chart-h280"><canvas id="agingChart"></canvas></div>
         <div class="split-summary">
           <div class="ss-item">
             <div class="ss-dot ok"></div>
             <div>
               <div class="ss-label">В межах терміну</div>
-              <div class="ss-val">${nfm(freshTotal)} ₴<span class="ss-pct">${freshPct.toFixed(1)}%</span></div>
+              <div class="ss-val">${nfm(freshARTotal)} ₴<span class="ss-pct">${openARTotal > 0 ? (freshARTotal/openARTotal*100).toFixed(1) : '0'}%</span></div>
             </div>
           </div>
           <div class="ss-item">
             <div class="ss-dot overdue"></div>
             <div>
               <div class="ss-label">Протерміновано</div>
-              <div class="ss-val">${nfm(overdueTotal)} ₴<span class="ss-pct">${overduePct.toFixed(1)}%</span></div>
+              <div class="ss-val">${nfm(overdueARTotal)} ₴<span class="ss-pct">${openARTotal > 0 ? (overdueARTotal/openARTotal*100).toFixed(1) : '0'}%</span></div>
             </div>
           </div>
-        </div>
+        </div>` : `<div class="empty-state dashed"><div class="es-icon">📭</div><div class="es-title">${invoicesEmptyMsg}</div><div class="es-sub">AR aging з'явиться після наступного sync рахунків</div></div>`}
       </div>
       <div class="cc">
         <div class="cc-head">
           <div>
             <div class="cc-title">Buckets — деталізація</div>
-            <div class="cc-sub">Сума, кількість, % протермінованої</div>
+            <div class="cc-sub">За payment_planned_moment vs. today</div>
           </div>
         </div>
-        <table class="dt">
-          <thead><tr><th>Bucket</th><th style="text-align:right">Відвантаж.</th><th style="text-align:right">Сума ₴</th><th style="text-align:right">% AR</th><th style="text-align:center;width:70px">Статус</th></tr></thead>
+        ${hasInvoices ? `<table class="dt">
+          <thead><tr><th>Bucket</th><th style="text-align:right">Рахунк.</th><th style="text-align:right">Сума ₴</th><th style="text-align:right">% AR</th><th style="text-align:center;width:70px">Статус</th></tr></thead>
           <tbody>
-            <tr><td><span class="bucket-pill b0">🟢 1-30 днів</span><div style="font-size:10px;color:var(--muted);margin-top:3px">в межах терміну</div></td><td style="text-align:right">${bucketsCount.b0}</td><td style="text-align:right;font-weight:600">${nf(buckets.b0)}</td><td style="text-align:right;color:var(--muted)">${openARTotal > 0 ? (buckets.b0/openARTotal*100).toFixed(1) : '0'}%</td><td style="text-align:center;color:#4a7000;font-weight:700;font-size:11px">OK</td></tr>
-            <tr><td><span class="bucket-pill b30">🟡 31-60 днів</span><div style="font-size:10px;color:#996600;margin-top:3px;font-weight:600">прострочено</div></td><td style="text-align:right">${bucketsCount.b30}</td><td style="text-align:right;font-weight:600">${nf(buckets.b30)}</td><td style="text-align:right;color:var(--muted)">${openARTotal > 0 ? (buckets.b30/openARTotal*100).toFixed(1) : '0'}%</td><td style="text-align:center;color:#996600;font-weight:700;font-size:11px">⚠</td></tr>
-            <tr><td><span class="bucket-pill b60">🟠 61-90 днів</span><div style="font-size:10px;color:#c2410c;margin-top:3px;font-weight:600">прострочено</div></td><td style="text-align:right">${bucketsCount.b60}</td><td style="text-align:right;font-weight:600">${nf(buckets.b60)}</td><td style="text-align:right;color:var(--muted)">${openARTotal > 0 ? (buckets.b60/openARTotal*100).toFixed(1) : '0'}%</td><td style="text-align:center;color:#c2410c;font-weight:700;font-size:11px">⚠⚠</td></tr>
-            <tr><td><span class="bucket-pill b90">🔴 90+ днів</span><div style="font-size:10px;color:var(--red);margin-top:3px;font-weight:700">критично прострочено</div></td><td style="text-align:right">${bucketsCount.b90}</td><td style="text-align:right;font-weight:600;color:var(--red)">${nf(buckets.b90)}</td><td style="text-align:right;color:var(--red)">${openARTotal > 0 ? (buckets.b90/openARTotal*100).toFixed(1) : '0'}%</td><td style="text-align:center;color:var(--red);font-weight:700;font-size:11px">🔴🔴</td></tr>
+            <tr><td><span class="bucket-pill b0">🟢 В межах терміну</span><div style="font-size:10px;color:var(--muted);margin-top:3px">planned ≥ today</div></td><td style="text-align:right">${bucketsCount.b0}</td><td style="text-align:right;font-weight:600">${nf(buckets.b0)}</td><td style="text-align:right;color:var(--muted)">${openARTotal > 0 ? (buckets.b0/openARTotal*100).toFixed(1) : '0'}%</td><td style="text-align:center;color:#4a7000;font-weight:700;font-size:11px">OK</td></tr>
+            <tr><td><span class="bucket-pill b30">🟡 1-30 днів прострочки</span><div style="font-size:10px;color:#996600;margin-top:3px;font-weight:600">м'яко прострочено</div></td><td style="text-align:right">${bucketsCount.b30}</td><td style="text-align:right;font-weight:600">${nf(buckets.b30)}</td><td style="text-align:right;color:var(--muted)">${openARTotal > 0 ? (buckets.b30/openARTotal*100).toFixed(1) : '0'}%</td><td style="text-align:center;color:#996600;font-weight:700;font-size:11px">⚠</td></tr>
+            <tr><td><span class="bucket-pill b60">🟠 31-60 днів прострочки</span><div style="font-size:10px;color:#c2410c;margin-top:3px;font-weight:600">прострочено</div></td><td style="text-align:right">${bucketsCount.b60}</td><td style="text-align:right;font-weight:600">${nf(buckets.b60)}</td><td style="text-align:right;color:var(--muted)">${openARTotal > 0 ? (buckets.b60/openARTotal*100).toFixed(1) : '0'}%</td><td style="text-align:center;color:#c2410c;font-weight:700;font-size:11px">⚠⚠</td></tr>
+            <tr><td><span class="bucket-pill b90">🔴 60+ днів прострочки</span><div style="font-size:10px;color:var(--red);margin-top:3px;font-weight:700">критично</div></td><td style="text-align:right">${bucketsCount.b90}</td><td style="text-align:right;font-weight:600;color:var(--red)">${nf(buckets.b90)}</td><td style="text-align:right;color:var(--red)">${openARTotal > 0 ? (buckets.b90/openARTotal*100).toFixed(1) : '0'}%</td><td style="text-align:center;color:var(--red);font-weight:700;font-size:11px">🔴🔴</td></tr>
           </tbody>
-        </table>
-        <div class="split-summary">
-          <div class="ss-item">
-            <div class="ss-dot overdue"></div>
-            <div>
-              <div class="ss-label">Σ Протерміновано</div>
-              <div class="ss-val">${nfm(overdueTotal)} ₴<span class="ss-pct">${overduePct.toFixed(1)}% AR</span></div>
-            </div>
-          </div>
-          <div class="ss-item">
-            <div class="ss-dot ok"></div>
-            <div>
-              <div class="ss-label">Σ В межах терміну</div>
-              <div class="ss-val">${nfm(freshTotal)} ₴<span class="ss-pct">${freshPct.toFixed(1)}% AR</span></div>
-            </div>
-          </div>
-        </div>
+        </table>` : `<div class="empty-state dashed"><div class="es-icon">📭</div><div class="es-title">${invoicesEmptyMsg}</div></div>`}
       </div>
     </div>
 
-    <!-- SECTION 4: TOP-10 DEBTORS — TWO SPLIT TABLES -->
-    <div class="sec">📞 ТОП-10 дебіторів — окремо overdue vs у межах терміну</div>
+    <!-- SECTION 5 — TOP-10 DEBTORS SPLIT -->
+    <div class="sec">📞 ТОП-10 дебіторів — overdue vs у межах терміну</div>
     <div class="g2">
       <div class="cc ${overdueDebtors.length ? 'alert' : 'ok'}">
         <div class="cc-head">
           <div>
             <div class="cc-title">🔴 Протерміновані<span class="cc-title-tag red">терміново дзвонити</span></div>
-            <div class="cc-sub">${overdueDebtors.length ? `${overdueDebtors.length} клієнт${overdueDebtors.length>1?'и':''} · Σ ${nfm(overdueTotal)} ₴` : 'Жодного'}</div>
+            <div class="cc-sub">${overdueDebtors.length ? `${overdueDebtors.length} клієнт${overdueDebtors.length>1?'и':''} · Σ ${nfm(overdueARTotal)} ₴` : (hasInvoices ? 'Жодного' : invoicesEmptyMsg)}</div>
           </div>
         </div>
         ${renderDebtorsTable(overdueDebtors, 'overdue')}
@@ -802,40 +973,46 @@ function renderDashboard(){
         <div class="cc-head">
           <div>
             <div class="cc-title">📋 В межах терміну<span class="cc-title-tag green">нормально</span></div>
-            <div class="cc-sub">${freshDebtors.length ? `${freshDebtors.length} клієнт${freshDebtors.length>1?'и':''} · Σ ${nfm(freshTotal)} ₴` : 'Жодного'}</div>
+            <div class="cc-sub">${freshDebtors.length ? `${freshDebtors.length} клієнт${freshDebtors.length>1?'и':''} · Σ ${nfm(freshARTotal)} ₴` : (hasInvoices ? 'Жодного' : invoicesEmptyMsg)}</div>
           </div>
         </div>
         ${renderDebtorsTable(freshDebtors, 'fresh')}
       </div>
     </div>
 
-    <!-- SECTION 5: UPCOMING DELIVERIES -->
-    <div class="sec">⏳ Заплановані відвантаження — наступні 30 днів</div>
+    <!-- SECTION 6 — UPCOMING RECEIPTS -->
+    <div class="sec">⏳ Очікувані надходження — наступні 30 днів</div>
     <div class="cc">
-      ${upcomingInvoices.length === 0 ? `
+      ${!hasInvoices ? `
+        <div class="empty-state dashed">
+          <div class="es-icon">📭</div>
+          <div class="es-title">${invoicesEmptyMsg}</div>
+          <div class="es-sub">Очікувані надходження будуються з payment_planned_moment рахунків.<br>Поки що список пустий — заповниться після наступного sync.</div>
+        </div>
+      ` : upcomingReceipts.length === 0 ? `
         <div class="empty-state">
           <div class="es-icon">📭</div>
-          <div class="es-title">Немає запланованих відвантажень</div>
-          <div class="es-sub">Жоден ордер не має delivery date у наступні 30 днів.<br>Прогноз надходжень нижче базується на історичній середній виручці.</div>
+          <div class="es-title">Немає очікуваних надходжень</div>
+          <div class="es-sub">Жоден відкритий рахунок не має payment_planned_moment у наступні 30 днів.</div>
         </div>
       ` : `
         <div class="cc-head" style="margin-bottom:8px">
-          <div class="cc-sub">${upcomingInvoices.length} ордерів · ${nfm(upcomingInvoices.reduce((a,u) => a+u.amount, 0))} ₴ очікується</div>
+          <div class="cc-sub">${upcomingReceipts.length} рахунків · ${nfm(upcomingReceipts.reduce((a,u) => a+u.amount, 0))} ₴ очікується</div>
         </div>
         <table class="dt">
           <thead>
             <tr>
-              <th style="width:90px">Дата</th>
+              <th style="width:90px">Planned</th>
               <th>Контрагент</th>
-              <th>Ордер</th>
+              <th>Рахунок</th>
               <th style="text-align:right">Сума ₴</th>
               <th style="text-align:right;width:80px">Днів</th>
             </tr>
           </thead>
           <tbody>
-            ${upcomingInvoices.slice(0, 30).map(u => `
+            ${upcomingReceipts.slice(0, 30).map(u => `
               <tr>
-                <td style="white-space:nowrap;font-weight:600">${df(u.date)}</td>
+                <td style="white-space:nowrap;font-weight:600">${df(u.planned)}</td>
                 <td>${escapeHtml(u.cpName)}</td>
                 <td style="font-size:11px;color:var(--muted)">${escapeHtml(u.invName)}</td>
                 <td style="text-align:right;font-weight:700">${nf(u.amount)}</td>
@@ -844,46 +1021,80 @@ function renderDashboard(){
             `).join('')}
           </tbody>
         </table>
-        ${upcomingInvoices.length > 30 ? `<div style="text-align:center;padding:10px;color:var(--muted);font-size:12px">показано перші 30 з ${upcomingInvoices.length}</div>` : ''}
+        ${upcomingReceipts.length > 30 ? `<div style="text-align:center;padding:10px;color:var(--muted);font-size:12px">показано перші 30 з ${upcomingReceipts.length}</div>` : ''}
       `}
     </div>
 
-    <!-- SECTION 6: AUTO-INSIGHTS — split-aware -->
+    <!-- SECTION 7 — LAST 20 PAYMENTS -->
+    <div class="sec">🕐 Останні 20 платежів — timeline</div>
+    <div class="cc">
+      ${last20Payments.length === 0 ? `
+        <div class="empty-state"><div class="es-icon">📭</div><div class="es-title">Немає платежів</div></div>
+      ` : `
+        <div class="pay-tl">
+          ${last20Payments.map(p => {
+            const isInb = p.type === 'inbound';
+            const isOut = p.type === 'outbound';
+            const iconCls = isInb ? 'inb' : isOut ? 'outb' : 'inb';
+            const amtCls = isInb ? 'pos' : isOut ? 'neg' : '';
+            const icon = isInb ? '💰' : isOut ? '💸' : '•';
+            const sign = isInb ? '+' : isOut ? '−' : '';
+            const meta = isOut && p.expenseItem ? `<div class="pay-tl-meta">Стаття: <strong>${escapeHtml(p.expenseItem)}</strong>${p.name ? ' · ' + escapeHtml(p.name) : ''}</div>` : (p.name ? `<div class="pay-tl-meta">${escapeHtml(p.name)}</div>` : '');
+            return `
+              <div class="pay-tl-item">
+                <div class="pay-tl-date">${df(p.date)}</div>
+                <div class="pay-tl-icon ${iconCls}">${icon}</div>
+                <div class="pay-tl-body">
+                  <div class="pay-tl-title">${escapeHtml(p.cpName)}</div>
+                  ${meta}
+                </div>
+                <div class="pay-tl-amount ${amtCls}">${sign}${nf(p.amount)} ₴</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `}
+    </div>
+
+    <!-- SECTION 8 — AUTO-INSIGHTS -->
     <div class="sec">🧠 Auto-insights</div>
     <div class="insights-grid">
 
-      <!-- Critical: overdue count & sum -->
-      <div class="insight ${overdueDemands.length > 0 ? 'red' : 'green'}">
-        <div class="insight-icon">${overdueDemands.length > 0 ? '🔴' : '✅'}</div>
+      <!-- 1. Critical overdue -->
+      <div class="insight ${criticalOverdueCount > 0 ? 'red' : (overdueAR.length > 0 ? 'yellow' : 'green')}">
+        <div class="insight-icon">${criticalOverdueCount > 0 ? '🔴' : (overdueAR.length > 0 ? '⚠️' : '✅')}</div>
         <div>
-          <strong>${overdueDemands.length > 0
-            ? `${overdueDemands.length} відвантаж. протерміновано на ${nfm(overdueTotal)} ₴`
-            : 'Жодного простроченого рахунку'}</strong>
-          ${overdueDemands.length > 0
-            ? `<br><span style="color:#666">${criticalOverdueCount > 0 ? `&gt; 90 днів: <strong>${nfm(criticalOverdueTotal)} ₴</strong> (${criticalOverdueCount} відвантаж.) — терміново!` : 'Критичних (&gt; 90 днів) нема'}</span>`
-            : '<br><span style="color:#666">Здоровий стан AR — всі рахунки в межах терміну</span>'}
+          <strong>${
+            criticalOverdueCount > 0
+              ? `${criticalOverdueCount} рахунк${criticalOverdueCount===1?'':criticalOverdueCount<5?'и':'ів'} прострочено &gt; 60 днів на ${nfm(criticalOverdueTotal)} ₴`
+              : overdueAR.length > 0
+                ? `${overdueAR.length} рахунк${overdueAR.length===1?'':overdueAR.length<5?'и':'ів'} протерміновано на ${nfm(overdueARTotal)} ₴`
+                : 'Жодного простроченого рахунку'
+          }</strong>
+          <br><span style="color:#666">${
+            criticalOverdueCount > 0
+              ? 'Терміново — призначити дзвінок або escalation'
+              : overdueAR.length > 0
+                ? 'Прострочка є, але до критичних 60 днів не дійшло'
+                : (hasInvoices ? 'Здоровий стан AR — всі рахунки в межах терміну' : invoicesEmptyMsg)
+          }</span>
         </div>
       </div>
 
-      <!-- Health: overdue ratio + DSO trend -->
+      <!-- 2. Net cash flow / DSO -->
       ${(() => {
-        const overdueDominant = overdueTotal > freshTotal && openARTotal > 0;
-        const veryFresh = overduePct < 20 && openARTotal > 0;
-        const cls = overdueDominant ? 'red' : (overduePct > 40 ? 'yellow' : 'green');
-        const icon = overdueDominant ? '⚠️' : (overduePct > 40 ? '🟡' : '🟢');
+        const cls = netCashFlow < 0 ? 'red' : netCashFlow > expLast30 * 0.3 ? 'green' : 'yellow';
+        const icon = netCashFlow < 0 ? '🩸' : netCashFlow > 0 ? '🟢' : '🟡';
         let title, body;
-        if (openARTotal === 0) {
-          title = 'Немає відкритої дебіторки';
-          body = 'Усі рахунки оплачено';
-        } else if (overdueDominant) {
-          title = `Σ overdue (${nfm(overdueTotal)} ₴) &gt; Σ в межах терміну (${nfm(freshTotal)} ₴)`;
-          body = `Тенденція до прострочки — ${overduePct.toFixed(1)}% AR протерміновано${dso !== null && dso > CREDIT_DAYS ? ` · DSO ${dso} дн &gt; credit term ${CREDIT_DAYS}` : ''}`;
-        } else if (veryFresh) {
-          title = `${freshPct.toFixed(0)}% дебіторки у межах терміну — здоровий cash flow`;
-          body = `Σ в межах ${nfm(freshTotal)} ₴ vs overdue ${nfm(overdueTotal)} ₴${dso !== null ? ` · DSO ${dso} дн` : ''}`;
+        if (netCashFlow < 0) {
+          title = `Cash burn ${nfm(Math.abs(netCashFlow))} ₴ за 30 днів`;
+          body = `Витрати (${nfm(expLast30)} ₴) перевищують надходження (${nfm(cashLast30)} ₴)${dso !== null ? ` · DSO ${dso} дн` : ''}`;
+        } else if (netCashFlow > 0) {
+          title = `Net cash positive +${nfm(netCashFlow)} ₴ за 30 днів`;
+          body = `Надходження (${nfm(cashLast30)} ₴) перевищують витрати (${nfm(expLast30)} ₴)${dso !== null ? ` · DSO ${dso} дн` : ''}`;
         } else {
-          title = `${overduePct.toFixed(1)}% AR протерміновано`;
-          body = `Σ в межах ${nfm(freshTotal)} ₴ vs overdue ${nfm(overdueTotal)} ₴${dso !== null ? ` · DSO ${dso} дн` : ''}`;
+          title = `Break-even за 30 днів`;
+          body = `Надходження = витрати = ${nfm(cashLast30)} ₴${dso !== null ? ` · DSO ${dso} дн` : ''}`;
         }
         return `
           <div class="insight ${cls}">
@@ -896,36 +1107,69 @@ function renderDashboard(){
         `;
       })()}
 
-      <!-- Forecast -->
-      <div class="insight blue">
-        <div class="insight-icon">📈</div>
-        <div>
-          <strong>Прогноз ${nfm(forecastCash)} ₴ у найближчі 30 днів</strong>
-          <br><span style="color:#666">На основі історичної середньої виручки за останні 90 днів</span>
-        </div>
-      </div>
-
-      <!-- Concentration серед overdue -->
+      <!-- 3. Healthy AR / зайнятість дебіторки -->
       ${(() => {
-        if (overdueDebtors.length === 0) {
+        if (!hasInvoices) {
           return `
-            <div class="insight green">
-              <div class="insight-icon">✅</div>
+            <div class="insight blue">
+              <div class="insight-icon">📋</div>
               <div>
-                <strong>Нема концентрації overdue</strong>
-                <br><span style="color:#666">Жодного простроченого дебітора</span>
+                <strong>${invoicesEmptyMsg}</strong>
+                <br><span style="color:#666">AR insights з'являться після наступного sync рахунків</span>
               </div>
             </div>
           `;
         }
-        const cls = top1OverdueShare > 50 ? 'red' : top1OverdueShare > 30 ? 'yellow' : 'green';
-        const icon = top1OverdueShare > 50 ? '🎯' : top1OverdueShare > 30 ? '⚠️' : '👥';
+        const freshPct = openARTotal > 0 ? (freshARTotal/openARTotal*100) : 0;
+        const cls = freshPct > 70 ? 'green' : freshPct > 40 ? 'yellow' : 'red';
+        const icon = freshPct > 70 ? '✅' : freshPct > 40 ? '🟡' : '🔴';
         return `
           <div class="insight ${cls}">
             <div class="insight-icon">${icon}</div>
             <div>
-              <strong>TOP-1 протермінований дебітор = ${top1OverdueShare.toFixed(1)}% ВСЬОГО overdue</strong>
-              <br><span style="color:#666">${escapeHtml(overdueDebtors[0].cp.name)} — ${nfm(overdueDebtors[0].balance)} ₴ · ${overdueDebtors[0].maxDays} дн</span>
+              <strong>${freshPct.toFixed(0)}% дебіторки у межах терміну</strong>
+              <br><span style="color:#666">${nfm(freshARTotal)} ₴ в строк · ${nfm(overdueARTotal)} ₴ прострочено · planned до 30д: ${nfm(plannedNext30Total)} ₴</span>
+            </div>
+          </div>
+        `;
+      })()}
+
+      <!-- 4. Concentration — top1 expense category OR top1 debtor -->
+      ${(() => {
+        // якщо є дебітори — показуємо їх concentration
+        if (allDebtors.length > 0 && top1DebtorName) {
+          const cls = top1DebtorShare > 50 ? 'red' : top1DebtorShare > 30 ? 'yellow' : 'green';
+          const icon = top1DebtorShare > 50 ? '🎯' : top1DebtorShare > 30 ? '⚠️' : '👥';
+          return `
+            <div class="insight ${cls}">
+              <div class="insight-icon">${icon}</div>
+              <div>
+                <strong>TOP-1 дебітор = ${top1DebtorShare.toFixed(1)}% усіх боргів</strong>
+                <br><span style="color:#666">${escapeHtml(top1DebtorName)} — ${nfm(allDebtors[0].balance)} ₴</span>
+              </div>
+            </div>
+          `;
+        }
+        // інакше — concentration у витратах
+        if (top1ExpenseName) {
+          const cls = top1ExpenseShare > 50 ? 'yellow' : 'blue';
+          const icon = top1ExpenseShare > 50 ? '🎯' : '📊';
+          return `
+            <div class="insight ${cls}">
+              <div class="insight-icon">${icon}</div>
+              <div>
+                <strong>TOP-1 стаття витрат = ${top1ExpenseShare.toFixed(1)}% усіх витрат за 90д</strong>
+                <br><span style="color:#666">${escapeHtml(top1ExpenseName)} — ${nfm(expByItemSorted[0][1])} ₴</span>
+              </div>
+            </div>
+          `;
+        }
+        return `
+          <div class="insight green">
+            <div class="insight-icon">✅</div>
+            <div>
+              <strong>Немає концентрації ризиків</strong>
+              <br><span style="color:#666">Ні дебіторської, ні видаткової концентрації не виявлено</span>
             </div>
           </div>
         `;
@@ -936,9 +1180,11 @@ function renderDashboard(){
 
   document.getElementById('contentWrap').innerHTML = html;
 
-  // === Render charts ===
+  // ============================================================================
+  // CHARTS
+  // ============================================================================
   setTimeout(() => {
-    // Cash flow chart
+    // Cash flow — 3 datasets
     const cfCtx = document.getElementById('cashFlowChart');
     if (cfCtx) {
       if (_charts.cf) _charts.cf.destroy();
@@ -948,8 +1194,8 @@ function renderDashboard(){
           labels: months,
           datasets: [
             {
-              label: 'Виручка (₴)',
-              data: months.map(m => revByMonth[m]),
+              label: 'Виставлено рахунків (₴)',
+              data: months.map(m => invByMonth[m]),
               backgroundColor: 'rgba(254,191,39,.75)',
               borderColor: '#FEBF27',
               borderWidth: 1,
@@ -961,32 +1207,37 @@ function renderDashboard(){
               borderColor: '#96C11F',
               borderWidth: 1,
             },
+            {
+              label: 'Витрати (₴, negative)',
+              data: months.map(m => -expByMonth[m]),
+              backgroundColor: 'rgba(232,64,64,.65)',
+              borderColor: '#E84040',
+              borderWidth: 1,
+            },
           ]
         },
         options: {
           responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { display: true, position: 'top' } },
+          plugins: {
+            legend: { display: true, position: 'top', labels: { font: { size: 11 } } },
+            tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${nf(Math.abs(ctx.parsed.y))} ₴` } }
+          },
           scales: { y: { ticks: { callback: v => nfm(v) + ' ₴' } } }
         }
       });
     }
 
-    // AR aging doughnut — clearer labels
-    const agCtx = document.getElementById('agingChart');
-    if (agCtx) {
-      if (_charts.ag) _charts.ag.destroy();
-      _charts.ag = new Chart(agCtx, {
+    // Expense doughnut
+    const expCtx = document.getElementById('expDoughnut');
+    if (expCtx && doughnutData.length > 0) {
+      if (_charts.exp) _charts.exp.destroy();
+      _charts.exp = new Chart(expCtx, {
         type: 'doughnut',
         data: {
-          labels: [
-            '🟢 1-30 днів (в межах терміну)',
-            '🟡 31-60 днів (прострочено)',
-            '🟠 61-90 днів (прострочено)',
-            '🔴 90+ днів (критично прострочено)'
-          ],
+          labels: doughnutLabels,
           datasets: [{
-            data: [buckets.b0, buckets.b30, buckets.b60, buckets.b90],
-            backgroundColor: ['#96C11F', '#FEBF27', '#F97316', '#E84040'],
+            data: doughnutData,
+            backgroundColor: ['#E84040', '#F97316', '#FEBF27', '#96C11F', '#3B82F6', '#7209B7', '#0EA5E9', '#EC4899', '#8a8a8a'],
             borderWidth: 2,
             borderColor: '#fff',
           }]
@@ -994,18 +1245,57 @@ function renderDashboard(){
         options: {
           responsive: true, maintainAspectRatio: false,
           plugins: {
-            legend: { position: 'bottom', labels: { padding: 10, font: { size: 10.5 }, boxWidth: 14 } },
+            legend: { position: 'bottom', labels: { padding: 8, font: { size: 10.5 }, boxWidth: 12 } },
             tooltip: {
               callbacks: {
                 label: (ctx) => {
-                  const pct = openARTotal > 0 ? (ctx.parsed/openARTotal*100).toFixed(1) : '0';
-                  return `${nf(ctx.parsed)} ₴ (${pct}%)`;
+                  const pct = expTotal90 > 0 ? (ctx.parsed/expTotal90*100).toFixed(1) : '0';
+                  return `${ctx.label}: ${nf(ctx.parsed)} ₴ (${pct}%)`;
                 }
               }
             }
           }
         }
       });
+    }
+
+    // AR aging doughnut
+    if (hasInvoices) {
+      const agCtx = document.getElementById('agingChart');
+      if (agCtx) {
+        if (_charts.ag) _charts.ag.destroy();
+        _charts.ag = new Chart(agCtx, {
+          type: 'doughnut',
+          data: {
+            labels: [
+              '🟢 В межах терміну',
+              '🟡 1-30 днів прострочки',
+              '🟠 31-60 днів прострочки',
+              '🔴 60+ днів критично'
+            ],
+            datasets: [{
+              data: [buckets.b0, buckets.b30, buckets.b60, buckets.b90],
+              backgroundColor: ['#96C11F', '#FEBF27', '#F97316', '#E84040'],
+              borderWidth: 2,
+              borderColor: '#fff',
+            }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom', labels: { padding: 10, font: { size: 10.5 }, boxWidth: 14 } },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => {
+                    const pct = openARTotal > 0 ? (ctx.parsed/openARTotal*100).toFixed(1) : '0';
+                    return `${nf(ctx.parsed)} ₴ (${pct}%)`;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
     }
   }, 50);
 }
