@@ -333,7 +333,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 · МойСклад API · Оновлення: щодня 06:00
+  snEco Customer 360 v2.66 · МойСклад API · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -405,6 +405,7 @@ window.bootCustomer360 = async function(token){
     const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const prevMonthYM = prevMonth.toISOString().slice(0, 7);
     const currMonthYM = now.toISOString().slice(0, 7);
+    const ytdStart = now.getFullYear() + '-01-01';  // v2.66: для ТОП-10 з початку року
     const cutoff30 = new Date(now.getTime() - 30*86400000).toISOString().slice(0,10);
 
     // Build CP lookup tables: by ID (primary) and by name (fallback)
@@ -421,6 +422,7 @@ window.bootCustomer360 = async function(token){
     const lifetimeMap = {};
     const lastMonthMap = {};
     const last30Map = {};
+    const ytdMap = {};               // v2.66: YTD revenue per agent
     const lastOrderMap = {};
     const virtualByKey = {};  // for demands whose CP isn't in counterparties
 
@@ -449,6 +451,7 @@ window.bootCustomer360 = async function(token){
       if (ym === prevMonthYM) _accumulate(lastMonthMap, key, amt);
       const dt = (d.ms_moment||'').slice(0,10);
       if (dt >= cutoff30) _accumulate(last30Map, key, amt);
+      if (dt >= ytdStart) _accumulate(ytdMap, key, amt);   // v2.66
       if (!lastOrderMap[key] || d.ms_moment > lastOrderMap[key]) lastOrderMap[key] = d.ms_moment;
     });
 
@@ -461,6 +464,7 @@ window.bootCustomer360 = async function(token){
       c.__revenue = lifetimeMap[k] || 0;
       c.__lastMonthRev = lastMonthMap[k] || 0;
       c.__last30Rev = last30Map[k] || 0;
+      c.__ytdRev = ytdMap[k] || 0;
       c.__lastOrder = lastOrderMap[k] || null;
       merged[k] = c;
     });
@@ -470,6 +474,7 @@ window.bootCustomer360 = async function(token){
         v.__revenue = lifetimeMap[k] || 0;
         v.__lastMonthRev = lastMonthMap[k] || 0;
         v.__last30Rev = last30Map[k] || 0;
+        v.__ytdRev = ytdMap[k] || 0;
         v.__lastOrder = lastOrderMap[k] || null;
         merged[k] = v;
       }
@@ -492,73 +497,118 @@ window.bootCustomer360 = async function(token){
 };
 
 function renderQuickPills(){
-  // PRIMARY: TOP-25 by LAST CALENDAR MONTH revenue (most actionable for sales reps)
-  // FALLBACK 1: TOP-25 by last 30 days
-  // FALLBACK 2: TOP-25 by lifetime revenue
+  // v2.66: ТРИ секції з різними фокусами — last month TOP-25, YTD TOP-10, Dormant 30+d TOP-10
+  const now = new Date();
+  const cutoff30Days = new Date(now.getTime() - 30*86400000).toISOString().slice(0,10);
+
+  // Helper: render a table section
+  function _renderSection(opts) {
+    // opts: { title, subtitle, items, valueKey, valueLabel, valueColor, extraCol, emptyMsg, badgeBg, badgeFg }
+    if (!opts.items.length) {
+      return `
+        <div style="width:100%;margin-top:14px;padding:14px;background:#fff;border:1px dashed var(--border);border-radius:10px;text-align:center;color:var(--muted);font-size:12px">
+          <span style="font-weight:600">${opts.title}:</span> ${opts.emptyMsg || 'нема даних'}
+        </div>`;
+    }
+    const sum = opts.items.reduce((a,c)=>a+(c[opts.valueKey]||0),0);
+    return `
+      <div style="width:100%;text-align:left;margin-top:14px;margin-bottom:6px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between;align-items:baseline;gap:10px">
+        <span style="color:${opts.badgeFg||'var(--muted)'};background:${opts.badgeBg||'transparent'};padding:${opts.badgeBg?'3px 9px':'0'};border-radius:10px">${opts.title}</span>
+        <span style="font-size:10px;color:var(--muted);font-weight:600">${opts.subtitle ? opts.subtitle + ' · ' : ''}Σ ${nfm(sum)}₴</span>
+      </div>
+      <div style="width:100%;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden">
+        <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+          <thead>
+            <tr style="background:#FAFAF5;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700">
+              <th style="width:26px;padding:7px 8px;text-align:right">#</th>
+              <th style="padding:7px 10px;text-align:left">Клієнт</th>
+              <th style="padding:7px 10px;text-align:right;white-space:nowrap">${opts.valueLabel}</th>
+              <th style="padding:7px 10px;text-align:right;white-space:nowrap">LTV</th>
+              <th style="padding:7px 10px;text-align:right;white-space:nowrap">${opts.extraCol || 'Остання продаж'}</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${opts.items.map((c,i) => {
+              const rev = c[opts.valueKey] || 0;
+              const ltv = c.__revenue || 0;
+              const last = c.__lastOrder ? dfShort(c.__lastOrder) : '—';
+              const tag = c.__virtual ? ' <span style="font-size:9px;opacity:.7" title="Контрагент відсутній у master-таблиці">⚠</span>' : '';
+              const ediz = c.edrpou || c.inn || '';
+              // For dormant: show days since last order in last col
+              let lastDisplay = last;
+              if (opts.extraCol === 'Не замовляв') {
+                const daysAgo = c.__lastOrder ? Math.floor((Date.now() - new Date(c.__lastOrder).getTime())/86400000) : null;
+                lastDisplay = daysAgo !== null ? `<span style="color:var(--red);font-weight:600">${daysAgo} дн</span>` : '—';
+              }
+              return `
+                <tr onclick="selectCustomer('${escapeAttr(c.__key || c.name)}')" style="cursor:pointer;border-top:1px solid var(--border);transition:background .12s" onmouseover="this.style.background='#FFF9E5'" onmouseout="this.style.background=''">
+                  <td style="padding:8px 8px;text-align:right;color:${opts.valueColor||'var(--y)'};font-weight:800">${i+1}</td>
+                  <td style="padding:8px 10px">
+                    <div style="font-weight:600;color:var(--d);line-height:1.3">${escapeHtml(c.name)}${tag}</div>
+                    ${ediz ? `<div style="font-size:10.5px;color:var(--muted);margin-top:1px">${ediz}</div>` : ''}
+                  </td>
+                  <td style="padding:8px 10px;text-align:right;font-weight:700;color:${opts.valueColor||'#4a7000'}">${nf(Math.round(rev))} ₴</td>
+                  <td style="padding:8px 10px;text-align:right;color:#555">${nfm(ltv)} ₴</td>
+                  <td style="padding:8px 10px;text-align:right;color:var(--muted);font-size:11px;white-space:nowrap">${lastDisplay}</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  // SECTION 1: TOP-25 за минулий місяць (з fallback на 30 днів / lifetime коли немає)
   let basis = 'last month';
   let pool = allCounterparties.filter(c => (c.__lastMonthRev||0) > 0);
   if (pool.length === 0) { basis = 'last 30 days'; pool = allCounterparties.filter(c => (c.__last30Rev||0) > 0); }
   if (pool.length === 0) { basis = 'lifetime'; pool = allCounterparties.filter(c => (c.__revenue||0) > 0); }
+  const sortKey1 = basis === 'last month' ? '__lastMonthRev' : basis === 'last 30 days' ? '__last30Rev' : '__revenue';
+  const top25 = pool.filter(c => !c.archived).sort((a,b) => (b[sortKey1]||0) - (a[sortKey1]||0)).slice(0, 25);
 
-  const sortKey = basis === 'last month' ? '__lastMonthRev' : basis === 'last 30 days' ? '__last30Rev' : '__revenue';
-  const top = pool
-    .filter(c => !c.archived)
-    .sort((a,b) => (b[sortKey]||0) - (a[sortKey]||0))
-    .slice(0, 25);
-
-  if (top.length === 0) {
+  if (top25.length === 0) {
     document.getElementById('quickPills').innerHTML = '<span style="color:var(--muted);font-size:11px;padding:5px 0">Жодного клієнта з даними. Перевір що sync пройшов.</span>';
     return;
   }
 
-  const label = basis === 'last month'
-    ? `ТОП-${top.length} за минулий місяць (за виручкою)`
-    : basis === 'last 30 days'
-      ? `ТОП-${top.length} за останні 30 днів`
-      : `ТОП-${top.length} за весь час`;
+  const label1 = basis === 'last month' ? 'ТОП-25 за минулий місяць'
+                : basis === 'last 30 days' ? 'ТОП-25 за останні 30 днів' : 'ТОП-25 за весь час';
+  const valueLabel1 = basis === 'last month' ? 'За місяць' : basis === 'last 30 days' ? '30 днів' : 'Весь час';
 
-  // Render as a sleek list/table — name | revenue period | LTV | last order
-  const sumPeriod = top.reduce((a,c)=>a+(c[sortKey]||0),0);
-  const html = `
-    <div style="width:100%;text-align:left;margin-bottom:6px;font-size:10.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between;align-items:baseline;gap:10px">
-      <span>${label}</span>
-      <span style="font-size:10px;color:var(--muted);font-weight:600">Σ ${nfm(sumPeriod)}₴</span>
-    </div>
-    <div style="width:100%;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden">
-      <table style="width:100%;border-collapse:collapse;font-size:12.5px">
-        <thead>
-          <tr style="background:#FAFAF5;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700">
-            <th style="width:26px;padding:7px 8px;text-align:right">#</th>
-            <th style="padding:7px 10px;text-align:left">Клієнт</th>
-            <th style="padding:7px 10px;text-align:right;white-space:nowrap">За ${basis === 'last month' ? 'місяць' : basis === 'last 30 days' ? '30 днів' : 'весь час'}</th>
-            <th style="padding:7px 10px;text-align:right;white-space:nowrap">LTV</th>
-            <th style="padding:7px 10px;text-align:right;white-space:nowrap">Остання продаж</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${top.map((c,i) => {
-            const rev = c[sortKey] || 0;
-            const ltv = c.__revenue || 0;
-            const last = c.__lastOrder ? dfShort(c.__lastOrder) : '—';
-            const tag = c.__virtual ? ' <span style="font-size:9px;opacity:.7" title="Контрагент відсутній у master-таблиці">⚠</span>' : '';
-            const ediz = c.edrpou || c.inn || '';
-            return `
-              <tr onclick="selectCustomer('${escapeAttr(c.__key || c.name)}')" style="cursor:pointer;border-top:1px solid var(--border);transition:background .12s" onmouseover="this.style.background='#FFF9E5'" onmouseout="this.style.background=''">
-                <td style="padding:8px 8px;text-align:right;color:var(--y);font-weight:800">${i+1}</td>
-                <td style="padding:8px 10px">
-                  <div style="font-weight:600;color:var(--d);line-height:1.3">${escapeHtml(c.name)}${tag}</div>
-                  ${ediz ? `<div style="font-size:10.5px;color:var(--muted);margin-top:1px">${ediz}</div>` : ''}
-                </td>
-                <td style="padding:8px 10px;text-align:right;font-weight:700;color:#4a7000">${nf(Math.round(rev))} ₴</td>
-                <td style="padding:8px 10px;text-align:right;color:#555">${nfm(ltv)} ₴</td>
-                <td style="padding:8px 10px;text-align:right;color:var(--muted);font-size:11px;white-space:nowrap">${last}</td>
-              </tr>
-            `;
-          }).join('')}
-        </tbody>
-      </table>
-    </div>
-  `;
+  // SECTION 2: TOP-10 з початку року (YTD)
+  const yearNum = now.getFullYear();
+  const top10ytd = allCounterparties
+    .filter(c => !c.archived && (c.__ytdRev||0) > 0)
+    .sort((a,b) => (b.__ytdRev||0) - (a.__ytdRev||0))
+    .slice(0, 10);
+
+  // SECTION 3: Dormant — не замовляли > 30 днів, мають LTV > 0, sorted by LTV desc
+  // Це КРИТИЧНИЙ список для sales — кого реактивовувати першими
+  const dormant = allCounterparties
+    .filter(c => !c.archived && (c.__revenue||0) > 0 && c.__lastOrder && c.__lastOrder.slice(0,10) < cutoff30Days)
+    .sort((a,b) => (b.__revenue||0) - (a.__revenue||0))
+    .slice(0, 10);
+
+  const html = [
+    _renderSection({
+      title: label1, items: top25, valueKey: sortKey1, valueLabel: valueLabel1,
+      valueColor: '#4a7000', badgeBg: 'rgba(150,193,31,.15)', badgeFg: '#4a7000'
+    }),
+    _renderSection({
+      title: `ТОП-10 з початку ${yearNum} року`, items: top10ytd,
+      valueKey: '__ytdRev', valueLabel: `YTD ${yearNum}`,
+      valueColor: '#996600', badgeBg: 'rgba(254,191,39,.18)', badgeFg: '#996600',
+      emptyMsg: 'нема продажів у цьому році'
+    }),
+    _renderSection({
+      title: 'Не замовляли > 30 днів — час реактивувати', items: dormant,
+      valueKey: '__revenue', valueLabel: 'LTV', extraCol: 'Не замовляв',
+      valueColor: 'var(--red)', badgeBg: 'rgba(232,64,64,.10)', badgeFg: '#a00',
+      emptyMsg: 'усі активні клієнти замовляли нещодавно ✅'
+    })
+  ].join('');
+
   document.getElementById('quickPills').innerHTML = html;
 }
 
@@ -604,7 +654,17 @@ window.selectCustomer = function(name){
   document.getElementById('custSearch').value = c.name;
   document.getElementById('searchResults').classList.remove('open');
   renderCustomerView(c);
-  window.scrollTo({top: document.querySelector('.selector-bar').offsetHeight + 60, behavior: 'smooth'});
+  // v2.66 fix: скролимо ДО contentWrap (де новий вміст), не на 150px вгору.
+  // Враховуємо sticky topbar (56px) + selector-bar (~120px) + невеликий gap.
+  setTimeout(() => {
+    const wrap = document.getElementById('contentWrap');
+    if (wrap) {
+      const topbarH = document.querySelector('.topbar')?.offsetHeight || 56;
+      const selectorH = document.querySelector('.selector-bar')?.offsetHeight || 120;
+      const targetY = wrap.getBoundingClientRect().top + window.scrollY - (topbarH + selectorH + 10);
+      window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+    }
+  }, 50);
 };
 
 function renderCustomerView(c){
