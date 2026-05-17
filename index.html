@@ -2117,7 +2117,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Bible v2.60 · 2026
+    Brand Bible v2.63 · 2026
   </div>
 </nav>
 
@@ -2131,7 +2131,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
     <span data-lang="sk">Jedna ingrediencia. <span class="qr-ns-accent">Žiadne kompromisy.</span> Syrový snack 21. storočia.</span>
   </div>
-  <div class="qr-meta">v2.60 · 2026</div>
+  <div class="qr-meta">v2.63 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -9386,6 +9386,23 @@ h3.block-title:first-of-type { margin-top: 0; }
   <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span><span data-lang="sk">História verzií</span></h3>
 
   <div class="changelog-entry">
+    <span class="changelog-version">v2.63</span><span class="changelog-date">17.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>💰 Finance Dashboard — новий standalone дашборд</strong> (block: <code>finance-dashboard</code>) для Пилипа, Богдана, Ярослава, Вадима. 8 hero KPI (виручка 30 днів з delta vs prev 30d, фактичні надходження з delta, відкриті/прострочені рахунки, DSO, прогноз ₴ на 30 днів, активні клієнти, avg рахунок). Cash flow chart (12 місяців: виручка vs надходження). AR aging — doughnut з 4 buckets (1-30 / 31-60 / 61-90 / 90+ днів) + детальна таблиця. <strong>ТОП-10 поточних дебіторів з готовими mailto/tel</strong> для миттєвого дзвінка/листа з нагадуванням. Очікувані надходження у наступні 30 днів. 4 auto-insights (critical &gt; 90d, DSO health, forecast, concentration TOP-1).</li>
+      <li data-lang="en"><strong>💰 Finance Dashboard — new standalone dashboard</strong> (block: <code>finance-dashboard</code>) for Pylyp, Bohdan, Yaroslav, Vadym. 8 hero KPIs, 12-month cash flow chart, AR aging doughnut (4 buckets), <strong>TOP-10 debtors with one-click mailto/tel</strong>, upcoming payments next 30d, 4 auto-insights.</li>
+      <li data-lang="sk"><strong>💰 Finance Dashboard — nový standalone dashboard</strong> (block: <code>finance-dashboard</code>) pre Pylypa, Bohdana, Yaroslava, Vadyma. 8 hero KPI, cash flow 12 mesiacov, AR aging (4 buckets), TOP-10 dlžníkov s mailto/tel.</li>
+
+      <li data-lang="uk"><strong>📂 Каталог Dashboards</strong> — KPI strip оновлено: 5 live · 2+ planned (Finance переміщено з «Planned» в активні launcher-картки). Гра кольорів: Finance — темно-зелений gradient #1B4332 → #2D6A4F (фінанси = «зелені» в обох сенсах).</li>
+      <li data-lang="en"><strong>📂 Dashboards catalog</strong> — KPI strip updated: 5 live · 2+ planned (Finance moved from "Planned" to active launchers). Color play: Finance uses dark-green gradient.</li>
+      <li data-lang="sk"><strong>📂 Katalóg Dashboards</strong> — 5 live · 2+ planned. Finance presunutý z „Plánované".</li>
+
+      <li data-lang="uk"><strong>🔧 v2.61 + v2.62 (інкорпоровано) — agent_id linkage + 24h JWT.</strong> v2.61: виправлено MoySklad expand=agent bug (530/530 demands мали agent=NULL у D1), додано agent_id колонки у ms_demands/ms_payments/ms_orders/ms_invoices_out/ms_returns. Customer 360 та Finance тепер канонічно матчать клієнтів за UUID (a не лише за назвою). v2.62: JWT TTL збільшено 1h → 24h — менше OTP перезаходів для дашборд-користувачів.</li>
+      <li data-lang="en"><strong>🔧 v2.61 + v2.62 (incorporated) — agent_id linkage + 24h JWT.</strong> v2.61: fixed MoySklad expand=agent bug (530/530 demands had NULL agent), added agent_id columns. Canonical UUID matching now. v2.62: JWT TTL 1h → 24h.</li>
+      <li data-lang="sk"><strong>🔧 v2.61 + v2.62 (zahrnuté) — agent_id linkage + 24h JWT.</strong></li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry">
     <span class="changelog-version">v2.60</span><span class="changelog-date">15.05.2026</span>
     <ul class="changelog-list">
       <li data-lang="uk"><strong>👥 Customer 360 — нова standalone сторінка</strong> з власним OTP-gate (<code>customer-dashboard</code>). Дозволяє вибрати будь-якого клієнта і побачити: header card (контакти, ЄДРПОУ, теги), 8 KPI (LTV, кількість замовлень, AOV, остання дата, дебіторка, rank vs cohort, return rate, активні замовлення), auto-insights (churn risk, висока дебіторка, strategic account, return rate alert), revenue trend chart, TOP-10 продуктів цього клієнта, timeline 20 останніх подій (demands+payments+orders+returns+invoices), comparison vs avg, нотатки з картки МойСклад. Quick actions: ✉ mailto, 📞 tel, 🖨 print/PDF, 📋 copy summary. Worker SUPPORTED_BLOCKS += customer-dashboard.</li>
@@ -10884,13 +10901,13 @@ h3.block-title:first-of-type { margin-top: 0; }
   <!-- KPI strip — каталог зростає -->
   <div class="grid-3" style="margin:24px 0 28px">
     <div class="card card-sm" style="background:var(--black);color:#fff;text-align:center">
-      <div style="font-size:32px;font-weight:900;color:var(--yellow);line-height:1">4</div>
+      <div style="font-size:32px;font-weight:900;color:var(--yellow);line-height:1">5</div>
       <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:6px;letter-spacing:0.04em;text-transform:uppercase">
         <span data-lang="uk">live дашборди</span><span data-lang="en">live dashboards</span><span data-lang="sk">live dashboardy</span>
       </div>
     </div>
     <div class="card card-sm" style="background:var(--yellow);color:var(--black);text-align:center">
-      <div style="font-size:32px;font-weight:900;line-height:1">3+</div>
+      <div style="font-size:32px;font-weight:900;line-height:1">2+</div>
       <div style="font-size:11px;color:rgba(30,30,30,0.7);margin-top:6px;letter-spacing:0.04em;text-transform:uppercase">
         <span data-lang="uk">в плані</span><span data-lang="en">planned</span><span data-lang="sk">v pláne</span>
       </div>
@@ -11001,14 +11018,35 @@ h3.block-title:first-of-type { margin-top: 0; }
     </div>
   </a>
 
+  <!-- v2.63: Finance Dashboard launcher (full-width) -->
+  <a href="dashboard/finance/" target="_blank" rel="noopener" style="display:block;background:linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%);color:#fff;padding:28px 28px;border-radius:var(--radius);text-decoration:none;position:relative;overflow:hidden;margin-top:14px;border:1px solid rgba(150,193,31,0.30)">
+    <div style="position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle, rgba(150,193,31,0.20) 0%, transparent 70%);pointer-events:none"></div>
+    <div style="position:relative;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap">
+      <div style="flex:1;min-width:300px">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#96C11F;margin-bottom:8px">💰 Finance Dashboard</div>
+        <div style="font-size:22px;font-weight:800;letter-spacing:-0.3px;line-height:1.2;margin-bottom:10px">
+          <span data-lang="uk">Cash flow, дебіторка, AR aging, прогноз надходжень</span>
+          <span data-lang="en">Cash flow, AR, aging, payment forecast</span>
+          <span data-lang="sk">Cash flow, AR, aging, prognóza príjmov</span>
+        </div>
+        <div style="font-size:13px;line-height:1.55;color:rgba(255,255,255,0.78);max-width:780px">
+          <span data-lang="uk">8 KPI зверху (виручка 30 днів з delta, надходження, відкриті/прострочені рахунки, DSO, прогноз ₴, активні клієнти, avg рахунок). Cash flow 12 місяців. AR aging — 4 buckets (1-30 / 31-60 / 61-90 / 90+). <strong>TOP-10 поточних дебіторів з готовими mailto/tel</strong> для дзвінків. Очікувані надходження у наступні 30 днів. Auto-insights. Whitelist: vg+Пилип+Богдан+Ярослав.</span>
+          <span data-lang="en">8 hero KPIs (revenue 30d with delta, cash collected, open/overdue invoices, DSO, forecast ₴, active customers, avg invoice). 12-month cash flow. AR aging — 4 buckets. <strong>TOP-10 debtors with one-click mailto/tel</strong>. Upcoming payments next 30d. Auto-insights. Whitelist: vg+Pylyp+Bohdan+Yaroslav.</span>
+          <span data-lang="sk">8 hero KPI, cash flow 12 mesiacov, AR aging (4 buckets), TOP-10 dlžníkov s mailto/tel, očakávané príjmy. Whitelist: vg+Pylyp+Bohdan+Yaroslav.</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:11px 20px;background:#96C11F;color:#fff;font-weight:800;border-radius:8px;font-size:13px;letter-spacing:0.02em">
+          <span data-lang="uk">Відкрити Finance</span><span data-lang="en">Open Finance</span><span data-lang="sk">Otvoriť Finance</span>
+          <span style="font-size:16px">↗</span>
+        </div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);font-style:italic">block: <code style="background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:3px;color:#96C11F">finance-dashboard</code></div>
+      </div>
+    </div>
+  </a>
+
   <h3 class="block-title" style="margin-top:36px">🟡 <span data-lang="uk">У плані</span><span data-lang="en">Planned</span><span data-lang="sk">Plánované</span></h3>
   <div class="grid-3">
-    <div class="card card-sm" style="opacity:0.85">
-      <div style="font-size:24px;margin-bottom:6px">💰</div>
-      <div style="font-size:14px;font-weight:800;margin-bottom:4px"><span data-lang="uk">Finance Dashboard</span><span data-lang="en">Finance Dashboard</span><span data-lang="sk">Finance Dashboard</span></div>
-      <div style="font-size:11.5px;color:var(--text-muted);line-height:1.55;margin-bottom:8px"><span data-lang="uk">Cashflow, AR/AP, monthly P&amp;L, currency exposure UAH/EUR/USD. Whitelist: vg, Pylyp, CFO.</span><span data-lang="en">Cashflow, AR/AP, monthly P&amp;L, currency exposure UAH/EUR/USD. Whitelist: vg, Pylyp, CFO.</span><span data-lang="sk">Cashflow, AR/AP, mesačné P&amp;L, currency exposure UAH/EUR/USD. Whitelist: vg, Pylyp, CFO.</span></div>
-      <div style="font-size:10px;color:var(--text-muted);font-style:italic">block: <code>finance-dashboard</code></div>
-    </div>
     <div class="card card-sm" style="opacity:0.85">
       <div style="font-size:24px;margin-bottom:6px">👥</div>
       <div style="font-size:14px;font-weight:800;margin-bottom:4px"><span data-lang="uk">HR Dashboard</span><span data-lang="en">HR Dashboard</span><span data-lang="sk">HR Dashboard</span></div>
