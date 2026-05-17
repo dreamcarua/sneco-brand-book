@@ -333,7 +333,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.66 · МойСклад API · Оновлення: щодня 06:00
+  snEco Customer 360 v2.68 · МойСклад API · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -428,6 +428,8 @@ window.bootCustomer360 = async function(token){
 
     function _accumulate(map, key, amt) { map[key] = (map[key]||0) + amt; }
 
+    const lastOrderAmountMap = {};   // v2.68: для Dormant — сума останнього замовлення
+
     allDemands.forEach(d => {
       const amt = (d.sum_kop||0)/100;
       const cp = (d.agent_id && cpById[d.agent_id]) || (d.agent && cpByName[(d.agent||'').trim()]);
@@ -452,7 +454,10 @@ window.bootCustomer360 = async function(token){
       const dt = (d.ms_moment||'').slice(0,10);
       if (dt >= cutoff30) _accumulate(last30Map, key, amt);
       if (dt >= ytdStart) _accumulate(ytdMap, key, amt);   // v2.66
-      if (!lastOrderMap[key] || d.ms_moment > lastOrderMap[key]) lastOrderMap[key] = d.ms_moment;
+      if (!lastOrderMap[key] || d.ms_moment > lastOrderMap[key]) {
+        lastOrderMap[key] = d.ms_moment;
+        lastOrderAmountMap[key] = amt;   // v2.68: оновлюємо суму останньої продажі разом з датою
+      }
     });
 
     // Merge: start with all known CPs, attach revenue; then add virtuals
@@ -466,6 +471,7 @@ window.bootCustomer360 = async function(token){
       c.__last30Rev = last30Map[k] || 0;
       c.__ytdRev = ytdMap[k] || 0;
       c.__lastOrder = lastOrderMap[k] || null;
+      c.__lastOrderAmount = lastOrderAmountMap[k] || 0;
       merged[k] = c;
     });
     Object.entries(virtualByKey).forEach(([k, v]) => {
@@ -476,6 +482,7 @@ window.bootCustomer360 = async function(token){
         v.__last30Rev = last30Map[k] || 0;
         v.__ytdRev = ytdMap[k] || 0;
         v.__lastOrder = lastOrderMap[k] || null;
+        v.__lastOrderAmount = lastOrderAmountMap[k] || 0;
         merged[k] = v;
       }
     });
@@ -502,8 +509,8 @@ function renderQuickPills(){
   const cutoff30Days = new Date(now.getTime() - 30*86400000).toISOString().slice(0,10);
 
   // Helper: render a table section
+  // v2.68: для dormant section — замість колонки LTV показуємо ОСТАННЄ ЗАМОВЛЕННЯ (дата + сума)
   function _renderSection(opts) {
-    // opts: { title, subtitle, items, valueKey, valueLabel, valueColor, extraCol, emptyMsg, badgeBg, badgeFg }
     if (!opts.items.length) {
       return `
         <div style="width:100%;margin-top:14px;padding:14px;background:#fff;border:1px dashed var(--border);border-radius:10px;text-align:center;color:var(--muted);font-size:12px">
@@ -511,6 +518,11 @@ function renderQuickPills(){
         </div>`;
     }
     const sum = opts.items.reduce((a,c)=>a+(c[opts.valueKey]||0),0);
+    const isDormant = opts.extraCol === 'Не замовляв';
+    // У dormant section: колонка LTV → "Остання продаж" (дата + сума); і остання колонка — "Днів"
+    const col4Label = isDormant ? 'Остання продаж' : 'LTV';
+    const col5Label = isDormant ? 'Днів' : (opts.extraCol || 'Остання продаж');
+
     return `
       <div style="width:100%;text-align:left;margin-top:14px;margin-bottom:6px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between;align-items:baseline;gap:10px">
         <span style="color:${opts.badgeFg||'var(--muted)'};background:${opts.badgeBg||'transparent'};padding:${opts.badgeBg?'3px 9px':'0'};border-radius:10px">${opts.title}</span>
@@ -523,8 +535,8 @@ function renderQuickPills(){
               <th style="width:26px;padding:7px 8px;text-align:right">#</th>
               <th style="padding:7px 10px;text-align:left">Клієнт</th>
               <th style="padding:7px 10px;text-align:right;white-space:nowrap">${opts.valueLabel}</th>
-              <th style="padding:7px 10px;text-align:right;white-space:nowrap">LTV</th>
-              <th style="padding:7px 10px;text-align:right;white-space:nowrap">${opts.extraCol || 'Остання продаж'}</th>
+              <th style="padding:7px 10px;text-align:right;white-space:nowrap">${col4Label}</th>
+              <th style="padding:7px 10px;text-align:right;white-space:nowrap">${col5Label}</th>
             </tr>
           </thead>
           <tbody>
@@ -534,11 +546,22 @@ function renderQuickPills(){
               const last = c.__lastOrder ? dfShort(c.__lastOrder) : '—';
               const tag = c.__virtual ? ' <span style="font-size:9px;opacity:.7" title="Контрагент відсутній у master-таблиці">⚠</span>' : '';
               const ediz = c.edrpou || c.inn || '';
-              // For dormant: show days since last order in last col
-              let lastDisplay = last;
-              if (opts.extraCol === 'Не замовляв') {
+              // Col 4 і Col 5 — поведінка залежить від типу секції
+              let col4Cell, col5Cell;
+              if (isDormant) {
                 const daysAgo = c.__lastOrder ? Math.floor((Date.now() - new Date(c.__lastOrder).getTime())/86400000) : null;
-                lastDisplay = daysAgo !== null ? `<span style="color:var(--red);font-weight:600">${daysAgo} дн</span>` : '—';
+                const lastDate = c.__lastOrder ? df(c.__lastOrder) : '—';
+                const lastAmt = c.__lastOrderAmount || 0;
+                // Col 4 = "Остання продаж" — дата + сума, 2 рядки
+                col4Cell = `
+                  <div style="font-weight:600;color:var(--d);font-size:12px">${lastDate}</div>
+                  <div style="font-size:11px;color:#555;margin-top:1px">${nf(Math.round(lastAmt))} ₴</div>
+                `;
+                // Col 5 = "Днів" — кількість днів простою
+                col5Cell = daysAgo !== null ? `<span style="color:var(--red);font-weight:700">${daysAgo}</span>` : '—';
+              } else {
+                col4Cell = `${nfm(ltv)} ₴`;
+                col5Cell = `<span style="font-size:11px;color:var(--muted)">${last}</span>`;
               }
               return `
                 <tr onclick="selectCustomer('${escapeAttr(c.__key || c.name)}')" style="cursor:pointer;border-top:1px solid var(--border);transition:background .12s" onmouseover="this.style.background='#FFF9E5'" onmouseout="this.style.background=''">
@@ -548,8 +571,8 @@ function renderQuickPills(){
                     ${ediz ? `<div style="font-size:10.5px;color:var(--muted);margin-top:1px">${ediz}</div>` : ''}
                   </td>
                   <td style="padding:8px 10px;text-align:right;font-weight:700;color:${opts.valueColor||'#4a7000'}">${nf(Math.round(rev))} ₴</td>
-                  <td style="padding:8px 10px;text-align:right;color:#555">${nfm(ltv)} ₴</td>
-                  <td style="padding:8px 10px;text-align:right;color:var(--muted);font-size:11px;white-space:nowrap">${lastDisplay}</td>
+                  <td style="padding:8px 10px;text-align:right;color:#555;white-space:nowrap">${col4Cell}</td>
+                  <td style="padding:8px 10px;text-align:right;color:var(--muted);font-size:11px;white-space:nowrap">${col5Cell}</td>
                 </tr>
               `;
             }).join('')}
@@ -645,6 +668,27 @@ function setupSearch(){
   });
 }
 
+// v2.68: бережемо HTML списків щоб можна було повернутися "← До списку"
+let _pillsBackup = null;
+
+window.showPillsList = function(){
+  // Повертаємо повний список ТОП-25 / YTD / Dormant
+  if (_pillsBackup) {
+    document.getElementById('quickPills').innerHTML = _pillsBackup;
+  } else {
+    renderQuickPills();
+  }
+  // Очистити вибраного клієнта
+  document.getElementById('custSearch').value = '';
+  document.getElementById('contentWrap').innerHTML = `
+    <div class="empty-hero">
+      <div class="eh-icon">👥</div>
+      <div class="eh-title">Оберіть клієнта</div>
+      <div class="eh-sub">Введіть назву або ЄДРПОУ у пошуку зверху,<br>або клікніть на швидкий вибір нижче.</div>
+    </div>`;
+  window.scrollTo({top: 0, behavior: 'smooth'});
+};
+
 window.selectCustomer = function(name){
   const c = allCounterparties.find(x => x.__key === name || x.name === name);
   if (!c) {
@@ -653,18 +697,34 @@ window.selectCustomer = function(name){
   }
   document.getElementById('custSearch').value = c.name;
   document.getElementById('searchResults').classList.remove('open');
+
+  // v2.68 FIX SCROLL BUG: проблема була у тому що selector-bar з 3 таблицями
+  // має висоту ~1000+ px → scrollTo(contentWrap - selectorH) йде у негатив.
+  // Рішення: при першому виборі — згортаємо список pills у компактну кнопку
+  // "← До списку клієнтів". Selector-bar стає 80px → scroll працює нормально.
+  const pillsEl = document.getElementById('quickPills');
+  if (pillsEl && !_pillsBackup) {
+    _pillsBackup = pillsEl.innerHTML;
+  }
+  pillsEl.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;width:100%">
+      <button onclick="showPillsList()" style="background:rgba(254,191,39,.18);color:#996600;border:1px solid rgba(254,191,39,.35);padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px">← До списку клієнтів</button>
+      <span style="font-size:11px;color:var(--muted);font-weight:600">Вибрано: <strong style="color:var(--d)">${escapeHtml(c.name)}</strong></span>
+    </div>
+  `;
+
   renderCustomerView(c);
-  // v2.66 fix: скролимо ДО contentWrap (де новий вміст), не на 150px вгору.
-  // Враховуємо sticky topbar (56px) + selector-bar (~120px) + невеликий gap.
+
+  // Тепер selector-bar має ~80px і scroll до contentWrap йде у правильну позицію
   setTimeout(() => {
     const wrap = document.getElementById('contentWrap');
     if (wrap) {
       const topbarH = document.querySelector('.topbar')?.offsetHeight || 56;
-      const selectorH = document.querySelector('.selector-bar')?.offsetHeight || 120;
-      const targetY = wrap.getBoundingClientRect().top + window.scrollY - (topbarH + selectorH + 10);
+      const selectorH = document.querySelector('.selector-bar')?.offsetHeight || 80;
+      const targetY = wrap.getBoundingClientRect().top + window.scrollY - (topbarH + selectorH + 12);
       window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
     }
-  }, 50);
+  }, 80);
 };
 
 function renderCustomerView(c){
