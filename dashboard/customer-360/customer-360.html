@@ -67,6 +67,105 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .cust-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .cust-tag{padding:3px 10px;background:rgba(254,191,39,.18);color:var(--y);font-size:11px;font-weight:600;border-radius:10px;border:1px solid rgba(254,191,39,.3)}
 
+/* ─── v2.74.0 OVERVIEW (першого екрана) ─── */
+.overview-wrap{padding:18px 24px 0}
+.ov-section{margin-bottom:18px}
+.ov-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:0 0 10px;display:flex;align-items:center;gap:10px}
+.ov-section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* KPI hero row — 5 cards compact */
+.ov-kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+@media(max-width:960px){.ov-kpi-row{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:620px){.ov-kpi-row{grid-template-columns:repeat(2,1fr)}}
+.ov-kpi{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 14px;position:relative;overflow:hidden}
+.ov-kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--y)}
+.ov-kpi.green::after{background:var(--g)}
+.ov-kpi.red::after{background:var(--red)}
+.ov-kpi.blue::after{background:var(--blue)}
+.ov-kpi-lbl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px}
+.ov-kpi-val{font-size:20px;font-weight:800;color:var(--d);line-height:1.1}
+.ov-kpi-sub{font-size:10.5px;color:var(--muted);margin-top:3px}
+.ov-kpi-delta{display:inline-block;padding:1px 6px;border-radius:6px;font-size:10px;font-weight:700;margin-top:3px}
+.ov-kpi-delta.up{background:rgba(150,193,31,.18);color:#4a7000}
+.ov-kpi-delta.down{background:rgba(232,64,64,.14);color:#a00}
+.ov-kpi-delta.flat{background:rgba(138,138,138,.13);color:#666}
+
+/* Concentration alert */
+.ov-concentration{background:rgba(254,191,39,.10);border:1px solid rgba(254,191,39,.35);border-left:4px solid var(--y);border-radius:8px;padding:11px 16px;font-size:12.5px;color:#7a5a00;line-height:1.5}
+.ov-concentration b{color:var(--d);font-weight:800}
+
+/* Portfolio chart */
+.ov-trend-chart{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.ov-trend-chart .chart-h180{height:180px;position:relative}
+
+/* Action items inline table */
+.ov-actions-table{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.ov-actions-row{display:grid;grid-template-columns:24px 1fr 140px 100px 130px;gap:10px;padding:9px 14px;align-items:center;border-bottom:1px solid var(--border);font-size:12.5px;cursor:pointer;transition:background .12s}
+.ov-actions-row:hover{background:#FFF9E5}
+.ov-actions-row:last-child{border:none}
+.ov-actions-row .ova-sev{font-size:13px}
+.ov-actions-row .ova-name{font-weight:600;color:var(--d)}
+.ov-actions-row .ova-meta{font-size:10.5px;color:var(--muted)}
+.ov-actions-row .ova-issue{font-size:11.5px;color:#a00;font-weight:600}
+.ov-actions-row .ova-amount{text-align:right;font-weight:700;color:var(--red);font-size:12.5px}
+.ov-actions-row .ova-actions{text-align:right;display:flex;gap:4px;justify-content:flex-end}
+.ov-actions-row .ova-btn{padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:#fff;font-size:10.5px;font-weight:600;color:var(--d);cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:3px}
+.ov-actions-row .ova-btn:hover{border-color:var(--y);background:rgba(254,191,39,.08)}
+.ov-actions-empty{padding:24px;text-align:center;color:#4a7000;font-weight:600;font-size:13px}
+
+/* Movers — 2 columns */
+.ov-movers-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.ov-movers-grid{grid-template-columns:1fr}}
+.ov-mover-card{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.ov-mover-card-head{padding:11px 14px;border-bottom:1px solid var(--border);background:#FAFAF5;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--d);display:flex;justify-content:space-between;align-items:center}
+.ov-mover-card-head .ovm-sub{font-size:10.5px;font-weight:500;color:var(--muted);text-transform:none;letter-spacing:0}
+.ov-mover-row{display:grid;grid-template-columns:24px 1fr 90px 80px;gap:8px;padding:8px 14px;align-items:center;border-bottom:1px dashed var(--border);font-size:12px;cursor:pointer;transition:background .12s}
+.ov-mover-row:hover{background:#FFF9E5}
+.ov-mover-row:last-child{border:none}
+.ov-mover-row .ovm-rank{font-weight:800;color:var(--y);text-align:right}
+.ov-mover-row .ovm-name{font-weight:600;color:var(--d);line-height:1.3}
+.ov-mover-row .ovm-name-sub{font-size:10px;color:var(--muted)}
+.ov-mover-row .ovm-prev{text-align:right;font-size:11px;color:var(--muted)}
+.ov-mover-row .ovm-delta{text-align:right;font-weight:800;font-size:13px}
+.ov-mover-row .ovm-delta.up{color:#4a7000}
+.ov-mover-row .ovm-delta.down{color:var(--red)}
+.ov-mover-empty{padding:18px;text-align:center;color:var(--muted);font-size:12px;font-style:italic}
+
+/* Secondary movers — New + Lost */
+.ov-secondary-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+@media(max-width:760px){.ov-secondary-grid{grid-template-columns:1fr}}
+
+/* Segment heatmap */
+.ov-heatmap{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px}
+.ov-heatmap-grid{display:grid;grid-template-columns:120px repeat(3, 1fr);gap:4px;margin-top:8px}
+.ov-heatmap-cell{padding:14px 12px;border-radius:8px;text-align:center;cursor:pointer;transition:transform .12s,box-shadow .12s}
+.ov-heatmap-cell:hover{transform:translateY(-1px);box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.ov-heatmap-cell.header{background:transparent;cursor:default;padding:6px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+.ov-heatmap-cell.header:hover{transform:none;box-shadow:none}
+.ov-heatmap-cell.label{background:transparent;cursor:default;font-weight:700;color:var(--d);font-size:12px;text-align:left;padding:14px 4px}
+.ov-heatmap-cell.green{background:rgba(150,193,31,.18);color:#4a7000;border:1px solid rgba(150,193,31,.3)}
+.ov-heatmap-cell.yellow{background:rgba(254,191,39,.18);color:#996600;border:1px solid rgba(254,191,39,.3)}
+.ov-heatmap-cell.red{background:rgba(232,64,64,.16);color:#a00;border:1px solid rgba(232,64,64,.3)}
+.ov-heatmap-cell .ovh-num{font-size:20px;font-weight:800;line-height:1.1}
+.ov-heatmap-cell .ovh-sub{font-size:10px;font-weight:600;margin-top:3px;opacity:.85}
+
+/* Quick filter chips */
+.ov-filters{display:flex;gap:6px;flex-wrap:wrap;padding:0 0 4px}
+.ov-chip{padding:6px 12px;background:#F1F1EB;color:#555;font-size:11.5px;font-weight:600;border-radius:14px;cursor:pointer;border:1.5px solid transparent;transition:all .12s;font-family:inherit}
+.ov-chip:hover{background:rgba(254,191,39,.18);color:var(--d)}
+.ov-chip.active{background:var(--d);color:#fff;border-color:var(--d)}
+.ov-chip.active:hover{background:var(--d)}
+.ov-chip .ovc-count{opacity:.6;margin-left:4px;font-weight:500}
+.ov-chip.active .ovc-count{opacity:.7}
+
+/* Compact existing lists at bottom */
+.ov-legacy-lists details{margin-top:14px}
+.ov-legacy-lists summary{cursor:pointer;padding:10px 14px;background:#fff;border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:var(--d);user-select:none;list-style:none;display:flex;justify-content:space-between;align-items:center}
+.ov-legacy-lists summary::-webkit-details-marker{display:none}
+.ov-legacy-lists summary::after{content:'▾';color:var(--muted)}
+.ov-legacy-lists details[open] summary::after{content:'▴'}
+.ov-legacy-lists details > div{margin-top:6px}
+
 /* ─── v2.73.0 Phase B — PRINT-FRIENDLY PDF ─── */
 @media print {
   /* Hide chrome */
@@ -469,7 +568,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.73.0 · Health Score + Next Order forecast + Decision-makers + CRM-log + Cross-sell + Promo response · МойСклад API · Оновлення: щодня 06:00
+  snEco Customer 360 v2.74.0 · Overview redesign (Portfolio KPIs + Trend chart + Movers % і ₴ + Action Items + Heatmap + Concentration) · МойСклад API · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -772,6 +871,260 @@ function calcCrossSell(c, allDemandPositions, allCounterparties){
   return { items, reason: items.length === 0 ? 'усе що peers купляють — клієнт уже бере' : '' };
 }
 
+// ============================================================================
+// v2.74.0 — OVERVIEW HELPERS (для першого екрана)
+// ============================================================================
+
+// Per-customer metrics — computed once у boot для всіх 11K клієнтів
+// (зберігаються як c.__metrics для швидкого доступу у renderOverview / movers / heatmap)
+function computeCustomerMetrics(c, allDemands, allReturns){
+  const matchCP = d => (d.agent_id && d.agent_id === c.id) || (d.agent === c.name);
+  const dems = allDemands.filter(matchCP);
+  const rets = allReturns.filter(matchCP);
+
+  if (dems.length === 0) {
+    return { totalShipped: 0, ordersCount: 0, avgCadence: null, daysSinceLast: null,
+             lastOrder: null, overdueAR: 0, returnRate: 0, trend3m: null,
+             monthRev: 0, prevMonthRev: 0 };
+  }
+
+  // Sort by date asc для cadence/trend
+  const sorted = dems.slice().sort((a,b) => (a.ms_moment||'').localeCompare(b.ms_moment||''));
+  const totalShipped = sorted.reduce((a,d) => a + (d.sum_kop||0)/100, 0);
+  const lastOrder = sorted[sorted.length - 1].ms_moment;
+  const daysSinceLast = lastOrder ? Math.floor((Date.now() - new Date(lastOrder).getTime()) / 86400000) : null;
+
+  // Cadence (avg gap)
+  let avgCadence = null;
+  if (sorted.length >= 2) {
+    const dates = sorted.map(d => new Date(d.ms_moment).getTime());
+    const gaps = [];
+    for (let i=1; i<dates.length; i++) gaps.push((dates[i]-dates[i-1])/86400000);
+    avgCadence = Math.round(gaps.reduce((a,x)=>a+x,0) / gaps.length);
+  }
+
+  // Overdue AR — demands з ms_moment > 30 днів і balance > 0
+  const cutoff30 = new Date(Date.now() - 30*86400000).toISOString().slice(0,10);
+  let overdueAR = 0;
+  sorted.forEach(d => {
+    const balanceUah = Math.round(((d.sum_kop||0) - (d.payed_sum_kop||0)) / 100);
+    if (balanceUah > 0 && (d.ms_moment||'').slice(0,10) <= cutoff30) overdueAR += balanceUah;
+  });
+
+  // Return rate
+  const totalReturns = rets.reduce((a,r) => a + (r.sum_kop||0)/100, 0);
+  const returnRate = totalShipped > 0 ? (totalReturns / totalShipped * 100) : 0;
+
+  // Monthly aggregation для trend + MoM
+  const byMonth = {};
+  sorted.forEach(d => {
+    const ym = (d.ms_moment||'').slice(0,7);
+    if (ym) byMonth[ym] = (byMonth[ym]||0) + (d.sum_kop||0)/100;
+  });
+  const months = Object.keys(byMonth).sort();
+  let trend3m = null;
+  if (months.length >= 6) {
+    const last3 = months.slice(-3).reduce((a,m) => a + byMonth[m], 0);
+    const prev3 = months.slice(-6, -3).reduce((a,m) => a + byMonth[m], 0);
+    trend3m = prev3 > 0 ? Math.round((last3 - prev3) / prev3 * 100) : null;
+  }
+
+  // MoM — поточний vs попередній місяць (по календарю)
+  const now = new Date();
+  const curMonthYM = now.toISOString().slice(0,7);
+  const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const prevMonthYM = prevMonth.toISOString().slice(0,7);
+  const monthRev = byMonth[curMonthYM] || 0;
+  const prevMonthRev = byMonth[prevMonthYM] || 0;
+
+  return {
+    totalShipped, ordersCount: sorted.length, avgCadence, daysSinceLast, lastOrder,
+    overdueAR, returnRate, trend3m, monthRev, prevMonthRev, byMonth
+  };
+}
+
+// Compute health score for a customer (uses computeCustomerMetrics output + crmLog)
+function computeHealthForCustomer(m, crmLog){
+  return calcHealthScore({
+    overdueAR: m.overdueAR, totalShipped: m.totalShipped,
+    daysSinceLast: m.daysSinceLast, avgCadenceDays: m.avgCadence,
+    trend3m: m.trend3m, returnRate: m.returnRate, crmLog
+  }).total;
+}
+
+// ============================================================================
+// PORTFOLIO KPIs (Tier 1 — 5 cards)
+// ============================================================================
+function calcPortfolioKPIs(allCounterparties){
+  const today = new Date();
+  const curMonthStart = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().slice(0,10);
+  const cutoff30 = new Date(Date.now() - 30*86400000).toISOString().slice(0,10);
+
+  let activeCount = 0;     // ordered у last 30d
+  let newThisMonth = 0;    // перше замовлення цього місяця
+  let totalRevCur = 0;
+  let totalRevPrev = 0;
+  let healthSum = 0, healthCount = 0;
+  let criticalCount = 0;
+
+  allCounterparties.forEach(c => {
+    const m = c.__metrics;
+    if (!m) return;
+    if (m.lastOrder && m.lastOrder.slice(0,10) >= cutoff30) activeCount++;
+    // New this month: first order дата у byMonth — мінімальна
+    if (m.byMonth) {
+      const firstM = Object.keys(m.byMonth).sort()[0];
+      if (firstM && firstM === curMonthStart.slice(0,7)) newThisMonth++;
+    }
+    totalRevCur += m.monthRev;
+    totalRevPrev += m.prevMonthRev;
+    if (m.totalShipped > 0) {
+      const h = c.__health || 0;
+      healthSum += h;
+      healthCount++;
+      if (h < 40) criticalCount++;
+    }
+  });
+  const revDelta = totalRevPrev > 0 ? Math.round((totalRevCur - totalRevPrev) / totalRevPrev * 100) : null;
+  const avgHealth = healthCount > 0 ? Math.round(healthSum / healthCount) : 0;
+
+  return { activeCount, newThisMonth, totalRevCur, totalRevPrev, revDelta, avgHealth, criticalCount };
+}
+
+// ============================================================================
+// MOVERS — TOP-10 by % growth + TOP-10 by absolute growth ₴
+// ============================================================================
+function calcMovers(allCounterparties){
+  // Min thresholds щоб виключати noise: cur month rev >= 1000 ₴ OR prev month rev >= 1000 ₴
+  const eligible = allCounterparties.filter(c => {
+    const m = c.__metrics;
+    return m && (m.monthRev >= 1000 || m.prevMonthRev >= 1000);
+  });
+
+  // TOP-10 ростуть % (growth = cur/prev - 1; якщо prev = 0 → "new" — пропускаємо у % rank)
+  const withPct = eligible
+    .filter(c => c.__metrics.prevMonthRev > 1000)  // потрібен база
+    .map(c => ({ c, pct: (c.__metrics.monthRev - c.__metrics.prevMonthRev) / c.__metrics.prevMonthRev * 100 }));
+  const topGrowPct = withPct.filter(x => x.pct > 0).sort((a,b) => b.pct - a.pct).slice(0, 10);
+  const topDeclinePct = withPct.filter(x => x.pct < 0).sort((a,b) => a.pct - b.pct).slice(0, 10);
+
+  // TOP-10 by absolute ₴ change
+  const withAbs = eligible.map(c => ({ c, abs: c.__metrics.monthRev - c.__metrics.prevMonthRev }));
+  const topGrowAbs = withAbs.filter(x => x.abs > 0).sort((a,b) => b.abs - a.abs).slice(0, 10);
+  const topDeclineAbs = withAbs.filter(x => x.abs < 0).sort((a,b) => a.abs - b.abs).slice(0, 10);
+
+  return { topGrowPct, topDeclinePct, topGrowAbs, topDeclineAbs };
+}
+
+// ============================================================================
+// NEW + LOST customers
+// ============================================================================
+function calcNewAndLost(allCounterparties){
+  const today = new Date();
+  const curMonthYM = today.toISOString().slice(0,7);
+  const cutoff90 = new Date(Date.now() - 90*86400000).toISOString().slice(0,10);
+
+  const newClients = allCounterparties.filter(c => {
+    const m = c.__metrics;
+    if (!m || !m.byMonth) return false;
+    const firstM = Object.keys(m.byMonth).sort()[0];
+    return firstM === curMonthYM;
+  }).sort((a,b) => (b.__metrics.monthRev||0) - (a.__metrics.monthRev||0)).slice(0, 10);
+
+  const lostClients = allCounterparties.filter(c => {
+    const m = c.__metrics;
+    if (!m || !m.totalShipped || m.totalShipped <= 0) return false;
+    return m.lastOrder && m.lastOrder.slice(0,10) <= cutoff90;
+  }).sort((a,b) => (b.__metrics.totalShipped||0) - (a.__metrics.totalShipped||0)).slice(0, 10);
+
+  return { newClients, lostClients };
+}
+
+// ============================================================================
+// ACTION ITEMS — TOP-5 critical (inline на головному екрані)
+// ============================================================================
+function calcActionItems(allCounterparties){
+  const items = [];
+  allCounterparties.forEach(c => {
+    const m = c.__metrics;
+    if (!m) return;
+    // Critical overdue >60d
+    const cutoff60 = new Date(Date.now() - 60*86400000).toISOString().slice(0,10);
+    if (m.overdueAR > 5000) {
+      // We approximate "60+ days overdue" by checking if overdueAR is from demands older than 60d
+      // For simplicity flag all overdueAR > 5000 as critical (later: more granular)
+      items.push({
+        c, severity: 'critical', icon: '🔴',
+        issue: `Прострочений борг ${nfm(m.overdueAR)} ₴`,
+        amount: m.overdueAR, sortKey: -m.overdueAR,
+        meta: `${m.daysSinceLast || '—'} дн без замовлення`
+      });
+    }
+    // Dormant top-50 (high revenue, no order)
+    if (m.totalShipped > 100000 && m.avgCadence && m.daysSinceLast > m.avgCadence * 1.5) {
+      items.push({
+        c, severity: 'dormant', icon: '📞',
+        issue: `Не замовляв ${m.daysSinceLast} дн (норма ${m.avgCadence})`,
+        amount: m.totalShipped, sortKey: -m.totalShipped,
+        meta: `LTV ${nfm(m.totalShipped)} ₴`
+      });
+    }
+    // Declining top-50
+    if (m.totalShipped > 100000 && m.trend3m !== null && m.trend3m < -20) {
+      items.push({
+        c, severity: 'declining', icon: '📉',
+        issue: `Тренд 3 міс ${m.trend3m}%`,
+        amount: m.totalShipped, sortKey: -m.totalShipped + Math.abs(m.trend3m * 1000),
+        meta: `LTV ${nfm(m.totalShipped)} ₴`
+      });
+    }
+  });
+  // Dedup by customer — leave only most severe per cust
+  const seen = {};
+  items.sort((a,b) => a.sortKey - b.sortKey);
+  const order = ['critical', 'dormant', 'declining'];
+  items.sort((a,b) => order.indexOf(a.severity) - order.indexOf(b.severity));
+  const dedupedItems = [];
+  items.forEach(it => {
+    const k = it.c.__key || it.c.id || it.c.name;
+    if (!seen[k]) { seen[k] = true; dedupedItems.push(it); }
+  });
+  return dedupedItems.slice(0, 5);
+}
+
+// ============================================================================
+// SEGMENT HEATMAP — Tier (VIP/Mid/SMB/New) × Health (good/warn/bad)
+// ============================================================================
+function calcSegmentHeatmap(allCounterparties){
+  const buckets = {
+    VIP:  { good: 0, warn: 0, bad: 0 },
+    Mid:  { good: 0, warn: 0, bad: 0 },
+    SMB:  { good: 0, warn: 0, bad: 0 },
+  };
+  allCounterparties.forEach(c => {
+    if (!c.__metrics || c.__metrics.totalShipped <= 0) return;
+    const rev = c.__metrics.totalShipped;
+    const tier = rev > 500000 ? 'VIP' : rev > 100000 ? 'Mid' : 'SMB';
+    const h = c.__health || 0;
+    const healthBucket = h >= 70 ? 'good' : h >= 40 ? 'warn' : 'bad';
+    buckets[tier][healthBucket]++;
+  });
+  return buckets;
+}
+
+// ============================================================================
+// CONCENTRATION — top-5 share of total revenue
+// ============================================================================
+function calcConcentration(allCounterparties){
+  const withRev = allCounterparties.filter(c => c.__metrics && c.__metrics.totalShipped > 0)
+    .sort((a,b) => b.__metrics.totalShipped - a.__metrics.totalShipped);
+  if (withRev.length === 0) return { share: 0, top5: [], total: 0 };
+  const total = withRev.reduce((a,c) => a + c.__metrics.totalShipped, 0);
+  const top5 = withRev.slice(0, 5);
+  const top5Sum = top5.reduce((a,c) => a + c.__metrics.totalShipped, 0);
+  return { share: total > 0 ? (top5Sum / total * 100) : 0, top5, total };
+}
+
 async function fetchJson(type, opts){
   const body = Object.assign({ type, limit: 50000 }, opts || {});
   const r = await fetch(WORKER + '/api/dashboard/data', {
@@ -902,7 +1255,22 @@ window.bootCustomer360 = async function(token){
     });
     allCounterparties = Object.values(merged);
 
-    renderQuickPills();
+    // v2.74.0: compute per-customer metrics + health для всіх клієнтів (для Overview screen).
+    // Виконується ОДИН раз у boot, кеш у c.__metrics / c.__health — потім швидко reuse.
+    const t0 = performance.now();
+    allCounterparties.forEach(c => {
+      c.__metrics = computeCustomerMetrics(c, allDemands, allReturns);
+      if (c.__metrics.totalShipped > 0) {
+        const k = c.__key || c.id || c.name;
+        const crmLog = loadCrmLog(k);
+        c.__health = computeHealthForCustomer(c.__metrics, crmLog);
+      } else {
+        c.__health = 0;
+      }
+    });
+    console.log(`📊 Computed metrics+health for ${allCounterparties.length} customers in ${Math.round(performance.now() - t0)}ms`);
+
+    renderOverview();        // v2.74.0: новий Overview замість renderQuickPills
     setupSearch();
     _lastBoot = Date.now();    // v2.71: позначка часу для last-updated badge
     startRefreshTicker();      // v2.71: запуск тікера що оновлює "🔄 Оновлено: …"
@@ -919,8 +1287,323 @@ window.bootCustomer360 = async function(token){
   }
 };
 
-function renderQuickPills(){
-  // v2.66: ТРИ секції з різними фокусами — last month TOP-25, YTD TOP-10, Dormant 30+d TOP-10
+// v2.74.0: alias для backwards-compat — старий код викликає renderQuickPills,
+// новий — renderOverview. Обидва роблять те саме.
+function renderQuickPills(){ return renderOverview(); }
+
+function renderOverview(){
+  // ============================================================================
+  // v2.74.0 OVERVIEW — Portfolio KPIs · Trend · Movers · Action Items · Heatmap · Concentration
+  // Замість 3 простих списків — comprehensive executive dashboard.
+  // ============================================================================
+  const overviewHtml = _buildOverviewHtml();
+  // Pills у selector-bar — стають коротким quick-access панелі
+  document.getElementById('quickPills').innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;font-size:11px;color:var(--muted)">
+      💡 <strong style="color:var(--d)">Overview</strong> нижче — клієнти / movers / action items.
+      Або пошук вище для конкретного клієнта.
+    </div>
+  `;
+  document.getElementById('contentWrap').innerHTML = overviewHtml;
+  // Bind chart after DOM
+  setTimeout(_renderOverviewCharts, 50);
+}
+
+function _buildOverviewHtml(){
+  const kpis = calcPortfolioKPIs(allCounterparties);
+  const movers = calcMovers(allCounterparties);
+  const newLost = calcNewAndLost(allCounterparties);
+  const actions = calcActionItems(allCounterparties);
+  const heatmap = calcSegmentHeatmap(allCounterparties);
+  const concentration = calcConcentration(allCounterparties);
+
+  // Quick filters counts
+  const totalActive = kpis.activeCount;
+  const totalAtRisk = allCounterparties.filter(c => c.__health >= 40 && c.__health < 70 && c.__metrics?.totalShipped > 0).length;
+  const totalDormant = allCounterparties.filter(c => {
+    const m = c.__metrics; if (!m || m.totalShipped <= 0) return false;
+    return m.lastOrder && m.lastOrder.slice(0,10) < new Date(Date.now() - 60*86400000).toISOString().slice(0,10);
+  }).length;
+  const totalVIP = allCounterparties.filter(c => c.__metrics?.totalShipped > 500000).length;
+  const totalAll = allCounterparties.filter(c => c.__metrics?.totalShipped > 0).length;
+
+  // Build legacy 3 lists HTML (collapsible at bottom)
+  const legacyHtml = _buildLegacyListsHtml();
+
+  return `
+    <div class="overview-wrap">
+
+      <!-- TIER 1: Portfolio Health KPIs -->
+      <div class="ov-section">
+        <div class="ov-section-title">📊 Portfolio Health · виручка поточного місяця та активність</div>
+        <div class="ov-kpi-row">
+          <div class="ov-kpi blue">
+            <div class="ov-kpi-lbl">Активні клієнти</div>
+            <div class="ov-kpi-val">${nf(kpis.activeCount)}</div>
+            <div class="ov-kpi-sub">з ${nf(totalAll)} · замовляли &lt; 30д</div>
+          </div>
+          <div class="ov-kpi green">
+            <div class="ov-kpi-lbl">🆕 Нові цього міс</div>
+            <div class="ov-kpi-val">${nf(kpis.newThisMonth)}</div>
+            <div class="ov-kpi-sub">перше замовлення</div>
+          </div>
+          <div class="ov-kpi ${kpis.revDelta !== null && kpis.revDelta >= 0 ? 'green' : 'red'}">
+            <div class="ov-kpi-lbl">💰 Revenue (поточний міс)</div>
+            <div class="ov-kpi-val">${nfm(kpis.totalRevCur)} ₴</div>
+            <div class="ov-kpi-sub">${kpis.revDelta !== null
+              ? `<span class="ov-kpi-delta ${kpis.revDelta > 1 ? 'up' : kpis.revDelta < -1 ? 'down' : 'flat'}">${kpis.revDelta >= 0 ? '+' : ''}${kpis.revDelta}%</span> vs ${nfm(kpis.totalRevPrev)} ₴ попередній`
+              : 'без попереднього міс'}</div>
+          </div>
+          <div class="ov-kpi ${kpis.avgHealth >= 70 ? 'green' : kpis.avgHealth >= 40 ? '' : 'red'}">
+            <div class="ov-kpi-lbl">🩺 Avg Health Score</div>
+            <div class="ov-kpi-val">${kpis.avgHealth}/100</div>
+            <div class="ov-kpi-sub">${kpis.avgHealth >= 70 ? '✅ портфель здоровий' : kpis.avgHealth >= 40 ? '🟡 треба уваги' : '🔴 критично'}</div>
+          </div>
+          <div class="ov-kpi ${kpis.criticalCount > 5 ? 'red' : kpis.criticalCount > 0 ? '' : 'green'}">
+            <div class="ov-kpi-lbl">⚠️ Критичні клієнти</div>
+            <div class="ov-kpi-val">${nf(kpis.criticalCount)}</div>
+            <div class="ov-kpi-sub">health &lt; 40</div>
+          </div>
+        </div>
+      </div>
+
+      ${concentration.share > 50 ? `
+      <!-- TIER 1.5: Concentration warning -->
+      <div class="ov-section">
+        <div class="ov-concentration">
+          ⚠ <b>Висока концентрація portfolio:</b> ТОП-5 клієнтів = <b>${concentration.share.toFixed(1)}%</b> усієї виручки.
+          Втрата одного = серйозний удар. Рекомендовано диверсифікувати у меньших клієнтів.
+          ТОП-5: ${concentration.top5.map(c => `<b>${escapeHtml(c.name)}</b>`).join(' · ')}.
+        </div>
+      </div>
+      ` : ''}
+
+      <!-- TIER 2: Portfolio trend chart -->
+      <div class="ov-section">
+        <div class="ov-section-title">📈 Тренд виручки портфелю · 12 місяців</div>
+        <div class="ov-trend-chart">
+          <div class="chart-h180"><canvas id="portfolioTrendChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- TIER 3: Action Items TOP-5 inline -->
+      <div class="ov-section">
+        <div class="ov-section-title">🎯 ТОП-5 критичних — дзвонити сьогодні</div>
+        <div class="ov-actions-table">
+          ${actions.length === 0 ? `
+            <div class="ov-actions-empty">✅ Жодних критичних action items зараз — все під контролем</div>
+          ` : actions.map(it => `
+            <div class="ov-actions-row" onclick="selectCustomer('${escapeAttr(it.c.__key || it.c.name)}')">
+              <div class="ova-sev">${it.icon}</div>
+              <div>
+                <div class="ova-name">${escapeHtml(it.c.name)}</div>
+                <div class="ova-meta">${escapeHtml(it.meta)}</div>
+              </div>
+              <div class="ova-issue">${escapeHtml(it.issue)}</div>
+              <div class="ova-amount">${nfm(it.amount)} ₴</div>
+              <div class="ova-actions">
+                ${it.c.phone ? `<a class="ova-btn" href="tel:${escapeAttr(it.c.phone.replace(/\D/g,''))}" onclick="event.stopPropagation()">📞</a>` : ''}
+                ${it.c.email ? `<a class="ova-btn" href="mailto:${escapeAttr(it.c.email)}" onclick="event.stopPropagation()">✉</a>` : ''}
+                <button class="ova-btn" onclick="event.stopPropagation(); selectCustomer('${escapeAttr(it.c.__key || it.c.name)}')">→</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- TIER 4: MOVERS — 2 columns (% growth + abs growth) -->
+      <div class="ov-section">
+        <div class="ov-section-title">🚀 ТОП-10 ростуть — найшвидше у % та у ₴</div>
+        <div class="ov-movers-grid">
+          <div class="ov-mover-card">
+            <div class="ov-mover-card-head">🚀 ТОП-10 % ріст MoM <span class="ovm-sub">cur vs prev month</span></div>
+            ${movers.topGrowPct.length === 0
+              ? `<div class="ov-mover-empty">Нема клієнтів з ростом % MoM</div>`
+              : movers.topGrowPct.map((x,i) => `
+                <div class="ov-mover-row" onclick="selectCustomer('${escapeAttr(x.c.__key || x.c.name)}')">
+                  <div class="ovm-rank">${i+1}</div>
+                  <div>
+                    <div class="ovm-name">${escapeHtml(x.c.name)}</div>
+                    <div class="ovm-name-sub">${x.c.edrpou || x.c.inn || ''}</div>
+                  </div>
+                  <div class="ovm-prev">${nfm(x.c.__metrics.prevMonthRev)}→${nfm(x.c.__metrics.monthRev)} ₴</div>
+                  <div class="ovm-delta up">+${Math.round(x.pct)}%</div>
+                </div>`).join('')}
+          </div>
+          <div class="ov-mover-card">
+            <div class="ov-mover-card-head">💰 ТОП-10 абсолютний ріст ₴ MoM <span class="ovm-sub">прибавка у грошах</span></div>
+            ${movers.topGrowAbs.length === 0
+              ? `<div class="ov-mover-empty">Нема клієнтів з ростом ₴ MoM</div>`
+              : movers.topGrowAbs.map((x,i) => `
+                <div class="ov-mover-row" onclick="selectCustomer('${escapeAttr(x.c.__key || x.c.name)}')">
+                  <div class="ovm-rank">${i+1}</div>
+                  <div>
+                    <div class="ovm-name">${escapeHtml(x.c.name)}</div>
+                    <div class="ovm-name-sub">${x.c.edrpou || x.c.inn || ''}</div>
+                  </div>
+                  <div class="ovm-prev">${nfm(x.c.__metrics.prevMonthRev)}→${nfm(x.c.__metrics.monthRev)} ₴</div>
+                  <div class="ovm-delta up">+${nfm(x.abs)} ₴</div>
+                </div>`).join('')}
+          </div>
+        </div>
+
+        <div class="ov-section-title" style="margin-top:18px">📉 ТОП-10 падають — найшвидше у % та у ₴</div>
+        <div class="ov-movers-grid">
+          <div class="ov-mover-card">
+            <div class="ov-mover-card-head">📉 ТОП-10 % падіння MoM <span class="ovm-sub">cur vs prev month</span></div>
+            ${movers.topDeclinePct.length === 0
+              ? `<div class="ov-mover-empty">Нема клієнтів з падінням % MoM</div>`
+              : movers.topDeclinePct.map((x,i) => `
+                <div class="ov-mover-row" onclick="selectCustomer('${escapeAttr(x.c.__key || x.c.name)}')">
+                  <div class="ovm-rank">${i+1}</div>
+                  <div>
+                    <div class="ovm-name">${escapeHtml(x.c.name)}</div>
+                    <div class="ovm-name-sub">${x.c.edrpou || x.c.inn || ''}</div>
+                  </div>
+                  <div class="ovm-prev">${nfm(x.c.__metrics.prevMonthRev)}→${nfm(x.c.__metrics.monthRev)} ₴</div>
+                  <div class="ovm-delta down">${Math.round(x.pct)}%</div>
+                </div>`).join('')}
+          </div>
+          <div class="ov-mover-card">
+            <div class="ov-mover-card-head">💸 ТОП-10 абсолютне падіння ₴ MoM <span class="ovm-sub">втрати у грошах</span></div>
+            ${movers.topDeclineAbs.length === 0
+              ? `<div class="ov-mover-empty">Нема клієнтів з падінням ₴ MoM</div>`
+              : movers.topDeclineAbs.map((x,i) => `
+                <div class="ov-mover-row" onclick="selectCustomer('${escapeAttr(x.c.__key || x.c.name)}')">
+                  <div class="ovm-rank">${i+1}</div>
+                  <div>
+                    <div class="ovm-name">${escapeHtml(x.c.name)}</div>
+                    <div class="ovm-name-sub">${x.c.edrpou || x.c.inn || ''}</div>
+                  </div>
+                  <div class="ovm-prev">${nfm(x.c.__metrics.prevMonthRev)}→${nfm(x.c.__metrics.monthRev)} ₴</div>
+                  <div class="ovm-delta down">${nfm(x.abs)} ₴</div>
+                </div>`).join('')}
+          </div>
+        </div>
+
+        <!-- New + Lost -->
+        <div class="ov-secondary-grid">
+          <div class="ov-mover-card">
+            <div class="ov-mover-card-head">🆕 Нові клієнти цього місяця <span class="ovm-sub">${newLost.newClients.length}</span></div>
+            ${newLost.newClients.length === 0
+              ? `<div class="ov-mover-empty">Нема нових клієнтів цього місяця</div>`
+              : newLost.newClients.map((c,i) => `
+                <div class="ov-mover-row" onclick="selectCustomer('${escapeAttr(c.__key || c.name)}')">
+                  <div class="ovm-rank">${i+1}</div>
+                  <div>
+                    <div class="ovm-name">${escapeHtml(c.name)}</div>
+                    <div class="ovm-name-sub">${c.edrpou || c.inn || ''}</div>
+                  </div>
+                  <div class="ovm-prev">${c.__metrics.ordersCount} замовл.</div>
+                  <div class="ovm-delta up">${nfm(c.__metrics.monthRev)} ₴</div>
+                </div>`).join('')}
+          </div>
+          <div class="ov-mover-card">
+            <div class="ov-mover-card-head">💔 Лост — &gt; 90 днів без замовлення <span class="ovm-sub">${newLost.lostClients.length}</span></div>
+            ${newLost.lostClients.length === 0
+              ? `<div class="ov-mover-empty">Жодного лост-клієнта 🎉</div>`
+              : newLost.lostClients.map((c,i) => `
+                <div class="ov-mover-row" onclick="selectCustomer('${escapeAttr(c.__key || c.name)}')">
+                  <div class="ovm-rank">${i+1}</div>
+                  <div>
+                    <div class="ovm-name">${escapeHtml(c.name)}</div>
+                    <div class="ovm-name-sub">LTV ${nfm(c.__metrics.totalShipped)} ₴</div>
+                  </div>
+                  <div class="ovm-prev">${c.__metrics.daysSinceLast} дн</div>
+                  <div class="ovm-delta down">${dfShort(c.__metrics.lastOrder)}</div>
+                </div>`).join('')}
+          </div>
+        </div>
+      </div>
+
+      <!-- TIER 5: SEGMENT HEATMAP -->
+      <div class="ov-section">
+        <div class="ov-section-title">🔥 Heatmap портфелю · сегмент × health</div>
+        <div class="ov-heatmap">
+          <div style="font-size:11.5px;color:#666;margin-bottom:6px">
+            VIP &gt; 500K ₴ LTV · Mid 100K–500K · SMB &lt; 100K. Click cell — пізніше додамо drill-down.
+          </div>
+          <div class="ov-heatmap-grid">
+            <div class="ov-heatmap-cell header"></div>
+            <div class="ov-heatmap-cell header">🟢 Good (≥70)</div>
+            <div class="ov-heatmap-cell header">🟡 Warn (40–70)</div>
+            <div class="ov-heatmap-cell header">🔴 Bad (&lt;40)</div>
+            ${['VIP','Mid','SMB'].map(tier => `
+              <div class="ov-heatmap-cell label">${tier === 'VIP' ? '💎' : tier === 'Mid' ? '🔸' : '🔹'} ${tier}</div>
+              <div class="ov-heatmap-cell green"><div class="ovh-num">${heatmap[tier].good}</div><div class="ovh-sub">клієнтів</div></div>
+              <div class="ov-heatmap-cell yellow"><div class="ovh-num">${heatmap[tier].warn}</div><div class="ovh-sub">клієнтів</div></div>
+              <div class="ov-heatmap-cell red"><div class="ovh-num">${heatmap[tier].bad}</div><div class="ovh-sub">клієнтів</div></div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+
+      <!-- TIER 6: Quick filter chips (preview — фільтр без логіки наразі, як навігація) -->
+      <div class="ov-section">
+        <div class="ov-section-title">🔎 Швидкий доступ · повні списки</div>
+        <div class="ov-filters">
+          <button class="ov-chip active">Усі<span class="ovc-count">${totalAll}</span></button>
+          <button class="ov-chip">🟢 Активні<span class="ovc-count">${totalActive}</span></button>
+          <button class="ov-chip">🟡 At-risk<span class="ovc-count">${totalAtRisk}</span></button>
+          <button class="ov-chip">🔴 Dormant<span class="ovc-count">${totalDormant}</span></button>
+          <button class="ov-chip">🆕 Нові<span class="ovc-count">${newLost.newClients.length}</span></button>
+          <button class="ov-chip">💎 VIP<span class="ovc-count">${totalVIP}</span></button>
+          <span style="margin-left:auto;font-size:11px;color:var(--muted);align-self:center">Скоро filter logic — поки info-only</span>
+        </div>
+
+        <!-- Legacy 3 lists у collapsible -->
+        <div class="ov-legacy-lists">
+          ${legacyHtml}
+        </div>
+      </div>
+
+    </div>
+  `;
+}
+
+// Render trend chart after innerHTML applied
+function _renderOverviewCharts(){
+  const ctx = document.getElementById('portfolioTrendChart');
+  if (!ctx) return;
+  // Aggregate revenue per month across ALL customers
+  const byMonth = {};
+  allCounterparties.forEach(c => {
+    if (!c.__metrics?.byMonth) return;
+    Object.entries(c.__metrics.byMonth).forEach(([m, v]) => {
+      byMonth[m] = (byMonth[m] || 0) + v;
+    });
+  });
+  // Last 12 months from today
+  const months = [];
+  const now = new Date();
+  for (let i=11; i>=0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push(d.toISOString().slice(0,7));
+  }
+  const labels = months.map(m => {
+    const [y,mn] = m.split('-');
+    const mNames = ['січ','лют','бер','кві','тра','чер','лип','сер','вер','жов','лис','гру'];
+    return mNames[parseInt(mn,10)-1] + ' ' + y.slice(2);
+  });
+  const data = months.map(m => Math.round(byMonth[m] || 0));
+  if (_charts.portfolioTrend) _charts.portfolioTrend.destroy();
+  _charts.portfolioTrend = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: [{
+      label: 'Виручка ₴', data,
+      backgroundColor: 'rgba(254,191,39,.75)',
+      borderColor: '#FEBF27', borderWidth: 1
+    }]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => nf(ctx.parsed.y) + ' ₴' } } },
+      scales: { y: { ticks: { callback: v => nfm(v) + ' ₴' } } }
+    }
+  });
+}
+
+// Build the 3 legacy lists (TOP-25 last month / TOP-10 YTD / Dormant) як collapsible
+function _buildLegacyListsHtml(){
   const now = new Date();
   const cutoff30Days = new Date(now.getTime() - 30*86400000).toISOString().slice(0,10);
 
@@ -1007,8 +1690,7 @@ function renderQuickPills(){
   const top25 = pool.filter(c => !c.archived).sort((a,b) => (b[sortKey1]||0) - (a[sortKey1]||0)).slice(0, 25);
 
   if (top25.length === 0) {
-    document.getElementById('quickPills').innerHTML = '<span style="color:var(--muted);font-size:11px;padding:5px 0">Жодного клієнта з даними. Перевір що sync пройшов.</span>';
-    return;
+    return '<details><summary>📋 Повні списки клієнтів — TOP-25 / YTD / Dormant</summary><div><span style="color:var(--muted);font-size:11px;padding:5px 0">Жодного клієнта з даними. Перевір що sync пройшов.</span></div></details>';
   }
 
   const label1 = basis === 'last month' ? 'ТОП-25 за минулий місяць'
@@ -1048,7 +1730,8 @@ function renderQuickPills(){
     })
   ].join('');
 
-  document.getElementById('quickPills').innerHTML = html;
+  // v2.74.0: повертаємо HTML як string (raніше писали у #quickPills)
+  return `<details><summary>📋 Повні списки клієнтів — TOP-25 / YTD / Dormant</summary><div>${html}</div></details>`;
 }
 
 function setupSearch(){
