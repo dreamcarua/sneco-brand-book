@@ -391,7 +391,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Finance Dashboard v3.0.1 · period filter + granularity + TOP suppliers + AR rounding fix · MoySklad → D1 → Worker · Cron щодня 06:00
+  snEco Finance Dashboard v3.0.2 · period filter + granularity (sticky + chart) + TOP suppliers + AR rounding fix · MoySklad → D1 → Worker · Cron щодня 06:00
 </div>
 
 <script>
@@ -579,17 +579,25 @@ function wirePeriodSelector(){
 }
 
 function wireGranularitySelector(){
-  const gt = document.getElementById('granToggle');
-  gt.querySelectorAll('.gt-btn').forEach(b => {
+  // v3.0.2: event delegation на document — ловить кліки і з #granToggle (sticky bar)
+  // і з #granToggleChart (дублікат біля cash flow chart). Обидва синхронізуються.
+  const sticky = document.getElementById('granToggle');
+  sticky.querySelectorAll('.gt-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.gran === currentGran);
   });
-  gt.addEventListener('click', e => {
-    const b = e.target.closest('.gt-btn');
+  document.addEventListener('click', e => {
+    const b = e.target.closest('.granularity-toggle .gt-btn');
     if (!b) return;
-    gt.querySelectorAll('.gt-btn').forEach(x => x.classList.remove('active'));
-    b.classList.add('active');
-    currentGran = b.dataset.gran;
+    const newGran = b.dataset.gran;
+    if (newGran === currentGran) return;
+    currentGran = newGran;
     try { localStorage.setItem('snEco-fin-gran', currentGran); } catch(e){}
+    // Синхронізуємо ВСІ granularity-toggle на сторінці
+    document.querySelectorAll('.granularity-toggle').forEach(gt => {
+      gt.querySelectorAll('.gt-btn').forEach(x => {
+        x.classList.toggle('active', x.dataset.gran === currentGran);
+      });
+    });
     renderDashboard();
   });
 }
@@ -1186,6 +1194,12 @@ function renderDashboard(){
         <div>
           <div class="cc-title">${months.length} ${effectiveGran === 'day' ? 'днів' : effectiveGran === 'week' ? 'тижнів' : 'місяців'} · 3 dataset</div>
           <div class="cc-sub">Виставлено рахунків (yellow) · Надходження (green) · Витрати (red, negative)${!hasInvoices ? ' · ⚠ рахунки = 0' : ''}</div>
+        </div>
+        <!-- v3.0.2: дублікат granularity toggle ПРЯМО біля графіка (синхронізується з sticky-bar) -->
+        <div class="granularity-toggle" id="granToggleChart" title="Деталізація графіка">
+          <button class="gt-btn ${effectiveGran === 'day' ? 'active' : ''}" data-gran="day">День</button>
+          <button class="gt-btn ${effectiveGran === 'week' ? 'active' : ''}" data-gran="week">Тиждень</button>
+          <button class="gt-btn ${effectiveGran === 'month' ? 'active' : ''}" data-gran="month">Місяць</button>
         </div>
       </div>
       <div class="chart-h320"><canvas id="cashFlowChart"></canvas></div>
