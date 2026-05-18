@@ -628,6 +628,12 @@ const DASHBOARD_TABLES = {
     table: 'ms_processing_plans',
     cols: ['id','name','code','parent_product','archived','raw_json','ingested_at'],
   },
+  // v2.70: товарні позиції з відвантажень. Composite primary key (demand_id, position_idx).
+  // Customer 360 використовує для TOP-10 продуктів per клієнт.
+  demand_positions: {
+    table: 'ms_demand_positions',
+    cols: ['demand_id','position_idx','product_name','product_id','quantity','price_kop','sum_kop','discount_pct','agent_id','agent','ms_moment','raw_json','ingested_at'],
+  },
 };
 
 const INGEST_BATCH_LIMIT = 500;          // max rows per single POST
