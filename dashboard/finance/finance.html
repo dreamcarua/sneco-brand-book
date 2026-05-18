@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>snEco — P&amp;L Dashboard 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --y:#FEBF27;--g:#96C11F;--d:#1E1E1E;--bg:#F4F4EF;--card:#fff;
+  --muted:#8a8a8a;--border:#E5E5DC;--red:#E84040;--blue:#3B82F6;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--bg);color:var(--d);font-size:14px;min-height:100vh}
+header{background:#fff;border-bottom:1px solid var(--border);padding:18px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:24px}
+header h1{font-size:18px;font-weight:700;letter-spacing:.2px}
+header .meta{font-size:12px;color:var(--muted)}
+.tabs{display:flex;gap:6px;padding:14px 24px 0;border-bottom:1px solid var(--border);
+  background:#fff;flex-wrap:wrap}
+.tab{padding:9px 16px;border:1px solid var(--border);border-bottom:none;
+  border-radius:8px 8px 0 0;background:#fafaf6;cursor:pointer;font-weight:500;
+  font-size:13px;color:#555}
+.tab.active{background:#fff;color:var(--d);border-color:var(--border);position:relative;top:1px}
+.tab.aggregate{background:#fef9e9;border-color:#f1d883;font-weight:700}
+.tab.aggregate.active{background:#fff5d1}
+main{padding:20px 24px 60px;max-width:1600px;margin:0 auto}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:22px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.kpi .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.kpi .value{font-size:22px;font-weight:700}
+.kpi .sub{font-size:11px;color:var(--muted);margin-top:4px}
+.kpi.green .value{color:var(--g)}
+.kpi.red .value{color:var(--red)}
+.section{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:22px}
+.section h2{font-size:14px;margin-bottom:14px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:#444}
+.chart-wrap{position:relative;height:380px}
+table{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left;font-weight:500;max-width:280px;overflow:hidden;text-overflow:ellipsis}
+thead th{background:#fafaf6;font-weight:600;color:#555;font-size:11px;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid var(--border);position:sticky;top:0}
+.row-revenue td{background:#fef9e9;font-weight:700;border-bottom:2px solid var(--y)}
+.row-total td{background:#f4f4ef;font-weight:700;border-top:2px solid var(--border)}
+.row-net td{background:#f0f7e6;font-weight:700;border-top:2px solid var(--g);color:var(--g)}
+.row-net.negative td{background:#fdecec;color:var(--red);border-top-color:var(--red)}
+.pct{display:inline-block;color:var(--muted);font-size:11px;margin-left:4px}
+.empty{color:#bbb}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.scroll-x{overflow-x:auto}
+.legend-cat{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.note{background:#fef9e9;border:1px solid #f1d883;border-left:4px solid var(--y);padding:11px 14px;border-radius:6px;font-size:12px;color:#7a5e10;margin-bottom:18px;line-height:1.5}
+.note strong{color:#5c4500}
+.loading-state{padding:60px 20px;text-align:center}
+.loading-state .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--y);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+/* ── OTP gate (copied from dashboard-template.html — DO NOT MODIFY pattern) ── */
+#dashauth-overlay{position:fixed;inset:0;background:#1E1E1E;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+#dashauth-overlay.is-hidden{display:none}
+.dashauth-card{background:#fff;width:100%;max-width:440px;border-radius:14px;padding:36px 30px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.dashauth-logo{font-size:24px;font-weight:900;color:#FEBF27;margin-bottom:6px;letter-spacing:-0.5px;text-align:center}
+.dashauth-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#888;text-align:center;margin-bottom:24px}
+.dashauth-icon{font-size:36px;text-align:center;margin-bottom:16px}
+.dashauth-h1{font-size:18px;font-weight:800;text-align:center;color:#1E1E1E;margin-bottom:6px}
+.dashauth-desc{font-size:13px;color:#666;text-align:center;line-height:1.55;margin-bottom:20px}
+.dashauth-input{width:100%;padding:12px 14px;border:2px solid #E5E5DC;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
+.dashauth-input:focus{border-color:#FEBF27}
+.dashauth-input.code{font-family:'SF Mono',Menlo,Consolas,monospace;letter-spacing:.4em;text-align:center;font-size:18px}
+.dashauth-btn{width:100%;padding:13px;background:#1E1E1E;color:#fff;border:0;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;margin-top:14px;font-family:inherit;transition:background .15s}
+.dashauth-btn:hover{background:#000}
+.dashauth-btn:disabled{opacity:.5;cursor:not-allowed}
+.dashauth-msg{font-size:12.5px;line-height:1.5;margin-top:12px;text-align:center;min-height:18px}
+.dashauth-msg.is-error{color:#DC2626}
+.dashauth-msg a{color:#FEBF27;font-weight:600;text-decoration:underline}
+.dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
+.dashauth-back:hover{color:#FEBF27}
+.dashauth-session{position:fixed;top:8px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:8px}
+.dashauth-session button{background:none;border:0;color:#96C11F;cursor:pointer;font-size:14px;padding:0;line-height:1}
+body.dash-locked{overflow:hidden}
+</style>
+</head>
+<body class="dash-locked">
+
+<!-- ===== OTP GATE (block='finance-dashboard') ===== -->
+<div id="dashauth-overlay">
+  <div class="dashauth-card">
+    <div class="dashauth-logo">snEco</div>
+    <div class="dashauth-sub">Finance / P&amp;L · Confidential</div>
+    <div id="dashauth-stage"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const WORKER = 'https://sneco-auth.vg-ab6.workers.dev';
+  const BLOCK = 'finance-dashboard';
+  const STORAGE_KEY = 'snEco-jwt-' + BLOCK;
+  const overlay = document.getElementById('dashauth-overlay');
+  const stage = document.getElementById('dashauth-stage');
+  let email = '';
+
+  function unlock(token, em, exp){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({token, email:em, exp})); } catch(e){}
+    document.body.classList.remove('dash-locked');
+    overlay.classList.add('is-hidden');
+    showSessionBadge(em, exp);
+    if (typeof window.bootDashboard === 'function') window.bootDashboard(token);
+  }
+  function showSessionBadge(em, exp){
+    const b = document.createElement('div');
+    b.className = 'dashauth-session';
+    const mins = Math.max(0, Math.floor((exp*1000 - Date.now())/60000));
+    b.innerHTML = '✓ ' + em + ' · ' + mins + ' min <button title="Lock">🔒</button>';
+    b.querySelector('button').onclick = () => { localStorage.removeItem(STORAGE_KEY); location.reload(); };
+    document.body.appendChild(b);
+  }
+  async function verifyExisting(){
+    let s; try { s = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null'); } catch(e){}
+    if (!s || !s.token || !s.exp || s.exp*1000 < Date.now()) return null;
+    try {
+      const r = await fetch(WORKER+'/api/session/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({token: s.token, block: BLOCK})});
+      const j = await r.json();
+      return j.ok ? s : null;
+    } catch(e) { return null; }
+  }
+  function renderEmail(){
+    stage.innerHTML = `
+      <div class="dashauth-icon">💰</div>
+      <div class="dashauth-h1">Введіть email</div>
+      <div class="dashauth-desc">Якщо ваш email у whitelist — на нього надійде 6-значний код. Сесія діє 1 годину.</div>
+      <input class="dashauth-input" type="email" id="auth-em" placeholder="ім'я@sneco.ua" autocomplete="email" autofocus>
+      <button class="dashauth-btn" id="auth-send">Надіслати код</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="../" class="dashauth-back">← Brand Bible</a>`;
+    const em = document.getElementById('auth-em');
+    const send = document.getElementById('auth-send');
+    const msg = document.getElementById('auth-msg');
+    em.addEventListener('keydown', e => { if(e.key==='Enter') send.click(); });
+    send.onclick = async () => {
+      const v = em.value.trim();
+      if (!v || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { msg.textContent='Введіть правильний email.'; msg.className='dashauth-msg is-error'; return; }
+      send.disabled = true; send.textContent = 'Надсилаємо...'; msg.textContent='';
+      try {
+        const r = await fetch(WORKER+'/api/otp/request', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email:v, block: BLOCK})});
+        if (!r.ok) {
+          const j = await r.json().catch(()=>({}));
+          if (j.error === 'not_in_whitelist') msg.innerHTML = `❌ Цього email немає у whitelist. <a href="mailto:vg@sneco.ua?subject=finance-dashboard%20whitelist">✉ Запит до vg@sneco.ua</a>`;
+          else msg.textContent = 'Помилка: ' + (j.error || r.status);
+          msg.className='dashauth-msg is-error'; send.disabled=false; send.textContent='Надіслати код'; return;
+        }
+        email = v; renderCode();
+      } catch(e) {
+        msg.textContent = 'Помилка мережі: ' + e.message;
+        msg.className='dashauth-msg is-error'; send.disabled=false; send.textContent='Надіслати код';
+      }
+    };
+  }
+  function renderCode(){
+    stage.innerHTML = `
+      <div class="dashauth-icon">🔢</div>
+      <div class="dashauth-h1">Введіть код з листа</div>
+      <div class="dashauth-desc">${email}<br>Код надіслано — перевірте пошту (включно зі спамом).</div>
+      <input class="dashauth-input code" type="text" id="auth-code" inputmode="numeric" maxlength="6" placeholder="••••••" autofocus>
+      <button class="dashauth-btn" id="auth-verify">Підтвердити</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="#" class="dashauth-back" id="auth-back">← Інший email</a>`;
+    const code = document.getElementById('auth-code');
+    const verify = document.getElementById('auth-verify');
+    const msg = document.getElementById('auth-msg');
+    code.addEventListener('keydown', e => { if(e.key==='Enter') verify.click(); });
+    document.getElementById('auth-back').onclick = e => { e.preventDefault(); renderEmail(); };
+    verify.onclick = async () => {
+      const c = code.value.trim();
+      if (!/^\d{6}$/.test(c)) { msg.textContent='Код — 6 цифр.'; msg.className='dashauth-msg is-error'; return; }
+      verify.disabled=true; verify.textContent='Перевіряємо...'; msg.textContent='';
+      try {
+        const r = await fetch(WORKER+'/api/otp/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, block: BLOCK, code: c})});
+        const j = await r.json();
+        if (!r.ok) { msg.textContent='Невірний або застарілий код.'; msg.className='dashauth-msg is-error'; verify.disabled=false; verify.textContent='Підтвердити'; return; }
+        unlock(j.token, j.email, j.exp);
+      } catch(e) {
+        msg.textContent = 'Помилка: ' + e.message; msg.className='dashauth-msg is-error';
+        verify.disabled=false; verify.textContent='Підтвердити';
+      }
+    };
+  }
+  (async()=>{
+    const sess = await verifyExisting();
+    if (sess) { unlock(sess.token, sess.email, sess.exp); return; }
+    renderEmail();
+  })();
+})();
+</script>
+<!-- ===== END OTP GATE ===== -->
+
+<header>
+  <div>
+    <h1>snEco · P&amp;L Dashboard 2026</h1>
+    <div class="meta" id="syncMeta">Завантаження…</div>
+  </div>
+  <div class="meta">Дані з МойСклад → D1 sneco-bible</div>
+</header>
+
+<div class="tabs" id="tabs"></div>
+<main id="main"><div class="loading-state"><div class="spinner"></div>Тягне дані з D1…</div></main>
+
+<script>
+// ─── Dashboard logic — runs after OTP unlock ─────────────────────────────────
+const WORKER = 'https://sneco-auth.vg-ab6.workers.dev';
+const YEAR = 2026;
+const DATE_FROM = `${YEAR}-01-01`;
+const DATE_TO   = `${YEAR}-12-31`;
+
+const PALETTE = ['#FEBF27','#96C11F','#3B82F6','#E84040','#8B5CF6','#F59E0B',
+                 '#10B981','#EC4899','#06B6D4','#EF4444','#84CC16','#A855F7',
+                 '#0EA5E9','#F97316','#14B8A6','#D946EF','#22C55E','#FB7185'];
+const colorFor = (i) => PALETTE[i % PALETTE.length];
+const fmt = (n) => n == null ? '—' : Number(n).toLocaleString('uk-UA', {maximumFractionDigits:0, minimumFractionDigits:0});
+const pct = (n, base) => base > 0 ? (n / base * 100).toFixed(1) + '%' : '—';
+const monthKey = (iso) => (iso || '').slice(0, 7);
+
+let DATA = null;
+let currentOrgIdx = 0;
+let chartInstance = null;
+
+// ─── API ────────────────────────────────────────────────────────────────────
+
+async function postJson(token, path, body) {
+  const r = await fetch(WORKER + path, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) throw new Error(`${path} → HTTP ${r.status}`);
+  return r.json();
+}
+
+async function fetchAll(token, type, from, to) {
+  const all = [];
+  let offset = 0;
+  const limit = 10000;
+  while (true) {
+    const resp = await postJson(token, '/api/dashboard/data', { type, from, to, limit, offset });
+    all.push(...resp.items);
+    if (resp.items.length < limit) break;
+    offset += limit;
+  }
+  return all;
+}
+
+// ─── Aggregation (Python build.py portted to JS) ────────────────────────────
+
+function aggregate(demands, payments) {
+  const months = [];
+  const today = new Date();
+  const lastMonth = today.getFullYear() === YEAR ? today.getMonth() + 1 :
+                    (today.getFullYear() > YEAR ? 12 : 1);
+  for (let m = 1; m <= lastMonth; m++) months.push(`${YEAR}-${String(m).padStart(2,'0')}`);
+
+  // org_id deduce: prefer organization name as id since D1 stores name as text
+  const orgByKey = {};  // key = organization (text) → { revenue[m], expenses[m][cat], revenue_docs[m], expense_docs[m] }
+  function ensureOrg(name) {
+    if (!orgByKey[name]) {
+      orgByKey[name] = {
+        name,
+        revenue: {},
+        revenue_docs: {},
+        expenses: {},
+        expense_docs: {},
+      };
+      months.forEach(m => {
+        orgByKey[name].revenue[m] = 0;
+        orgByKey[name].revenue_docs[m] = 0;
+        orgByKey[name].expenses[m] = {};
+        orgByKey[name].expense_docs[m] = 0;
+      });
+    }
+    return orgByKey[name];
+  }
+
+  // Revenue: demands
+  for (const d of demands) {
+    if (!d.applicable) continue;
+    const m = monthKey(d.ms_moment);
+    if (m.slice(0,4) !== String(YEAR)) continue;
+    const o = ensureOrg(d.organization || '(не вказано)');
+    o.revenue[m] = (o.revenue[m] || 0) + ((d.sum_kop || 0) / 100);
+    o.revenue_docs[m] = (o.revenue_docs[m] || 0) + 1;
+  }
+  // Expenses: payments where expense_item is set (exclude paymentin via payment_type)
+  // payment_type values: 'paymentout' = expense, 'paymentin' = revenue
+  for (const p of payments) {
+    if (!p.applicable) continue;
+    if (p.payment_type !== 'paymentout') continue;  // skip inbound, those are revenue side
+    const m = monthKey(p.ms_moment);
+    if (m.slice(0,4) !== String(YEAR)) continue;
+    const o = ensureOrg(p.organization || '(не вказано)');
+    const cat = p.expense_item || '(Без категорії)';
+    o.expenses[m] = o.expenses[m] || {};
+    o.expenses[m][cat] = (o.expenses[m][cat] || 0) + ((p.sum_kop || 0) / 100);
+    o.expense_docs[m] = (o.expense_docs[m] || 0) + 1;
+  }
+
+  // Build per-org datasets
+  const orgs = [];
+  for (const name of Object.keys(orgByKey)) {
+    const o = orgByKey[name];
+    let total_rev = 0, total_exp = 0;
+    const catTotals = {};
+    months.forEach(m => {
+      total_rev += o.revenue[m] || 0;
+      for (const [c, v] of Object.entries(o.expenses[m] || {})) {
+        catTotals[c] = (catTotals[c] || 0) + v;
+        total_exp += v;
+      }
+    });
+    if (total_rev === 0 && total_exp === 0) continue;
+    const sortedCats = Object.entries(catTotals).sort((a,b) => b[1]-a[1]).map(x => x[0]);
+    const monthly = months.map(m => {
+      const exp_by_cat = {};
+      sortedCats.forEach(c => exp_by_cat[c] = +((o.expenses[m] || {})[c] || 0).toFixed(2));
+      const total_expense = +Object.values(exp_by_cat).reduce((a,b)=>a+b, 0).toFixed(2);
+      const revenue = +((o.revenue[m] || 0).toFixed(2));
+      return {
+        month: m,
+        revenue,
+        revenue_docs: o.revenue_docs[m] || 0,
+        expenses_by_cat: exp_by_cat,
+        total_expense,
+        expense_docs: o.expense_docs[m] || 0,
+        net: +(revenue - total_expense).toFixed(2),
+      };
+    });
+    orgs.push({
+      id: name,
+      name,
+      total_revenue: +total_rev.toFixed(2),
+      total_expense: +total_exp.toFixed(2),
+      net: +(total_rev - total_exp).toFixed(2),
+      categories: sortedCats,
+      category_totals: Object.fromEntries(Object.entries(catTotals).map(([k,v]) => [k, +v.toFixed(2)])),
+      monthly,
+    });
+  }
+  orgs.sort((a,b) => b.total_revenue - a.total_revenue);
+
+  // Consolidated view
+  if (orgs.length > 1) {
+    const allCats = {};
+    orgs.forEach(o => Object.entries(o.category_totals).forEach(([c, v]) => { allCats[c] = (allCats[c] || 0) + v; }));
+    const sortedCats = Object.entries(allCats).sort((a,b) => b[1]-a[1]).map(x => x[0]);
+    const totalRev = orgs.reduce((s,o) => s + o.total_revenue, 0);
+    const totalExp = orgs.reduce((s,o) => s + o.total_expense, 0);
+    const monthly = months.map((m, mi) => {
+      const exp_by_cat = {};
+      sortedCats.forEach(c => {
+        exp_by_cat[c] = +orgs.reduce((s, o) => s + (o.monthly[mi].expenses_by_cat[c] || 0), 0).toFixed(2);
+      });
+      const rev = +orgs.reduce((s,o) => s + o.monthly[mi].revenue, 0).toFixed(2);
+      const total_expense = +orgs.reduce((s,o) => s + o.monthly[mi].total_expense, 0).toFixed(2);
+      return {
+        month: m,
+        revenue: rev,
+        revenue_docs: orgs.reduce((s,o) => s + o.monthly[mi].revenue_docs, 0),
+        expenses_by_cat: exp_by_cat,
+        total_expense,
+        expense_docs: orgs.reduce((s,o) => s + o.monthly[mi].expense_docs, 0),
+        net: +(rev - total_expense).toFixed(2),
+      };
+    });
+    const aggregate = {
+      id: '__all__',
+      name: `Всі юр.особи (${orgs.length})`,
+      is_aggregate: true,
+      note: 'Сума по всіх юр.особах у UAH. УВАГА: внутрішньогрупові потоки (Перемещение, Вивод Средств, На Абрис, на Пет Корп) можуть подвоюватись.',
+      total_revenue: +totalRev.toFixed(2),
+      total_expense: +totalExp.toFixed(2),
+      net: +(totalRev - totalExp).toFixed(2),
+      categories: sortedCats,
+      category_totals: Object.fromEntries(Object.entries(allCats).map(([k,v]) => [k, +v.toFixed(2)])),
+      monthly,
+    };
+    orgs.unshift(aggregate);
+  }
+
+  return { year: YEAR, months, organizations: orgs };
+}
+
+// ─── Render ─────────────────────────────────────────────────────────────────
+
+function renderTabs() {
+  const tabs = document.getElementById('tabs');
+  tabs.innerHTML = '';
+  DATA.organizations.forEach((o, i) => {
+    const t = document.createElement('div');
+    let cls = 'tab';
+    if (i === currentOrgIdx) cls += ' active';
+    if (o.is_aggregate) cls += ' aggregate';
+    t.className = cls;
+    t.textContent = o.name;
+    t.onclick = () => { currentOrgIdx = i; renderTabs(); renderOrg(); };
+    tabs.appendChild(t);
+  });
+}
+
+function renderOrg() {
+  const main = document.getElementById('main');
+  const org = DATA.organizations[currentOrgIdx];
+  if (!org) { main.innerHTML = '<div class="empty-state">Немає даних.</div>'; return; }
+
+  const months = DATA.months;
+  const cats = org.categories;
+  const monthsWithData = org.monthly.filter(m => m.revenue > 0 || m.total_expense > 0).length;
+  const avgMonthlyRev = monthsWithData > 0 ? org.total_revenue / monthsWithData : 0;
+  const netMargin = org.total_revenue > 0 ? (org.net / org.total_revenue * 100) : 0;
+  const noteHtml = org.note ? `<div class="note"><strong>⚠ Консолідований view:</strong> ${org.note}</div>` : '';
+
+  main.innerHTML = `
+    ${noteHtml}
+    <div class="kpis">
+      <div class="kpi"><div class="label">Загальна виручка ${DATA.year}</div><div class="value">${fmt(org.total_revenue)}</div><div class="sub">${monthsWithData} міс з даними</div></div>
+      <div class="kpi"><div class="label">Загальні витрати</div><div class="value">${fmt(org.total_expense)}</div><div class="sub">${pct(org.total_expense, org.total_revenue)} від виручки</div></div>
+      <div class="kpi ${org.net >= 0 ? 'green' : 'red'}"><div class="label">Net</div><div class="value">${fmt(org.net)}</div><div class="sub">${netMargin.toFixed(1)}% маржа</div></div>
+      <div class="kpi"><div class="label">Середня виручка/міс</div><div class="value">${fmt(avgMonthlyRev)}</div><div class="sub">по місяцях з даними</div></div>
+    </div>
+    <div class="section"><h2>Витрати як % від виручки помісячно</h2><div class="chart-wrap"><canvas id="chartMonthly"></canvas></div></div>
+    <div class="section"><h2>Помісячна розбивка</h2><div class="scroll-x"><table id="tablePnl"></table></div></div>`;
+
+  drawChart(org, months, cats);
+  drawTable(org, months, cats);
+}
+
+function drawChart(org, months, cats) {
+  const ctx = document.getElementById('chartMonthly').getContext('2d');
+  if (chartInstance) chartInstance.destroy();
+  const catDatasets = cats.map((c, i) => ({
+    label: c,
+    data: months.map((m, mi) => {
+      const row = org.monthly[mi];
+      if (row.revenue <= 0) return 0;
+      return +(((row.expenses_by_cat[c] || 0) / row.revenue) * 100).toFixed(2);
+    }),
+    backgroundColor: colorFor(i),
+    stack: 'stack1',
+  }));
+  const netData = months.map((m, mi) => {
+    const row = org.monthly[mi];
+    if (row.revenue <= 0) return 0;
+    return +(((row.revenue - row.total_expense) / row.revenue) * 100).toFixed(2);
+  });
+  catDatasets.push({
+    label: 'Net margin', data: netData,
+    backgroundColor: '#1E1E1E', borderColor: '#1E1E1E',
+    type: 'line', yAxisID: 'y', tension: 0.3,
+    pointRadius: 4, pointHoverRadius: 6, fill: false, order: -1,
+  });
+  chartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: months.map(m => m.slice(5) + '.' + m.slice(2,4)), datasets: catDatasets },
+    options: {
+      maintainAspectRatio: false, responsive: true,
+      scales: { y: { stacked: true, ticks: { callback: v => v + '%' }, title: { display: true, text: '% від виручки' }}, x: { stacked: true }},
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 8, font: { size: 11 }}},
+                 tooltip: { callbacks: { label: c => `${c.dataset.label}: ${c.parsed.y.toFixed(1)}%` }}},
+    },
+  });
+}
+
+function drawTable(org, months, cats) {
+  const table = document.getElementById('tablePnl');
+  const monthHeaders = months.map(m => `<th>${m.slice(5)}.${m.slice(2,4)}</th>`).join('');
+  let html = `<thead><tr><th>Стаття</th>${monthHeaders}<th>Всього</th></tr></thead><tbody>`;
+  const revCells = org.monthly.map(r => `<td>${r.revenue > 0 ? fmt(r.revenue) : '<span class="empty">—</span>'}</td>`).join('');
+  html += `<tr class="row-revenue"><td>Відвантаження (виручка) — 100%</td>${revCells}<td>${fmt(org.total_revenue)}</td></tr>`;
+  cats.forEach((c, i) => {
+    const cells = org.monthly.map(r => {
+      const v = r.expenses_by_cat[c] || 0;
+      const p = r.revenue > 0 ? (v / r.revenue * 100) : null;
+      if (v === 0) return '<td><span class="empty">—</span></td>';
+      return `<td>${fmt(v)}<span class="pct">${p != null ? p.toFixed(1)+'%' : ''}</span></td>`;
+    }).join('');
+    const total = org.category_totals[c] || 0;
+    const totalPct = org.total_revenue > 0 ? (total / org.total_revenue * 100).toFixed(1) + '%' : '—';
+    html += `<tr><td><span class="legend-cat" style="background:${colorFor(i)}"></span>${c}</td>${cells}<td>${fmt(total)}<span class="pct">${totalPct}</span></td></tr>`;
+  });
+  const expCells = org.monthly.map(r => {
+    const p = r.revenue > 0 ? (r.total_expense / r.revenue * 100).toFixed(1) + '%' : '—';
+    return `<td>${r.total_expense > 0 ? fmt(r.total_expense) : '<span class="empty">—</span>'}<span class="pct">${r.total_expense > 0 ? p : ''}</span></td>`;
+  }).join('');
+  html += `<tr class="row-total"><td>Всього витрати</td>${expCells}<td>${fmt(org.total_expense)}<span class="pct">${pct(org.total_expense, org.total_revenue)}</span></td></tr>`;
+  const netCells = org.monthly.map(r => `<td>${fmt(r.net)}</td>`).join('');
+  html += `<tr class="row-net ${org.net >= 0 ? '' : 'negative'}"><td>Net (виручка − витрати)</td>${netCells}<td>${fmt(org.net)}</td></tr>`;
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+
+// ─── Bootstrap ──────────────────────────────────────────────────────────────
+
+window.bootDashboard = async function(token) {
+  try {
+    // 1. last-sync info (public, no auth needed)
+    const ls = await fetch(WORKER + '/api/dashboard/last-sync').then(r => r.json()).catch(() => null);
+    let syncTxt = '';
+    if (ls && ls.last) {
+      const dt = new Date((ls.last.finished_at || ls.last.started_at) * 1000);
+      syncTxt = `Останній sync: ${dt.toLocaleString('uk-UA')} · `;
+    }
+
+    // 2. Fetch raw rows
+    const [demands, payments] = await Promise.all([
+      fetchAll(token, 'demands',  DATE_FROM, DATE_TO),
+      fetchAll(token, 'payments', DATE_FROM, DATE_TO),
+    ]);
+
+    // 3. Aggregate client-side
+    DATA = aggregate(demands, payments);
+    document.getElementById('syncMeta').textContent =
+      `${syncTxt}${DATA.organizations.length} орг (вкл. консолідований) · ${DATA.months.length} міс · ${demands.length} demands + ${payments.length} payments`;
+
+    if (DATA.organizations.length === 0) {
+      document.getElementById('main').innerHTML = '<div class="empty-state">Дані за ' + DATA.year + ' рік відсутні у D1.</div>';
+    } else {
+      renderTabs();
+      renderOrg();
+    }
+  } catch(e) {
+    console.error('bootDashboard error', e);
+    document.getElementById('main').innerHTML = `<div class="empty-state">⚠ Помилка завантаження:<br><code>${e.message}</code><br><br>Перевір що ти у whitelist <code>finance-dashboard</code>.</div>`;
+  }
+};
+</script>
+
+</body>
+</html>

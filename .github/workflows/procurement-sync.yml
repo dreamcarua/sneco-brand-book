@@ -1,0 +1,60 @@
+name: Procurement Sync
+
+on:
+  schedule:
+    # 00:00 UTC = 03:00 Київ (EEST, літо) / 02:00 (EET, зима)
+    # Philip ask: 03:00 Київ — використовуємо 00:00 UTC (літній час, поточний)
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      full:
+        description: 'Run full 2026 sync (default: last 7 days)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+jobs:
+  sync:
+    name: Fetch МойСклад processings/stock → write proc_* tables in D1
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests python-dotenv
+
+      - name: Run procurement sync
+        env:
+          MOYSKLAD_TOKEN: ${{ secrets.MOYSKLAD_TOKEN }}
+          SYNC_API_KEY:   ${{ secrets.SYNC_API_KEY }}
+          WORKER_URL:     ${{ secrets.WORKER_URL }}
+        run: |
+          mkdir -p logs
+          FULL_FLAG=""
+          if [ "${{ github.event.inputs.full }}" = "true" ]; then
+            FULL_FLAG="--full"
+          fi
+          python3 dashboard/procurement/sync.py --trigger cron $FULL_FLAG 2>&1 | tee logs/procurement_$(date -u +%Y%m%d_%H%M).log
+
+      - name: Sync summary
+        if: always()
+        run: |
+          echo "::notice::Procurement sync finished at $(date -u). Status: ${{ job.status }}"

@@ -34,27 +34,41 @@
 
 ### Pylyp
 
-<!-- Pylyp Claude session пише сюди свої зміни. Приклад:
+#### Added (17.05.2026) — Finance + Procurement dashboards (POC → prod migration)
 
-#### Added (DD.MM.YYYY)
-- `dashboard/payroll/` — initial scaffold для Payroll Dashboard
-- `dashboard/payroll/payroll.html` — UI з KPI: ФОП загальний, по підрозділах, динаміка
-- `dashboard/payroll/sync.py` — sync employees + payrolls з МойСклад
-- `dashboard/payroll/schema.sql` — pay_employees, pay_payrolls, pay_sync_log
-- `.github/workflows/payroll-sync.yml` — cron щоночі 03:00 UTC
+**Local POC (працює зараз без Vadym):**
+- `dashboard/finance/build.py` — pull demands+paymentout з МойСклад → агрегує помісячно по 5 юр.особах → генерує self-contained `finance.html` з консолідованою вкладкою + per-org tabs
+- `dashboard/procurement/build.py` — pull processings/positions/stock з МойСклад → виробничий баланс (свіжий→сушений, yield 60-67%) + прогноз днів до закінчення сировини
+- `dashboard/serve.py` — локальний HTTP сервер з кнопкою «Оновити дані» у кожному дашборді
+
+**Prod pipeline (готово, чекає Vadym):**
+- `dashboard/procurement/schema.sql` — D1 tables `proc_processings`, `proc_processing_materials`, `proc_processing_products`, `proc_stocks`, `proc_sync_log`
+- `dashboard/procurement/sync.py` — cron-friendly: pull → batch POST `/api/dashboard/ingest` → `proc_*` tables. `--full` для повного 2026, default last 7d incremental
+- `.github/workflows/procurement-sync.yml` — cron 00:00 UTC (03:00 Київ EEST)
+- Finance використовує EXISTING `ms_demands` + `ms_payments` (з Sales sync), окремий sync не потрібен
+- `dashboard/LAUNCHER_CARDS_FOR_VADYM.md` — HTML snippets для sec-dashboard каталогу
 
 #### Blocked (потребує дії від vg)
-- [ ] Apply schema.sql до D1 sneco-bible
-- [ ] Додати block 'payroll-dashboard' у Worker SUPPORTED_BLOCKS + redeploy
-- [ ] Whitelist у KV: vg + fg + Богдан
-- [ ] Redeploy через `wrangler deploy`
-- [ ] Картка-launcher у Brand Bible sec-dashboard
+- [ ] Додати `finance-dashboard` + `procurement-dashboard` у Worker `SUPPORTED_BLOCKS` + `blockNice`
+- [ ] Worker `/api/dashboard/ingest`: додати entity handlers для `processings`, `processing_materials`, `processing_products`, `stocks`
+- [ ] Apply schema: `npx wrangler d1 execute sneco-bible --file=dashboard/procurement/schema.sql --remote`
+- [ ] KV whitelist (через Maintenance UI):
+   - `wl:finance-dashboard`: vg@abrisart.com, fg@abrisart.com
+   - `wl:procurement-dashboard`: vg@abrisart.com, fg@abrisart.com
+- [ ] GitHub Secrets: `MOYSKLAD_TOKEN` (у CHANGELOG позначено як pending), `SYNC_API_KEY` (підтвердити)
+- [ ] Redeploy Worker: `cd ~/snEco/sneco-auth && npx wrangler deploy`
+- [ ] Додати launcher cards у `!snEco_Brand_Guide.html` sec-dashboard (snippets у `LAUNCHER_CARDS_FOR_VADYM.md`)
+- [ ] Підтвердити формат `/api/dashboard/data` — назви таблиць, параметри URL, ліміти, формат відповіді (потрібно щоб дописати read-side HTML)
+
+#### Pending (Pylyp дописує після Vadym)
+- [ ] Static `dashboard/finance/finance.html` з OTP-gate + fetch `/api/dashboard/data?type=ms_demands` + `?type=ms_payments` (зараз тільки локальний POC)
+- [ ] Static `dashboard/procurement/procurement.html` з OTP-gate + fetch `proc_*` таблиць
+- [ ] Manual test workflow_dispatch для `procurement-sync` після deploy
 
 #### Notes
-- Test plan: …
-- Open questions for vg: …
-
--->
+- **Security:** Поточний Sales дашборд має дані inline у public repo → view-source leak. Pylyp + Vadym домовились мігрувати P&L (sensitive) на D1+JWT pattern (data НЕ в HTML, fetch через Worker з JWT). Sales може залишитися на старому паттерні поки не критично.
+- **Inter-company elimination:** консолідований P&L view (5 юр.осіб) має категорії «Перемещение / Вивод Средств / На Абрис / на Пет Корп» що подвоюються між фірмами. Не елімінується у POC — окремий backlog item.
+- **Dividends in P&L:** Дивіденди (20% від виручки) поки залишаються у категоріях витрат — backlog: винести у окрему секцію «Розподіл прибутку».
 
 ---
 
