@@ -1299,7 +1299,7 @@ async function updateSyncBadge(){
     statusEl.textContent = `✓ Sync: ${fmt}`;
     updateEl.textContent = ageH < 1 ? 'щойно' : ageH < 24 ? ageH + ' год тому' : Math.round(ageH/24) + ' дн. тому';
   } catch(e) {
-    statusEl.textContent = '⚠ Sync info недоступне';
+    statusEl.textContent = '⟙ Sync info недоступне';
   }
 }
 </script>
