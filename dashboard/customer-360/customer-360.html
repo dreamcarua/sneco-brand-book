@@ -568,7 +568,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.74.1 · Overview + Quick-filter chips з логікою + повні списки завжди розкриті · МойСклад API · Оновлення: щодня 06:00
+  snEco Customer 360 v2.74.2 · Overview + Filter chips + Heatmap drill-down + Legacy lists фільтруються · МойСклад API · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -902,8 +902,40 @@ function applyOverviewFilter(customers, filter){
 
 window.setOverviewFilter = function(f){
   currentOverviewFilter = f;
+  heatmapDrillKey = null;     // reset drill коли змінюємо filter
   renderOverview();
 };
+
+// v2.74.2: heatmap cell drill-down — клік на cell показує список клієнтів цього сегменту×health
+let heatmapDrillKey = null;   // 'VIP-good', 'Mid-warn', 'SMB-bad' etc.
+window.openHeatmapDrill = function(tier, health){
+  const k = `${tier}-${health}`;
+  heatmapDrillKey = (heatmapDrillKey === k) ? null : k;  // toggle
+  renderOverview();
+  // Scroll до drill section
+  setTimeout(() => {
+    const el = document.getElementById('heatmapDrill');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+};
+window.closeHeatmapDrill = function(){
+  heatmapDrillKey = null;
+  renderOverview();
+};
+
+// Helper — filter клієнтів по tier + health для drill
+function filterByTierHealth(customers, tier, health){
+  return customers.filter(c => {
+    const m = c.__metrics;
+    if (!m || m.totalShipped <= 0) return false;
+    const rev = m.totalShipped;
+    const t = rev > 500000 ? 'VIP' : rev > 100000 ? 'Mid' : 'SMB';
+    if (t !== tier) return false;
+    const h = c.__health || 0;
+    const hb = h >= 70 ? 'good' : h >= 40 ? 'warn' : 'bad';
+    return hb === health;
+  });
+}
 
 // ============================================================================
 // v2.74.0 — OVERVIEW HELPERS (для першого екрана)
@@ -1365,8 +1397,41 @@ function _buildOverviewHtml(){
   const totalVIP = allCounterparties.filter(c => c.__metrics?.totalShipped > 500000).length;
   const totalAll = allCounterparties.filter(c => c.__metrics?.totalShipped > 0).length;
 
-  // Build legacy 3 lists HTML (collapsible at bottom)
-  const legacyHtml = _buildLegacyListsHtml();
+  // Build legacy 3 lists HTML — v2.74.2: respects current filter
+  const legacyHtml = _buildLegacyListsHtml(filtered);
+
+  // v2.74.2: heatmap drill-down section (якщо клікнули cell)
+  let drillHtml = '';
+  if (heatmapDrillKey) {
+    const [tier, health] = heatmapDrillKey.split('-');
+    const drillCustomers = filterByTierHealth(filtered, tier, health)
+      .sort((a,b) => (b.__metrics.totalShipped||0) - (a.__metrics.totalShipped||0));
+    const healthLabel = health === 'good' ? '🟢 Good (≥70)' : health === 'warn' ? '🟡 Warn (40–70)' : '🔴 Bad (<40)';
+    const tierLabel = tier === 'VIP' ? '💎 VIP (>500K)' : tier === 'Mid' ? '🔸 Mid (100K–500K)' : '🔹 SMB (<100K)';
+    drillHtml = `
+      <div class="ov-section" id="heatmapDrill">
+        <div class="ov-section-title">
+          🔬 Heatmap drill-down · ${tierLabel} × ${healthLabel} · ${drillCustomers.length} клієнтів
+          <button onclick="closeHeatmapDrill()" style="margin-left:auto;background:none;border:1px solid var(--border);padding:3px 9px;border-radius:6px;cursor:pointer;font-size:11px;color:var(--muted);font-family:inherit">✕ закрити</button>
+        </div>
+        <div class="ov-mover-card">
+          ${drillCustomers.length === 0
+            ? `<div class="ov-mover-empty">Нема клієнтів у цьому сегменті</div>`
+            : drillCustomers.slice(0, 50).map((c, i) => `
+              <div class="ov-mover-row" onclick="selectCustomer('${escapeAttr(c.__key || c.name)}')">
+                <div class="ovm-rank">${i+1}</div>
+                <div>
+                  <div class="ovm-name">${escapeHtml(c.name)}</div>
+                  <div class="ovm-name-sub">${c.edrpou || c.inn || ''} · last ${c.__metrics.lastOrder ? dfShort(c.__metrics.lastOrder) : '—'}</div>
+                </div>
+                <div class="ovm-prev">health ${c.__health}/100</div>
+                <div class="ovm-delta ${c.__health >= 70 ? 'up' : c.__health >= 40 ? '' : 'down'}" style="color:${c.__health >= 70 ? '#4a7000' : c.__health >= 40 ? '#996600' : 'var(--red)'}">${nfm(c.__metrics.totalShipped)} ₴</div>
+              </div>`).join('')}
+          ${drillCustomers.length > 50 ? `<div class="ov-mover-empty">Показано 50 з ${drillCustomers.length}. Уточни фільтром угорі.</div>` : ''}
+        </div>
+      </div>
+    `;
+  }
 
   return `
     <div class="overview-wrap">
@@ -1568,13 +1633,15 @@ function _buildOverviewHtml(){
             <div class="ov-heatmap-cell header">🔴 Bad (&lt;40)</div>
             ${['VIP','Mid','SMB'].map(tier => `
               <div class="ov-heatmap-cell label">${tier === 'VIP' ? '💎' : tier === 'Mid' ? '🔸' : '🔹'} ${tier}</div>
-              <div class="ov-heatmap-cell green"><div class="ovh-num">${heatmap[tier].good}</div><div class="ovh-sub">клієнтів</div></div>
-              <div class="ov-heatmap-cell yellow"><div class="ovh-num">${heatmap[tier].warn}</div><div class="ovh-sub">клієнтів</div></div>
-              <div class="ov-heatmap-cell red"><div class="ovh-num">${heatmap[tier].bad}</div><div class="ovh-sub">клієнтів</div></div>
+              <div class="ov-heatmap-cell green" onclick="openHeatmapDrill('${tier}','good')"><div class="ovh-num">${heatmap[tier].good}</div><div class="ovh-sub">клієнтів · click 🔬</div></div>
+              <div class="ov-heatmap-cell yellow" onclick="openHeatmapDrill('${tier}','warn')"><div class="ovh-num">${heatmap[tier].warn}</div><div class="ovh-sub">клієнтів · click 🔬</div></div>
+              <div class="ov-heatmap-cell red" onclick="openHeatmapDrill('${tier}','bad')"><div class="ovh-num">${heatmap[tier].bad}</div><div class="ovh-sub">клієнтів · click 🔬</div></div>
             `).join('')}
           </div>
         </div>
       </div>
+
+      ${drillHtml}
 
       <!-- TIER 6: Quick filter chips (preview — фільтр без логіки наразі, як навігація) -->
       <div class="ov-section">
@@ -1640,8 +1707,10 @@ function _renderOverviewCharts(){
   });
 }
 
-// Build the 3 legacy lists (TOP-25 last month / TOP-10 YTD / Dormant) як collapsible
-function _buildLegacyListsHtml(){
+// Build the 3 legacy lists (TOP-25 last month / TOP-10 YTD / Dormant)
+// v2.74.2: приймає filtered pool — respects currentOverviewFilter
+function _buildLegacyListsHtml(customersPool){
+  const pool = customersPool || allCounterparties;
   const now = new Date();
   const cutoff30Days = new Date(now.getTime() - 30*86400000).toISOString().slice(0,10);
 
@@ -1720,12 +1789,13 @@ function _buildLegacyListsHtml(){
   }
 
   // SECTION 1: TOP-25 за минулий місяць (з fallback на 30 днів / lifetime коли немає)
+  // v2.74.2: pool тепер input (filtered subset з renderOverview)
   let basis = 'last month';
-  let pool = allCounterparties.filter(c => (c.__lastMonthRev||0) > 0);
-  if (pool.length === 0) { basis = 'last 30 days'; pool = allCounterparties.filter(c => (c.__last30Rev||0) > 0); }
-  if (pool.length === 0) { basis = 'lifetime'; pool = allCounterparties.filter(c => (c.__revenue||0) > 0); }
+  let sect1Pool = pool.filter(c => (c.__lastMonthRev||0) > 0);
+  if (sect1Pool.length === 0) { basis = 'last 30 days'; sect1Pool = pool.filter(c => (c.__last30Rev||0) > 0); }
+  if (sect1Pool.length === 0) { basis = 'lifetime'; sect1Pool = pool.filter(c => (c.__revenue||0) > 0); }
   const sortKey1 = basis === 'last month' ? '__lastMonthRev' : basis === 'last 30 days' ? '__last30Rev' : '__revenue';
-  const top25 = pool.filter(c => !c.archived).sort((a,b) => (b[sortKey1]||0) - (a[sortKey1]||0)).slice(0, 25);
+  const top25 = sect1Pool.filter(c => !c.archived).sort((a,b) => (b[sortKey1]||0) - (a[sortKey1]||0)).slice(0, 25);
 
   if (top25.length === 0) {
     return '<div><span style="color:var(--muted);font-size:11px;padding:5px 0">Жодного клієнта з даними. Перевір що sync пройшов.</span></div>';
@@ -1735,16 +1805,15 @@ function _buildLegacyListsHtml(){
                 : basis === 'last 30 days' ? 'ТОП-25 за останні 30 днів' : 'ТОП-25 за весь час';
   const valueLabel1 = basis === 'last month' ? 'За місяць' : basis === 'last 30 days' ? '30 днів' : 'Весь час';
 
-  // SECTION 2: TOP-10 з початку року (YTD)
+  // SECTION 2: TOP-10 з початку року (YTD) — v2.74.2: pool (filtered)
   const yearNum = now.getFullYear();
-  const top10ytd = allCounterparties
+  const top10ytd = pool
     .filter(c => !c.archived && (c.__ytdRev||0) > 0)
     .sort((a,b) => (b.__ytdRev||0) - (a.__ytdRev||0))
     .slice(0, 10);
 
-  // SECTION 3: Dormant — не замовляли > 30 днів, мають LTV > 0, sorted by LTV desc
-  // Це КРИТИЧНИЙ список для sales — кого реактивовувати першими
-  const dormant = allCounterparties
+  // SECTION 3: Dormant — не замовляли > 30 днів, мають LTV > 0, sorted by LTV desc — v2.74.2: pool
+  const dormant = pool
     .filter(c => !c.archived && (c.__revenue||0) > 0 && c.__lastOrder && c.__lastOrder.slice(0,10) < cutoff30Days)
     .sort((a,b) => (b.__revenue||0) - (a.__revenue||0))
     .slice(0, 10);
