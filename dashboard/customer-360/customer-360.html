@@ -336,7 +336,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.71 · МойСклад API · Оновлення: щодня 06:00
+  snEco Customer 360 v2.72.1 · hotfix renderCustomerView + Worker cap 100K · МойСклад API · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -739,6 +739,9 @@ window.selectCustomer = function(name){
 };
 
 function renderCustomerView(c){
+  // v2.72.1 HOTFIX: now був undefined у цій функції (визначався лише у bootCustomer360)
+  // що зламало YoY block (line 887) + seasonal action (line 1085) → ReferenceError
+  const now = new Date();
   // Match by ID first (canonical), fallback to name
   const matchCP = (item) =>
     (c.id && item.agent_id && item.agent_id === c.id) ||
