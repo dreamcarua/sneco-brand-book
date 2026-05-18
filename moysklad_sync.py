@@ -187,10 +187,33 @@ def safe(val, key="name"):
     return val or ""
 
 
+# v2.72.4 FIX: openpyxl IllegalCharacterError на ASCII control chars (0x00-0x1F крім \t,\n,\r).
+# Реальний кейс — Іvано-Франківськ counterparty з ^V (U+0016) у адресі → краш sync на
+# parse_counterparties → invoices/products/positions не записались. Sanitize ALL string
+# cells перед save_excel.
+import re as _re
+_ILLEGAL_XLSX_CHARS = _re.compile(r'[\x00-\x08\x0B\x0C\x0E-\x1F]')
+
+def _sanitize_xlsx(val):
+    if isinstance(val, str):
+        return _ILLEGAL_XLSX_CHARS.sub('', val)
+    return val
+
+
 def save_excel(df: pd.DataFrame, name: str, reliable: bool = True):
-    """Upsert: мержить нові дані з існуючим файлом по колонці 'id' (якщо є)."""
+    """Upsert: мержить нові дані з існуючим файлом по колонці 'id' (якщо є).
+    v2.72.4: автоматично sanitize control chars з усіх string cells перед write."""
     path = OUTPUT_DIR / f"{name}.xlsx"
     flag = "✅" if reliable else "⚠️ "
+
+    # v2.72.4: clean control chars у всіх object (string) columns
+    # Сompatible зі старим/новим pandas — iterates лише string columns, не чіпає numeric.
+    if not df.empty:
+        try:
+            for col in df.select_dtypes(include=['object']).columns:
+                df[col] = df[col].apply(_sanitize_xlsx)
+        except Exception as e:
+            print(f"  ⚠️  sanitize warning ({name}): {e}", flush=True)
 
     if path.exists() and "id" in df.columns:
         try:
@@ -246,12 +269,32 @@ def parse_demands(rows):
     return records
 
 
+def _fetch_positions_for_demand(demand_id):
+    """v2.72.4: окремий fetch positions per demand коли bulk expand повернув порожні rows.
+    MoySklad bulk fetch з expand=positions.assortment частково повертає positions лише як
+    meta-ref коли nested rows > ~100 у відповіді. Тоді треба окремий call."""
+    if not demand_id:
+        return []
+    url = f"{BASE_URL}/entity/demand/{demand_id}/positions"
+    try:
+        resp = requests.get(url, headers=HEADERS, params={"expand": "assortment", "limit": 1000})
+        if resp.status_code != 200:
+            return []
+        return resp.json().get("rows", []) or []
+    except Exception:
+        return []
+
+
 def parse_demand_positions(rows):
     """v2.70: окремий парсер для positions з ms_demands.
     Один рядок per (demand_id, position_idx). Дозволяє правильно ingest'ити у
-    окрему D1 таблицю ms_demand_positions і отримувати TOP-10 продуктів per клієнт."""
+    окрему D1 таблицю ms_demand_positions і отримувати TOP-10 продуктів per клієнт.
+
+    v2.72.4: fallback на окремий fetch коли bulk expand повернув порожні rows.
+    Робиться по batch, з progress logging кожні 500."""
     records = []
-    for r in rows:
+    fallback_count = 0
+    for i, r in enumerate(rows):
         demand_id = r.get("id")
         if not demand_id:
             continue
@@ -260,6 +303,14 @@ def parse_demand_positions(rows):
         moment = (r.get("moment", "") or "")[:10]
         positions = r.get("positions", {})
         pos_rows = positions.get("rows", []) if isinstance(positions, dict) else []
+
+        # v2.72.4: якщо bulk не повернув inline rows — fetch напряму per demand
+        if not pos_rows and isinstance(positions, dict) and positions.get("meta"):
+            pos_rows = _fetch_positions_for_demand(demand_id)
+            fallback_count += 1
+            if fallback_count % 500 == 0:
+                print(f"  📦 fallback positions fetch: {fallback_count} demands done", flush=True)
+
         for idx, p in enumerate(pos_rows):
             records.append({
                 "demand_id":   demand_id,
