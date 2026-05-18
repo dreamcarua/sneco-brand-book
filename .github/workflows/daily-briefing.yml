@@ -1,0 +1,32 @@
+name: Daily KAM Briefing
+
+on:
+  schedule:
+    # 06:00 UTC = 08:00/09:00 Kyiv (літо/зима). Запускається після ранкового MoySklad sync (03:00 UTC).
+    - cron: '0 6 * * *'
+  workflow_dispatch:           # Manual trigger from Actions tab
+
+jobs:
+  briefing:
+    name: Generate + email daily briefing
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: pip install requests
+
+      - name: Generate + send briefing
+        env:
+          WORKER_URL: ${{ secrets.WORKER_URL }}
+          ADMIN_JWT_TOKEN: ${{ secrets.ADMIN_JWT_TOKEN }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          BRIEFING_TO: ${{ secrets.BRIEFING_TO }}
+        run: python3 daily_briefing.py
