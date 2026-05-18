@@ -91,6 +91,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .insight.green{background:rgba(150,193,31,.08);color:#4a7000;border-left:3px solid var(--g)}
 .insight.yellow{background:rgba(254,191,39,.08);color:#996600;border-left:3px solid var(--y)}
 .insight.red{background:rgba(232,64,64,.06);color:#a00;border-left:3px solid var(--red)}
+.insight.blue{background:rgba(59,130,246,.07);color:#1d5fa6;border-left:3px solid var(--blue)}
 .insight-icon{font-size:18px;flex-shrink:0;margin-top:-2px}
 .insights-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:620px){.insights-grid{grid-template-columns:1fr}}
@@ -308,6 +309,8 @@ body.dash-locked{overflow:hidden}
   <div class="topbar-right">
     <span class="badge badge-green" id="syncStatus">✓ Перевіряємо sync...</span>
     <span class="badge badge-gray" id="lastUpdate">—</span>
+    <span class="badge badge-gray" id="lastBootBadge" title="Час з моменту останнього завантаження дашборду">🔄 —</span>
+    <button id="refreshBtn" class="badge badge-gray" style="cursor:pointer;font-family:inherit" title="Перезавантажити дані з D1">↻ Refresh</button>
   </div>
 </div>
 
@@ -333,7 +336,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.69 · МойСклад API · Оновлення: щодня 06:00
+  snEco Customer 360 v2.71 · МойСклад API · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -353,6 +356,10 @@ let allReturns = [];          // for return rate
 
 let _token = null;
 let _charts = {};
+let _lastBoot = null;          // v2.71: timestamp ms коли bootCustomer360 завершився
+let _lastSyncTime = null;      // v2.71: timestamp ms останнього успішного sync
+let allDemandPositions = [];   // v2.71: позиції з ms_demand_positions для product breakdown
+let _refreshTickerId = null;   // v2.71: setInterval для оновлення last-updated badge
 
 // Number formatters
 const nf  = n => Number(n||0).toLocaleString('uk-UA');
@@ -384,19 +391,21 @@ window.bootCustomer360 = async function(token){
   document.getElementById('quickPills').innerHTML = '<span style="color:var(--muted);font-size:11px;padding:5px 0">⏳ Завантажуємо дані з D1…</span>';
 
   try {
-    // Parallel fetch all data
-    const [cp, dem, pay, ord, inv, ret] = await Promise.all([
+    // Parallel fetch all data (v2.71: + demand_positions for product breakdown)
+    const [cp, dem, pay, ord, inv, ret, dpos] = await Promise.all([
       fetchJson('counterparties'),
       fetchJson('demands'),
       fetchJson('payments'),
       fetchJson('orders'),
       fetchJson('invoices_out'),
       fetchJson('returns'),
+      fetchJson('demand_positions').catch(e => { console.warn('demand_positions недоступні:', e.message); return []; }),
     ]);
     allCounterparties = cp || [];
     allDemands = dem || [];
     allPayments = pay || [];
     allOrders = ord || [];
+    allDemandPositions = dpos || [];
     allInvoices = inv || [];
     allReturns = ret || [];
 
@@ -490,7 +499,9 @@ window.bootCustomer360 = async function(token){
 
     renderQuickPills();
     setupSearch();
-    console.log(`Loaded: ${allCounterparties.length} merged customers (${allCounterparties.filter(c=>c.__virtual).length} virtual), ${allDemands.length} demands, ${allPayments.length} payments`);
+    _lastBoot = Date.now();    // v2.71: позначка часу для last-updated badge
+    startRefreshTicker();      // v2.71: запуск тікера що оновлює "🔄 Оновлено: …"
+    console.log(`Loaded: ${allCounterparties.length} merged customers (${allCounterparties.filter(c=>c.__virtual).length} virtual), ${allDemands.length} demands, ${allPayments.length} payments, ${allDemandPositions.length} demand positions`);
     console.log(`Period: prev month=${prevMonthYM}, last30 since ${cutoff30}`);
   } catch(e) {
     console.error('Boot error', e);
@@ -817,21 +828,54 @@ function renderCustomerView(c){
   });
   const allMonths = [...new Set([...Object.keys(shipByMonth), ...Object.keys(payByMonth)])].sort();
 
-  // === Product mix (from raw_json positions) ===
-  const productMap = {};
-  dems.forEach(d => {
-    let raw = {};
-    try { raw = typeof d.raw_json === 'string' ? JSON.parse(d.raw_json) : (d.raw_json||{}); } catch(e){}
-    const prod = raw['Товар'] || raw['product'] || null;
-    if (prod) {
-      productMap[prod] = (productMap[prod]||0) + (d.sum_kop||0)/100;
-    }
+  // === Product mix (v2.71: з ms_demand_positions, fallback на raw_json) ===
+  const productMap = {};   // name → {qty, sum}
+  // Primary: demand_positions filtered by agent
+  const demandIds = new Set(dems.map(d => d.id).filter(Boolean));
+  const positionsForCust = allDemandPositions.filter(p => {
+    if (p.demand_id && demandIds.has(p.demand_id)) return true;
+    if (p.agent_id && c.id && p.agent_id === c.id) return true;
+    if (p.agent && c.name && p.agent === c.name) return true;
+    return false;
   });
+  positionsForCust.forEach(p => {
+    const name = p.product_name || p.assortment_name || p.name || '— без назви —';
+    if (!productMap[name]) productMap[name] = { qty: 0, sum: 0 };
+    productMap[name].qty += Number(p.quantity || p.qty || 0);
+    productMap[name].sum += (p.sum_kop || 0) / 100;
+  });
+  // Fallback: якщо positions порожні — спробувати raw_json
+  if (Object.keys(productMap).length === 0) {
+    dems.forEach(d => {
+      let raw = {};
+      try { raw = typeof d.raw_json === 'string' ? JSON.parse(d.raw_json) : (d.raw_json||{}); } catch(e){}
+      const prod = raw['Товар'] || raw['product'] || null;
+      if (prod) {
+        if (!productMap[prod]) productMap[prod] = { qty: 0, sum: 0 };
+        productMap[prod].sum += (d.sum_kop||0)/100;
+      }
+    });
+  }
+  const productTotal = Object.values(productMap).reduce((a,x) => a + (x.sum||0), 0);
   const topProducts = Object.entries(productMap)
-    .sort((a,b) => b[1]-a[1])
+    .sort((a,b) => (b[1].sum||0) - (a[1].sum||0))
     .slice(0, 10);
+  const usingPositions = positionsForCust.length > 0;
 
-  // === Trends (v2.69) — для блоку "📈 Тренди клієнта" ===
+  // === Payment cadence (DSO per customer) — обчислюється раніше, бо потрібен у trends ===
+  let custDSO = null;
+  if (invs.length) {
+    const paidInvs = invs.filter(i => i.payed_sum_kop && i.payment_planned_moment);
+    if (paidInvs.length) {
+      const avg = paidInvs.reduce((a,i) => {
+        const planned = new Date(i.payment_planned_moment).getTime();
+        return a + Math.max(0, (Date.now() - planned)/86400000);
+      }, 0) / paidInvs.length;
+      custDSO = Math.round(avg);
+    }
+  }
+
+  // === Trends (v2.71) — глибокий аналіз для блоку "📈 Тренди клієнта" ===
   const monthsSorted = Object.keys(shipByMonth).sort();
   const sumMonths = (arr) => arr.reduce((a,m)=>a+(shipByMonth[m]||0), 0);
   const last3 = sumMonths(monthsSorted.slice(-3));
@@ -839,72 +883,221 @@ function renderCustomerView(c){
   const trend3m = prev3 > 0 ? Math.round((last3-prev3)/prev3*100) : null;
   const cashRatio = totalShipped > 0 ? cashCollected/totalShipped*100 : 0;
 
+  // YoY comparison
+  const curYear = String(now.getFullYear());
+  const prevYear = String(now.getFullYear() - 1);
+  const curYearRev = Object.entries(shipByMonth).filter(([m]) => m.startsWith(curYear)).reduce((a,[,v]) => a+v, 0);
+  const prevYearRev = Object.entries(shipByMonth).filter(([m]) => m.startsWith(prevYear)).reduce((a,[,v]) => a+v, 0);
+  const yoyPct = prevYearRev > 0 ? Math.round((curYearRev - prevYearRev)/prevYearRev*100) : null;
+
+  // Best / worst month — overall + worst у поточному році
+  let bestMonth = null, bestMonthVal = 0;
+  Object.entries(shipByMonth).forEach(([m,v]) => { if (v > bestMonthVal) { bestMonth = m; bestMonthVal = v; }});
+  let worstMonthCY = null, worstMonthCYVal = Infinity;
+  Object.entries(shipByMonth).filter(([m]) => m.startsWith(curYear)).forEach(([m,v]) => { if (v < worstMonthCYVal && v > 0) { worstMonthCY = m; worstMonthCYVal = v; }});
+
+  // AOV drift — 90d vs lifetime
+  const cutoff90 = new Date(Date.now() - 90*86400000).toISOString().slice(0,10);
+  const recentDems = dems.filter(d => (d.ms_moment||'').slice(0,10) >= cutoff90);
+  const recentSum = recentDems.reduce((a,d) => a + (d.sum_kop||0)/100, 0);
+  const aov90 = recentDems.length ? recentSum / recentDems.length : 0;
+  const aovLifetime = aov;
+  const aovDriftPct = aovLifetime > 0 ? Math.round((aov90 - aovLifetime)/aovLifetime*100) : null;
+
+  // Cadence drift — last 90d vs earlier
+  let recentCadence = null, prevCadence = null;
+  if (recentDems.length >= 2) {
+    const sorted = recentDems.map(d => new Date(d.ms_moment).getTime()).sort((a,b)=>a-b);
+    const gaps = [];
+    for (let i=1; i<sorted.length; i++) gaps.push((sorted[i]-sorted[i-1])/86400000);
+    recentCadence = Math.round(gaps.reduce((a,x)=>a+x,0)/gaps.length);
+  }
+  const olderDems = dems.filter(d => (d.ms_moment||'').slice(0,10) < cutoff90);
+  if (olderDems.length >= 2) {
+    const sorted = olderDems.map(d => new Date(d.ms_moment).getTime()).sort((a,b)=>a-b);
+    const gaps = [];
+    for (let i=1; i<sorted.length; i++) gaps.push((sorted[i]-sorted[i-1])/86400000);
+    prevCadence = Math.round(gaps.reduce((a,x)=>a+x,0)/gaps.length);
+  }
+
+  // First / last + lifetime months
+  const firstDate = dems.length ? dems[dems.length-1].ms_moment : null;
+  const lifetimeMonths = firstDate ? Math.max(1, Math.round((Date.now() - new Date(firstDate).getTime())/(30*86400000))) : null;
+
+  // ru-UA month name from YYYY-MM
+  const monthLabel = (ym) => {
+    if (!ym) return '—';
+    try { return new Date(ym + '-01').toLocaleDateString('uk-UA', {month:'long', year:'numeric'}); } catch(e) { return ym; }
+  };
+
   const sentences = [];
+
+  // 3M delta
   if (trend3m !== null && Math.abs(trend3m) >= 5) {
     sentences.push(`За останні 3 місяці виручка ${trend3m > 0 ? 'зросла' : 'зменшилась'} на ${Math.abs(trend3m)}% порівняно з попередніми 3 місяцями (${nfm(last3)} ₴ vs ${nfm(prev3)} ₴).`);
   } else if (trend3m !== null) {
     sentences.push(`За останні 3 місяці виручка стабільна (${nfm(last3)} ₴ vs ${nfm(prev3)} ₴, зміна ${trend3m}%).`);
   }
+  // YoY
+  if (yoyPct !== null) {
+    sentences.push(`<strong>YoY:</strong> ${yoyPct >= 0 ? '+' : ''}${yoyPct}% за ${curYear} рік порівняно з ${prevYear} (${nfm(curYearRev)} ₴ vs ${nfm(prevYearRev)} ₴).`);
+  }
+  // Best/worst
+  if (bestMonth) {
+    let msg = `<strong>Найкращий місяць за весь час:</strong> ${monthLabel(bestMonth)} — ${nfm(bestMonthVal)} ₴.`;
+    if (worstMonthCY && worstMonthCY !== bestMonth) {
+      msg += ` Найгірший у ${curYear}: ${monthLabel(worstMonthCY)} — ${nfm(worstMonthCYVal)} ₴.`;
+    }
+    sentences.push(msg);
+  }
+  // AOV drift
+  if (aov90 > 0 && aovDriftPct !== null) {
+    const trend = aovDriftPct > 5 ? 'зростає ↑' : aovDriftPct < -5 ? 'падає ↓' : 'стабільний';
+    sentences.push(`<strong>Середній чек:</strong> ${nf(Math.round(aov90))} ₴ (за останні 90 днів) vs ${nf(Math.round(aovLifetime))} ₴ (lifetime) — ${trend} (${aovDriftPct >= 0 ? '+' : ''}${aovDriftPct}%).`);
+  }
+  // Cadence drift
+  if (recentCadence && prevCadence) {
+    const dir = recentCadence < prevCadence ? 'частіше' : recentCadence > prevCadence ? 'рідше' : 'без змін';
+    sentences.push(`<strong>Темп замовлень:</strong> зараз кожні ${recentCadence} днів, раніше було ${prevCadence} — клієнт замовляє ${dir}.`);
+  } else if (avgCadenceDays) {
+    sentences.push(`Замовляє в середньому кожні ${avgCadenceDays} днів. ${daysSinceLast !== null && daysSinceLast > avgCadenceDays*1.5 ? 'Зараз пауза довша ніж зазвичай.' : 'Темп нормальний.'}`);
+  }
+  // DSO per customer
+  if (custDSO !== null) {
+    sentences.push(`<strong>DSO для цього клієнта:</strong> ~${custDSO} днів від рахунку до оплати.`);
+  }
+  // Cash discipline
   if (totalShipped > 0) {
     if (cashRatio < 90) sentences.push(`Сплачено лише ${cashRatio.toFixed(0)}% від відвантаженого — накопичується дебіторка (${nfm(totalShipped-cashCollected)} ₴ розриву).`);
     else sentences.push(`Сплачено ${cashRatio.toFixed(0)}% від відвантаженого — фінансова дисципліна добра.`);
   }
-  if (avgCadenceDays) sentences.push(`Замовляє в середньому кожні ${avgCadenceDays} днів. ${daysSinceLast !== null && daysSinceLast > avgCadenceDays*1.5 ? 'Зараз пауза довша ніж зазвичай.' : 'Темп нормальний.'}`);
+  // Concentration
+  if (sharePct > 0) {
+    sentences.push(`<strong>Частка у портфелі snEco:</strong> ${sharePct.toFixed(2)}% від всієї виручки.`);
+  }
+  // First/last + lifetime
+  if (firstDate && lifetimeMonths) {
+    sentences.push(`<strong>Перше замовлення:</strong> ${df(firstDate)}. Lifetime тривалість: ${lifetimeMonths} ${lifetimeMonths === 1 ? 'місяць' : lifetimeMonths < 5 ? 'місяці' : 'місяців'}.`);
+  }
+  // Overdue
   if (overdueDemands.length > 0) sentences.push(`Має ${overdueDemands.length} прострочених рахунків загалом на ${nf(Math.round(overdueAR))} ₴.`);
+  // Return rate warning
+  if (returnRate > 5) sentences.push(`<strong style="color:#a00">⚠ Підвищений рівень повернень:</strong> ${returnRate.toFixed(1)}% (норма < 5%). Варто розібратися з причинами.`);
+  // Top-25 rank
   if (rank > 0 && rank <= 25) sentences.push(`Входить у ТОП-25 клієнтів за виручкою (${rank} місце з ${totalClients}).`);
 
-  // === Actions (v2.69) — "🎯 Рекомендовані дії" ===
+  // === Actions (v2.71) — "🎯 Рекомендовані дії" — розширений набір ===
   const actions = [];
+
+  // 1. URGENT — overdue AR call
   if (overdueAR > 0) {
     actions.push({
-      icon: '📞', priority: 'red',
-      title: `Зателефонувати по простроченій дебіторці ${nf(Math.round(overdueAR))} ₴`,
-      expected: 'Очікуваний impact: повернення оборотного капіталу + покращення cash flow'
+      icon: '🔴', priority: 'red',
+      title: `Терміновий дзвінок по простроченому боргу ${nf(Math.round(overdueAR))} ₴`,
+      expected: `${overdueDemands.length} рахунків поза терміном · Очікуваний impact: повернення оборотного капіталу, покращення cash flow`
     });
   }
+
+  // 2. Dormant reactivation
   if (daysSinceLast !== null && avgCadenceDays && daysSinceLast > avgCadenceDays * 1.5) {
     actions.push({
       icon: '✉', priority: 'yellow',
-      title: 'Реактивація — клієнт давно не замовляв',
-      expected: `Очікуваний impact: ~${nfm(aov)} ₴ нове замовлення`
+      title: `Реактивація — клієнт мовчить ${daysSinceLast} днів (норма ${avgCadenceDays})`,
+      expected: `Очікуваний impact: ~${nfm(aov)} ₴ нове замовлення. Підготувати персональну пропозицію + знижку.`
     });
   }
+
+  // 3. TOP-10 з негативним трендом — personal touch
   if (rank > 0 && rank <= 10 && trend3m !== null && trend3m < 0) {
     actions.push({
-      icon: '🤝', priority: 'yellow',
-      title: 'TOP-10 клієнт втрачає темп — особиста зустріч/дзвінок',
-      expected: `Очікуваний impact: утримання ~${nfm(last3/3)} ₴/міс revenue`
+      icon: '🤝', priority: 'red',
+      title: 'TOP-10 клієнт втрачає темп — особиста зустріч / дзвінок CEO',
+      expected: `Тренд 3 міс: ${trend3m}%. Утримання ~${nfm(last3/3)} ₴/міс revenue. Найвищий пріоритет.`
     });
   }
+
+  // 4. High return rate investigation
   if (returnRate > 5) {
     actions.push({
       icon: '🔍', priority: 'yellow',
-      title: `Розібратися з причинами повернень (${returnRate.toFixed(1)}%)`,
-      expected: 'Зменшення return rate → +margin'
+      title: `Розібратися з причинами повернень (${returnRate.toFixed(1)}% > 5% норми)`,
+      expected: `Загалом ${nf(Math.round(totalReturns))} ₴ повернень. Перевірити логістику, якість партій, відповідність замовленню.`
     });
   }
+
+  // 5. Quarterly report
   if (c.email) {
     actions.push({
       icon: '📊', priority: 'green',
       title: 'Надіслати квартальний звіт + спецпропозицію',
-      expected: rank > 0 ? `Upsell opportunity для TOP-${rank} клієнта` : 'Upsell opportunity'
+      expected: rank > 0 && rank <= 25
+        ? `Upsell opportunity для ТОП-${rank} клієнта. Email: ${c.email}`
+        : `Підтримка регулярного контакту. Email: ${c.email}`
     });
   }
-  if (actions.length === 0) actions.push({ icon:'✅', priority:'green', title:'Клієнт у нормі — все ОК', expected:'Тримати поточний рівень обслуговування' });
 
-  // === Payment cadence (DSO per customer) ===
-  let custDSO = null;
-  if (invs.length) {
-    const paidInvs = invs.filter(i => i.payed_sum_kop && i.payment_planned_moment);
-    if (paidInvs.length) {
-      const avg = paidInvs.reduce((a,i) => {
-        const planned = new Date(i.payment_planned_moment).getTime();
-        // approximate payment date from raw or just use ms_moment of invoice + payment_planned
-        return a + Math.max(0, (Date.now() - planned)/86400000);
-      }, 0) / paidInvs.length;
-      custDSO = Math.round(avg);
-    }
+  // 6. Renewal discount — активний > 12 міс і trend stable
+  if (lifetimeMonths && lifetimeMonths >= 12 && trend3m !== null && Math.abs(trend3m) < 10) {
+    actions.push({
+      icon: '🎁', priority: 'green',
+      title: `Renewal discount — клієнт лояльний ${lifetimeMonths} місяців`,
+      expected: 'Тренд стабільний. Запропонувати річний контракт або bulk discount для locked-in revenue.'
+    });
   }
+
+  // 7. Upsell — peer comparison
+  if (aovLifetime > 0 && avgRev > 0 && aovLifetime < avgRev * 0.7) {
+    actions.push({
+      icon: '📈', priority: 'yellow',
+      title: 'Upsell — середній чек нижчий за peer average',
+      expected: `Цей клієнт: ${nfm(aovLifetime)} ₴/замовлення vs середній по портфелю: ${nfm(avgRev)} ₴/клієнт LTV. Розглянути bundle або преміум SKU.`
+    });
+  }
+
+  // 8. Cross-sell — категорійна диверсифікація (placeholder поки немає category мапінгу)
+  if (dems.length >= 5) {
+    actions.push({
+      icon: '🎯', priority: 'green',
+      title: 'Cross-sell — перевірити покриття категорій snEco',
+      expected: 'Клієнт активний — варто перевірити чи купляє з усіх 4-5 категорій (Cheese / Mix / Kids / Fitness / Premium). Categories mapping в roadmap.'
+    });
+  }
+
+  // 9. Регулярний check-in (для TOP-25 без контакту > 60 днів)
+  if (rank > 0 && rank <= 25 && daysSinceLast !== null && daysSinceLast > 60) {
+    actions.push({
+      icon: '🗓', priority: 'yellow',
+      title: 'Регулярний check-in — TOP клієнт без контакту > 60 днів',
+      expected: `Заплановий дзвінок / зустріч для підтримки відносин. Перевірити NPS, плани, болі.`
+    });
+  }
+
+  // 10. Account manager assignment (для great VIP-клієнтів)
+  if (totalShipped > avgRev * 5 && !((c.tags||'').toLowerCase().includes('manager') || (c.tags||'').toLowerCase().includes('am'))) {
+    actions.push({
+      icon: '🛡', priority: 'blue',
+      title: 'Призначити персонального account-менеджера',
+      expected: `Revenue ${(totalShipped/avgRev).toFixed(1)}× від середнього. VIP-рівень. Виділений AM зменшить churn risk + збільшить wallet share.`
+    });
+  }
+
+  // 11. Сезонна пропозиція (always)
+  const monthNow = now.getMonth();   // 0-11
+  const seasons = [
+    { months:[11,0,1], label:'Новий рік + зимові свята', tip:'Подарункові набори, Master Collection, "ALL IN" mix' },
+    { months:[2,3], label:'Великдень + весна', tip:'Сезонні мікси, дитяча лінійка Kids "Cosmic"' },
+    { months:[4,5], label:'Травневі свята + пікніки', tip:'HoReCa snack-pack, Smoked Suluguni, Smoked Emmental' },
+    { months:[6,7,8], label:'Літо + туризм', tip:'Fitness/Superfood low-fat для активного відпочинку, Beach picnics' },
+    { months:[9,10], label:'Back-to-school + осінь', tip:'Дитячі набори, family packs' }
+  ];
+  const currentSeason = seasons.find(s => s.months.includes(monthNow)) || { label:'Поточний сезон', tip:'Перевірити сезонний асортимент' };
+  actions.push({
+    icon: '🎄', priority: 'green',
+    title: `Сезонна пропозиція — ${currentSeason.label}`,
+    expected: currentSeason.tip + '. Підготувати email blast з timed offer.'
+  });
+
+  if (actions.length === 0) actions.push({ icon:'✅', priority:'green', title:'Клієнт у нормі — все ОК', expected:'Тримати поточний рівень обслуговування' });
 
   // === Build HTML ===
   const tags = (c.tags||'').split(',').map(t=>t.trim()).filter(Boolean);
@@ -1045,16 +1238,25 @@ function renderCustomerView(c){
         <div class="cc-head">
           <div>
             <div class="cc-title">🛒 ТОП-10 продуктів</div>
-            <div class="cc-sub">За загальною виручкою</div>
+            <div class="cc-sub">${usingPositions ? `ms_demand_positions · ${positionsForCust.length} позицій` : 'fallback з raw_json'}</div>
           </div>
         </div>
         <div style="overflow-x:auto">
           <table class="dt">
-            <thead><tr><th style="width:30px">#</th><th>Продукт</th><th style="text-align:right">Виручка</th></tr></thead>
+            <thead><tr><th style="width:28px">#</th><th>Продукт</th><th style="text-align:right">Кількість</th><th style="text-align:right">Виручка</th><th style="text-align:right">% клієнта</th></tr></thead>
             <tbody>
               ${topProducts.length
-                ? topProducts.map(([p,r],i) => `<tr><td class="rank">${i+1}</td><td style="font-size:12px">${escapeHtml(p)}</td><td style="text-align:right;font-weight:600">${nfm(r)} ₴</td></tr>`).join('')
-                : `<tr><td colspan="3"><div class="empty-state"><div class="es-icon">🛒</div><div class="es-title">Немає деталізації</div><div class="es-sub">Демонстрації не мали position rows</div></div></td></tr>`
+                ? topProducts.map(([p,obj],i) => {
+                    const sharePct = productTotal > 0 ? (obj.sum/productTotal*100).toFixed(1) : '0';
+                    return `<tr>
+                      <td class="rank">${i+1}</td>
+                      <td style="font-size:12px">${escapeHtml(p)}</td>
+                      <td style="text-align:right;color:#555">${obj.qty ? nf(Math.round(obj.qty)) : '—'}</td>
+                      <td style="text-align:right;font-weight:600">${nfm(obj.sum)} ₴</td>
+                      <td style="text-align:right;color:var(--muted);font-size:11px">${sharePct}%</td>
+                    </tr>`;
+                  }).join('')
+                : `<tr><td colspan="5"><div class="empty-state"><div class="es-icon">🛒</div><div class="es-title">Чекає на синхронізацію demand_positions</div><div class="es-sub">Запустіть Run у GitHub Actions або перевірте чи ingest наповнює таблицю</div></div></td></tr>`
               }
             </tbody>
           </table>
@@ -1175,85 +1377,120 @@ function renderCustomerView(c){
 }
 
 function renderNotes(c){
-  // v2.69: повна картка контрагента з raw_json
+  // v2.71: повна картка контрагента — structured columns (v2.67 enrichment) + fallback на raw_json
   let raw = {};
   try { raw = typeof c.raw_json === 'string' ? JSON.parse(c.raw_json) : (c.raw_json||{}); } catch(e) {}
 
-  const notes = raw['Коментар'] || raw['description'] || c.description || '';
-  const attrs = raw['attributes'] || [];
-  const balance = raw['Баланс, грн'] || raw['balance'] || null;
-  const overdue = raw['Борг прострочений'] || raw['overdueDebt'] || null;
-  const status = raw['Статус'] || raw['state'] || null;
-  const legalTitle = raw['Повна назва'] || raw['legalTitle'] || c.legal_title || '';
-  const legalAddr = raw['Юр.адреса'] || raw['legalAddress'] || c.legal_address || '';
-  const legalAddrComment = raw['Юр.адреса коментар'] || raw['legalAddressFull'] || '';
-  const actualAddr = raw['Факт.адреса'] || raw['actualAddress'] || c.actual_address || '';
-  const companyType = raw['Тип'] || raw['companyType'] || c.company_type || '';
-  const tags = raw['Теги'] || raw['tags'] || c.tags || '';
-  const tagsArr = (Array.isArray(tags) ? tags : String(tags||'').split(',')).map(t => String(t).trim()).filter(Boolean);
+  // Universal getter: structured col → raw_json UA key → raw_json EN key
+  const pick = (cols, rawKeys) => {
+    for (const k of (Array.isArray(cols) ? cols : [cols])) {
+      if (c[k] !== undefined && c[k] !== null && c[k] !== '') return c[k];
+    }
+    for (const k of (Array.isArray(rawKeys) ? rawKeys : [rawKeys])) {
+      if (raw[k] !== undefined && raw[k] !== null && raw[k] !== '') return raw[k];
+    }
+    return '';
+  };
 
-  const hasAnything = notes || attrs.length || balance !== null || status || legalTitle || legalAddr || actualAddr || companyType || tagsArr.length;
+  const fullName = pick('full_name', ['Повна назва', 'legalTitle']);
+  const legalAddr = pick('legal_address', ['Юр.адреса', 'legalAddress']);
+  const legalAddrComment = pick('legal_address_comment', ['Юр.адреса коментар', 'legalAddressFull']);
+  const actualAddr = pick('actual_address', ['Факт.адреса', 'actualAddress']);
+  const fax = pick('fax', ['Факс', 'fax']);
+  const stateLbl = pick('state', ['Статус', 'state']);
+  const description = pick('description', ['Коментар', 'description']);
+  const companyType = pick('company_type', ['Тип', 'companyType']);
+  const tagsRaw = pick('tags', ['Теги', 'tags']);
+
+  // Balance: structured (kop) → raw_json
+  let balance = null, overdueAmount = null;
+  if (c.balance_kop !== undefined && c.balance_kop !== null) balance = c.balance_kop / 100;
+  else { const b = raw['Баланс, грн'] || raw['balance']; if (b !== undefined && b !== null && b !== '') balance = parseFloat(b) || 0; }
+  if (c.overdue_debt_kop !== undefined && c.overdue_debt_kop !== null) overdueAmount = c.overdue_debt_kop / 100;
+  else { const o = raw['Борг прострочений'] || raw['overdueDebt']; if (o !== undefined && o !== null && o !== '') overdueAmount = parseFloat(o) || 0; }
+
+  const attrs = Array.isArray(raw['attributes']) ? raw['attributes'] : [];
+  const tagsArr = (Array.isArray(tagsRaw) ? tagsRaw : String(tagsRaw||'').split(',')).map(t => String(t).trim()).filter(Boolean);
+
+  const hasAnything = description || attrs.length || balance !== null || overdueAmount !== null || stateLbl || fullName || legalAddr || actualAddr || companyType || tagsArr.length || fax || c.inn || c.edrpou || c.email || c.phone;
   if (!hasAnything) return '';
 
+  // Requisites card
   const reqRows = [
-    legalTitle ? ['Повна назва', escapeHtml(String(legalTitle))] : null,
+    fullName ? ['Повна назва', escapeHtml(String(fullName))] : null,
     companyType ? ['Тип', escapeHtml(String(companyType))] : null,
     c.inn ? ['ІНН', escapeHtml(String(c.inn))] : null,
     c.edrpou ? ['ЄДРПОУ', escapeHtml(String(c.edrpou))] : null,
     c.code ? ['Код', escapeHtml(String(c.code))] : null,
     c.email ? ['Email', `<a href="mailto:${escapeAttr(c.email)}" style="color:var(--blue)">${escapeHtml(c.email)}</a>`] : null,
     c.phone ? ['Телефон', `<a href="tel:${escapeAttr(c.phone)}" style="color:var(--blue)">${escapeHtml(c.phone)}</a>`] : null,
+    fax ? ['Факс', escapeHtml(String(fax))] : null,
     tagsArr.length ? ['Теги', tagsArr.map(t => `<span class="cust-tag" style="background:rgba(254,191,39,.15);color:#996600;padding:1px 8px;border-radius:8px;font-size:11px;font-weight:600;display:inline-block;margin:1px 2px">${escapeHtml(t)}</span>`).join(' ')] : null,
   ].filter(Boolean);
 
+  // Finance card
   const finRows = [
-    balance !== null ? ['Баланс МойСклад', `<span style="font-weight:600">${nf(Math.round(parseFloat(balance)||0))} ₴</span>`] : null,
-    overdue !== null && overdue > 0 ? ['Прострочений борг', `<span style="color:var(--red);font-weight:600">${nf(Math.round(parseFloat(overdue)||0))} ₴</span>`] : null,
-    status ? ['Статус', escapeHtml(String(status))] : null,
+    balance !== null ? ['Баланс МойСклад', `<span style="font-weight:600;color:${balance < 0 ? 'var(--red)' : balance > 0 ? '#4a7000' : 'var(--d)'}">${nf(Math.round(balance))} ₴</span>`] : null,
+    overdueAmount !== null && overdueAmount > 0 ? ['Прострочений борг', `<span style="color:var(--red);font-weight:700">${nf(Math.round(overdueAmount))} ₴</span>`] : null,
+    stateLbl ? ['Статус', `<span style="font-weight:600">${escapeHtml(String(stateLbl))}</span>`] : null,
   ].filter(Boolean);
 
-  const addrRows = [
-    legalAddr ? ['Юр.адреса', escapeHtml(String(legalAddr))] : null,
-    legalAddrComment ? ['Юр.адреса (коментар)', escapeHtml(String(legalAddrComment))] : null,
-    actualAddr ? ['Факт.адреса', escapeHtml(String(actualAddr))] : null,
-  ].filter(Boolean);
+  // Address rows — full-width
+  const addrRows = [];
+  if (legalAddr) {
+    addrRows.push(['🏛 Юридична адреса', escapeHtml(String(legalAddr)) + (legalAddrComment ? `<div style="font-size:11px;color:var(--muted);margin-top:3px">📝 ${escapeHtml(String(legalAddrComment))}</div>` : '')]);
+  }
+  if (actualAddr && actualAddr !== legalAddr) {
+    addrRows.push(['📍 Фактична адреса', escapeHtml(String(actualAddr))]);
+  }
 
   return `
-    <div class="sec">📝 Деталі картки контрагента (МойСклад)</div>
+    <div class="sec">📝 Картка контрагента (МойСклад)</div>
     <div class="g2">
-      <div class="notes-block" style="${notes ? '' : 'display:none'}">
-        <div class="nb-title">📌 Коментар з картки</div>
-        <pre>${escapeHtml(String(notes||''))}</pre>
+      <!-- Left: коментар (description) — full height -->
+      <div class="cc" style="background:#FFFBE6;border-color:#F5E5A5">
+        <div class="cc-title" style="margin-bottom:10px;color:#7a5a00">📌 Коментар з картки МойСклад</div>
+        ${description
+          ? `<pre style="font-family:inherit;white-space:pre-wrap;word-wrap:break-word;margin:0;font-size:13px;line-height:1.6;color:#5c4400">${escapeHtml(String(description))}</pre>`
+          : `<div style="color:var(--muted);font-size:13px;font-style:italic">— коментар не заповнено в МойСклад —</div>`}
       </div>
+      <!-- Right column: Реквізити + Фінанси stacked -->
       <div style="display:flex;flex-direction:column;gap:14px">
         ${reqRows.length ? `
           <div class="cc">
             <div class="cc-title" style="margin-bottom:8px">📋 Реквізити</div>
             <table class="dt">
-              ${reqRows.map(([k,v]) => `<tr><td style="color:var(--muted)">${k}</td><td style="text-align:right">${v}</td></tr>`).join('')}
+              ${reqRows.map(([k,v]) => `<tr><td style="color:var(--muted);white-space:nowrap">${k}</td><td style="text-align:right">${v}</td></tr>`).join('')}
             </table>
           </div>` : ''}
         ${finRows.length ? `
           <div class="cc">
-            <div class="cc-title" style="margin-bottom:8px">📊 Фінансові показники</div>
+            <div class="cc-title" style="margin-bottom:8px">📊 Фінансові показники МойСклад</div>
             <table class="dt">
-              ${finRows.map(([k,v]) => `<tr><td style="color:var(--muted)">${k}</td><td style="text-align:right">${v}</td></tr>`).join('')}
-            </table>
-          </div>` : ''}
-        ${addrRows.length ? `
-          <div class="cc">
-            <div class="cc-title" style="margin-bottom:8px">🏢 Адреси</div>
-            <table class="dt">
-              ${addrRows.map(([k,v]) => `<tr><td style="color:var(--muted);white-space:nowrap;vertical-align:top">${k}</td><td>${v}</td></tr>`).join('')}
+              ${finRows.map(([k,v]) => `<tr><td style="color:var(--muted);white-space:nowrap">${k}</td><td style="text-align:right">${v}</td></tr>`).join('')}
             </table>
           </div>` : ''}
       </div>
     </div>
-    ${attrs.length ? `
-      <div style="margin-top:14px" class="cc">
-        <div class="cc-title" style="margin-bottom:8px">Додаткові атрибути</div>
+    ${addrRows.length ? `
+      <div class="cc" style="margin-top:14px">
+        <div class="cc-title" style="margin-bottom:10px">🏢 Адреси</div>
         <table class="dt">
-          ${attrs.map(a => `<tr><td>${escapeHtml(a.name||'')}</td><td>${escapeHtml(typeof a.value === 'object' ? (a.value.name||JSON.stringify(a.value)) : String(a.value||''))}</td></tr>`).join('')}
+          ${addrRows.map(([k,v]) => `<tr><td style="color:var(--muted);white-space:nowrap;vertical-align:top;width:180px">${k}</td><td>${v}</td></tr>`).join('')}
+        </table>
+      </div>` : ''}
+    ${attrs.length ? `
+      <div class="cc" style="margin-top:14px">
+        <div class="cc-title" style="margin-bottom:10px">🔧 Додаткові атрибути <span style="font-size:11px;color:var(--muted);font-weight:400">· ${attrs.length} полів</span></div>
+        <table class="dt">
+          <thead><tr><th style="width:40%">Атрибут</th><th>Значення</th></tr></thead>
+          <tbody>
+          ${attrs.map(a => {
+            let val = a.value;
+            if (val && typeof val === 'object') val = val.name || val.title || JSON.stringify(val);
+            return `<tr><td style="font-weight:600">${escapeHtml(a.name||'')}</td><td>${escapeHtml(String(val||''))}</td></tr>`;
+          }).join('')}
+          </tbody>
         </table>
       </div>` : ''}
   `;
@@ -1294,6 +1531,7 @@ async function updateSyncBadge(){
     const ok = items.find(x => x.status === 'success');
     if (!ok) { statusEl.textContent = '⚠ Sync не успішний'; return; }
     const d = new Date(ok.finished_at * 1000);
+    _lastSyncTime = d.getTime();  // v2.71: зберегти для перевірки "застарів"
     const fmt = d.toLocaleString('uk-UA', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
     const ageH = Math.round((Date.now() - d.getTime()) / 36e5);
     statusEl.textContent = `✓ Sync: ${fmt}`;
@@ -1302,6 +1540,49 @@ async function updateSyncBadge(){
     statusEl.textContent = '⚠ Sync info недоступне';
   }
 }
+
+// === v2.71: Auto-refresh ticker + Refresh button ===
+function formatAge(ms) {
+  if (ms < 60000) return Math.max(1, Math.round(ms/1000)) + 's';
+  if (ms < 3600000) return Math.round(ms/60000) + ' хв';
+  if (ms < 86400000) return Math.round(ms/3600000) + ' год';
+  return Math.round(ms/86400000) + ' дн';
+}
+function startRefreshTicker(){
+  if (_refreshTickerId) clearInterval(_refreshTickerId);
+  const tick = () => {
+    const el = document.getElementById('lastBootBadge');
+    if (!el || !_lastBoot) return;
+    const ageMs = Date.now() - _lastBoot;
+    let txt = '🔄 Оновлено: ' + formatAge(ageMs) + ' тому';
+    if (_lastSyncTime && (Date.now() - _lastSyncTime) > 3600000) {
+      txt += ' · ⚠ Sync застарів';
+      el.style.background = 'rgba(254,191,39,.18)';
+      el.style.color = '#FEBF27';
+    }
+    el.textContent = txt;
+  };
+  tick();
+  _refreshTickerId = setInterval(tick, 15000);
+}
+// Refresh button wiring (once)
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('refreshBtn');
+  if (btn) btn.addEventListener('click', async () => {
+    if (!_token) return;
+    btn.textContent = '⏳ ...';
+    btn.disabled = true;
+    try {
+      await updateSyncBadge();
+      await window.bootCustomer360(_token);
+      btn.textContent = '✓ Готово';
+      setTimeout(() => { btn.textContent = '↻ Refresh'; btn.disabled = false; }, 1200);
+    } catch(e) {
+      btn.textContent = '✕ Помилка';
+      setTimeout(() => { btn.textContent = '↻ Refresh'; btn.disabled = false; }, 2000);
+    }
+  });
+});
 </script>
 
 </body>
