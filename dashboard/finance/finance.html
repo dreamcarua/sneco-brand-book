@@ -391,7 +391,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Finance Dashboard v3.0 · period filter + granularity + TOP suppliers · MoySklad → D1 → Worker · Cron щодня 06:00
+  snEco Finance Dashboard v3.0.1 · period filter + granularity + TOP suppliers + AR rounding fix · MoySklad → D1 → Worker · Cron щодня 06:00
 </div>
 
 <script>
@@ -739,7 +739,10 @@ function renderDashboard(){
   const netDelta    = netPrev !== 0 ? ((netCashFlow - netPrev)/Math.abs(netPrev)*100) : null;
 
   // Row 2 — поточний стан AR (з invoices)
-  const openInvoices = allInvoices.filter(i => ((i.sum_kop||0) - (i.payed_sum_kop||0)) > 0);
+  // v2.72.3 ROUNDING FIX: фільтрувати на цілих ₴ (Math.round) — MoySklad payedSum
+  // іноді з offset 1-99 копійок, display округлює до "0 ₴" але kop > 0.
+  const invDebtUah = i => Math.round(((i.sum_kop||0) - (i.payed_sum_kop||0)) / 100);
+  const openInvoices = allInvoices.filter(i => invDebtUah(i) > 0);
 
   const freshAR = openInvoices.filter(i => {
     const planned = (i.payment_planned_moment||'').slice(0,10);

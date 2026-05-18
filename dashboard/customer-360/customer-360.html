@@ -336,7 +336,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.72.1 · hotfix renderCustomerView + Worker cap 100K · МойСклад API · Оновлення: щодня 06:00
+  snEco Customer 360 v2.72.3 · AR rounding fix (0₴ як не overdue) · МойСклад API · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -774,7 +774,12 @@ function renderCustomerView(c){
   // v2.69: AR split — окремо нормальна vs протермінована
   const CREDIT_DAYS = 30;
   const dueCutoff = new Date(Date.now() - CREDIT_DAYS*86400000).toISOString().slice(0,10);
-  const openDemands = dems.filter(d => ((d.sum_kop||0) - (d.payed_sum_kop||0)) > 0);
+  // v2.72.3 ROUNDING FIX: MoySklad іноді повертає payedSum з мінімальним offset
+  // (напр. sum=4369023, paid=4369000 → balance=23 копійки → display округлює до "0 ₴",
+  // але фільтр > 0 kop пропускав ці рядки у "Прострочену дебіторку").
+  // Тепер фільтруємо на цілих гривнях (як на дисплеї).
+  const debtUah = d => Math.round(((d.sum_kop||0) - (d.payed_sum_kop||0)) / 100);
+  const openDemands = dems.filter(d => debtUah(d) > 0);
   const overdueDemands = openDemands.filter(d => (d.ms_moment||'').slice(0,10) <= dueCutoff);
   const freshDemands = openDemands.filter(d => (d.ms_moment||'').slice(0,10) > dueCutoff);
   const overdueAR = overdueDemands.reduce((a,d) => a + ((d.sum_kop||0)-(d.payed_sum_kop||0))/100, 0);
