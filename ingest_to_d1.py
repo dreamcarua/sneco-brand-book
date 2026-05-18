@@ -91,6 +91,12 @@ ENTITY_MAP = {
             "Контрагент ID": "agent_id",
             "Організація": "organization",
             "Сума, грн": "sum_kop",
+            "Стаття витрат": "expense_item",        # v2.72 — категорія витрат для cash-flow
+            "Стаття витрат ID": "expense_item_id",  # v2.72
+            "Призначення": "payment_purpose",       # v2.72
+            "Рахунок": "account",
+            "Проект": "project",
+            "Стан": "state",
             # EN aliases ─────────
             "id": "id",
             "moment": "ms_moment",
@@ -101,6 +107,7 @@ ENTITY_MAP = {
             "agent_name": "agent", "agent": "agent",
             "account_name": "account", "account": "account",
             "expenseItem_name": "expense_item", "expenseItem": "expense_item",
+            "paymentPurpose": "payment_purpose", "payment_purpose": "payment_purpose",
         },
     },
     "orders": {
