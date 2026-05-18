@@ -43,7 +43,8 @@ BATCH_SIZE = 50   # Зменшили з 400 → 50 (v2.63) щоб уникнут
 KOP_COLS = {
     "sum_kop", "payed_sum_kop", "shipped_sum_kop",
     "sale_price_kop", "buy_price_kop", "min_price_kop",
-    "balance_kop", "overdue_debt_kop",  # NEW v2.67
+    "balance_kop", "overdue_debt_kop",  # v2.67
+    "price_kop",                         # v2.70: для ms_demand_positions
 }
 
 # Map xlsx file → entity slug + column rename map (xlsx header → D1 column).
@@ -278,6 +279,26 @@ ENTITY_MAP = {
             "archived": "archived",
         },
     },
+    # v2.70: окрема таблиця позицій з відвантажень — для ТОП-10 продуктів у Customer 360.
+    # ВАЖЛИВО: тут НЕМАЄ поля 'id' — primary key composite (demand_id, position_idx).
+    # df_to_rows() використовує d.get('id'); для positions ми ставимо id == demand_id + ':' + idx.
+    "demand_positions": {
+        "file": "demand_positions.xlsx",
+        "cols": {
+            # UA (real) ─────────
+            "demand_id":       "demand_id",
+            "position_idx":    "position_idx",
+            "Товар":           "product_name",
+            "Товар ID":        "product_id",
+            "Кількість":       "quantity",
+            "Ціна, грн":       "price_kop",       # KOP × 100
+            "Сума, грн":       "sum_kop",         # KOP × 100
+            "Знижка %":        "discount_pct",
+            "Контрагент ID":   "agent_id",
+            "Контрагент":      "agent",
+            "Дата":            "ms_moment",
+        },
+    },
 }
 
 
@@ -314,7 +335,12 @@ def df_to_rows(df: pd.DataFrame, col_map: dict) -> list:
                     else:
                         d[target] = v
         d["raw_json"] = json.dumps(raw, ensure_ascii=False, default=str)
-        if not d.get("id"): continue
+        # v2.70: для composite-key таблиць (ms_demand_positions) primary key —
+        # (demand_id, position_idx). Пропускаємо рядок тільки якщо нема ЖОДНОГО
+        # з identifying полів.
+        has_id = bool(d.get("id"))
+        has_composite = bool(d.get("demand_id") is not None and d.get("position_idx") is not None)
+        if not has_id and not has_composite: continue
         out.append(d)
     return out
 
