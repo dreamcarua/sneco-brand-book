@@ -568,7 +568,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.75.0 · Overview + Filter chips + Heatmap drill-down + CRM-log D1 backend (team sync) + MoySklad write-back · Оновлення: щодня 06:00
+  snEco Customer 360 v2.75.2 · Overview + Filter chips + Heatmap drill-down + CRM-log D1 backend + MoySklad write-back + normalize legal_address_comment dict-repr · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -742,7 +742,29 @@ window.deleteCrmEntry = async function(custKey, noteId){
 // Reality check (Епіцентр приклад): contact text часто має формат:
 //   "Алексей - 380952723013\no.kapusta@epicentrk.ua\nЕлена - 063 529 90 57 (заказы)"
 // Парсимо лінії з phone/email + heuristic role detection.
+// v2.75.2: normalize legal_address_comment — МойСклад attribute іноді приходить
+// як Python dict-repr "{'comment': '...'}" замість plain text. Витягуємо comment field.
+function normalizeAddrComment(val){
+  if (!val) return '';
+  const s = String(val).trim();
+  if (!s.startsWith('{') && !s.startsWith('[')) return s;
+  // Витягнути значення поля 'comment' з Python dict (single quotes + \n escapes)
+  const m = s.match(/['"]comment['"]\s*:\s*['"]([\s\S]*?)['"]\s*[,}]/);
+  if (m) {
+    return m[1]
+      .replace(/\\n/g, '\n')
+      .replace(/\\'/g, "'")
+      .replace(/\\"/g, '"')
+      .replace(/\\\\/g, '\\');
+  }
+  // Або інше поле з значенням
+  const m2 = s.match(/['"](?:value|text|description)['"]\s*:\s*['"]([\s\S]*?)['"]\s*[,}]/);
+  if (m2) return m2[1].replace(/\\n/g, '\n');
+  return s;  // як є — краще ніж нічого
+}
+
 function parseDecisionMakers(commentText){
+  commentText = normalizeAddrComment(commentText);
   if (!commentText) return [];
   const lines = String(commentText).split('\n').map(l => l.trim()).filter(Boolean);
   const phoneRe = /(\+?\d[\d\s\-\(\)]{8,15}\d)/;
@@ -2886,7 +2908,7 @@ function renderNotes(c){
 
   const fullName = pick('full_name', ['Повна назва', 'legalTitle']);
   const legalAddr = pick('legal_address', ['Юр.адреса', 'legalAddress']);
-  const legalAddrComment = pick('legal_address_comment', ['Юр.адреса коментар', 'legalAddressFull']);
+  const legalAddrComment = normalizeAddrComment(pick('legal_address_comment', ['Юр.адреса коментар', 'legalAddressFull']));
   const actualAddr = pick('actual_address', ['Факт.адреса', 'actualAddress']);
   const fax = pick('fax', ['Факс', 'fax']);
   const stateLbl = pick('state', ['Статус', 'state']);
