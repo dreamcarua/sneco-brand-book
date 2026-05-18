@@ -568,7 +568,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.74.0 · Overview redesign (Portfolio KPIs + Trend chart + Movers % і ₴ + Action Items + Heatmap + Concentration) · МойСклад API · Оновлення: щодня 06:00
+  snEco Customer 360 v2.74.1 · Overview + Quick-filter chips з логікою + повні списки завжди розкриті · МойСклад API · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -870,6 +870,40 @@ function calcCrossSell(c, allDemandPositions, allCounterparties){
     .slice(0, 10);
   return { items, reason: items.length === 0 ? 'усе що peers купляють — клієнт уже бере' : '' };
 }
+
+// ============================================================================
+// v2.74.1 — Overview FILTER STATE
+// ============================================================================
+// Глобальний стан фільтра: 'all' | 'active' | 'at-risk' | 'dormant' | 'new' | 'vip'
+// При зміні — re-render Movers/Heatmap/Action Items/Lists з відфільтрованим pool.
+let currentOverviewFilter = 'all';
+
+function applyOverviewFilter(customers, filter){
+  if (!filter || filter === 'all') return customers.filter(c => c.__metrics?.totalShipped > 0);
+  const cutoff30 = new Date(Date.now() - 30*86400000).toISOString().slice(0,10);
+  const cutoff60 = new Date(Date.now() - 60*86400000).toISOString().slice(0,10);
+  const curMonthYM = new Date().toISOString().slice(0,7);
+  switch(filter) {
+    case 'active':  return customers.filter(c => c.__metrics?.lastOrder && c.__metrics.lastOrder.slice(0,10) >= cutoff30);
+    case 'at-risk': return customers.filter(c => c.__metrics?.totalShipped > 0 && c.__health >= 40 && c.__health < 70);
+    case 'dormant': return customers.filter(c => {
+      const m = c.__metrics; if (!m || m.totalShipped <= 0) return false;
+      return m.lastOrder && m.lastOrder.slice(0,10) < cutoff60;
+    });
+    case 'new': return customers.filter(c => {
+      const m = c.__metrics; if (!m?.byMonth) return false;
+      const firstM = Object.keys(m.byMonth).sort()[0];
+      return firstM === curMonthYM;
+    });
+    case 'vip': return customers.filter(c => c.__metrics?.totalShipped > 500000);
+  }
+  return customers.filter(c => c.__metrics?.totalShipped > 0);
+}
+
+window.setOverviewFilter = function(f){
+  currentOverviewFilter = f;
+  renderOverview();
+};
 
 // ============================================================================
 // v2.74.0 — OVERVIEW HELPERS (для першого екрана)
@@ -1310,12 +1344,16 @@ function renderOverview(){
 }
 
 function _buildOverviewHtml(){
+  // KPIs/Concentration/Trend — глобальні (не залежать від фільтра)
   const kpis = calcPortfolioKPIs(allCounterparties);
-  const movers = calcMovers(allCounterparties);
-  const newLost = calcNewAndLost(allCounterparties);
-  const actions = calcActionItems(allCounterparties);
-  const heatmap = calcSegmentHeatmap(allCounterparties);
   const concentration = calcConcentration(allCounterparties);
+
+  // Movers/Heatmap/Actions/NewLost — респектують currentOverviewFilter
+  const filtered = applyOverviewFilter(allCounterparties, currentOverviewFilter);
+  const movers = calcMovers(filtered);
+  const newLost = calcNewAndLost(filtered);
+  const actions = calcActionItems(filtered);
+  const heatmap = calcSegmentHeatmap(filtered);
 
   // Quick filters counts
   const totalActive = kpis.activeCount;
@@ -1542,13 +1580,13 @@ function _buildOverviewHtml(){
       <div class="ov-section">
         <div class="ov-section-title">🔎 Швидкий доступ · повні списки</div>
         <div class="ov-filters">
-          <button class="ov-chip active">Усі<span class="ovc-count">${totalAll}</span></button>
-          <button class="ov-chip">🟢 Активні<span class="ovc-count">${totalActive}</span></button>
-          <button class="ov-chip">🟡 At-risk<span class="ovc-count">${totalAtRisk}</span></button>
-          <button class="ov-chip">🔴 Dormant<span class="ovc-count">${totalDormant}</span></button>
-          <button class="ov-chip">🆕 Нові<span class="ovc-count">${newLost.newClients.length}</span></button>
-          <button class="ov-chip">💎 VIP<span class="ovc-count">${totalVIP}</span></button>
-          <span style="margin-left:auto;font-size:11px;color:var(--muted);align-self:center">Скоро filter logic — поки info-only</span>
+          <button class="ov-chip ${currentOverviewFilter==='all'?'active':''}" onclick="setOverviewFilter('all')">Усі<span class="ovc-count">${totalAll}</span></button>
+          <button class="ov-chip ${currentOverviewFilter==='active'?'active':''}" onclick="setOverviewFilter('active')">🟢 Активні<span class="ovc-count">${totalActive}</span></button>
+          <button class="ov-chip ${currentOverviewFilter==='at-risk'?'active':''}" onclick="setOverviewFilter('at-risk')">🟡 At-risk<span class="ovc-count">${totalAtRisk}</span></button>
+          <button class="ov-chip ${currentOverviewFilter==='dormant'?'active':''}" onclick="setOverviewFilter('dormant')">🔴 Dormant<span class="ovc-count">${totalDormant}</span></button>
+          <button class="ov-chip ${currentOverviewFilter==='new'?'active':''}" onclick="setOverviewFilter('new')">🆕 Нові<span class="ovc-count">${newLost.newClients.length}</span></button>
+          <button class="ov-chip ${currentOverviewFilter==='vip'?'active':''}" onclick="setOverviewFilter('vip')">💎 VIP<span class="ovc-count">${totalVIP}</span></button>
+          ${currentOverviewFilter !== 'all' ? `<span style="margin-left:auto;font-size:11px;color:var(--muted);align-self:center">Фільтр: <b>${currentOverviewFilter}</b> · Movers / Heatmap / Actions показують лише ці клієнти</span>` : `<span style="margin-left:auto;font-size:11px;color:var(--muted);align-self:center">Click chip → фільтрує Movers / Heatmap / Actions</span>`}
         </div>
 
         <!-- Legacy 3 lists у collapsible -->
@@ -1690,7 +1728,7 @@ function _buildLegacyListsHtml(){
   const top25 = pool.filter(c => !c.archived).sort((a,b) => (b[sortKey1]||0) - (a[sortKey1]||0)).slice(0, 25);
 
   if (top25.length === 0) {
-    return '<details><summary>📋 Повні списки клієнтів — TOP-25 / YTD / Dormant</summary><div><span style="color:var(--muted);font-size:11px;padding:5px 0">Жодного клієнта з даними. Перевір що sync пройшов.</span></div></details>';
+    return '<div><span style="color:var(--muted);font-size:11px;padding:5px 0">Жодного клієнта з даними. Перевір що sync пройшов.</span></div>';
   }
 
   const label1 = basis === 'last month' ? 'ТОП-25 за минулий місяць'
@@ -1730,8 +1768,9 @@ function _buildLegacyListsHtml(){
     })
   ].join('');
 
-  // v2.74.0: повертаємо HTML як string (raніше писали у #quickPills)
-  return `<details><summary>📋 Повні списки клієнтів — TOP-25 / YTD / Dormant</summary><div>${html}</div></details>`;
+  // v2.74.0: повертаємо HTML як string (раніше писали у #quickPills)
+  // v2.74.1: розгорнуто за замовчуванням (без <details>) — user хоче бачити одразу
+  return `<div>${html}</div>`;
 }
 
 function setupSearch(){
