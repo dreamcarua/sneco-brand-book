@@ -15,10 +15,12 @@ snEco — МойСклад Data Sync v2
 import os
 import sys
 import json
+import time
 import requests
 import pandas as pd
 from datetime import datetime, timedelta
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dotenv import load_dotenv
 
 # Force unbuffered stdout — critical for GitHub Actions where tee buffers print()
@@ -269,15 +271,19 @@ def parse_demands(rows):
     return records
 
 
-def _fetch_positions_for_demand(demand_id):
+def _fetch_positions_for_demand(demand_id, _session=None):
     """v2.72.4: окремий fetch positions per demand коли bulk expand повернув порожні rows.
-    MoySklad bulk fetch з expand=positions.assortment частково повертає positions лише як
-    meta-ref коли nested rows > ~100 у відповіді. Тоді треба окремий call."""
+    v2.72.6: тепер приймає session для connection-reuse у ThreadPoolExecutor."""
     if not demand_id:
         return []
     url = f"{BASE_URL}/entity/demand/{demand_id}/positions"
+    sess = _session or requests
     try:
-        resp = requests.get(url, headers=HEADERS, params={"expand": "assortment", "limit": 1000})
+        resp = sess.get(url, headers=HEADERS, params={"expand": "assortment", "limit": 1000}, timeout=30)
+        if resp.status_code == 429:
+            # Rate limited — wait and retry once
+            time.sleep(2)
+            resp = sess.get(url, headers=HEADERS, params={"expand": "assortment", "limit": 1000}, timeout=30)
         if resp.status_code != 200:
             return []
         return resp.json().get("rows", []) or []
@@ -285,31 +291,85 @@ def _fetch_positions_for_demand(demand_id):
         return []
 
 
+def _fetch_positions_parallel(demand_ids, workers=5):
+    """v2.72.6: паралельний batch-fetch positions для багатьох demands через ThreadPoolExecutor.
+    MoySklad дозволяє ~45 req/sec; 5 workers × ~3-5 req/sec = ~20-25 sustained = безпечно.
+    Reuse requests.Session per thread для connection-pooling (швидше у 2-3 рази vs new conn)."""
+    if not demand_ids:
+        return {}
+    print(f"  ⚡ Parallel fetch positions для {len(demand_ids)} demands ({workers} workers)...", flush=True)
+    t0 = time.time()
+    result = {}
+    # Each worker gets its own Session (thread-safe per-thread)
+    sessions = [requests.Session() for _ in range(workers)]
+    done = [0]
+    def _worker(args):
+        idx, did = args
+        sess = sessions[idx % workers]
+        return did, _fetch_positions_for_demand(did, _session=sess)
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        futures = {ex.submit(_worker, (i, did)): did for i, did in enumerate(demand_ids)}
+        for fut in as_completed(futures):
+            try:
+                did, pos_rows = fut.result()
+                result[did] = pos_rows
+                done[0] += 1
+                if done[0] % 500 == 0 or done[0] == len(demand_ids):
+                    elapsed = time.time() - t0
+                    rate = done[0] / max(0.1, elapsed)
+                    eta = (len(demand_ids) - done[0]) / max(0.1, rate)
+                    print(f"  📦 {done[0]}/{len(demand_ids)} positions ({rate:.1f}/s · ETA {eta:.0f}s)", flush=True)
+            except Exception as e:
+                pass
+    for s in sessions:
+        try: s.close()
+        except: pass
+    print(f"  ✅ Parallel fetch done у {time.time()-t0:.1f}s · {len(result)}/{len(demand_ids)}", flush=True)
+    return result
+
+
 def parse_demand_positions(rows):
     """v2.70: окремий парсер для positions з ms_demands.
     Один рядок per (demand_id, position_idx). Дозволяє правильно ingest'ити у
     окрему D1 таблицю ms_demand_positions і отримувати TOP-10 продуктів per клієнт.
 
-    v2.72.4: fallback на окремий fetch коли bulk expand повернув порожні rows.
-    Робиться по batch, з progress logging кожні 500."""
+    v2.72.6: 2-pass approach з PARALLEL fallback fetch:
+      Pass 1 — збираємо demand_ids у яких positions без inline rows
+      Pass 2 — ThreadPoolExecutor паралельно fetch positions для них
+      Pass 3 — assemble records з усіх позицій
+    Скорочує fallback з ~75 хв (sequential) до ~15-20 хв (5 workers parallel)."""
+    if not rows:
+        return []
+
+    # Pass 1 — identify demands потребуючих fallback
+    fallback_ids = []
+    inline_rows = {}   # demand_id → positions
+    for r in rows:
+        demand_id = r.get("id")
+        if not demand_id:
+            continue
+        positions = r.get("positions", {})
+        pos_rows = positions.get("rows", []) if isinstance(positions, dict) else []
+        if pos_rows:
+            inline_rows[demand_id] = pos_rows
+        elif isinstance(positions, dict) and positions.get("meta"):
+            fallback_ids.append(demand_id)
+
+    print(f"  📊 Positions: {len(inline_rows)} inline, {len(fallback_ids)} потребують fallback fetch", flush=True)
+
+    # Pass 2 — parallel fallback fetch
+    fallback_rows = _fetch_positions_parallel(fallback_ids, workers=5) if fallback_ids else {}
+
+    # Pass 3 — assemble records
     records = []
-    fallback_count = 0
-    for i, r in enumerate(rows):
+    for r in rows:
         demand_id = r.get("id")
         if not demand_id:
             continue
         agent_id = _extract_id(r.get("agent"))
         agent_name = safe(r.get("agent"))
         moment = (r.get("moment", "") or "")[:10]
-        positions = r.get("positions", {})
-        pos_rows = positions.get("rows", []) if isinstance(positions, dict) else []
-
-        # v2.72.4: якщо bulk не повернув inline rows — fetch напряму per demand
-        if not pos_rows and isinstance(positions, dict) and positions.get("meta"):
-            pos_rows = _fetch_positions_for_demand(demand_id)
-            fallback_count += 1
-            if fallback_count % 500 == 0:
-                print(f"  📦 fallback positions fetch: {fallback_count} demands done", flush=True)
+        pos_rows = inline_rows.get(demand_id) or fallback_rows.get(demand_id, [])
 
         for idx, p in enumerate(pos_rows):
             records.append({
