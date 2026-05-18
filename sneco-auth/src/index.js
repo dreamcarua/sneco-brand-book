@@ -759,7 +759,12 @@ async function handleDashboardData(req, env) {
   const from   = body.from ? String(body.from) : null;
   const to     = body.to   ? String(body.to)   : null;
 
-  let sql = `SELECT * FROM ${def.table}`;
+  // v2.75.4 HOTFIX: НЕ повертаємо raw_json — це масивна JSON колонка яка
+  // переповнює CF Worker heap (128MB) на великих таблицях (ms_demand_positions
+  // ~50K+ rows × ~2KB raw_json = >200MB response → Worker 503).
+  // raw_json був для fallback parsing, тепер фронт використовує structured cols.
+  const cols = def.cols.filter(c => c !== 'raw_json');
+  let sql = `SELECT ${cols.join(', ')} FROM ${def.table}`;
   const params = [];
   const where = [];
   if (def.cols.includes('ms_moment')) {
