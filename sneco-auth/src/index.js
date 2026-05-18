@@ -598,7 +598,7 @@ const DASHBOARD_TABLES = {
   },
   payments: {
     table: 'ms_payments',
-    cols: ['id','ms_moment','payment_type','name','sum_kop','organization','agent','agent_id','account','expense_item','raw_json','ingested_at'],
+    cols: ['id','ms_moment','payment_type','name','sum_kop','organization','agent','agent_id','account','expense_item','expense_item_id','payment_purpose','raw_json','ingested_at'],
   },
   orders: {
     table: 'ms_orders',
@@ -746,7 +746,10 @@ async function handleDashboardData(req, env) {
   if (!def) return jsonResp({ error: 'unknown type', supported: [...Object.keys(DASHBOARD_TABLES), 'summary'] }, 400, env);
 
   // Filters
-  const limit  = Math.min(Math.max(Number(body.limit) || 1000, 1), 10000);
+  // v2.72.1: cap bumped 10000 → 100000 — Customer 360 + Finance потребують
+  // повний історичний dataset (22k demands + 24k payments + ще буде demand_positions ~100k+).
+  // CF Workers heap = 128MB → JSON ~100K rows × 500 bytes = ~50MB, влізає.
+  const limit  = Math.min(Math.max(Number(body.limit) || 1000, 1), 100000);
   const offset = Math.max(Number(body.offset) || 0, 0);
   const from   = body.from ? String(body.from) : null;
   const to     = body.to   ? String(body.to)   : null;

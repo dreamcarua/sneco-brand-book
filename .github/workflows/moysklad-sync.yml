@@ -66,17 +66,43 @@ jobs:
         run: |
           python3 ingest_to_d1.py --trigger cron --window-days ${{ github.event.inputs.window_days || '30' }}
 
-      - name: Commit + push regenerated dashboard.html
+      # v2.72.2 FIX: цей step був джерелом exit 128 — race condition коли
+      # vg/Pylyp пушать commits паралельно з 18-хв sync run.
+      # Тепер: pull --rebase перед push + retry до 3 разів + continue-on-error
+      # (бо data ВЖЕ у D1 до цього степу, commit dashboard.html — косметика).
+      - name: Commit + push regenerated dashboard.html (tolerant)
+        continue-on-error: true   # data sync important, dashboard commit — bonus
         run: |
           git config user.name  "snEco-sync-bot"
           git config user.email "noreply@sneco.ua"
+
+          # Якщо dashboard.html не існує — нема чого комітити
+          if [ ! -f dashboard.html ]; then
+            echo "::notice::dashboard.html not present — skipping git commit (no regen needed)"
+            exit 0
+          fi
+
           git add dashboard.html
           if git diff --cached --quiet; then
-            echo "No dashboard changes to commit."
-          else
-            git commit -m "auto: dashboard refreshed $(date -u +%Y-%m-%d) via MoySklad cron"
-            git push
+            echo "::notice::No dashboard changes to commit."
+            exit 0
           fi
+
+          git commit -m "auto: dashboard refreshed $(date -u +%Y-%m-%d) via MoySklad cron"
+
+          # Retry push до 3 разів з pull --rebase у разі rejected
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then
+              echo "::notice::Pushed on attempt $attempt"
+              exit 0
+            fi
+            echo "::warning::Push rejected on attempt $attempt — pulling rebase and retrying..."
+            git pull --rebase --autostash origin main || true
+            sleep 2
+          done
+
+          echo "::warning::Push failed after 3 attempts — leaving for next run (data already in D1)"
+          exit 0    # не fail-али step бо data ВЖЕ у D1
 
       - name: Sync summary
         if: always()

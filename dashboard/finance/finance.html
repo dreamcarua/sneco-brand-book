@@ -46,6 +46,36 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .fin-title{font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;line-height:1.2}
 .fin-sub{font-size:13px;color:rgba(255,255,255,.75)}
 
+/* ─── PERIOD SELECTOR + DIAGNOSTIC STRIP (v3.0) ─── */
+.period-bar{background:#fff;border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;position:sticky;top:56px;z-index:150;box-shadow:0 1px 0 rgba(0,0,0,.02)}
+.period-bar-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-right:2px}
+.period-chips{display:flex;gap:4px;background:#F1F1EB;padding:3px;border-radius:9px;flex-wrap:wrap}
+.period-chip{padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;color:#555;cursor:pointer;border:none;background:transparent;transition:all .15s ease;white-space:nowrap}
+.period-chip:hover{background:rgba(254,191,39,.18);color:var(--d)}
+.period-chip.active{background:var(--d);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.period-chip.active:hover{background:var(--d);color:#fff}
+.period-custom{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.period-custom input[type=date]{padding:5px 8px;border-radius:7px;border:1px solid var(--border);font-size:12px;font-family:inherit;color:var(--d);background:#fafafa}
+.period-custom input[type=date]:focus{outline:none;border-color:var(--y);background:#fff}
+.granularity-toggle{display:flex;gap:3px;background:#F1F1EB;padding:3px;border-radius:8px;margin-left:auto}
+.granularity-toggle .gt-btn{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;color:#555;cursor:pointer;border:none;background:transparent}
+.granularity-toggle .gt-btn.active{background:#fff;color:var(--d);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.period-range-info{font-size:11px;color:var(--muted);padding:4px 10px;background:rgba(150,193,31,.08);border-radius:7px;font-weight:500;white-space:nowrap}
+@media(max-width:760px){.period-bar{padding:10px 12px;gap:8px}.period-chips{flex:1;justify-content:flex-start;overflow-x:auto}.granularity-toggle{margin-left:0;width:100%;justify-content:flex-start;margin-top:4px}}
+
+.diag-strip{background:#FFF9E5;border-bottom:1px solid #F5E6B3;padding:8px 24px;display:flex;align-items:center;gap:16px;font-size:11.5px;flex-wrap:wrap}
+.diag-strip.ok{background:rgba(150,193,31,.08);border-color:rgba(150,193,31,.25)}
+.diag-strip.warn{background:#FFF9E5;border-color:#F5E6B3}
+.diag-strip.err{background:rgba(232,64,64,.05);border-color:rgba(232,64,64,.18)}
+.diag-item{display:flex;align-items:center;gap:5px;color:#555;font-weight:500}
+.diag-item strong{color:var(--d);font-weight:700}
+.diag-item.empty{color:var(--red)}
+.diag-item.empty strong{color:var(--red)}
+.diag-divider{color:#ccc;font-weight:300}
+.diag-action{margin-left:auto;font-size:11px;color:#1d5fa6;text-decoration:none;font-weight:600;padding:3px 9px;background:rgba(59,130,246,.08);border-radius:5px;cursor:pointer;border:none;font-family:inherit}
+.diag-action:hover{background:rgba(59,130,246,.16)}
+@media(max-width:760px){.diag-strip{padding:8px 12px}.diag-divider{display:none}.diag-action{margin-left:0}}
+
 /* ─── KPI CARDS ─── */
 .kpi{background:var(--card);border-radius:12px;padding:16px 18px;border:1px solid var(--border);position:relative;overflow:hidden}
 .kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px}
@@ -322,6 +352,35 @@ body.dash-locked{overflow:hidden}
   </div>
 </div>
 
+<!-- PERIOD SELECTOR BAR (v3.0) -->
+<div class="period-bar" id="periodBar" style="display:none">
+  <span class="period-bar-label">Період</span>
+  <div class="period-chips" id="periodChips">
+    <button class="period-chip" data-period="7d">7 днів</button>
+    <button class="period-chip active" data-period="30d">30 днів</button>
+    <button class="period-chip" data-period="90d">90 днів</button>
+    <button class="period-chip" data-period="6m">6 міс</button>
+    <button class="period-chip" data-period="12m">12 міс</button>
+    <button class="period-chip" data-period="ytd">YTD</button>
+    <button class="period-chip" data-period="all">Усе</button>
+  </div>
+  <div class="period-custom">
+    <span style="font-size:11px">або:</span>
+    <input type="date" id="periodFrom" title="Від">
+    <span>→</span>
+    <input type="date" id="periodTo" title="До">
+  </div>
+  <span class="period-range-info" id="periodRangeInfo">—</span>
+  <div class="granularity-toggle" id="granToggle" title="Деталізація графіка cash flow">
+    <button class="gt-btn" data-gran="day">День</button>
+    <button class="gt-btn" data-gran="week">Тиждень</button>
+    <button class="gt-btn active" data-gran="month">Місяць</button>
+  </div>
+</div>
+
+<!-- DIAGNOSTIC STRIP (v3.0) — показує row counts усіх таблиць -->
+<div class="diag-strip" id="diagStrip" style="display:none"></div>
+
 <!-- CONTENT -->
 <div class="wrap" id="contentWrap">
   <div class="empty-hero">
@@ -332,25 +391,30 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Finance Dashboard v2.68 · MoySklad → D1 → Worker · Оновлення: щодня 06:00
+  snEco Finance Dashboard v3.0 · period filter + granularity + TOP suppliers · MoySklad → D1 → Worker · Cron щодня 06:00
 </div>
 
 <script>
 // ============================================================================
-// FINANCE DASHBOARD — main logic (v2.68 — переписано на ФІНАНСОВУ модель)
+// FINANCE DASHBOARD — main logic (v3.0 — period filter + granularity + diag strip)
 // ============================================================================
 // Дані:
 //   • РАХУНКИ (ms_invoices_out) — джерело правди про дебіторку, planned dates.
 //   • ГРОШІ (ms_payments) — фактичні надходження (inbound) і витрати (outbound).
-//   • expense_item — стаття витрат для outbound paymentout (КРИТИЧНО для блоку
-//     "Витрати по напрямах").
+//   • expense_item — стаття витрат для outbound paymentout (v2.72 fix — категорії
+//     більше не падають у "(не вказано)").
 //
-// Стан v2.68: invoices_out у D1 поки що = 0 (fix v2.65 пушений, але ефекту нема).
-// Дашборд УМІЄ показувати порожній стан і автоматично оживе після наступного sync.
+// v3.0 changes:
+//   • Period selector: 7д · 30д · 90д · 6м · 12м · YTD · Усе + custom range
+//   • Granularity toggle: день · тиждень · місяць (для cash flow chart)
+//   • Diagnostic strip — row counts + freshness одразу видно що порожнє
+//   • Усі KPI / charts / tables re-renderable при зміні period
+//   • Period choice persistent у localStorage
 // ============================================================================
 
 const WORKER = 'https://sneco-auth.vg-ab6.workers.dev';
 const STORAGE_KEY = 'snEco-jwt-finance-dashboard';
+const PERIOD_STORAGE = 'snEco-finance-period-v3';
 
 let allCounterparties = [];
 let allInvoices = [];    // РАХУНКИ — invoices_out
@@ -358,6 +422,61 @@ let allPayments = [];    // ГРОШІ — paymentin + paymentout
 
 let _token = null;
 let _charts = {};
+
+// === v3.0 — Period filter state ===========================================
+// currentPeriod = { preset:'30d'|'7d'|...|'custom', from:Date|null, to:Date|null }
+// `from`/`to` обчислюються динамічно або беруться з custom range.
+let currentPeriod = loadPeriod() || { preset: '30d' };
+let currentGran = localStorage.getItem('snEco-fin-gran') || 'month'; // day/week/month
+
+function loadPeriod(){
+  try { return JSON.parse(localStorage.getItem(PERIOD_STORAGE)); } catch(e){ return null; }
+}
+function savePeriod(){
+  try { localStorage.setItem(PERIOD_STORAGE, JSON.stringify(currentPeriod)); } catch(e){}
+}
+
+// Розрахунок діапазону дат для поточного period.
+// Повертає { from:Date, to:Date, label:string, days:number, prevFrom:Date, prevTo:Date }
+function resolvePeriod(p){
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+  let from, to = today, label;
+  switch(p.preset){
+    case '7d':   from = new Date(now); from.setDate(now.getDate()-6);  from.setHours(0,0,0,0); label = '7 днів'; break;
+    case '30d':  from = new Date(now); from.setDate(now.getDate()-29); from.setHours(0,0,0,0); label = '30 днів'; break;
+    case '90d':  from = new Date(now); from.setDate(now.getDate()-89); from.setHours(0,0,0,0); label = '90 днів'; break;
+    case '6m':   from = new Date(now); from.setMonth(now.getMonth()-6); from.setHours(0,0,0,0); label = '6 місяців'; break;
+    case '12m':  from = new Date(now); from.setFullYear(now.getFullYear()-1); from.setHours(0,0,0,0); label = '12 місяців'; break;
+    case 'ytd':  from = new Date(now.getFullYear(), 0, 1, 0, 0, 0); label = 'YTD ' + now.getFullYear(); break;
+    case 'all':  from = new Date(2020, 0, 1); label = 'Усі дані'; break;
+    case 'custom':
+      from = p.from ? new Date(p.from) : new Date(now.getFullYear(), now.getMonth()-1, 1);
+      to   = p.to   ? new Date(p.to)   : today;
+      to.setHours(23,59,59,999);
+      label = `${df(from.toISOString())} → ${df(to.toISOString())}`;
+      break;
+    default:
+      from = new Date(now); from.setDate(now.getDate()-29); from.setHours(0,0,0,0);
+      label = '30 днів';
+  }
+  const days = Math.max(1, Math.round((to.getTime() - from.getTime())/86400000) + 1);
+  // Previous period — однакова тривалість, безпосередньо перед from
+  const prevTo = new Date(from.getTime() - 1);
+  const prevFrom = new Date(prevTo.getTime() - (days-1)*86400000);
+  prevFrom.setHours(0,0,0,0);
+  return { from, to, prevFrom, prevTo, label, days };
+}
+
+// ISO date strings (YYYY-MM-DD)
+function isoDate(d){ return d.toISOString().slice(0,10); }
+
+// Перевіряє чи дата (ISO або Date) попадає у [from,to] включно
+function inRange(dateStr, from, to){
+  if (!dateStr) return false;
+  const d = String(dateStr).slice(0,10);
+  return d >= isoDate(from) && d <= isoDate(to);
+}
 
 // === Number formatters ===
 const nf  = n => Number(Math.round(n)||0).toLocaleString('uk-UA');
@@ -402,6 +521,13 @@ window.bootFinance = async function(token){
     allPayments = pay || [];
 
     console.log(`Loaded: ${allCounterparties.length} CPs, ${allInvoices.length} invoices_out, ${allPayments.length} payments`);
+
+    // v3.0: показати period selector + diagnostic strip після успішного load
+    document.getElementById('periodBar').style.display = 'flex';
+    document.getElementById('diagStrip').style.display = 'flex';
+    wirePeriodSelector();
+    wireGranularitySelector();
+    renderDiagnostic();
     renderDashboard();
   } catch(e) {
     console.error('Boot error', e);
@@ -413,6 +539,100 @@ window.bootFinance = async function(token){
       </div>`;
   }
 };
+
+// === v3.0 — period selector wiring ===
+function wirePeriodSelector(){
+  const chips = document.getElementById('periodChips');
+  const from  = document.getElementById('periodFrom');
+  const to    = document.getElementById('periodTo');
+  // Активувати поточний chip
+  chips.querySelectorAll('.period-chip').forEach(b => {
+    b.classList.toggle('active', b.dataset.period === currentPeriod.preset);
+  });
+  // Заповнити custom inputs якщо custom
+  if (currentPeriod.preset === 'custom') {
+    if (currentPeriod.from) from.value = isoDate(new Date(currentPeriod.from));
+    if (currentPeriod.to)   to.value   = isoDate(new Date(currentPeriod.to));
+  }
+  chips.addEventListener('click', e => {
+    const b = e.target.closest('.period-chip');
+    if (!b) return;
+    chips.querySelectorAll('.period-chip').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    currentPeriod = { preset: b.dataset.period };
+    from.value = ''; to.value = '';
+    savePeriod();
+    updatePeriodInfo();
+    renderDashboard();
+  });
+  const handleCustom = () => {
+    if (!from.value || !to.value) return;
+    chips.querySelectorAll('.period-chip').forEach(x => x.classList.remove('active'));
+    currentPeriod = { preset: 'custom', from: from.value, to: to.value };
+    savePeriod();
+    updatePeriodInfo();
+    renderDashboard();
+  };
+  from.addEventListener('change', handleCustom);
+  to.addEventListener('change', handleCustom);
+  updatePeriodInfo();
+}
+
+function wireGranularitySelector(){
+  const gt = document.getElementById('granToggle');
+  gt.querySelectorAll('.gt-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.gran === currentGran);
+  });
+  gt.addEventListener('click', e => {
+    const b = e.target.closest('.gt-btn');
+    if (!b) return;
+    gt.querySelectorAll('.gt-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    currentGran = b.dataset.gran;
+    try { localStorage.setItem('snEco-fin-gran', currentGran); } catch(e){}
+    renderDashboard();
+  });
+}
+
+function updatePeriodInfo(){
+  const r = resolvePeriod(currentPeriod);
+  document.getElementById('periodRangeInfo').textContent =
+    `${df(r.from.toISOString())} → ${df(r.to.toISOString())} · ${r.days} дн.`;
+}
+
+// === v3.0 — Diagnostic strip ===
+function renderDiagnostic(){
+  const el = document.getElementById('diagStrip');
+  const cpN = allCounterparties.length;
+  const invN = allInvoices.length;
+  const payN = allPayments.length;
+  const payIn  = allPayments.filter(p => isInbound(p)).length;
+  const payOut = allPayments.filter(p => isOutbound(p)).length;
+  const withExpense = allPayments.filter(p => p.expense_item && String(p.expense_item).trim() && !/не вказано/.test(p.expense_item)).length;
+  const expensePct = payOut > 0 ? Math.round(withExpense / payOut * 100) : 0;
+
+  const issues = [];
+  if (invN === 0) issues.push('invoices_out');
+  if (payN === 0) issues.push('payments');
+  if (cpN === 0) issues.push('counterparties');
+  if (payOut > 0 && expensePct < 20) issues.push('expense_item < 20%');
+
+  el.className = 'diag-strip ' + (issues.length === 0 ? 'ok' : issues.length === 1 ? 'warn' : 'err');
+  el.innerHTML = `
+    <span class="diag-item ${cpN ? '' : 'empty'}">👥 <strong>${nf(cpN)}</strong> контрагентів</span>
+    <span class="diag-divider">·</span>
+    <span class="diag-item ${invN ? '' : 'empty'}">📋 <strong>${nf(invN)}</strong> рахунків</span>
+    <span class="diag-divider">·</span>
+    <span class="diag-item ${payN ? '' : 'empty'}">💳 <strong>${nf(payN)}</strong> платежів <span style="color:var(--muted)">(in: ${nf(payIn)} · out: ${nf(payOut)})</span></span>
+    <span class="diag-divider">·</span>
+    <span class="diag-item ${expensePct >= 20 ? '' : 'empty'}">📊 <strong>${expensePct}%</strong> виплат з категорією
+      ${expensePct < 20 ? '<span style="color:var(--red);font-weight:700" title="parse_payments не витягувала expenseItem — fixed у v2.72, чекаємо full sync">⚠ v2.72</span>' : ''}
+    </span>
+    ${issues.length > 0
+      ? `<button class="diag-action" onclick="alert('Проблема: ${issues.join(', ')}\\n\\nЩо робити:\\n1) Перевір що Run #18+ МoySklad Sync пройшов успішно\\n2) Apply migration 0004 у D1 (для expense_item_id, payment_purpose)\\n3) wrangler deploy\\n4) Запусти full sync через workflow_dispatch')">Що робити?</button>`
+      : `<span class="diag-action" style="background:rgba(150,193,31,.12);color:#4a7000">✓ дані OK</span>`}
+  `;
+}
 
 // === Helpers — payment direction ===
 function isInbound(p) {
@@ -464,6 +684,19 @@ function renderDashboard(){
   const now = new Date();
   const today = now.toISOString().slice(0,10);
   const todayMs = Date.now();
+
+  // v3.0: period-driven windows (заміна жорстко вшитих 30/60/90)
+  // periodFrom..periodTo — поточне вікно вибране юзером
+  // prevFrom..prevTo  — попереднє вікно тієї ж тривалості (для delta %)
+  const range = resolvePeriod(currentPeriod);
+  const periodFrom = isoDate(range.from);
+  const periodTo   = isoDate(range.to);
+  const prevFrom   = isoDate(range.prevFrom);
+  const prevTo     = isoDate(range.prevTo);
+  const periodLabel = range.label;
+  const periodDays  = range.days;
+
+  // Legacy compat константи (для блоків, які ще використовують "90 днів" / "next 30 днів")
   const c30 = new Date(now.getTime() - 30*86400000).toISOString().slice(0,10);
   const c60 = new Date(now.getTime() - 60*86400000).toISOString().slice(0,10);
   const c90 = new Date(now.getTime() - 90*86400000).toISOString().slice(0,10);
@@ -477,34 +710,33 @@ function renderDashboard(){
   // SECTION 1 — KPIs (Row 1 + Row 2)
   // ============================================================================
 
-  // Row 1 — за останні 30 днів
-  const invLast30 = allInvoices.filter(i => (i.ms_moment||'').slice(0,10) >= c30)
-    .reduce((a,i) => a + (i.sum_kop||0)/100, 0);
-  const invPrev30 = allInvoices.filter(i => {
-    const dt = (i.ms_moment||'').slice(0,10);
-    return dt >= c60 && dt < c30;
-  }).reduce((a,i) => a + (i.sum_kop||0)/100, 0);
-  const invDelta = invPrev30 > 0 ? ((invLast30 - invPrev30)/invPrev30*100) : null;
+  // v3.0: Row 1 KPIs — driven by currentPeriod (а не жорстко 30/60)
+  const sumInRange = (items, getDate, getAmount, pred) =>
+    items.filter(x => (!pred || pred(x))).reduce((a,x) => {
+      const d = String(getDate(x)||'').slice(0,10);
+      return d >= periodFrom && d <= periodTo ? a + getAmount(x) : a;
+    }, 0);
+  const sumInPrev = (items, getDate, getAmount, pred) =>
+    items.filter(x => (!pred || pred(x))).reduce((a,x) => {
+      const d = String(getDate(x)||'').slice(0,10);
+      return d >= prevFrom && d <= prevTo ? a + getAmount(x) : a;
+    }, 0);
 
-  const cashLast30 = allPayments.filter(p => isInbound(p) && (p.ms_moment||'').slice(0,10) >= c30)
-    .reduce((a,p) => a + (p.sum_kop||0)/100, 0);
-  const cashPrev30 = allPayments.filter(p => {
-    const dt = (p.ms_moment||'').slice(0,10);
-    return isInbound(p) && dt >= c60 && dt < c30;
-  }).reduce((a,p) => a + (p.sum_kop||0)/100, 0);
-  const cashDelta = cashPrev30 > 0 ? ((cashLast30 - cashPrev30)/cashPrev30*100) : null;
+  const invLast30  = sumInRange(allInvoices, i => i.ms_moment, i => (i.sum_kop||0)/100);
+  const invPrev30  = sumInPrev (allInvoices, i => i.ms_moment, i => (i.sum_kop||0)/100);
+  const invDelta   = invPrev30 > 0 ? ((invLast30 - invPrev30)/invPrev30*100) : null;
 
-  const expLast30 = allPayments.filter(p => isOutbound(p) && (p.ms_moment||'').slice(0,10) >= c30)
-    .reduce((a,p) => a + (p.sum_kop||0)/100, 0);
-  const expPrev30 = allPayments.filter(p => {
-    const dt = (p.ms_moment||'').slice(0,10);
-    return isOutbound(p) && dt >= c60 && dt < c30;
-  }).reduce((a,p) => a + (p.sum_kop||0)/100, 0);
-  const expDelta = expPrev30 > 0 ? ((expLast30 - expPrev30)/expPrev30*100) : null;
+  const cashLast30 = sumInRange(allPayments, p => p.ms_moment, p => (p.sum_kop||0)/100, isInbound);
+  const cashPrev30 = sumInPrev (allPayments, p => p.ms_moment, p => (p.sum_kop||0)/100, isInbound);
+  const cashDelta  = cashPrev30 > 0 ? ((cashLast30 - cashPrev30)/cashPrev30*100) : null;
+
+  const expLast30  = sumInRange(allPayments, p => p.ms_moment, p => (p.sum_kop||0)/100, isOutbound);
+  const expPrev30  = sumInPrev (allPayments, p => p.ms_moment, p => (p.sum_kop||0)/100, isOutbound);
+  const expDelta   = expPrev30 > 0 ? ((expLast30 - expPrev30)/expPrev30*100) : null;
 
   const netCashFlow = cashLast30 - expLast30;
-  const netPrev = cashPrev30 - expPrev30;
-  const netDelta = netPrev !== 0 ? ((netCashFlow - netPrev)/Math.abs(netPrev)*100) : null;
+  const netPrev     = cashPrev30 - expPrev30;
+  const netDelta    = netPrev !== 0 ? ((netCashFlow - netPrev)/Math.abs(netPrev)*100) : null;
 
   // Row 2 — поточний стан AR (з invoices)
   const openInvoices = allInvoices.filter(i => ((i.sum_kop||0) - (i.payed_sum_kop||0)) > 0);
@@ -542,48 +774,117 @@ function renderDashboard(){
   }
 
   // ============================================================================
-  // SECTION 2 — CASH FLOW 12 months: invoices + inbound + outbound
+  // SECTION 2 — CASH FLOW (v3.0: period + granularity-driven)
   // ============================================================================
-  const months = [];
-  for (let i=11; i>=0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    months.push(d.toISOString().slice(0,7));
+  // Granularity: day → YYYY-MM-DD · week → YYYY-Www (ISO) · month → YYYY-MM
+  // Якщо період < 14 днів → forced day; < 90 днів → принаймні week.
+  let effectiveGran = currentGran;
+  if (periodDays <= 14 && effectiveGran === 'month') effectiveGran = 'day';
+  if (periodDays >= 730 && effectiveGran === 'day') effectiveGran = 'month';
+
+  function bucketKey(dateStr){
+    const d = new Date(dateStr);
+    if (effectiveGran === 'day') return dateStr.slice(0,10);
+    if (effectiveGran === 'week'){
+      // ISO week
+      const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+      const dayN = (t.getUTCDay() + 6) % 7;
+      t.setUTCDate(t.getUTCDate() - dayN + 3);
+      const firstThu = new Date(Date.UTC(t.getUTCFullYear(), 0, 4));
+      const week = 1 + Math.round(((t - firstThu) / 86400000 - 3 + ((firstThu.getUTCDay() + 6) % 7)) / 7);
+      return `${t.getUTCFullYear()}-W${String(week).padStart(2,'0')}`;
+    }
+    return dateStr.slice(0,7);
   }
+  function bucketLabel(key){
+    if (effectiveGran === 'day') return dfShort(key);
+    if (effectiveGran === 'week') return key.replace('-W','/T');
+    // month
+    const [y,m] = key.split('-');
+    const monthNames = ['січ','лют','бер','кві','тра','чер','лип','сер','вер','жов','лис','гру'];
+    return `${monthNames[parseInt(m,10)-1]} ${y.slice(2)}`;
+  }
+  function* eachBucket(){
+    const cur = new Date(range.from); cur.setHours(0,0,0,0);
+    const end = new Date(range.to);   end.setHours(0,0,0,0);
+    if (effectiveGran === 'day'){
+      while (cur <= end){ yield bucketKey(isoDate(cur)); cur.setDate(cur.getDate()+1); }
+    } else if (effectiveGran === 'week'){
+      const seen = new Set();
+      while (cur <= end){
+        const k = bucketKey(isoDate(cur));
+        if (!seen.has(k)){ seen.add(k); yield k; }
+        cur.setDate(cur.getDate()+1);
+      }
+    } else { // month
+      const seen = new Set();
+      while (cur <= end){
+        const k = isoDate(cur).slice(0,7);
+        if (!seen.has(k)){ seen.add(k); yield k; }
+        cur.setMonth(cur.getMonth()+1);
+        cur.setDate(1);
+      }
+    }
+  }
+
+  const months = [...eachBucket()];
   const invByMonth = {}, cashByMonth = {}, expByMonth = {};
   months.forEach(m => { invByMonth[m] = 0; cashByMonth[m] = 0; expByMonth[m] = 0; });
 
   allInvoices.forEach(i => {
-    const ym = (i.ms_moment||'').slice(0,7);
-    if (ym in invByMonth) invByMonth[ym] += (i.sum_kop||0)/100;
+    const d = String(i.ms_moment||'').slice(0,10);
+    if (d < periodFrom || d > periodTo) return;
+    const k = bucketKey(d);
+    if (k in invByMonth) invByMonth[k] += (i.sum_kop||0)/100;
   });
   allPayments.forEach(p => {
-    const ym = (p.ms_moment||'').slice(0,7);
-    if (!(ym in cashByMonth)) return;
-    if (isInbound(p)) cashByMonth[ym] += (p.sum_kop||0)/100;
-    else if (isOutbound(p)) expByMonth[ym] += (p.sum_kop||0)/100;
+    const d = String(p.ms_moment||'').slice(0,10);
+    if (d < periodFrom || d > periodTo) return;
+    const k = bucketKey(d);
+    if (!(k in cashByMonth)) return;
+    if (isInbound(p)) cashByMonth[k] += (p.sum_kop||0)/100;
+    else if (isOutbound(p)) expByMonth[k] += (p.sum_kop||0)/100;
   });
+  const chartLabels = months.map(bucketLabel);
 
   // ============================================================================
-  // SECTION 3 — Витрати по напрямах (expense_item)
+  // SECTION 3 — Витрати по напрямах (expense_item) · v3.0 driven by period
   // ============================================================================
-  const outbound90 = allPayments.filter(p => isOutbound(p) && (p.ms_moment||'').slice(0,10) >= c90);
-  const outboundLastM = allPayments.filter(p => {
-    const dt = (p.ms_moment||'').slice(0,10);
-    return isOutbound(p) && dt >= c60 && dt < c30;
+  const outboundInPeriod = allPayments.filter(p => {
+    if (!isOutbound(p)) return false;
+    const d = String(p.ms_moment||'').slice(0,10);
+    return d >= periodFrom && d <= periodTo;
+  });
+  const outboundPrev = allPayments.filter(p => {
+    if (!isOutbound(p)) return false;
+    const d = String(p.ms_moment||'').slice(0,10);
+    return d >= prevFrom && d <= prevTo;
   });
 
   const expByItem = {};
-  const expByItemLastM = {};
-  outbound90.forEach(p => {
+  const expByItemLastM = {};       // змінна "Минулий міс." тепер = "Попер. період"
+  outboundInPeriod.forEach(p => {
     const k = getExpenseItem(p);
     expByItem[k] = (expByItem[k]||0) + (p.sum_kop||0)/100;
   });
-  outboundLastM.forEach(p => {
+  outboundPrev.forEach(p => {
     const k = getExpenseItem(p);
     expByItemLastM[k] = (expByItemLastM[k]||0) + (p.sum_kop||0)/100;
   });
   const expByItemSorted = Object.entries(expByItem).sort((a,b) => b[1]-a[1]);
   const expTotal90 = expByItemSorted.reduce((a,[,v]) => a+v, 0);
+
+  // v3.0 NEW: TOP постачальники (outbound payments by agent) у поточному періоді
+  const outByAgent = {};
+  outboundInPeriod.forEach(p => {
+    const cp = (p.agent_id && cpById[p.agent_id]) || cpByName[(p.agent||'').trim()] || null;
+    const key = cp ? (cp.id || cp.name) : (p.agent || '—');
+    const name = cp ? cp.name : (p.agent || '—');
+    if (!outByAgent[key]) outByAgent[key] = { name, sum: 0, count: 0, cp };
+    outByAgent[key].sum += (p.sum_kop||0)/100;
+    outByAgent[key].count++;
+  });
+  const topSuppliers = Object.values(outByAgent).sort((a,b) => b.sum - a.sum).slice(0, 10);
   // TOP-8 для doughnut, решта в "Інші"
   const top8 = expByItemSorted.slice(0, 8);
   const others = expByItemSorted.slice(8);
@@ -777,7 +1078,7 @@ function renderDashboard(){
   function renderExpenseTable(){
     const top10 = expByItemSorted.slice(0, 10);
     if (top10.length === 0) {
-      return `<div class="empty-state"><div class="es-icon">💸</div><div class="es-title">Немає витрат за 90 днів</div><div class="es-sub">Перевір що paymentout sync з MoySklad працює</div></div>`;
+      return `<div class="empty-state"><div class="es-icon">💸</div><div class="es-title">Немає витрат за ${periodLabel}</div><div class="es-sub">Перевір що paymentout sync з MoySklad працює. Якщо все = "(не вказано)" — потрібен v2.72 sync для категоризації.</div></div>`;
     }
     return `
       <table class="dt">
@@ -785,8 +1086,8 @@ function renderDashboard(){
           <tr>
             <th style="width:30px">#</th>
             <th>Стаття витрат</th>
-            <th style="text-align:right">90 днів ₴</th>
-            <th style="text-align:right">Минулий міс. ₴</th>
+            <th style="text-align:right">${periodLabel} ₴</th>
+            <th style="text-align:right">Попер. період ₴</th>
             <th style="text-align:right;width:70px">% усіх</th>
           </tr>
         </thead>
@@ -822,26 +1123,26 @@ function renderDashboard(){
     <!-- SECTION 1 — KPI ROW 1: за останні 30 днів -->
     <div class="g4">
       ${invKpi(
-        '💰 Виставлено рахунків (30д)',
+        `💰 Виставлено рахунків (${periodLabel})`,
         `${nfm(invLast30)} ₴`,
-        deltaPill(invDelta),
+        deltaPill(invDelta) + ' vs попер. період',
         'cy',
         true
       )}
       <div class="kpi cg">
-        <div class="kpi-lbl">✅ Надходження (30д)</div>
+        <div class="kpi-lbl">✅ Надходження (${periodLabel})</div>
         <div class="kpi-val">${nfm(cashLast30)} ₴</div>
-        ${deltaPill(cashDelta)}
+        ${deltaPill(cashDelta)} <span style="font-size:10px;color:var(--muted)">vs попер.</span>
       </div>
       <div class="kpi cr">
-        <div class="kpi-lbl">💸 Витрати (30д)</div>
+        <div class="kpi-lbl">💸 Витрати (${periodLabel})</div>
         <div class="kpi-val">${nfm(expLast30)} ₴</div>
-        ${deltaPill(expDelta)}
+        ${deltaPill(expDelta)} <span style="font-size:10px;color:var(--muted)">vs попер.</span>
       </div>
       <div class="kpi ${netCashFlow >= 0 ? 'cg' : 'cr'}">
-        <div class="kpi-lbl">📊 Net Cash Flow (30д)</div>
+        <div class="kpi-lbl">📊 Net Cash Flow (${periodLabel})</div>
         <div class="kpi-val" style="color:${netCashFlow >= 0 ? '#4a7000' : 'var(--red)'}">${netCashFlow >= 0 ? '+' : ''}${nfm(netCashFlow)} ₴</div>
-        ${deltaPill(netDelta)}
+        ${deltaPill(netDelta)} <span style="font-size:10px;color:var(--muted)">vs попер.</span>
       </div>
     </div>
 
@@ -876,11 +1177,11 @@ function renderDashboard(){
     </div>
 
     <!-- SECTION 2 — CASH FLOW CHART -->
-    <div class="sec">💸 Грошовий потік — рахунки, надходження, витрати</div>
+    <div class="sec">💸 Грошовий потік — рахунки, надходження, витрати · ${periodLabel}</div>
     <div class="cc">
       <div class="cc-head">
         <div>
-          <div class="cc-title">12 місяців · 3 dataset</div>
+          <div class="cc-title">${months.length} ${effectiveGran === 'day' ? 'днів' : effectiveGran === 'week' ? 'тижнів' : 'місяців'} · 3 dataset</div>
           <div class="cc-sub">Виставлено рахунків (yellow) · Надходження (green) · Витрати (red, negative)${!hasInvoices ? ' · ⚠ рахунки = 0' : ''}</div>
         </div>
       </div>
@@ -888,13 +1189,13 @@ function renderDashboard(){
     </div>
 
     <!-- SECTION 3 — ВИТРАТИ ПО НАПРЯМАХ -->
-    <div class="sec">📊 Витрати по напрямах — останні 90 днів</div>
+    <div class="sec">📊 Витрати по напрямах · ${periodLabel}</div>
     <div class="g2">
       <div class="cc">
         <div class="cc-head">
           <div>
-            <div class="cc-title">Структура витрат</div>
-            <div class="cc-sub">TOP-8 категорій + Інші · Σ ${nfm(expTotal90)} ₴ за 90 днів</div>
+            <div class="cc-title">Структура витрат (по категоріях)</div>
+            <div class="cc-sub">TOP-8 + Інші · Σ ${nfm(expTotal90)} ₴ за ${periodLabel}${expByItemSorted.find(x => x[0] === '(не вказано)') ? ` · ⚠ ${(expByItemSorted.find(x => x[0]==='(не вказано)')[1]/Math.max(1,expTotal90)*100).toFixed(0)}% без категорії` : ''}</div>
           </div>
         </div>
         <div class="chart-h320"><canvas id="expDoughnut"></canvas></div>
@@ -903,11 +1204,50 @@ function renderDashboard(){
         <div class="cc-head">
           <div>
             <div class="cc-title">TOP-10 статей витрат</div>
-            <div class="cc-sub">Сума за 90д, минулий місяць, % від всіх</div>
+            <div class="cc-sub">Сума за ${periodLabel}, попер. період, % від всіх</div>
           </div>
         </div>
         ${renderExpenseTable()}
       </div>
+    </div>
+
+    <!-- SECTION 3b — TOP-10 ПОСТАЧАЛЬНИКІВ (v3.0 NEW) -->
+    <div class="sec">🏭 ТОП-10 постачальників · кому ми платили · ${periodLabel}</div>
+    <div class="cc">
+      ${topSuppliers.length === 0 ? `
+        <div class="empty-state"><div class="es-icon">📭</div><div class="es-title">Немає виплат за ${periodLabel}</div></div>
+      ` : `
+        <div class="cc-head" style="margin-bottom:8px">
+          <div class="cc-sub">Σ ${nfm(topSuppliers.reduce((a,s) => a+s.sum, 0))} ₴ виплачено ТОП-10 з ${nfm(expTotal90)} ₴ всього</div>
+        </div>
+        <table class="dt">
+          <thead><tr><th style="width:30px">#</th><th>Постачальник</th><th style="text-align:right">Виплачено ₴</th><th style="text-align:center;width:70px">Платежів</th><th style="text-align:right;width:70px">% усіх</th><th style="text-align:right;width:140px">Контакт</th></tr></thead>
+          <tbody>
+            ${topSuppliers.map((s, i) => {
+              const pct = expTotal90 > 0 ? (s.sum/expTotal90*100) : 0;
+              const phone = s.cp?.phone || '';
+              const em = s.cp?.email || '';
+              return `
+                <tr>
+                  <td class="rank">${i+1}</td>
+                  <td>
+                    <div style="font-weight:600">${escapeHtml(s.name)}</div>
+                    ${s.cp?.legal_address ? `<div style="font-size:11px;color:var(--muted)">${escapeHtml(s.cp.legal_address)}</div>` : ''}
+                  </td>
+                  <td style="text-align:right;font-weight:700;color:var(--red)">${nf(s.sum)}</td>
+                  <td style="text-align:center">${s.count}</td>
+                  <td style="text-align:right;color:var(--muted)">${pct.toFixed(1)}%</td>
+                  <td style="text-align:right;white-space:nowrap">
+                    ${phone ? `<a href="tel:${escapeAttr(phone)}" class="act-btn tel" title="${escapeAttr(phone)}">📞</a>` : ''}
+                    ${em ? `<a href="mailto:${escapeAttr(em)}" class="act-btn mail" title="${escapeAttr(em)}">✉</a>` : ''}
+                    ${!phone && !em ? '<span style="color:var(--muted);font-size:11px">—</span>' : ''}
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      `}
     </div>
 
     <!-- SECTION 4 — AR AGING -->
@@ -1191,7 +1531,7 @@ function renderDashboard(){
       _charts.cf = new Chart(cfCtx, {
         type: 'bar',
         data: {
-          labels: months,
+          labels: chartLabels,
           datasets: [
             {
               label: 'Виставлено рахунків (₴)',

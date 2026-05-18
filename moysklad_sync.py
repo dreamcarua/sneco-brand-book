@@ -423,16 +423,23 @@ def parse_stock(rows):
 
 
 def parse_payments(rows, ptype):
+    """v2.72: + expenseItem (Стаття витрат) — критично для Finance Dashboard
+    "Витрати по напрямах" блоку. Без expense_item ВСІ виплати йдуть у '(не вказано)'."""
     return [{
-        "id":           r.get("id"),
-        "Тип":          ptype,
-        "Дата":         r.get("moment", "")[:10],
-        "Номер":        r.get("name"),
-        "Контрагент":   safe(r.get("agent")),
-        "Контрагент ID": _extract_id(r.get("agent")),
-        "Сума, грн":    r.get("sum", 0) / 100,
-        "Призначення":  r.get("paymentPurpose", ""),
-        "Проект":       safe(r.get("project")),
+        "id":              r.get("id"),
+        "Тип":             ptype,
+        "Дата":            r.get("moment", "")[:10],
+        "Номер":           r.get("name"),
+        "Контрагент":      safe(r.get("agent")),
+        "Контрагент ID":   _extract_id(r.get("agent")),
+        "Організація":     safe(r.get("organization")),
+        "Сума, грн":       r.get("sum", 0) / 100,
+        "Призначення":     r.get("paymentPurpose", ""),
+        "Стаття витрат":   safe(r.get("expenseItem")),       # v2.72: критично для cash-flow
+        "Стаття витрат ID": _extract_id(r.get("expenseItem")),
+        "Рахунок":         safe(r.get("agentAccount")) or safe(r.get("organizationAccount")),
+        "Проект":          safe(r.get("project")),
+        "Стан":            safe(r.get("state")),
     } for r in rows]
 
 
@@ -626,9 +633,10 @@ def main():
     print(f"   📦 Витягнуто {len(pos_records)} товарних позицій з {len(rows)} відвантажень", flush=True)
 
     print("\n💳 Оплати вхідні...")
-    rows_in = fetch_all("entity/paymentin", expand="agent,state")
+    # v2.72: + expand=expenseItem,organization,project — для категоризації витрат у Finance Dashboard
+    rows_in = fetch_all("entity/paymentin", expand="agent,state,organization,project")
     print("💳 Оплати вихідні...")
-    rows_out = fetch_all("entity/paymentout", expand="agent,state")
+    rows_out = fetch_all("entity/paymentout", expand="agent,state,organization,project,expenseItem")
     records = parse_payments(rows_in, "Вхідний") + parse_payments(rows_out, "Вихідний")
     save_excel(pd.DataFrame(records), "payments", reliable=True)
 
