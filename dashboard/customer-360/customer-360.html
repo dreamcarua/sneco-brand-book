@@ -568,7 +568,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.74.2 · Overview + Filter chips + Heatmap drill-down + Legacy lists фільтруються · МойСклад API · Оновлення: щодня 06:00
+  snEco Customer 360 v2.75.0 · Overview + Filter chips + Heatmap drill-down + CRM-log D1 backend (team sync) + MoySklad write-back · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -600,30 +600,65 @@ const df  = d => { try { return new Date(d).toLocaleDateString('uk-UA', {day:'2-
 const dfShort = d => { try { return new Date(d).toLocaleDateString('uk-UA', {day:'2-digit', month:'2-digit'}); } catch(e){ return d; }};
 
 // ============================================================================
-// v2.73.0 — CRM-LOG (localStorage-based, per-customer)
+// v2.75.0 — CRM-LOG (D1 backend + MoySklad write-back)
 // ============================================================================
-// Зберігається у localStorage key `snEco-crm-log-${customerKey}` = array of:
-//   { date: 'YYYY-MM-DD', type: '📞 Дзвінок', summary: '...', nextStep: '...', nextDate: 'YYYY-MM-DD' }
-// Limitation v1: per-browser, not synced across team. v2 буде D1 backend.
-const CRM_KEY = (custKey) => `snEco-crm-log-${custKey}`;
-function loadCrmLog(custKey){
-  try { return JSON.parse(localStorage.getItem(CRM_KEY(custKey)) || '[]'); } catch(e) { return []; }
+// Замінив localStorage v2.73.0 на API:
+//   GET    /api/crm-notes/list      — список записів для customer_key
+//   POST   /api/crm-notes/create    — додати + sync у МойСклад
+//   POST   /api/crm-notes/update    — редагувати запис
+//   POST   /api/crm-notes/delete    — soft delete
+// Кожен create також PUT-ує у МойСклад counterparty.description (write-back).
+// Team-wide: усі менеджери бачать однакові записи + у МойСклад теж видно.
+
+// In-memory cache per customer для рендера (заповнюється при відкритті картки)
+const _crmCache = {};
+
+async function loadCrmLogAsync(custKey){
+  if (!custKey) return [];
+  if (_crmCache[custKey]) return _crmCache[custKey];
+  try {
+    const r = await fetch(WORKER + '/api/crm-notes/list', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + _token },
+      body: JSON.stringify({ customer_key: custKey }),
+    });
+    if (!r.ok) return [];
+    const j = await r.json();
+    const items = (j.items || []).map(it => ({
+      id: it.id,
+      date: it.note_date,
+      type: it.note_type,
+      summary: it.summary,
+      nextStep: it.next_step,
+      nextDate: it.next_date,
+      authorEmail: it.author_email,
+      authorName: it.author_name,
+      msSynced: it.ms_synced === 1,
+    }));
+    _crmCache[custKey] = items;
+    return items;
+  } catch (e) {
+    console.warn('CRM load failed:', e);
+    return [];
+  }
 }
-function saveCrmLog(custKey, arr){
-  try { localStorage.setItem(CRM_KEY(custKey), JSON.stringify(arr)); } catch(e){}
+
+// Synchronous version для health score (use cached) — повертає [] якщо ще не cache-овано
+function loadCrmLog(custKey){
+  return _crmCache[custKey] || [];
 }
 
 // Поточний клієнт для модального вікна (set у renderCustomerView)
 let _currentCustKey = null;
+let _currentCust = null;   // повний об'єкт клієнта — потрібен для customer_id у API
 
-window.openCrmModal = function(editIdx){
-  if (editIdx === undefined) editIdx = -1;
+window.openCrmModal = function(noteId){
   const modal = document.getElementById('crmModal');
   document.getElementById('crmModalKey').value = _currentCustKey;
-  document.getElementById('crmEditIdx').value = editIdx;
-  if (editIdx >= 0) {
+  document.getElementById('crmEditIdx').value = noteId || '';
+  if (noteId) {
     const arr = loadCrmLog(_currentCustKey);
-    const e = arr[editIdx] || {};
+    const e = arr.find(x => x.id === noteId) || {};
     document.getElementById('crmDate').value = e.date || new Date().toISOString().slice(0,10);
     document.getElementById('crmType').value = e.type || '📞 Дзвінок';
     document.getElementById('crmSummary').value = e.summary || '';
@@ -641,34 +676,64 @@ window.openCrmModal = function(editIdx){
 window.closeCrmModal = function(){
   document.getElementById('crmModal').classList.remove('open');
 };
-window.saveCrmEntry = function(){
+window.saveCrmEntry = async function(){
   const custKey = document.getElementById('crmModalKey').value;
-  if (!custKey) return;
-  const idx = parseInt(document.getElementById('crmEditIdx').value, 10);
-  const entry = {
-    date: document.getElementById('crmDate').value || new Date().toISOString().slice(0,10),
-    type: document.getElementById('crmType').value,
+  if (!custKey || !_currentCust) return;
+  const editId = document.getElementById('crmEditIdx').value;
+  const payload = {
+    customer_key: custKey,
+    customer_id: _currentCust.id || null,        // для MoySklad write-back
+    customer_name: _currentCust.name,
+    note_date: document.getElementById('crmDate').value || new Date().toISOString().slice(0,10),
+    note_type: document.getElementById('crmType').value,
     summary: document.getElementById('crmSummary').value.trim(),
-    nextStep: document.getElementById('crmNextStep').value.trim(),
-    nextDate: document.getElementById('crmNextDate').value,
+    next_step: document.getElementById('crmNextStep').value.trim() || null,
+    next_date: document.getElementById('crmNextDate').value || null,
   };
-  if (!entry.summary) { alert('Заповни короткий звіт'); return; }
-  const arr = loadCrmLog(custKey);
-  if (idx >= 0) arr[idx] = entry; else arr.unshift(entry);
-  arr.sort((a,b) => (b.date||'').localeCompare(a.date||''));
-  saveCrmLog(custKey, arr);
-  closeCrmModal();
-  // Re-render current customer view
-  const c = allCounterparties.find(x => x.__key === custKey || x.name === custKey);
-  if (c) renderCustomerView(c);
+  if (!payload.summary) { alert('Заповни короткий звіт'); return; }
+
+  const btn = document.querySelector('.crm-modal-btn.save');
+  const oldTxt = btn ? btn.textContent : '';
+  if (btn) { btn.textContent = '⏳ Зберігаємо...'; btn.disabled = true; }
+
+  try {
+    const url = editId ? '/api/crm-notes/update' : '/api/crm-notes/create';
+    const body = editId ? { id: editId, ...payload } : payload;
+    const r = await fetch(WORKER + url, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + _token },
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status + ': ' + (await r.text()).slice(0,200));
+    const j = await r.json();
+    // Cache invalidate + reload
+    delete _crmCache[custKey];
+    await loadCrmLogAsync(custKey);
+    closeCrmModal();
+    // Re-render картки клієнта
+    const c = allCounterparties.find(x => x.__key === custKey || x.name === custKey);
+    if (c) renderCustomerView(c);
+  } catch (e) {
+    alert('Помилка збереження: ' + e.message);
+    if (btn) { btn.textContent = oldTxt; btn.disabled = false; }
+  }
 };
-window.deleteCrmEntry = function(custKey, idx){
+window.deleteCrmEntry = async function(custKey, noteId){
   if (!confirm('Видалити цей запис з CRM-логу?')) return;
-  const arr = loadCrmLog(custKey);
-  arr.splice(idx, 1);
-  saveCrmLog(custKey, arr);
-  const c = allCounterparties.find(x => x.__key === custKey || x.name === custKey);
-  if (c) renderCustomerView(c);
+  try {
+    const r = await fetch(WORKER + '/api/crm-notes/delete', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + _token },
+      body: JSON.stringify({ id: noteId }),
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    delete _crmCache[custKey];
+    await loadCrmLogAsync(custKey);
+    const c = allCounterparties.find(x => x.__key === custKey || x.name === custKey);
+    if (c) renderCustomerView(c);
+  } catch (e) {
+    alert('Помилка видалення: ' + e.message);
+  }
 };
 
 // ============================================================================
@@ -2033,6 +2098,11 @@ function renderCustomerView(c){
 
   // v2.73.0: Set _currentCustKey for CRM modal
   _currentCustKey = c.__key || c.id || c.name;
+  _currentCust = c;
+  // v2.75.0: async load CRM-лог з D1. При першому showu — empty, при повторному re-render — cached.
+  if (!_crmCache[_currentCustKey]) {
+    loadCrmLogAsync(_currentCustKey).then(() => renderCustomerView(c));
+  }
   const crmLog = loadCrmLog(_currentCustKey);
 
   // v2.73.0: forecast — avg order size = totalShipped / ordersCount (calc'd later)
@@ -2608,20 +2678,22 @@ function renderCustomerView(c){
           ⚪ Записів немає — фіксуй кожен дзвінок / зустріч / лист, щоб не забути домовленості.<br>
           <button class="crm-log-add" onclick="openCrmModal()" style="margin-top:10px">📝 Створити перший запис</button>
         </div>
-      ` : crmLog.map((e, i) => {
+      ` : crmLog.map((e) => {
         const nextOverdueRow = e.nextDate && e.nextDate < new Date().toISOString().slice(0,10);
+        const msIcon = e.msSynced ? '<span title="Синхронізовано у МойСклад" style="color:#4a7000">✓ MS</span>'
+                                  : '<span title="Лише у D1, не sync у МойСклад (немає cp.id)" style="color:var(--muted)">— D1</span>';
         return `
         <div class="crm-row">
-          <div class="crm-date">${df(e.date)}</div>
-          <div><span class="crm-type">${escapeHtml(e.type)}</span></div>
+          <div class="crm-date">${df(e.date)}<div style="font-size:9.5px;color:var(--muted);font-weight:500;margin-top:2px">${msIcon}</div></div>
+          <div><span class="crm-type">${escapeHtml(e.type)}</span><div style="font-size:9.5px;color:var(--muted);margin-top:3px">👤 ${escapeHtml(e.authorName || e.authorEmail || '—')}</div></div>
           <div class="crm-text">
             ${escapeHtml(e.summary)}
             ${e.nextStep ? `<strong>🎯 ${escapeHtml(e.nextStep)}</strong>` : ''}
           </div>
           <div class="crm-next ${nextOverdueRow ? 'due' : ''}">
             ${e.nextDate ? `📅 ${df(e.nextDate)}${nextOverdueRow ? ' ⚠' : ''}` : ''}
-            <button class="crm-del" onclick="window.openCrmModal(${i})" title="Редагувати">✎</button>
-            <button class="crm-del" onclick="window.deleteCrmEntry('${escapeAttr(_currentCustKey)}', ${i})" title="Видалити">×</button>
+            <button class="crm-del" onclick="window.openCrmModal('${escapeAttr(e.id)}')" title="Редагувати">✎</button>
+            <button class="crm-del" onclick="window.deleteCrmEntry('${escapeAttr(_currentCustKey)}', '${escapeAttr(e.id)}')" title="Видалити">×</button>
           </div>
         </div>
       `}).join('')}
