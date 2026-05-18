@@ -775,6 +775,148 @@ async function handleDashboardData(req, env) {
   return jsonResp({ items: results || [], limit, offset, count: (results || []).length }, 200, env);
 }
 
+// =====================================================================
+// v2.75.0 — CRM-LOG endpoints (D1 backend + MoySklad write-back)
+// =====================================================================
+
+// Auth helper — повертає payload з JWT (для author tracking)
+async function _crmAuth(req, env) {
+  const auth = req.headers.get('Authorization') || '';
+  const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+  if (!token) return null;
+  try {
+    const payload = await jwtVerify(token, env.JWT_SECRET);
+    if (!DASHBOARD_BLOCKS.has(payload.block) && !payload.isAdmin) return null;
+    return payload;
+  } catch (e) { return null; }
+}
+
+// GET notes for customer
+async function handleCrmNotesList(req, env) {
+  const auth = await _crmAuth(req, env);
+  if (!auth) return jsonResp({ error: 'unauthorized' }, 401, env);
+  const body = await readJson(req) || {};
+  const customerKey = String(body.customer_key || '').trim();
+  if (!customerKey) return jsonResp({ error: 'customer_key required' }, 400, env);
+  const { results } = await env.DB.prepare(
+    `SELECT id, note_date, note_type, summary, next_step, next_date, author_email, author_name, created_at, ms_synced
+     FROM customer_notes WHERE customer_key = ? AND deleted = 0
+     ORDER BY note_date DESC, created_at DESC LIMIT 200`
+  ).bind(customerKey).all();
+  return jsonResp({ items: results || [] }, 200, env);
+}
+
+// CREATE note — also push to MoySklad counterparty.description
+async function handleCrmNoteCreate(req, env) {
+  const auth = await _crmAuth(req, env);
+  if (!auth) return jsonResp({ error: 'unauthorized' }, 401, env);
+  const body = await readJson(req) || {};
+  const customerKey = String(body.customer_key || '').trim();
+  const customerId = String(body.customer_id || '').trim() || null;  // MoySklad cp.id для PATCH
+  const customerName = String(body.customer_name || '').trim();
+  const noteDate = String(body.note_date || '').trim();
+  const noteType = String(body.note_type || '').trim();
+  const summary = String(body.summary || '').trim();
+  const nextStep = String(body.next_step || '').trim() || null;
+  const nextDate = String(body.next_date || '').trim() || null;
+
+  if (!customerKey || !customerName || !noteDate || !noteType || !summary) {
+    return jsonResp({ error: 'customer_key, customer_name, note_date, note_type, summary обовʼязкові' }, 400, env);
+  }
+
+  const id = uid();
+  const now = Math.floor(Date.now() / 1000);
+  await env.DB.prepare(
+    `INSERT INTO customer_notes
+     (id, customer_key, customer_id, customer_name, note_date, note_type, summary, next_step, next_date,
+      author_email, author_name, created_at, ms_synced)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`
+  ).bind(
+    id, customerKey, customerId, customerName, noteDate, noteType, summary, nextStep, nextDate,
+    auth.email, auth.email.split('@')[0], now
+  ).run();
+
+  // MoySklad write-back (fire-and-forget — не блокуємо response)
+  // Якщо нема customerId (віртуальний клієнт) — skip MS sync
+  if (customerId && env.MOYSKLAD_TOKEN) {
+    const noteText = `[${noteDate} · ${auth.email} · ${noteType}] ${summary}`
+      + (nextStep ? `\nНаступний крок: ${nextStep}` : '')
+      + (nextDate ? `\nНаступний контакт: ${nextDate}` : '');
+    // Async fire-and-forget through ctx.waitUntil якщо доступний
+    (async () => {
+      try {
+        // 1. GET existing counterparty description
+        const cur = await fetch(
+          `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${customerId}`,
+          { headers: { Authorization: `Bearer ${env.MOYSKLAD_TOKEN}` } }
+        );
+        if (!cur.ok) throw new Error(`MS GET ${cur.status}`);
+        const cp = await cur.json();
+        const existingDesc = (cp.description || '').trim();
+        // 2. Prepend new note (newest first), keep existing below separator
+        const newDesc = `${noteText}\n\n--- CRM-лог (попередні нотатки) ---\n${existingDesc}`.slice(0, 4096); // MS limit
+        // 3. PATCH counterparty
+        const patch = await fetch(
+          `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${customerId}`,
+          {
+            method: 'PUT',
+            headers: { Authorization: `Bearer ${env.MOYSKLAD_TOKEN}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ description: newDesc })
+          }
+        );
+        if (!patch.ok) throw new Error(`MS PUT ${patch.status}: ${(await patch.text()).slice(0,200)}`);
+        // 4. Mark synced у D1
+        await env.DB.prepare(
+          `UPDATE customer_notes SET ms_synced = 1, ms_sync_at = ?, ms_sync_error = NULL WHERE id = ?`
+        ).bind(Math.floor(Date.now()/1000), id).run();
+      } catch (e) {
+        // Log error у D1 — manager бачить ⚠ у UI
+        try {
+          await env.DB.prepare(
+            `UPDATE customer_notes SET ms_sync_error = ? WHERE id = ?`
+          ).bind(String(e).slice(0, 300), id).run();
+        } catch (_) {}
+      }
+    })();
+  }
+
+  return jsonResp({ ok: true, id, ms_sync_pending: !!customerId }, 200, env);
+}
+
+// UPDATE existing note (edit form)
+async function handleCrmNoteUpdate(req, env) {
+  const auth = await _crmAuth(req, env);
+  if (!auth) return jsonResp({ error: 'unauthorized' }, 401, env);
+  const body = await readJson(req) || {};
+  const id = String(body.id || '').trim();
+  if (!id) return jsonResp({ error: 'id required' }, 400, env);
+  const now = Math.floor(Date.now() / 1000);
+  await env.DB.prepare(
+    `UPDATE customer_notes SET
+       note_date = COALESCE(?, note_date),
+       note_type = COALESCE(?, note_type),
+       summary   = COALESCE(?, summary),
+       next_step = ?, next_date = ?,
+       updated_at = ?
+     WHERE id = ?`
+  ).bind(
+    body.note_date || null, body.note_type || null, body.summary || null,
+    body.next_step ?? null, body.next_date ?? null, now, id
+  ).run();
+  return jsonResp({ ok: true }, 200, env);
+}
+
+// DELETE — soft delete (deleted = 1)
+async function handleCrmNoteDelete(req, env) {
+  const auth = await _crmAuth(req, env);
+  if (!auth) return jsonResp({ error: 'unauthorized' }, 401, env);
+  const body = await readJson(req) || {};
+  const id = String(body.id || '').trim();
+  if (!id) return jsonResp({ error: 'id required' }, 400, env);
+  await env.DB.prepare(`UPDATE customer_notes SET deleted = 1 WHERE id = ?`).bind(id).run();
+  return jsonResp({ ok: true }, 200, env);
+}
+
 // === ENTRY ===
 export default {
   async fetch(request, env) {
@@ -811,6 +953,11 @@ export default {
         case '/api/dashboard/ingest':       return await handleDashboardIngest(request, env);
         case '/api/dashboard/last-sync':    return await handleDashboardLastSync(request, env);
         case '/api/dashboard/data':         return await handleDashboardData(request, env);
+        // CRM notes (v2.75.0) — D1 backend + MoySklad write-back
+        case '/api/crm-notes/list':         return await handleCrmNotesList(request, env);
+        case '/api/crm-notes/create':       return await handleCrmNoteCreate(request, env);
+        case '/api/crm-notes/update':       return await handleCrmNoteUpdate(request, env);
+        case '/api/crm-notes/delete':       return await handleCrmNoteDelete(request, env);
         default: return jsonResp({ error: 'not found' }, 404, env);
       }
     } catch (e) {
