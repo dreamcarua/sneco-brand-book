@@ -26,7 +26,7 @@ jobs:
       - name: Generate + send briefing
         env:
           WORKER_URL: ${{ secrets.WORKER_URL }}
-          ADMIN_JWT_TOKEN: ${{ secrets.ADMIN_JWT_TOKEN }}
+          SYNC_API_KEY: ${{ secrets.SYNC_API_KEY }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           BRIEFING_TO: ${{ secrets.BRIEFING_TO }}
         run: python3 daily_briefing.py

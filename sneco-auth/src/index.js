@@ -719,15 +719,20 @@ async function handleDashboardLastSync(req, env) {
 }
 
 async function handleDashboardData(req, env) {
-  // Auth: JWT block='dashboard'
-  const auth = req.headers.get('Authorization') || '';
-  const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
-  if (!token) return jsonResp({ error: 'unauthorized' }, 401, env);
-  let payload;
-  try { payload = await jwtVerify(token, env.JWT_SECRET); }
-  catch (e) { return jsonResp({ error: 'invalid token' }, 401, env); }
-  if (!DASHBOARD_BLOCKS.has(payload.block) && !payload.isAdmin) {
-    return jsonResp({ error: 'forbidden' }, 403, env);
+  // Auth: JWT block='dashboard' OR X-Sync-Key (для scheduled tasks типу daily_briefing)
+  // v2.73.0 Phase B-2: SYNC_API_KEY дає read-access без expiration (alternative до 24h JWT).
+  const syncKey = req.headers.get('X-Sync-Key') || '';
+  if (!syncKey || syncKey !== env.SYNC_API_KEY) {
+    // Не sync-key — перевіряємо JWT
+    const auth = req.headers.get('Authorization') || '';
+    const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+    if (!token) return jsonResp({ error: 'unauthorized' }, 401, env);
+    let payload;
+    try { payload = await jwtVerify(token, env.JWT_SECRET); }
+    catch (e) { return jsonResp({ error: 'invalid token' }, 401, env); }
+    if (!DASHBOARD_BLOCKS.has(payload.block) && !payload.isAdmin) {
+      return jsonResp({ error: 'forbidden' }, 403, env);
+    }
   }
 
   const body = await readJson(req) || {};

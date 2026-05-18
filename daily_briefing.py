@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
 """
-snEco — Daily Briefing for KAM (v2.73.0 Phase B)
+snEco — Daily Briefing for KAM (v2.73.0 Phase B-2)
 
 Запускається щодня о 06:00 UTC через GitHub Action.
 1. Тягне дані з Cloudflare Worker /api/dashboard/data (counterparties + demands + payments)
-2. Розраховує health score per клієнт (та сама логіка що у customer-360.html)
-3. Виявляє ACTION ITEMS:
-   - 🔴 Overdue AR > 30 днів
-   - 🟡 Dormant: gap > 1.5× avg cadence
-   - 📞 Next CRM contact today/overdue (з D1, якщо буде backend; v1 — skip)
-   - ⚠ Trend 3m < -20% для TOP-50 клієнтів
-4. Формує HTML email + надсилає через Resend на vg@sneco.ua + KAM mailing list
+2. Виявляє ACTION ITEMS:
+   - 🔴 Critical overdue AR > 60 днів
+   - 🟡 Overdue 30-60 днів
+   - 📞 Dormant ТОП-50: gap > 1.5× avg cadence
+   - 📉 Trend 3m < -20% для ТОП-50
+3. Формує branded HTML email + надсилає через Resend
 
-ENV:
+ENV (всі вже у GitHub secrets після MoySklad sync setup):
   WORKER_URL              https://sneco-auth.vg-ab6.workers.dev
-  SYNC_API_KEY            secret для Worker (read access via /api/dashboard/data — JWT)
-  ADMIN_JWT_TOKEN         JWT з block='dashboard' для read API (видається у Brand Bible Maintenance)
+  SYNC_API_KEY            secret для read access (v2.73.0 B-2: Worker тепер приймає X-Sync-Key для /api/dashboard/data)
   RESEND_API_KEY          для відправки email
   BRIEFING_TO             comma-separated emails (default: vg@sneco.ua)
 """
@@ -23,20 +21,20 @@ ENV:
 import os, sys, json, requests
 from datetime import datetime, timedelta, timezone
 
-WORKER  = os.getenv("WORKER_URL", "https://sneco-auth.vg-ab6.workers.dev")
-TOKEN   = os.getenv("ADMIN_JWT_TOKEN", "")
-RESEND  = os.getenv("RESEND_API_KEY", "")
-TO      = [e.strip() for e in os.getenv("BRIEFING_TO", "vg@sneco.ua").split(",") if e.strip()]
+WORKER    = os.getenv("WORKER_URL", "https://sneco-auth.vg-ab6.workers.dev")
+SYNC_KEY  = os.getenv("SYNC_API_KEY", "")
+RESEND    = os.getenv("RESEND_API_KEY", "")
+TO        = [e.strip() for e in os.getenv("BRIEFING_TO", "vg@sneco.ua").split(",") if e.strip()]
 
-if not TOKEN or not RESEND:
-    print("❌ ADMIN_JWT_TOKEN + RESEND_API_KEY обов'язкові", file=sys.stderr)
+if not SYNC_KEY or not RESEND:
+    print("❌ SYNC_API_KEY + RESEND_API_KEY обов'язкові", file=sys.stderr)
     sys.exit(2)
 
 
 def fetch(table, limit=50000):
     r = requests.post(
         f"{WORKER}/api/dashboard/data",
-        headers={"Content-Type": "application/json", "Authorization": f"Bearer {TOKEN}"},
+        headers={"Content-Type": "application/json", "X-Sync-Key": SYNC_KEY},
         json={"type": table, "limit": limit},
         timeout=60,
     )
