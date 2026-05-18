@@ -67,6 +67,110 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .cust-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .cust-tag{padding:3px 10px;background:rgba(254,191,39,.18);color:var(--y);font-size:11px;font-weight:600;border-radius:10px;border:1px solid rgba(254,191,39,.3)}
 
+/* ─── v2.73.0 Phase B — PRINT-FRIENDLY PDF ─── */
+@media print {
+  /* Hide chrome */
+  .topbar,.selector-bar,.dashauth-session,.footer,.crm-modal,
+  .actions-bar,.crm-log-add,.crm-del,.act-btn,#refreshBtn,
+  .topbar-right,.tl-icon,#timelineBody{display:none !important}
+  /* Reset bg */
+  body{background:#fff !important;color:#000 !important;font-size:11pt}
+  .wrap{padding:0 !important;max-width:none !important}
+  /* No shadow / no border-radius */
+  .cust-header,.kpi,.cc,.health-hero,.dm-card,.crm-log,.cs-item{
+    box-shadow:none !important;border:1px solid #ddd !important;border-radius:6px !important;
+    page-break-inside:avoid;break-inside:avoid;
+  }
+  /* Header dark → light */
+  .cust-header{background:#f5f5f5 !important;color:#000 !important;}
+  .cust-header .cust-meta,.cust-header .cust-meta-item a{color:#333 !important}
+  .cust-name{color:#000 !important}
+  /* Charts canvas — keep but smaller */
+  .chart-h220,.chart-h280{height:180px !important}
+  /* Section titles tighter */
+  .sec{margin:14px 0 8px;font-size:10pt;color:#555}
+  /* Insights — slim */
+  .insight{padding:8px 12px;font-size:10pt}
+  /* Page break helpers */
+  .sec{page-break-after:avoid;break-after:avoid}
+  .health-hero,.cust-header{page-break-after:avoid;break-after:avoid}
+}
+
+/* ─── v2.73.0 HEALTH SCORE ─── */
+.health-hero{background:#fff;border-radius:14px;padding:18px 22px;border:1px solid var(--border);display:flex;align-items:center;gap:18px;margin-bottom:14px;position:relative;overflow:hidden}
+.health-circle{position:relative;width:96px;height:96px;flex-shrink:0}
+.health-circle svg{transform:rotate(-90deg)}
+.health-circle .hc-bg{stroke:#eee}
+.health-circle .hc-fg{stroke-linecap:round;transition:stroke-dashoffset .6s ease}
+.health-circle .hc-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:24px;color:var(--d);flex-direction:column;line-height:1}
+.health-circle .hc-num span{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-top:2px}
+.health-body{flex:1;min-width:0}
+.health-title{font-size:13px;font-weight:800;color:var(--d);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.health-badge{padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.health-badge.good{background:rgba(150,193,31,.18);color:#4a7000}
+.health-badge.warn{background:rgba(254,191,39,.20);color:#996600}
+.health-badge.bad{background:rgba(232,64,64,.14);color:#a00}
+.health-breakdown{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11.5px;color:#666}
+.health-breakdown b{color:var(--d);font-weight:700}
+.health-fact{display:inline-flex;align-items:center;gap:4px}
+
+/* ─── v2.73.0 CRM-LOG ─── */
+.crm-log{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.crm-log-empty{text-align:center;color:var(--muted);padding:18px 10px;font-size:12px;font-style:italic}
+.crm-log-add{background:var(--y);color:var(--d);border:0;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+.crm-log-add:hover{background:#e4ab1f}
+.crm-row{display:grid;grid-template-columns:90px 110px 1fr 130px;gap:10px;padding:10px 0;border-bottom:1px dashed var(--border);align-items:start;font-size:12.5px}
+.crm-row:last-child{border:none}
+.crm-row .crm-date{font-weight:700;color:var(--d);font-size:12px}
+.crm-row .crm-type{font-size:11px;font-weight:600;color:#555;padding:2px 8px;border-radius:8px;background:#F1F1EB;display:inline-block;white-space:nowrap}
+.crm-row .crm-text{color:#333;line-height:1.5}
+.crm-row .crm-text strong{display:block;color:var(--d);margin-top:4px;font-size:11.5px}
+.crm-row .crm-next{font-size:11px;color:var(--muted);text-align:right}
+.crm-row .crm-next.due{color:var(--red);font-weight:700}
+.crm-del{background:none;border:0;color:var(--muted);cursor:pointer;font-size:14px;margin-left:6px;opacity:.4;transition:opacity .15s}
+.crm-row:hover .crm-del{opacity:1}
+
+/* CRM modal */
+.crm-modal{position:fixed;inset:0;background:rgba(30,30,30,.7);z-index:9990;display:none;align-items:center;justify-content:center;padding:20px}
+.crm-modal.open{display:flex}
+.crm-modal-card{background:#fff;border-radius:14px;padding:24px 26px;width:100%;max-width:520px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.crm-modal-title{font-size:16px;font-weight:800;color:var(--d);margin-bottom:14px}
+.crm-modal label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:10px 0 4px}
+.crm-modal input,.crm-modal textarea,.crm-modal select{width:100%;padding:9px 11px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none}
+.crm-modal input:focus,.crm-modal textarea:focus,.crm-modal select:focus{border-color:var(--y)}
+.crm-modal textarea{min-height:70px;resize:vertical}
+.crm-modal-actions{display:flex;justify-content:space-between;gap:10px;margin-top:18px}
+.crm-modal-btn{padding:9px 18px;border-radius:8px;border:0;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:.3px}
+.crm-modal-btn.cancel{background:#F1F1EB;color:#666}
+.crm-modal-btn.save{background:var(--y);color:var(--d)}
+
+/* ─── v2.73.0 DECISION MAKERS ─── */
+.dm-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:8px}
+@media(max-width:760px){.dm-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.dm-grid{grid-template-columns:1fr}}
+.dm-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:11px 13px;position:relative}
+.dm-card .dm-role{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--y);background:rgba(254,191,39,.12);padding:2px 7px;border-radius:6px;display:inline-block;margin-bottom:5px}
+.dm-card .dm-name{font-weight:700;color:var(--d);font-size:13px;margin-bottom:3px}
+.dm-card .dm-contact{display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:#555}
+.dm-card .dm-contact a{color:#1d5fa6;text-decoration:none}
+.dm-card .dm-contact a:hover{text-decoration:underline}
+
+/* ─── v2.73.0 CROSS-SELL ─── */
+.cs-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));gap:8px}
+.cs-item{background:#fff;border:1px solid var(--border);border-radius:10px;padding:10px 13px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.cs-item .cs-name{font-size:12.5px;color:var(--d);font-weight:600;line-height:1.3}
+.cs-item .cs-info{font-size:10.5px;color:var(--muted);margin-top:2px}
+.cs-item .cs-opp{font-size:13px;font-weight:800;color:#4a7000;white-space:nowrap}
+
+/* ─── v2.73.0 PROMO RESPONSE ─── */
+.promo-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--border);font-size:12.5px}
+.promo-row:last-child{border:none}
+.promo-row .pr-month{font-weight:700;color:var(--d);min-width:90px}
+.promo-row .pr-bar{flex:1;height:14px;background:#F1F1EB;border-radius:7px;position:relative;overflow:hidden}
+.promo-row .pr-bar-fg{height:100%;background:linear-gradient(90deg, var(--g), var(--y));border-radius:7px}
+.promo-row .pr-lift{font-weight:800;color:#4a7000;min-width:70px;text-align:right;font-size:13px}
+.promo-row .pr-vs{font-size:10.5px;color:var(--muted);min-width:75px}
+
 /* ─── KPI CARDS ─── */
 .kpi{background:var(--card);border-radius:12px;padding:16px 18px;border:1px solid var(--border);position:relative;overflow:hidden}
 .kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px}
@@ -314,6 +418,35 @@ body.dash-locked{overflow:hidden}
   </div>
 </div>
 
+<!-- v2.73.0 CRM-LOG MODAL -->
+<div class="crm-modal" id="crmModal">
+  <div class="crm-modal-card">
+    <div class="crm-modal-title">📝 Новий запис у CRM-лог</div>
+    <input type="hidden" id="crmModalKey">
+    <input type="hidden" id="crmEditIdx" value="-1">
+    <label>Дата контакту</label>
+    <input type="date" id="crmDate">
+    <label>Тип</label>
+    <select id="crmType">
+      <option value="📞 Дзвінок">📞 Дзвінок</option>
+      <option value="✉ Email">✉ Email</option>
+      <option value="🤝 Зустріч">🤝 Зустріч</option>
+      <option value="💬 Месенджер">💬 Месенджер</option>
+      <option value="📝 Нотатка">📝 Нотатка</option>
+    </select>
+    <label>Короткий звіт</label>
+    <textarea id="crmSummary" placeholder="Про що говорили, які домовленості, проблеми…"></textarea>
+    <label>Наступний крок</label>
+    <input type="text" id="crmNextStep" placeholder="Напр.: підготувати пропозицію по новому SKU">
+    <label>Дата наступного контакту</label>
+    <input type="date" id="crmNextDate">
+    <div class="crm-modal-actions">
+      <button class="crm-modal-btn cancel" onclick="closeCrmModal()">Скасувати</button>
+      <button class="crm-modal-btn save" onclick="saveCrmEntry()">Зберегти</button>
+    </div>
+  </div>
+</div>
+
 <!-- SELECTOR -->
 <div class="selector-bar">
   <div class="search-wrap">
@@ -336,7 +469,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.72.5 · повна картка (legal_address_comment + tags) + comparison block + Топ-1 fix · МойСклад API · Оновлення: щодня 06:00
+  snEco Customer 360 v2.73.0 · Health Score + Next Order forecast + Decision-makers + CRM-log + Cross-sell + Promo response · МойСклад API · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -366,6 +499,278 @@ const nf  = n => Number(n||0).toLocaleString('uk-UA');
 const nfm = n => (Math.abs(n) >= 1e6 ? (n/1e6).toFixed(1) + 'M' : Math.abs(n) >= 1e3 ? (n/1e3).toFixed(0) + 'K' : Math.round(n));
 const df  = d => { try { return new Date(d).toLocaleDateString('uk-UA', {day:'2-digit', month:'2-digit', year:'numeric'}); } catch(e){ return d; }};
 const dfShort = d => { try { return new Date(d).toLocaleDateString('uk-UA', {day:'2-digit', month:'2-digit'}); } catch(e){ return d; }};
+
+// ============================================================================
+// v2.73.0 — CRM-LOG (localStorage-based, per-customer)
+// ============================================================================
+// Зберігається у localStorage key `snEco-crm-log-${customerKey}` = array of:
+//   { date: 'YYYY-MM-DD', type: '📞 Дзвінок', summary: '...', nextStep: '...', nextDate: 'YYYY-MM-DD' }
+// Limitation v1: per-browser, not synced across team. v2 буде D1 backend.
+const CRM_KEY = (custKey) => `snEco-crm-log-${custKey}`;
+function loadCrmLog(custKey){
+  try { return JSON.parse(localStorage.getItem(CRM_KEY(custKey)) || '[]'); } catch(e) { return []; }
+}
+function saveCrmLog(custKey, arr){
+  try { localStorage.setItem(CRM_KEY(custKey), JSON.stringify(arr)); } catch(e){}
+}
+
+// Поточний клієнт для модального вікна (set у renderCustomerView)
+let _currentCustKey = null;
+
+window.openCrmModal = function(editIdx){
+  if (editIdx === undefined) editIdx = -1;
+  const modal = document.getElementById('crmModal');
+  document.getElementById('crmModalKey').value = _currentCustKey;
+  document.getElementById('crmEditIdx').value = editIdx;
+  if (editIdx >= 0) {
+    const arr = loadCrmLog(_currentCustKey);
+    const e = arr[editIdx] || {};
+    document.getElementById('crmDate').value = e.date || new Date().toISOString().slice(0,10);
+    document.getElementById('crmType').value = e.type || '📞 Дзвінок';
+    document.getElementById('crmSummary').value = e.summary || '';
+    document.getElementById('crmNextStep').value = e.nextStep || '';
+    document.getElementById('crmNextDate').value = e.nextDate || '';
+  } else {
+    document.getElementById('crmDate').value = new Date().toISOString().slice(0,10);
+    document.getElementById('crmType').value = '📞 Дзвінок';
+    document.getElementById('crmSummary').value = '';
+    document.getElementById('crmNextStep').value = '';
+    document.getElementById('crmNextDate').value = '';
+  }
+  modal.classList.add('open');
+};
+window.closeCrmModal = function(){
+  document.getElementById('crmModal').classList.remove('open');
+};
+window.saveCrmEntry = function(){
+  const custKey = document.getElementById('crmModalKey').value;
+  if (!custKey) return;
+  const idx = parseInt(document.getElementById('crmEditIdx').value, 10);
+  const entry = {
+    date: document.getElementById('crmDate').value || new Date().toISOString().slice(0,10),
+    type: document.getElementById('crmType').value,
+    summary: document.getElementById('crmSummary').value.trim(),
+    nextStep: document.getElementById('crmNextStep').value.trim(),
+    nextDate: document.getElementById('crmNextDate').value,
+  };
+  if (!entry.summary) { alert('Заповни короткий звіт'); return; }
+  const arr = loadCrmLog(custKey);
+  if (idx >= 0) arr[idx] = entry; else arr.unshift(entry);
+  arr.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  saveCrmLog(custKey, arr);
+  closeCrmModal();
+  // Re-render current customer view
+  const c = allCounterparties.find(x => x.__key === custKey || x.name === custKey);
+  if (c) renderCustomerView(c);
+};
+window.deleteCrmEntry = function(custKey, idx){
+  if (!confirm('Видалити цей запис з CRM-логу?')) return;
+  const arr = loadCrmLog(custKey);
+  arr.splice(idx, 1);
+  saveCrmLog(custKey, arr);
+  const c = allCounterparties.find(x => x.__key === custKey || x.name === custKey);
+  if (c) renderCustomerView(c);
+};
+
+// ============================================================================
+// v2.73.0 — DECISION-MAKERS parsing from legal_address_comment + tags
+// ============================================================================
+// Reality check (Епіцентр приклад): contact text часто має формат:
+//   "Алексей - 380952723013\no.kapusta@epicentrk.ua\nЕлена - 063 529 90 57 (заказы)"
+// Парсимо лінії з phone/email + heuristic role detection.
+function parseDecisionMakers(commentText){
+  if (!commentText) return [];
+  const lines = String(commentText).split('\n').map(l => l.trim()).filter(Boolean);
+  const phoneRe = /(\+?\d[\d\s\-\(\)]{8,15}\d)/;
+  const emailRe = /([a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/;
+  const roleHints = [
+    [/buyer|закупки|закупник/i, 'Buyer'],
+    [/заказы|order|оператор/i, 'Orders'],
+    [/логистик|logistic/i, 'Logistics'],
+    [/директор|director|ceo/i, 'Director'],
+    [/бухгалтер|account|финанс|фінанс/i, 'Finance'],
+    [/marketing|маркетинг/i, 'Marketing'],
+  ];
+  const result = [];
+  let pendingName = null;
+  for (const line of lines) {
+    const phone = (line.match(phoneRe) || [])[1];
+    const email = (line.match(emailRe) || [])[1];
+    if (!phone && !email) {
+      // Можливо це name або інфо line
+      if (line.length < 60 && !/[0-9]/.test(line)) pendingName = line;
+      continue;
+    }
+    // Name = text before phone/email, OR previous pendingName, OR "—"
+    let name = line;
+    if (phone) name = line.split(phone)[0].replace(/[-—:.,]\s*$/, '').trim();
+    else if (email) name = line.split(email)[0].replace(/[-—:.,]\s*$/, '').trim();
+    if (!name && pendingName) { name = pendingName; pendingName = null; }
+    if (!name) name = '—';
+    // Role from line text
+    let role = '';
+    for (const [re, r] of roleHints) {
+      if (re.test(line)) { role = r; break; }
+    }
+    result.push({ name: name.slice(0, 60), role, phone, email });
+  }
+  return result;
+}
+
+// ============================================================================
+// v2.73.0 — HEALTH SCORE 0-100
+// ============================================================================
+// Weights:
+//   AR (40): overdueAR=0 → 40 pts; overdueAR>0.3*totalShipped → 0 pts; linear in between
+//   Cadence (25): daysSinceLast/avgCadence ratio. <1 → 25; 1-1.5 → 18; 1.5-3 → 10; >3 → 0
+//   Trend 3m (20): >+10% → 20; 0-10% → 15; -10-0% → 10; <-10% → 0
+//   Return rate (10): <2% → 10; 2-5% → 7; 5-10% → 3; >10% → 0
+//   CRM activity (5): last note <14d → 5; 14-30d → 3; >30d → 0
+function calcHealthScore({ overdueAR, totalShipped, daysSinceLast, avgCadenceDays, trend3m, returnRate, crmLog }){
+  const breakdown = [];
+  // AR (40)
+  let arPts = 40;
+  if (totalShipped > 0 && overdueAR > 0) {
+    const ratio = overdueAR / totalShipped;
+    arPts = Math.max(0, Math.round(40 * (1 - ratio / 0.3)));
+  }
+  breakdown.push({ label: 'AR (дебіторка)', pts: arPts, max: 40 });
+  // Cadence (25)
+  let cadPts = 25;
+  if (avgCadenceDays && daysSinceLast !== null) {
+    const r = daysSinceLast / avgCadenceDays;
+    if (r > 3) cadPts = 0;
+    else if (r > 1.5) cadPts = 10;
+    else if (r > 1) cadPts = 18;
+    else cadPts = 25;
+  } else if (daysSinceLast > 90) cadPts = 0;
+  else if (avgCadenceDays === null && daysSinceLast === null) cadPts = 15; // unknown — neutral
+  breakdown.push({ label: 'Темп замовлень', pts: cadPts, max: 25 });
+  // Trend (20)
+  let trPts = 15;
+  if (trend3m !== null) {
+    if (trend3m > 10) trPts = 20;
+    else if (trend3m >= 0) trPts = 15;
+    else if (trend3m >= -10) trPts = 10;
+    else trPts = 0;
+  }
+  breakdown.push({ label: 'Тренд 3 міс', pts: trPts, max: 20 });
+  // Return rate (10)
+  let retPts = 10;
+  if (returnRate >= 10) retPts = 0;
+  else if (returnRate >= 5) retPts = 3;
+  else if (returnRate >= 2) retPts = 7;
+  breakdown.push({ label: 'Return rate', pts: retPts, max: 10 });
+  // CRM activity (5)
+  let crmPts = 0;
+  if (crmLog && crmLog.length) {
+    const lastNoteDate = crmLog[0].date;
+    if (lastNoteDate) {
+      const days = Math.floor((Date.now() - new Date(lastNoteDate).getTime()) / 86400000);
+      if (days <= 14) crmPts = 5;
+      else if (days <= 30) crmPts = 3;
+    }
+  }
+  breakdown.push({ label: 'CRM активність', pts: crmPts, max: 5 });
+
+  const total = breakdown.reduce((a, b) => a + b.pts, 0);
+  return { total, breakdown };
+}
+
+// ============================================================================
+// v2.73.0 — NEXT ORDER FORECAST
+// ============================================================================
+function calcNextOrderForecast({ daysSinceLast, avgCadenceDays, lastOrder, avgOrderSize }){
+  if (!avgCadenceDays || daysSinceLast === null || !lastOrder) {
+    return { label: 'Недостатньо даних', sub: 'min 2 замовлення для прогнозу', cls: 'cb' };
+  }
+  const expectedDay = new Date(new Date(lastOrder).getTime() + avgCadenceDays * 86400000);
+  const daysLeft = Math.floor((expectedDay.getTime() - Date.now()) / 86400000);
+  if (daysLeft > 0) {
+    return {
+      label: `Через ${daysLeft} дн`,
+      sub: `≈ ${df(expectedDay.toISOString())} · очік. сума ${nfm(avgOrderSize)} ₴`,
+      cls: daysLeft <= 7 ? 'cy' : 'cg'
+    };
+  } else {
+    const overdue = Math.abs(daysLeft);
+    return {
+      label: `Спізнюється ${overdue} дн`,
+      sub: `Мав би замовити ${df(expectedDay.toISOString())} · підготувати пропозицію`,
+      cls: overdue > avgCadenceDays * 0.5 ? 'cr' : 'cy'
+    };
+  }
+}
+
+// ============================================================================
+// v2.73.0 — PROMO RESPONSE DETECTION
+// ============================================================================
+// Шукаємо місяці-spike: revenue > 1.5× від ковзного середнього 3 сусідніх місяців.
+// Для кожного spike рахуємо uplift % (vs avg оточуючих).
+function detectPromoSpikes(shipByMonth){
+  const months = Object.keys(shipByMonth).sort();
+  if (months.length < 4) return [];
+  const spikes = [];
+  for (let i = 1; i < months.length - 1; i++) {
+    const cur = shipByMonth[months[i]] || 0;
+    const prev = shipByMonth[months[i-1]] || 0;
+    const next = shipByMonth[months[i+1]] || 0;
+    const surroundAvg = (prev + next) / 2;
+    if (surroundAvg <= 0 || cur < 1000) continue;
+    const lift = ((cur - surroundAvg) / surroundAvg) * 100;
+    if (lift >= 50) {
+      spikes.push({ month: months[i], revenue: cur, baseline: surroundAvg, lift });
+    }
+  }
+  return spikes.sort((a,b) => b.lift - a.lift).slice(0, 6);
+}
+
+// ============================================================================
+// v2.73.0 — CROSS-SELL OPPORTUNITY
+// ============================================================================
+// Знаходимо SKU які peers (similar клієнти у тому ж revenue tier) купляють,
+// а наш клієнт — ні. Sort by avg sum_kop серед peers.
+function calcCrossSell(c, allDemandPositions, allCounterparties){
+  if (!allDemandPositions || allDemandPositions.length === 0) {
+    return { items: [], reason: 'demand_positions ще пуста — чекаємо sync' };
+  }
+  // Поточний клієнт — список SKU
+  const myKey = c.__key || c.id || c.name;
+  const myMatch = p => (p.agent_id && (p.agent_id === c.id || p.agent_id === myKey)) || (p.agent === c.name);
+  const mySKUs = new Set();
+  allDemandPositions.filter(myMatch).forEach(p => {
+    const name = p.product_name || p.assortment_name || p.name;
+    if (name) mySKUs.add(name);
+  });
+
+  // Peer tier — клієнти з revenue у +/- 50% від нашого
+  const myRev = c.__revenue || 0;
+  if (myRev <= 0) return { items: [], reason: 'клієнт без revenue — peers не визначені' };
+  const peers = allCounterparties.filter(x =>
+    x !== c && x.__revenue > myRev * 0.5 && x.__revenue < myRev * 1.5
+  );
+  if (peers.length === 0) return { items: [], reason: 'нема peers у tier' };
+  const peerKeys = new Set(peers.map(p => p.id || p.name));
+  const peerNames = new Set(peers.map(p => p.name));
+
+  // Aggregate SKUs across peers
+  const skuStats = {}; // {name: {peerCount, totalSum}}
+  allDemandPositions.forEach(p => {
+    const matchesPeer = (p.agent_id && peerKeys.has(p.agent_id)) || (p.agent && peerNames.has(p.agent));
+    if (!matchesPeer) return;
+    const name = p.product_name || p.assortment_name || p.name;
+    if (!name || mySKUs.has(name)) return; // already buys → skip
+    if (!skuStats[name]) skuStats[name] = { peerCount: new Set(), totalSum: 0 };
+    skuStats[name].peerCount.add(p.agent_id || p.agent);
+    skuStats[name].totalSum += (p.sum_kop || 0) / 100;
+  });
+  const items = Object.entries(skuStats)
+    .map(([name, s]) => ({ name, peerCount: s.peerCount.size, avgPerPeer: s.totalSum / s.peerCount.size }))
+    .filter(x => x.peerCount >= 2) // мінімум 2 peers купляють — для статистичної значимості
+    .sort((a, b) => b.avgPerPeer - a.avgPerPeer)
+    .slice(0, 10);
+  return { items, reason: items.length === 0 ? 'усе що peers купляють — клієнт уже бере' : '' };
+}
 
 async function fetchJson(type, opts){
   const body = Object.assign({ type, limit: 50000 }, opts || {});
@@ -834,6 +1239,13 @@ function renderCustomerView(c){
   });
   const avgAOV = allAOVs.length ? allAOVs.reduce((a,x)=>a+x,0) / allAOVs.length : 0;
   const avgCadence = allCadences.length ? Math.round(allCadences.reduce((a,x)=>a+x,0) / allCadences.length) : null;
+
+  // v2.73.0: Set _currentCustKey for CRM modal
+  _currentCustKey = c.__key || c.id || c.name;
+  const crmLog = loadCrmLog(_currentCustKey);
+
+  // v2.73.0: forecast — avg order size = totalShipped / ordersCount (calc'd later)
+  // calc'd inline below where totalShipped is available.
   // Avg SKUs per customer — based on demand_positions if available
   let avgSKUs = null;
   if (allDemandPositions.length > 0) {
@@ -1138,6 +1550,40 @@ function renderCustomerView(c){
 
   if (actions.length === 0) actions.push({ icon:'✅', priority:'green', title:'Клієнт у нормі — все ОК', expected:'Тримати поточний рівень обслуговування' });
 
+  // ============================================================================
+  // v2.73.0 — Health Score + Next Order + Decision-makers + Cross-sell + Promo
+  // ============================================================================
+  const healthScore = calcHealthScore({
+    overdueAR, totalShipped, daysSinceLast, avgCadenceDays,
+    trend3m, returnRate, crmLog
+  });
+  const healthCls = healthScore.total >= 70 ? 'good' : healthScore.total >= 40 ? 'warn' : 'bad';
+  const healthLabel = healthScore.total >= 70 ? 'Здоровий клієнт'
+                    : healthScore.total >= 40 ? 'Потребує уваги' : 'Критичний стан';
+  const healthColor = healthScore.total >= 70 ? 'var(--g)' : healthScore.total >= 40 ? 'var(--y)' : 'var(--red)';
+
+  // Next order forecast (avgOrderSize у грн)
+  const avgOrderSize = ordersCount ? totalShipped / ordersCount : 0;
+  const nextOrder = calcNextOrderForecast({ daysSinceLast, avgCadenceDays, lastOrder, avgOrderSize });
+
+  // Decision-makers — парсимо з legal_address_comment (там часто контакти)
+  let raw = {};
+  try { raw = typeof c.raw_json === 'string' ? JSON.parse(c.raw_json) : (c.raw_json||{}); } catch(e) {}
+  const commentText = c.legal_address_comment || raw['Юр.адреса коментар'] || raw['legalAddressFull']
+    || c.description || raw['Коментар'] || '';
+  const decisionMakers = parseDecisionMakers(commentText);
+
+  // Cross-sell — SKUs that peers buy but this customer doesn't
+  const crossSell = calcCrossSell(c, allDemandPositions, allCounterparties);
+
+  // Promo response — spikes у shipByMonth
+  const promoSpikes = detectPromoSpikes(shipByMonth);
+
+  // Last CRM contact info
+  const lastCrm = crmLog[0];
+  const nextCrmContact = crmLog.find(e => e.nextDate);
+  const nextCrmOverdue = nextCrmContact && nextCrmContact.nextDate < new Date().toISOString().slice(0,10);
+
   // === Build HTML ===
   const tags = (c.tags||'').split(',').map(t=>t.trim()).filter(Boolean);
   const html = `
@@ -1162,6 +1608,28 @@ function renderCustomerView(c){
       </div>
     </div>
 
+    <!-- v2.73.0 HEALTH SCORE HERO -->
+    <div class="health-hero">
+      <div class="health-circle">
+        <svg viewBox="0 0 96 96" width="96" height="96">
+          <circle cx="48" cy="48" r="40" fill="none" stroke-width="8" class="hc-bg"></circle>
+          <circle cx="48" cy="48" r="40" fill="none" stroke-width="8" class="hc-fg"
+            stroke="${healthColor}"
+            stroke-dasharray="${2 * Math.PI * 40}"
+            stroke-dashoffset="${2 * Math.PI * 40 * (1 - healthScore.total / 100)}"></circle>
+        </svg>
+        <div class="hc-num">${healthScore.total}<span>health</span></div>
+      </div>
+      <div class="health-body">
+        <div class="health-title">🩺 Health score <span class="health-badge ${healthCls}">${healthLabel}</span></div>
+        <div class="health-breakdown">
+          ${healthScore.breakdown.map(b => `<span class="health-fact"><b>${b.pts}</b>/${b.max} ${b.label}</span>`).join('')}
+        </div>
+        ${lastCrm ? `<div style="font-size:11.5px;color:var(--muted);margin-top:8px">📞 Останній контакт: <b style="color:var(--d)">${df(lastCrm.date)}</b> · ${lastCrm.type} · ${escapeHtml(lastCrm.summary.slice(0,70))}${lastCrm.summary.length>70?'…':''}</div>` : `<div style="font-size:11.5px;color:var(--red);margin-top:8px">⚠ Жодного запису у CRM-лозі — додай перший!</div>`}
+        ${nextCrmContact ? `<div style="font-size:11.5px;color:${nextCrmOverdue?'var(--red)':'var(--muted)'};margin-top:3px">📅 Наступний контакт: <b style="color:${nextCrmOverdue?'var(--red)':'var(--d)'}">${df(nextCrmContact.nextDate)}</b>${nextCrmOverdue?' (прострочено!)':''} — ${escapeHtml(nextCrmContact.nextStep || '')}</div>` : ''}
+      </div>
+    </div>
+
     <!-- KPI STRIP (v2.69) -->
     <div class="g4">
       <div class="kpi cg">
@@ -1179,23 +1647,33 @@ function renderCustomerView(c){
         <div class="kpi-val" style="font-size:18px">${lastOrder ? df(lastOrder) : '—'}</div>
         <div class="kpi-sub">${daysSinceLast !== null ? daysSinceLast + ' днів тому' : '—'}</div>
       </div>
-      <div class="kpi cg">
-        <div class="kpi-lbl">📋 В межах терміну (≤30 дн)</div>
-        <div class="kpi-val">${nfm(freshAR)} ₴</div>
-        <div class="kpi-sub">${freshDemands.length} рахунків</div>
+      <!-- v2.73.0 NEXT ORDER FORECAST — replaces "Дебіторка в межах терміну" (того блока є duplicate нижче) -->
+      <div class="kpi ${nextOrder.cls}">
+        <div class="kpi-lbl">🔮 Наступне замовлення</div>
+        <div class="kpi-val" style="font-size:17px">${nextOrder.label}</div>
+        <div class="kpi-sub">${nextOrder.sub}</div>
       </div>
     </div>
 
-    <!-- AOV + Rank + ReturnRate + Pipeline + Overdue AR -->
-    <div class="g4" style="margin-top:14px">
+    <!-- KPI STRIP — AR row -->
+    <div class="g2" style="margin-top:14px">
+      <div class="kpi cg">
+        <div class="kpi-lbl">📋 Дебіторка в межах терміну (≤30 дн)</div>
+        <div class="kpi-val">${nfm(freshAR)} ₴</div>
+        <div class="kpi-sub">${freshDemands.length} рахунків</div>
+      </div>
       <div class="kpi cr">
         <div class="kpi-lbl">🔴 Протерміновано (>30 дн)</div>
         <div class="kpi-val" style="color:${overdueAR>0?'var(--red)':'var(--d)'}">${nfm(overdueAR)} ₴</div>
         <div class="kpi-sub">${overdueDemands.length} рахунків</div>
       </div>
+    </div>
+
+    <!-- AOV + Rank + ReturnRate + Pipeline (overdueAR переніс наверх у KPI Strip) -->
+    <div class="g3" style="margin-top:14px">
       <div class="kpi cy">
         <div class="kpi-lbl">Rank vs усіх клієнтів</div>
-        <div class="kpi-val">${rank > 0 ? '#'+rank : '—'} <span style="font-size:13px;color:var(--muted)">з ${totalClients}</span></div>
+        <div class="kpi-val">${rank === 1 ? 'ТОП-1' : rank > 0 ? '#'+rank : '—'} <span style="font-size:13px;color:var(--muted)">з ${totalClients}</span></div>
         <div class="kpi-sub">${sharePct.toFixed(2)}% загальної виручки</div>
       </div>
       <div class="kpi ${returnRate>5?'cr':'cg'}">
@@ -1204,9 +1682,9 @@ function renderCustomerView(c){
         <div class="kpi-sub">${nf(Math.round(totalReturns))} ₴ повернень</div>
       </div>
       <div class="kpi cb">
-        <div class="kpi-lbl">Активні замовлення</div>
+        <div class="kpi-lbl">Активні замовлення (не відвантажені)</div>
         <div class="kpi-val">${nf(ords.filter(o => ((o.sum_kop||0) - (o.shipped_sum_kop||0)) > 0).length)}</div>
-        <div class="kpi-sub">не відвантажені</div>
+        <div class="kpi-sub">з ${ords.length} всього</div>
       </div>
     </div>
 
@@ -1311,6 +1789,88 @@ function renderCustomerView(c){
         <div class="timeline" id="timelineBody"></div>
       </div>
     </div>
+
+    <!-- v2.73.0 — DECISION MAKERS (parsed з legal_address_comment) -->
+    ${decisionMakers.length ? `
+      <div class="sec">👥 Контактні особи · ${decisionMakers.length}</div>
+      <div class="dm-grid">
+        ${decisionMakers.map(dm => `
+          <div class="dm-card">
+            ${dm.role ? `<div class="dm-role">${dm.role}</div>` : ''}
+            <div class="dm-name">${escapeHtml(dm.name)}</div>
+            <div class="dm-contact">
+              ${dm.phone ? `<a href="tel:${escapeAttr(dm.phone.replace(/[\s\-\(\)]/g,''))}">📞 ${escapeHtml(dm.phone)}</a>` : ''}
+              ${dm.email ? `<a href="mailto:${escapeAttr(dm.email)}">✉ ${escapeHtml(dm.email)}</a>` : ''}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    ` : ''}
+
+    <!-- v2.73.0 — CRM-LOG (manager-editable, localStorage) -->
+    <div class="sec">📝 CRM-лог · комунікації з клієнтом
+      <button class="crm-log-add" onclick="openCrmModal()" style="margin-left:auto">+ Додати запис</button>
+    </div>
+    <div class="crm-log">
+      ${crmLog.length === 0 ? `
+        <div class="crm-log-empty">
+          ⚪ Записів немає — фіксуй кожен дзвінок / зустріч / лист, щоб не забути домовленості.<br>
+          <button class="crm-log-add" onclick="openCrmModal()" style="margin-top:10px">📝 Створити перший запис</button>
+        </div>
+      ` : crmLog.map((e, i) => {
+        const nextOverdueRow = e.nextDate && e.nextDate < new Date().toISOString().slice(0,10);
+        return `
+        <div class="crm-row">
+          <div class="crm-date">${df(e.date)}</div>
+          <div><span class="crm-type">${escapeHtml(e.type)}</span></div>
+          <div class="crm-text">
+            ${escapeHtml(e.summary)}
+            ${e.nextStep ? `<strong>🎯 ${escapeHtml(e.nextStep)}</strong>` : ''}
+          </div>
+          <div class="crm-next ${nextOverdueRow ? 'due' : ''}">
+            ${e.nextDate ? `📅 ${df(e.nextDate)}${nextOverdueRow ? ' ⚠' : ''}` : ''}
+            <button class="crm-del" onclick="window.openCrmModal(${i})" title="Редагувати">✎</button>
+            <button class="crm-del" onclick="window.deleteCrmEntry('${escapeAttr(_currentCustKey)}', ${i})" title="Видалити">×</button>
+          </div>
+        </div>
+      `}).join('')}
+    </div>
+
+    <!-- v2.73.0 — CROSS-SELL OPPORTUNITY -->
+    ${crossSell.items.length > 0 ? `
+      <div class="sec">🎯 Cross-sell opportunity · SKU що peers купляють, а ${escapeHtml(c.name)} — ні</div>
+      <div class="cs-grid">
+        ${crossSell.items.map(it => `
+          <div class="cs-item">
+            <div>
+              <div class="cs-name">${escapeHtml(it.name)}</div>
+              <div class="cs-info">${it.peerCount} peer${it.peerCount===1?'':'s'} купляють</div>
+            </div>
+            <div class="cs-opp">${nfm(it.avgPerPeer)} ₴</div>
+          </div>
+        `).join('')}
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;font-style:italic">💡 Σ avg per peer — потенційна opportunity якщо клієнт додасть ці SKU у замовлення. Peers = клієнти з revenue +/- 50% від цього.</div>
+    ` : `
+      <div class="sec">🎯 Cross-sell opportunity</div>
+      <div class="cc" style="font-size:13px;color:var(--muted);font-style:italic">${crossSell.reason}</div>
+    `}
+
+    <!-- v2.73.0 — PROMO RESPONSE -->
+    ${promoSpikes.length > 0 ? `
+      <div class="sec">🚀 Promo response · сплески замовлень (lift > 50%)</div>
+      <div class="cc">
+        ${promoSpikes.map(s => `
+          <div class="promo-row">
+            <div class="pr-month">${s.month}</div>
+            <div class="pr-bar"><div class="pr-bar-fg" style="width:${Math.min(100, s.lift / 3)}%"></div></div>
+            <div class="pr-vs">vs ${nfm(s.baseline)} ₴</div>
+            <div class="pr-lift">+${Math.round(s.lift)}%</div>
+          </div>
+        `).join('')}
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;font-style:italic">💡 snEco avg promo lift = +126%. Якщо у клієнта lift вищий — він добре реагує на акції, легко планувати майбутні промо.</div>
+      </div>
+    ` : ''}
 
     <!-- NOTES from raw_json -->
     ${renderNotes(c)}
