@@ -336,7 +336,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.72.3 · AR rounding fix (0₴ як не overdue) · МойСклад API · Оновлення: щодня 06:00
+  snEco Customer 360 v2.72.5 · повна картка (legal_address_comment + tags) + comparison block + Топ-1 fix · МойСклад API · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -811,11 +811,42 @@ function renderCustomerView(c){
   const allClientsByRev = allCounterparties.filter(x => x.__revenue > 0).sort((a,b) => b.__revenue - a.__revenue);
   const rank = allClientsByRev.findIndex(x => x === c || x.__key === c.__key || x.name === c.name) + 1;
   const totalClients = allClientsByRev.length;
-  // v2.69: якщо не знайдено (rank=0) — це віртуальний клієнт або з нульовою виручкою
-  const percentile = rank > 0 ? Math.round((1 - (rank-1)/Math.max(1,totalClients)) * 100) : null;
+  // v2.72.5: percentile = "% клієнтів які мають МЕНШЕ revenue"
+  // Top-1: (N-1)/N — для UI краще показувати "Топ-1" окремо
+  const percentile = rank > 0 ? Math.round((totalClients - rank) / Math.max(1, totalClients) * 100) : null;
   const totalRevAll = allClientsByRev.reduce((a,x) => a+x.__revenue, 0);
   const sharePct = totalRevAll ? (totalShipped/totalRevAll*100) : 0;
   const avgRev = totalClients > 0 ? totalRevAll/totalClients : 0;
+
+  // === v2.72.5: Comparison data — avg cadence / AOV / growth / SKUs across ВСІХ клієнтів ===
+  // Це для блоку "Порівняння" — щоб бачити чи наш клієнт ВИЩЕ/НИЖЧЕ середнього.
+  const allAOVs = [], allCadences = [], allRecentGrowth = [];
+  allCounterparties.forEach(cust => {
+    if (!cust.__revenue || cust.__revenue <= 0) return;
+    const custDems = allDemands.filter(d => (d.agent_id && d.agent_id === cust.id) || (d.agent === cust.name));
+    if (custDems.length < 2) return;
+    const totalSum = custDems.reduce((a,d) => a + (d.sum_kop||0)/100, 0);
+    allAOVs.push(totalSum / custDems.length);
+    const dates = custDems.map(d => new Date(d.ms_moment).getTime()).sort((a,b)=>a-b);
+    const gaps = [];
+    for (let j=1; j<dates.length; j++) gaps.push((dates[j]-dates[j-1])/86400000);
+    if (gaps.length) allCadences.push(gaps.reduce((a,x)=>a+x,0) / gaps.length);
+  });
+  const avgAOV = allAOVs.length ? allAOVs.reduce((a,x)=>a+x,0) / allAOVs.length : 0;
+  const avgCadence = allCadences.length ? Math.round(allCadences.reduce((a,x)=>a+x,0) / allCadences.length) : null;
+  // Avg SKUs per customer — based on demand_positions if available
+  let avgSKUs = null;
+  if (allDemandPositions.length > 0) {
+    const skusByAgent = {};
+    allDemandPositions.forEach(p => {
+      const key = p.agent_id || p.agent;
+      if (!key) return;
+      if (!skusByAgent[key]) skusByAgent[key] = new Set();
+      if (p.product_name) skusByAgent[key].add(p.product_name);
+    });
+    const skuCounts = Object.values(skusByAgent).map(s => s.size).filter(n => n > 0);
+    if (skuCounts.length) avgSKUs = Math.round(skuCounts.reduce((a,x)=>a+x,0) / skuCounts.length);
+  }
 
   // === Shipments + Payments trend (v2.69) ===
   const shipByMonth = {};
@@ -1303,23 +1334,53 @@ function renderCustomerView(c){
       `).join('')}
     </div>
 
-    <!-- COMPARISON -->
+    <!-- COMPARISON (v2.72.5: розширено — LTV / cadence / AOV / growth / SKUs vs avg) -->
     <div class="sec">📊 Порівняння з усіма клієнтами</div>
-    <div class="g3">
-      <div class="kpi">
-        <div class="kpi-lbl">Avg клієнт</div>
-        <div class="kpi-val">${nfm(avgRev)} ₴</div>
-        <div class="kpi-sub">середня LTV</div>
-      </div>
+    <div class="g4">
+      <!-- 1. LTV -->
       <div class="kpi cy">
-        <div class="kpi-lbl">Цей клієнт</div>
+        <div class="kpi-lbl">💰 LTV (відвантажено)</div>
         <div class="kpi-val">${nfm(totalShipped)} ₴</div>
-        <div class="kpi-sub">${avgRev > 0 ? (totalShipped/avgRev).toFixed(1) + '× від середнього' : '—'}</div>
+        <div class="kpi-sub">avg клієнт: ${nfm(avgRev)} ₴ · ${avgRev > 0 ? (totalShipped/avgRev).toFixed(1) + '× ' + (totalShipped >= avgRev ? '↑' : '↓') : '—'}</div>
       </div>
+      <!-- 2. Cadence -->
+      <div class="kpi ${avgCadenceDays && avgCadence && avgCadenceDays < avgCadence ? 'cg' : 'cr'}">
+        <div class="kpi-lbl">⏱ Частота замовлень</div>
+        <div class="kpi-val">${avgCadenceDays ? avgCadenceDays + ' дн' : '—'}</div>
+        <div class="kpi-sub">${avgCadence ? `avg: ${avgCadence} дн · ${avgCadenceDays < avgCadence ? '✅ частіше' : avgCadenceDays > avgCadence ? '⚠ рідше' : 'як середній'}` : 'мало даних'}</div>
+      </div>
+      <!-- 3. AOV -->
+      <div class="kpi ${aov && avgAOV && aov > avgAOV ? 'cg' : 'cy'}">
+        <div class="kpi-lbl">🛒 Середній чек (AOV)</div>
+        <div class="kpi-val">${nfm(aov)} ₴</div>
+        <div class="kpi-sub">avg: ${nfm(avgAOV)} ₴ · ${aov && avgAOV ? (aov >= avgAOV ? '✅ ' + (aov/avgAOV).toFixed(1) + '× більше' : '⚠ ' + (aov/avgAOV).toFixed(2) + '× менше') : '—'}</div>
+      </div>
+      <!-- 4. Growth -->
+      <div class="kpi ${trend3m !== null && trend3m > 0 ? 'cg' : trend3m !== null && trend3m < 0 ? 'cr' : 'cb'}">
+        <div class="kpi-lbl">📈 Зростання 3 міс</div>
+        <div class="kpi-val">${trend3m !== null ? (trend3m >= 0 ? '+' : '') + trend3m + '%' : '—'}</div>
+        <div class="kpi-sub">${trend3m !== null ? (trend3m > 0 ? '✅ росте' : trend3m < 0 ? '⚠ скорочується' : 'стабільний') : 'мало даних для тренду'}</div>
+      </div>
+    </div>
+
+    <div class="g3" style="margin-top:14px">
+      <!-- 5. Rank + Percentile -->
+      <div class="kpi cy">
+        <div class="kpi-lbl">🏆 Rank</div>
+        <div class="kpi-val">${rank === 1 ? 'ТОП-1' : rank > 0 ? '#' + rank : '—'}</div>
+        <div class="kpi-sub">${rank > 0 ? `з ${totalClients} клієнтів · ${percentile !== null ? 'кращий за ' + percentile + '%' : ''}` : 'віртуальний / без revenue'}</div>
+      </div>
+      <!-- 6. Share -->
       <div class="kpi cg">
-        <div class="kpi-lbl">Percentile</div>
-        <div class="kpi-val">${percentile !== null ? percentile + '%' : '—'}</div>
-        <div class="kpi-sub">${percentile !== null ? 'кращий за ' + percentile + '% клієнтів' : 'нема даних для рангу'}</div>
+        <div class="kpi-lbl">🍰 Частка у portfolio</div>
+        <div class="kpi-val">${sharePct.toFixed(2)}%</div>
+        <div class="kpi-sub">${sharePct > 10 ? '⚠ strategic account' : sharePct > 5 ? '⭐ top-tier' : 'звичайний'}</div>
+      </div>
+      <!-- 7. SKU diversity -->
+      <div class="kpi ${productTotal > 0 && avgSKUs && Object.keys(productMap).length > avgSKUs ? 'cg' : 'cy'}">
+        <div class="kpi-lbl">🛍 Асортимент</div>
+        <div class="kpi-val">${productTotal > 0 ? Object.keys(productMap).length + ' SKU' : '—'}</div>
+        <div class="kpi-sub">${avgSKUs ? `avg: ${avgSKUs} SKU · ${Object.keys(productMap).length > avgSKUs ? '✅ ширше' : '⚠ вужче'}` : (productTotal > 0 ? 'avg недоступний' : 'чекає demand_positions sync')}</div>
       </div>
     </div>
   `;
@@ -1444,9 +1505,13 @@ function renderNotes(c){
   ].filter(Boolean);
 
   // Address rows — full-width
+  // v2.72.5: legal_address_comment часто містить контакти (телефони, emails контактних осіб,
+  // умови співпраці, бонуси) навіть коли legal_address порожній — показуємо ЗАВЖДИ.
   const addrRows = [];
-  if (legalAddr) {
-    addrRows.push(['🏛 Юридична адреса', escapeHtml(String(legalAddr)) + (legalAddrComment ? `<div style="font-size:11px;color:var(--muted);margin-top:3px">📝 ${escapeHtml(String(legalAddrComment))}</div>` : '')]);
+  if (legalAddr || legalAddrComment) {
+    const inner = (legalAddr ? escapeHtml(String(legalAddr)) : '<span style="color:var(--muted);font-style:italic">— адреса не вказана —</span>')
+      + (legalAddrComment ? `<div style="font-size:12px;color:#5c4400;background:#FFFBE6;border-left:3px solid #FEBF27;padding:8px 12px;border-radius:4px;margin-top:6px;white-space:pre-wrap;word-wrap:break-word"><strong>📝 Коментар до адреси:</strong>\n${escapeHtml(String(legalAddrComment))}</div>` : '');
+    addrRows.push(['🏛 Юридична адреса', inner]);
   }
   if (actualAddr && actualAddr !== legalAddr) {
     addrRows.push(['📍 Фактична адреса', escapeHtml(String(actualAddr))]);
