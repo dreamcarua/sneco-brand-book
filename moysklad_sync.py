@@ -221,6 +221,8 @@ def save_excel(df: pd.DataFrame, name: str, reliable: bool = True):
 # ── Парсери ───────────────────────────────────────────────────────────────────
 
 def parse_demands(rows):
+    """v2.70: парсимо ТІЛЬКИ header — один рядок per demand (унікальний id).
+    Positions винесено у parse_demand_positions() щоб ingest_to_d1 не дублював."""
     records = []
     for r in rows:
         base = {
@@ -240,19 +242,38 @@ def parse_demands(rows):
             "Канал збуту":      safe(r.get("salesChannel")),
             "Коментар":         r.get("description", ""),
         }
+        records.append(base)
+    return records
+
+
+def parse_demand_positions(rows):
+    """v2.70: окремий парсер для positions з ms_demands.
+    Один рядок per (demand_id, position_idx). Дозволяє правильно ingest'ити у
+    окрему D1 таблицю ms_demand_positions і отримувати TOP-10 продуктів per клієнт."""
+    records = []
+    for r in rows:
+        demand_id = r.get("id")
+        if not demand_id:
+            continue
+        agent_id = _extract_id(r.get("agent"))
+        agent_name = safe(r.get("agent"))
+        moment = (r.get("moment", "") or "")[:10]
         positions = r.get("positions", {})
-        pos_rows  = positions.get("rows", []) if isinstance(positions, dict) else []
-        if pos_rows:
-            for p in pos_rows:
-                rec = base.copy()
-                rec["Товар"]            = safe(p.get("assortment"))
-                rec["Кількість"]        = p.get("quantity", 0)
-                rec["Ціна, грн"]        = p.get("price", 0) / 100
-                rec["Сума позиції, грн"]= p.get("sum", 0) / 100
-                rec["Знижка %"]         = p.get("discount", 0)
-                records.append(rec)
-        else:
-            records.append(base)
+        pos_rows = positions.get("rows", []) if isinstance(positions, dict) else []
+        for idx, p in enumerate(pos_rows):
+            records.append({
+                "demand_id":   demand_id,
+                "position_idx": idx,
+                "Товар":       safe(p.get("assortment")),
+                "Товар ID":    _extract_id(p.get("assortment")),
+                "Кількість":   p.get("quantity", 0),
+                "Ціна, грн":   p.get("price", 0) / 100,
+                "Сума, грн":   p.get("sum", 0) / 100,
+                "Знижка %":    p.get("discount", 0),
+                "Контрагент ID": agent_id,
+                "Контрагент":   agent_name,
+                "Дата":         moment,
+            })
     return records
 
 
@@ -596,8 +617,13 @@ def main():
     print("✅ ТОЧНІ ДАНІ\n" + "-"*40)
 
     print("\n📦 Відвантаження...")
-    rows = fetch_all("entity/demand", expand="agent,store,organization,state")
+    # v2.70: + expand=positions.assortment щоб витягти товарні позиції з кожного відвантаження
+    rows = fetch_all("entity/demand", expand="agent,store,organization,state,positions.assortment")
     save_excel(pd.DataFrame(parse_demands(rows)), "demands", reliable=True)
+    # v2.70: окремо позиції — для ТОП-10 продуктів per клієнт у Customer 360
+    pos_records = parse_demand_positions(rows)
+    save_excel(pd.DataFrame(pos_records), "demand_positions", reliable=True)
+    print(f"   📦 Витягнуто {len(pos_records)} товарних позицій з {len(rows)} відвантажень", flush=True)
 
     print("\n💳 Оплати вхідні...")
     rows_in = fetch_all("entity/paymentin", expand="agent,state")
@@ -635,11 +661,34 @@ def main():
     rows = fetch_all("entity/productfolder", filter_field="updated")
     save_excel(pd.DataFrame(parse_productfolders(rows)), "product_folders", reliable=True)
 
-    print("\n🧾 Рахунки покупцям...")
+    print("\n>>> INVOICES BLOCK START >>>", flush=True)
+    print("\n🧾 Рахунки покупцям...", flush=True)
     # v2.65: expand=agent,state інакше agent.name = ""; paymentPlannedMoment приходить без expand
-    rows = fetch_all("entity/invoiceout", expand="agent,state")
-    save_excel(pd.DataFrame(parse_invoicesout(rows)), "invoices_out", reliable=True)
-    print(f"   📋 Завантажено рахунків: {len(rows)}", flush=True)
+    # v2.69: загорнуто у try/except + verbose logging бо invoices_out у D1 досі = 0
+    try:
+        # FIRST — спробуємо без filter (date_filter=False) щоб точно тягнути всі рахунки
+        # snEco invoices можуть мати moment у різний час відносно DATE_FROM
+        if SYNC_MODE == "full":
+            print("   🔄 SYNC_MODE=full → fetch без date_filter (всі invoices від MoySklad)", flush=True)
+            rows = fetch_all("entity/invoiceout", expand="agent,state", date_filter=False)
+        else:
+            print(f"   📅 incremental → fetch з date_filter (moment>={DATE_FROM})", flush=True)
+            rows = fetch_all("entity/invoiceout", expand="agent,state")
+        print(f"   ✅ fetch_all returned {len(rows)} raw rows from /entity/invoiceout", flush=True)
+        if rows:
+            print(f"   🔍 sample row keys: {list(rows[0].keys())[:10]}", flush=True)
+            print(f"   🔍 sample row.name={rows[0].get('name')}, moment={rows[0].get('moment','')[:10]}, sum={rows[0].get('sum',0)/100}", flush=True)
+        parsed = parse_invoicesout(rows)
+        print(f"   ✅ parse_invoicesout returned {len(parsed)} records", flush=True)
+        save_excel(pd.DataFrame(parsed), "invoices_out", reliable=True)
+        print(f"   📋 Завантажено рахунків: {len(rows)}", flush=True)
+    except Exception as e:
+        import traceback
+        print(f"   ❌ INVOICES FETCH FAILED: {type(e).__name__}: {e}", flush=True)
+        traceback.print_exc()
+        # Не падаємо — продовжуємо щоб решта sync пройшла
+        save_excel(pd.DataFrame([]), "invoices_out", reliable=True)
+    print(">>> INVOICES BLOCK END >>>\n", flush=True)
 
     print("\n📊 Залишки (поточні)...")
     all_rows, offset = [], 0
