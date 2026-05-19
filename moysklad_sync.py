@@ -267,18 +267,19 @@ def save_excel(df: pd.DataFrame, name: str, reliable: bool = True):
 
 # ── Парсери ───────────────────────────────────────────────────────────────────
 
-def parse_demands(rows):
+def parse_demands(rows, agent_map=None, org_map=None):
     """v2.70: парсимо ТІЛЬКИ header — один рядок per demand (унікальний id).
-    Positions винесено у parse_demand_positions() щоб ingest_to_d1 не дублював."""
+    Positions винесено у parse_demand_positions() щоб ingest_to_d1 не дублював.
+    v2.77.2: + agent_map/org_map fallback resolve href→name (MoySklad ігнорує expand)."""
     records = []
     for r in rows:
         base = {
             "id":               r.get("id"),
             "Дата":             r.get("moment", "")[:10],
             "Номер":            r.get("name"),
-            "Контрагент":       safe(r.get("agent")),
+            "Контрагент":       safe(r.get("agent")) or _resolve_href(r.get("agent"), agent_map),
             "Контрагент ID":    _extract_id(r.get("agent")),
-            "Організація":      safe(r.get("organization")),
+            "Організація":      safe(r.get("organization")) or _resolve_href(r.get("organization"), org_map),
             "Склад":            safe(r.get("store")),
             "Сума, грн":        r.get("sum", 0) / 100,
             "ПДВ, грн":         r.get("vatSum", 0) / 100,
@@ -410,16 +411,17 @@ def parse_demand_positions(rows):
     return records
 
 
-def parse_customerorders(rows):
+def parse_customerorders(rows, agent_map=None, org_map=None):
+    """v2.77.2: + agent_map/org_map fallback resolve."""
     records = []
     for r in rows:
         base = {
             "id":                   r.get("id"),
             "Дата":                 r.get("moment", "")[:10],
             "Номер":                r.get("name"),
-            "Контрагент":           safe(r.get("agent")),
+            "Контрагент":           safe(r.get("agent")) or _resolve_href(r.get("agent"), agent_map),
             "Контрагент ID":        _extract_id(r.get("agent")),
-            "Організація":          safe(r.get("organization")),
+            "Організація":          safe(r.get("organization")) or _resolve_href(r.get("organization"), org_map),
             "Сума, грн":            r.get("sum", 0) / 100,
             "Оплачено, грн":        r.get("payedSum", 0) / 100,
             "Відвантажено, грн":    r.get("shippedSum", 0) / 100,
@@ -442,14 +444,15 @@ def parse_customerorders(rows):
     return records
 
 
-def parse_salesreturns(rows):
+def parse_salesreturns(rows, agent_map=None):
+    """v2.77.2: + agent_map fallback resolve."""
     records = []
     for r in rows:
         base = {
             "id":           r.get("id"),
             "Дата":         r.get("moment", "")[:10],
             "Номер":        r.get("name"),
-            "Контрагент":   safe(r.get("agent")),
+            "Контрагент":   safe(r.get("agent")) or _resolve_href(r.get("agent"), agent_map),
             "Контрагент ID": _extract_id(r.get("agent")),
             "Склад":        safe(r.get("store")),
             "Сума, грн":    r.get("sum", 0) / 100,
@@ -555,20 +558,30 @@ def parse_stock(rows):
     } for r in rows]
 
 
-def parse_payments(rows, ptype):
-    """v2.72: + expenseItem (Стаття витрат) — критично для Finance Dashboard
-    "Витрати по напрямах" блоку. Без expense_item ВСІ виплати йдуть у '(не вказано)'."""
+def _resolve_href(obj, href_map):
+    """v2.77.2: resolve name через href→name mapping коли expand не спрацював.
+    MoySklad НЕ підтримує expand для paymentout/paymentin → agent.meta тільки href.
+    Fix: lookup name за href з окремо отриманого mapping."""
+    if not isinstance(obj, dict): return ""
+    href = obj.get("meta", {}).get("href", "") if isinstance(obj.get("meta"), dict) else ""
+    return href_map.get(href, "") if href_map and href else ""
+
+
+def parse_payments(rows, ptype, agent_map=None, expense_map=None, org_map=None):
+    """v2.72: + expenseItem (Стаття витрат) — критично для Finance Dashboard.
+    v2.77.2: + agent_map/expense_map/org_map — fallback resolve href→name коли
+    MoySklad ігнорує expand. Без цього всі поля приходять як {meta:{href}} без name."""
     return [{
         "id":              r.get("id"),
         "Тип":             ptype,
         "Дата":            r.get("moment", "")[:10],
         "Номер":           r.get("name"),
-        "Контрагент":      safe(r.get("agent")),
+        "Контрагент":      safe(r.get("agent")) or _resolve_href(r.get("agent"), agent_map),
         "Контрагент ID":   _extract_id(r.get("agent")),
-        "Організація":     safe(r.get("organization")),
+        "Організація":     safe(r.get("organization")) or _resolve_href(r.get("organization"), org_map),
         "Сума, грн":       r.get("sum", 0) / 100,
         "Призначення":     r.get("paymentPurpose", ""),
-        "Стаття витрат":   safe(r.get("expenseItem")),       # v2.72: критично для cash-flow
+        "Стаття витрат":   safe(r.get("expenseItem")) or _resolve_href(r.get("expenseItem"), expense_map),
         "Стаття витрат ID": _extract_id(r.get("expenseItem")),
         "Рахунок":         safe(r.get("agentAccount")) or safe(r.get("organizationAccount")),
         "Проект":          safe(r.get("project")),
@@ -576,12 +589,43 @@ def parse_payments(rows, ptype):
     } for r in rows]
 
 
-def parse_invoicesout(rows):
+def fetch_lookup_map(endpoint):
+    """v2.77.2: тягне ВСІ записи endpoint (без date_filter) і будує
+    href→name mapping. Використовується для resolve agent/expense/organization
+    у payments коли expand=... ігнорується MoySklad."""
+    url = f"{BASE_URL}/{endpoint}"
+    all_rows = []
+    offset, limit = 0, 1000
+    from urllib.parse import urlencode as _urlencode
+    while True:
+        qs = _urlencode({"limit": limit, "offset": offset}, safe=',')
+        r = requests.get(f"{url}?{qs}", headers=HEADERS)
+        if r.status_code != 200:
+            print(f"  ⚠️  {endpoint} lookup HTTP {r.status_code}", flush=True)
+            break
+        data = r.json()
+        rows = data.get("rows", [])
+        all_rows.extend(rows)
+        total = data.get("meta", {}).get("size", 0)
+        offset += limit
+        if offset >= total or not rows: break
+    href_map = {}
+    for row in all_rows:
+        href = (row.get("meta") or {}).get("href", "")
+        name = row.get("name", "") or ""
+        if href and name:
+            href_map[href] = name
+    print(f"  📚 {endpoint} lookup: {len(href_map)} entries", flush=True)
+    return href_map
+
+
+def parse_invoicesout(rows, agent_map=None):
+    """v2.77.2: + agent_map fallback resolve."""
     return [{
         "id":           r.get("id"),
         "Дата":         r.get("moment", "")[:10],
         "Номер":        r.get("name"),
-        "Контрагент":   safe(r.get("agent")),
+        "Контрагент":   safe(r.get("agent")) or _resolve_href(r.get("agent"), agent_map),
         "Контрагент ID": _extract_id(r.get("agent")),
         "Сума, грн":    r.get("sum", 0) / 100,
         "Оплачено, грн":r.get("payedSum", 0) / 100,
@@ -756,18 +800,25 @@ def main():
 
     print("✅ ТОЧНІ ДАНІ\n" + "-"*40)
 
+    # v2.77.2: ROOT CAUSE FIX — MoySklad ігнорує expand=agent,expenseItem,organization
+    # для transactional endpoints (demand, paymentin, paymentout). Реальність перевірено
+    # debug print у v2.76.4: agent: keys=['meta'], name=None навіть з urlencode(safe=',')
+    # FIX: окремо fetch lookup tables один раз і resolve href→name у parse_*.
+    print("\n📚 Lookup maps (resolve href→name для transactional)...", flush=True)
+    expense_map = fetch_lookup_map("entity/expenseitem")
+    org_map = fetch_lookup_map("entity/organization")
+    cp_map = fetch_lookup_map("entity/counterparty")
+
     print("\n📦 Відвантаження...")
     # v2.70: + expand=positions.assortment щоб витягти товарні позиції з кожного відвантаження
     rows = fetch_all("entity/demand", expand="agent,store,organization,state,positions.assortment")
-    save_excel(pd.DataFrame(parse_demands(rows)), "demands", reliable=True)
+    save_excel(pd.DataFrame(parse_demands(rows, agent_map=cp_map, org_map=org_map)), "demands", reliable=True)
     # v2.70: окремо позиції — для ТОП-10 продуктів per клієнт у Customer 360
     pos_records = parse_demand_positions(rows)
     save_excel(pd.DataFrame(pos_records), "demand_positions", reliable=True)
     print(f"   📦 Витягнуто {len(pos_records)} товарних позицій з {len(rows)} відвантажень", flush=True)
 
     print("\n💳 Оплати вхідні...")
-    # v2.76.0: + expand=expenseItem для paymentin теж (раніше тільки для paymentout).
-    # MoySklad дозволяє привʼязувати статтю витрат і до вхідних (поверненя/комісії).
     rows_in = fetch_all("entity/paymentin", expand="agent,state,organization,project,expenseItem")
     print("💳 Оплати вихідні...")
     rows_out = fetch_all("entity/paymentout", expand="agent,state,organization,project,expenseItem")
@@ -793,16 +844,18 @@ def main():
         else:
             print(f"     ATTRIBUTES: none", flush=True)
 
-    records = parse_payments(rows_in, "Вхідний") + parse_payments(rows_out, "Вихідний")
+    # v2.77.2: pass lookup maps щоб resolve href→name
+    records = parse_payments(rows_in, "Вхідний", agent_map=cp_map, expense_map=expense_map, org_map=org_map) \
+            + parse_payments(rows_out, "Вихідний", agent_map=cp_map, expense_map=expense_map, org_map=org_map)
     save_excel(pd.DataFrame(records), "payments", reliable=True)
 
     print("\n🛒 Замовлення покупців...")
     rows = fetch_all("entity/customerorder", expand="agent,state")
-    save_excel(pd.DataFrame(parse_customerorders(rows)), "customer_orders", reliable=True)
+    save_excel(pd.DataFrame(parse_customerorders(rows, agent_map=cp_map, org_map=org_map)), "customer_orders", reliable=True)
 
     print("\n↩️  Повернення від покупців...")
     rows = fetch_all("entity/salesreturn", expand="agent,store,state")
-    save_excel(pd.DataFrame(parse_salesreturns(rows)), "sales_returns", reliable=True)
+    save_excel(pd.DataFrame(parse_salesreturns(rows, agent_map=cp_map)), "sales_returns", reliable=True)
 
     print("\n👥 Контрагенти...", flush=True)
     # При SYNC_MODE=full витягуємо ВСІХ контрагентів (не тільки updated за вікно),
@@ -842,7 +895,7 @@ def main():
         if rows:
             print(f"   🔍 sample row keys: {list(rows[0].keys())[:10]}", flush=True)
             print(f"   🔍 sample row.name={rows[0].get('name')}, moment={rows[0].get('moment','')[:10]}, sum={rows[0].get('sum',0)/100}", flush=True)
-        parsed = parse_invoicesout(rows)
+        parsed = parse_invoicesout(rows, agent_map=cp_map)
         print(f"   ✅ parse_invoicesout returned {len(parsed)} records", flush=True)
         save_excel(pd.DataFrame(parsed), "invoices_out", reliable=True)
         print(f"   📋 Завантажено рахунків: {len(rows)}", flush=True)
