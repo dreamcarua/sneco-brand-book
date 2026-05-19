@@ -21,6 +21,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .logo-text{color:#fff;font-size:15px;font-weight:700;letter-spacing:-.3px}
 .logo-sub{color:rgba(255,255,255,.4);font-size:11px;margin-top:1px}
 .topbar-right{display:flex;align-items:center;gap:10px}
+/* v2.76.0 — Unified nav menu across all dashboards */
+.nav-menu{display:flex;align-items:center;gap:2px;margin-left:18px;padding-left:18px;border-left:1px solid rgba(255,255,255,.12)}
+.nav-link{color:rgba(255,255,255,.65);text-decoration:none;font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:7px;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.nav-link:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-link.active{background:rgba(254,191,39,.18);color:#FEBF27}
+.nav-toggle{display:none;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:6px;margin-left:8px}
+@media(max-width:1100px){
+  .nav-menu{position:fixed;top:56px;left:0;right:0;background:#1E1E1E;flex-direction:column;align-items:stretch;padding:8px 16px;gap:0;margin:0;border-left:none;border-bottom:1px solid rgba(255,255,255,.1);transform:translateY(-110%);transition:transform .25s;z-index:180;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+  .nav-menu.open{transform:translateY(0)}
+  .nav-link{padding:11px 12px;border-radius:6px}
+  .nav-toggle{display:inline-block}
+}
 .badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
 .badge-green{background:rgba(150,193,31,.2);color:var(--g);border:1px solid rgba(150,193,31,.3)}
 .badge-gray{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1)}
@@ -336,14 +348,26 @@ body.dash-locked{overflow:hidden}
 
 <!-- TOPBAR -->
 <div class="topbar">
-  <div class="logo">
-    <div class="logo-box">sn</div>
-    <div>
-      <div class="logo-text">snEco Inventory</div>
-      <div class="logo-sub">Склад &amp; закупки · МойСклад</div>
+  <div style="display:flex;align-items:center;min-width:0;flex:0 1 auto">
+    <div class="logo">
+      <div class="logo-box">sn</div>
+      <div>
+        <div class="logo-text">snEco Inventory</div>
+        <div class="logo-sub">Склад &amp; закупки · МойСклад</div>
+      </div>
     </div>
+    <!-- v2.76.0 — Unified nav menu -->
+    <nav class="nav-menu" id="navMenu">
+      <a class="nav-link" href="../customer-360/customer-360.html">👥 Customer 360</a>
+      <a class="nav-link" href="../finance/finance.html">💰 Finance</a>
+      <a class="nav-link" href="../dashboard.html">📊 Sales</a>
+      <a class="nav-link active" href="../inventory/inventory.html">📦 Inventory</a>
+      <a class="nav-link" href="../production/production.html">🏭 Production</a>
+      <a class="nav-link" href="../../">📘 Brand Bible</a>
+    </nav>
   </div>
   <div class="topbar-right">
+    <button class="nav-toggle" onclick="document.getElementById('navMenu').classList.toggle('open')" aria-label="Меню">☰</button>
     <span class="badge badge-green" id="syncStatus">✓ Перевіряємо останній sync...</span>
     <span class="badge badge-gray" id="lastUpdate">—</span>
   </div>
@@ -1075,7 +1099,7 @@ body.dash-locked{overflow:hidden}
 </div><!-- /wrap -->
 
 <div class="footer">
-  snEco Inventory · МойСклад API · Джерело правди: оплати ✅ та відвантаження ✅ · Оновлення: щодня 06:00
+  snEco Inventory v1.1 (v2.76.0) · unified nav menu · МойСклад API · Оновлення: щодня 06:00
 </div>
 
 <script>
