@@ -144,11 +144,28 @@ def fetch_all(endpoint: str, params: dict = None, date_filter: bool = True, expa
     # без name → save_excel пише None для ВСІХ rows.
     # Fix: будуємо query string вручну з urlencode(safe=',') → comma НЕ encoded.
     from urllib.parse import urlencode as _urlencode
+    import time as _time
     t0 = datetime.now()
     while True:
         base_params["offset"] = offset
         qs = _urlencode(base_params, safe=',')
-        resp = requests.get(f"{url}?{qs}", headers=HEADERS)
+        # v2.77.3: retry × 3 з backoff + explicit timeout=120
+        resp = None
+        for attempt in range(3):
+            try:
+                resp = requests.get(f"{url}?{qs}", headers=HEADERS, timeout=120)
+                break
+            except (requests.exceptions.Timeout, requests.exceptions.ReadTimeout,
+                    requests.exceptions.ConnectionError) as e:
+                wait = 2 ** attempt
+                print(f"  ⚠️  {endpoint} offset={offset} {type(e).__name__} (attempt {attempt+1}/3), sleep {wait}s", flush=True)
+                if attempt < 2:
+                    _time.sleep(wait)
+                else:
+                    print(f"  ❌ {endpoint} offset={offset} FAILED after 3 attempts", flush=True)
+                    resp = None
+        if resp is None:
+            break
         if resp.status_code != 200:
             print(f"  ⚠️  {endpoint} → HTTP {resp.status_code}: {resp.text[:200]}", flush=True)
             break
@@ -592,14 +609,34 @@ def parse_payments(rows, ptype, agent_map=None, expense_map=None, org_map=None):
 def fetch_lookup_map(endpoint):
     """v2.77.2: тягне ВСІ записи endpoint (без date_filter) і будує
     href→name mapping. Використовується для resolve agent/expense/organization
-    у payments коли expand=... ігнорується MoySklad."""
+    у payments коли expand=... ігнорується MoySklad.
+    v2.77.3: + retry × 3 з backoff + explicit timeout=60 (counterparty fetch
+    timeout'нув на 11K entries без цього)."""
+    import time as _time
     url = f"{BASE_URL}/{endpoint}"
     all_rows = []
     offset, limit = 0, 1000
     from urllib.parse import urlencode as _urlencode
     while True:
         qs = _urlencode({"limit": limit, "offset": offset}, safe=',')
-        r = requests.get(f"{url}?{qs}", headers=HEADERS)
+        full_url = f"{url}?{qs}"
+        # Retry × 3 з backoff для timeout / network errors
+        r = None
+        for attempt in range(3):
+            try:
+                r = requests.get(full_url, headers=HEADERS, timeout=60)
+                break
+            except (requests.exceptions.Timeout, requests.exceptions.ReadTimeout,
+                    requests.exceptions.ConnectionError) as e:
+                wait = 2 ** attempt  # 1s, 2s, 4s
+                print(f"  ⚠️  {endpoint} offset={offset} timeout (attempt {attempt+1}/3): {type(e).__name__}, sleep {wait}s", flush=True)
+                if attempt < 2:
+                    _time.sleep(wait)
+                else:
+                    print(f"  ❌ {endpoint} offset={offset} FAILED after 3 attempts — partial map", flush=True)
+                    r = None
+        if r is None:
+            break  # graceful — повертаємо partial map
         if r.status_code != 200:
             print(f"  ⚠️  {endpoint} lookup HTTP {r.status_code}", flush=True)
             break
@@ -615,7 +652,7 @@ def fetch_lookup_map(endpoint):
         name = row.get("name", "") or ""
         if href and name:
             href_map[href] = name
-    print(f"  📚 {endpoint} lookup: {len(href_map)} entries", flush=True)
+    print(f"  📚 {endpoint} lookup: {len(href_map)} entries (з {len(all_rows)} raw rows)", flush=True)
     return href_map
 
 
