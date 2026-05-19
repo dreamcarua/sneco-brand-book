@@ -371,15 +371,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* ─── FOOTER ─── */
 .footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:20px}
 
-/* v2.76.3 — Product period filter chips */
-.prod-period-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px;padding:8px 0 4px;border-top:1px dashed var(--border)}
-.prod-period-bar-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-right:4px}
-.prod-chip{padding:5px 11px;border:1px solid var(--border);background:#fff;color:var(--d);font-size:11px;font-weight:600;border-radius:14px;cursor:pointer;font-family:inherit;transition:all .15s}
+/* v2.76.3 — Product period filter chips · v2.77.4: повний width + wrap не overlap */
+.prod-period-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:8px 0 0;padding:8px 0 4px;border-top:1px dashed var(--border);width:100%;clear:both}
+.prod-period-bar-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-right:4px;flex-shrink:0}
+.prod-chip{padding:5px 11px;border:1px solid var(--border);background:#fff;color:var(--d);font-size:11px;font-weight:600;border-radius:14px;cursor:pointer;font-family:inherit;transition:all .15s;flex-shrink:0;white-space:nowrap}
 .prod-chip:hover{background:var(--yf);border-color:var(--y)}
 .prod-chip.active{background:var(--y);border-color:var(--y);color:var(--d)}
-.prod-chip-custom{padding:5px 9px;border:1px solid var(--border);background:#fff;font-size:11px;font-weight:500;border-radius:14px;font-family:inherit;color:var(--d);outline:none}
+.prod-chip-custom{padding:5px 9px;border:1px solid var(--border);background:#fff;font-size:11px;font-weight:500;border-radius:14px;font-family:inherit;color:var(--d);outline:none;flex-shrink:0}
 .prod-chip-custom:focus{border-color:var(--y)}
 .prod-period-info{margin-left:auto;font-size:11px;color:var(--muted);font-weight:500}
+/* v2.77.4: ov-mover-card-head має min-height і flex-wrap щоб chips переходили на новий рядок */
+.ov-mover-card-head{display:block !important;width:100%}
 
 /* === OTP gate === */
 #dashauth-overlay{position:fixed;inset:0;background:#1E1E1E;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
@@ -401,8 +403,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .dashauth-msg a{color:#FEBF27;font-weight:600;text-decoration:underline}
 .dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
 .dashauth-back:hover{color:#FEBF27}
-/* v2.77.1: top:130px — нижче selector-bar (sticky top:56px + search input + quickPills ~70px) */
-.dashauth-session{position:fixed;top:130px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-family:-apple-system,sans-serif;font-weight:600;display:flex;align-items:center;gap:8px}
+/* v2.77.4: top:170px — Customer 360 selector-bar з search+quickPills може бути ~110px */
+.dashauth-session{position:fixed;top:170px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-family:-apple-system,sans-serif;font-weight:600;display:flex;align-items:center;gap:8px}
 @media(max-width:760px){.dashauth-session{top:auto;bottom:12px;right:12px;left:12px;justify-content:center}}
 .dashauth-session button{background:none;border:0;color:#96C11F;cursor:pointer;font-size:14px;padding:0;line-height:1}
 body.dash-locked{overflow:hidden}
@@ -618,7 +620,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.77.0 · Movers TOP-20 sliding 30d + New/Lost з фільтрами + exclude роздріб/архівних + sync expand fix · Оновлення: щодня 06:00
+  snEco Customer 360 v2.77.4 · Portfolio KPIs exclude роздріб/архівних + verstka fix chips · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -1259,6 +1261,10 @@ function computeHealthForCustomer(m, crmLog){
 // PORTFOLIO KPIs (Tier 1 — 5 cards)
 // ============================================================================
 function calcPortfolioKPIs(allCounterparties){
+  // v2.77.4: exclude retail + archived з усіх KPI (active/new/critical/health avg)
+  // щоб KPIs відображали тільки B2B портфель (без інтернет-магазину)
+  const pool = excludeRetailAndArchived(allCounterparties);
+
   const today = new Date();
   const curMonthStart = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().slice(0,10);
   const cutoff30 = new Date(Date.now() - 30*86400000).toISOString().slice(0,10);
@@ -1270,7 +1276,7 @@ function calcPortfolioKPIs(allCounterparties){
   let healthSum = 0, healthCount = 0;
   let criticalCount = 0;
 
-  allCounterparties.forEach(c => {
+  pool.forEach(c => {
     const m = c.__metrics;
     if (!m) return;
     if (m.lastOrder && m.lastOrder.slice(0,10) >= cutoff30) activeCount++;
@@ -1291,7 +1297,8 @@ function calcPortfolioKPIs(allCounterparties){
   const revDelta = totalRevPrev > 0 ? Math.round((totalRevCur - totalRevPrev) / totalRevPrev * 100) : null;
   const avgHealth = healthCount > 0 ? Math.round(healthSum / healthCount) : 0;
 
-  return { activeCount, newThisMonth, totalRevCur, totalRevPrev, revDelta, avgHealth, criticalCount };
+  // v2.77.4: + poolSize для KPI sub-line "з 8392" → "з 3500 B2B" (без роздрібу/архівних)
+  return { activeCount, newThisMonth, totalRevCur, totalRevPrev, revDelta, avgHealth, criticalCount, poolSize: pool.length };
 }
 
 // ============================================================================
@@ -1678,15 +1685,16 @@ function _buildOverviewHtml(){
   const actions = calcActionItems(filtered);
   const heatmap = calcSegmentHeatmap(filtered);
 
-  // Quick filters counts
+  // v2.77.4: всі quick filter counts — теж без роздрібу/архівних (для консистентності з KPIs)
+  const b2bPool = excludeRetailAndArchived(allCounterparties);
   const totalActive = kpis.activeCount;
-  const totalAtRisk = allCounterparties.filter(c => c.__health >= 40 && c.__health < 70 && c.__metrics?.totalShipped > 0).length;
-  const totalDormant = allCounterparties.filter(c => {
+  const totalAtRisk = b2bPool.filter(c => c.__health >= 40 && c.__health < 70 && c.__metrics?.totalShipped > 0).length;
+  const totalDormant = b2bPool.filter(c => {
     const m = c.__metrics; if (!m || m.totalShipped <= 0) return false;
     return m.lastOrder && m.lastOrder.slice(0,10) < new Date(Date.now() - 60*86400000).toISOString().slice(0,10);
   }).length;
-  const totalVIP = allCounterparties.filter(c => c.__metrics?.totalShipped > 500000).length;
-  const totalAll = allCounterparties.filter(c => c.__metrics?.totalShipped > 0).length;
+  const totalVIP = b2bPool.filter(c => c.__metrics?.totalShipped > 500000).length;
+  const totalAll = b2bPool.filter(c => c.__metrics?.totalShipped > 0).length;
 
   // Build legacy 3 lists HTML — v2.74.2: respects current filter
   const legacyHtml = _buildLegacyListsHtml(filtered);
@@ -1732,14 +1740,14 @@ function _buildOverviewHtml(){
         <div class="ov-section-title">📊 Portfolio Health · виручка поточного місяця та активність</div>
         <div class="ov-kpi-row">
           <div class="ov-kpi blue">
-            <div class="ov-kpi-lbl">Активні клієнти</div>
+            <div class="ov-kpi-lbl">Активні клієнти B2B</div>
             <div class="ov-kpi-val">${nf(kpis.activeCount)}</div>
-            <div class="ov-kpi-sub">з ${nf(totalAll)} · замовляли &lt; 30д</div>
+            <div class="ov-kpi-sub">з ${nf(kpis.poolSize || totalAll)} B2B · замовл &lt; 30д · без роздрібу</div>
           </div>
           <div class="ov-kpi green">
-            <div class="ov-kpi-lbl">🆕 Нові цього міс</div>
+            <div class="ov-kpi-lbl">🆕 Нові цього міс B2B</div>
             <div class="ov-kpi-val">${nf(kpis.newThisMonth)}</div>
-            <div class="ov-kpi-sub">перше замовлення</div>
+            <div class="ov-kpi-sub">перше замовл · без роздрібу/архівних</div>
           </div>
           <div class="ov-kpi ${kpis.revDelta !== null && kpis.revDelta >= 0 ? 'green' : 'red'}">
             <div class="ov-kpi-lbl">💰 Revenue (поточний міс)</div>
