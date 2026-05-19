@@ -1,0 +1,4 @@
+# Local POC build artifacts — generated, not for repo
+data/
+data.json
+local-preview.html

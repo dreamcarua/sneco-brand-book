@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>snEco — Procurement Planning 2026</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--y:#FEBF27;--g:#96C11F;--d:#1E1E1E;--bg:#F4F4EF;--card:#fff;--muted:#8a8a8a;--border:#E5E5DC;--red:#E84040}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--d);font-size:14px;min-height:100vh}
+header{background:#fff;border-bottom:1px solid var(--border);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+header h1{font-size:18px;font-weight:700}
+header .meta{font-size:12px;color:var(--muted)}
+main{padding:20px 24px 60px;max-width:1280px;margin:0 auto}
+.section{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:22px}
+.section h2{font-size:14px;margin-bottom:14px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:#444}
+table{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left;font-weight:500;max-width:340px;overflow:hidden;text-overflow:ellipsis}
+thead th{background:#fafaf6;font-weight:600;color:#555;font-size:11px;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid var(--border)}
+.bad{background:#fdecec !important;color:var(--red);font-weight:600}
+.warn{background:#fef9e9 !important;color:#c69510;font-weight:600}
+.ok{background:#f0f7e6 !important;color:var(--g);font-weight:600}
+.note{background:#fef9e9;border:1px solid #f1d883;border-left:4px solid var(--y);padding:14px 18px;border-radius:6px;font-size:13px;color:#7a5e10;margin-bottom:18px;line-height:1.6}
+.note strong{color:#5c4500}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.loading-state{padding:60px 20px;text-align:center}
+.loading-state .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--y);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:22px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.kpi .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.kpi .value{font-size:22px;font-weight:700}
+.muted{color:var(--muted)}
+
+/* OTP-gate (same as finance.html) */
+#dashauth-overlay{position:fixed;inset:0;background:#1E1E1E;z-index:9999;display:flex;align-items:center;justify-content:center}
+#dashauth-overlay.is-hidden{display:none}
+.dashauth-card{background:#fff;width:100%;max-width:440px;border-radius:14px;padding:36px 30px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.dashauth-logo{font-size:24px;font-weight:900;color:#FEBF27;margin-bottom:6px;letter-spacing:-0.5px;text-align:center}
+.dashauth-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#888;text-align:center;margin-bottom:24px}
+.dashauth-icon{font-size:36px;text-align:center;margin-bottom:16px}
+.dashauth-h1{font-size:18px;font-weight:800;text-align:center;margin-bottom:6px}
+.dashauth-desc{font-size:13px;color:#666;text-align:center;line-height:1.55;margin-bottom:20px}
+.dashauth-input{width:100%;padding:12px 14px;border:2px solid #E5E5DC;border-radius:8px;font-size:14px;outline:none;font-family:inherit}
+.dashauth-input:focus{border-color:#FEBF27}
+.dashauth-input.code{font-family:'SF Mono',Menlo,monospace;letter-spacing:.4em;text-align:center;font-size:18px}
+.dashauth-btn{width:100%;padding:13px;background:#1E1E1E;color:#fff;border:0;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;margin-top:14px;font-family:inherit}
+.dashauth-btn:hover{background:#000}
+.dashauth-btn:disabled{opacity:.5;cursor:not-allowed}
+.dashauth-msg{font-size:12.5px;margin-top:12px;text-align:center;min-height:18px}
+.dashauth-msg.is-error{color:#DC2626}
+.dashauth-msg a{color:#FEBF27;font-weight:600}
+.dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
+.dashauth-session{position:fixed;top:8px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:8px}
+.dashauth-session button{background:none;border:0;color:#96C11F;cursor:pointer;font-size:14px}
+body.dash-locked{overflow:hidden}
+</style>
+</head>
+<body class="dash-locked">
+
+<div id="dashauth-overlay">
+  <div class="dashauth-card">
+    <div class="dashauth-logo">snEco</div>
+    <div class="dashauth-sub">Procurement Planning · Confidential</div>
+    <div id="dashauth-stage"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const WORKER = 'https://sneco-auth.vg-ab6.workers.dev';
+  const BLOCK = 'procurement-dashboard';
+  const STORAGE_KEY = 'snEco-jwt-' + BLOCK;
+  const overlay = document.getElementById('dashauth-overlay');
+  const stage = document.getElementById('dashauth-stage');
+  let email = '';
+
+  function unlock(token, em, exp){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({token, email:em, exp})); } catch(e){}
+    document.body.classList.remove('dash-locked');
+    overlay.classList.add('is-hidden');
+    const b = document.createElement('div');
+    b.className = 'dashauth-session';
+    const mins = Math.max(0, Math.floor((exp*1000 - Date.now())/60000));
+    b.innerHTML = '✓ ' + em + ' · ' + mins + ' min <button title="Lock">🔒</button>';
+    b.querySelector('button').onclick = () => { localStorage.removeItem(STORAGE_KEY); location.reload(); };
+    document.body.appendChild(b);
+    if (typeof window.bootDashboard === 'function') window.bootDashboard(token);
+  }
+  async function verifyExisting(){
+    let s; try { s = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null'); } catch(e){}
+    if (!s || !s.token || !s.exp || s.exp*1000 < Date.now()) return null;
+    try {
+      const r = await fetch(WORKER+'/api/session/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({token: s.token, block: BLOCK})});
+      const j = await r.json(); return j.ok ? s : null;
+    } catch(e) { return null; }
+  }
+  function renderEmail(){
+    stage.innerHTML = `<div class="dashauth-icon">📦</div><div class="dashauth-h1">Введіть email</div>
+      <div class="dashauth-desc">Якщо ваш email у whitelist — на нього надійде 6-значний код. Сесія діє 1 годину.</div>
+      <input class="dashauth-input" type="email" id="auth-em" placeholder="ім'я@sneco.ua" autofocus>
+      <button class="dashauth-btn" id="auth-send">Надіслати код</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="../" class="dashauth-back">← Brand Bible</a>`;
+    const em = document.getElementById('auth-em');
+    const send = document.getElementById('auth-send');
+    const msg = document.getElementById('auth-msg');
+    em.addEventListener('keydown', e => { if(e.key==='Enter') send.click(); });
+    send.onclick = async () => {
+      const v = em.value.trim();
+      if (!v || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { msg.textContent='Введіть правильний email.'; msg.className='dashauth-msg is-error'; return; }
+      send.disabled=true; send.textContent='Надсилаємо…'; msg.textContent='';
+      try {
+        const r = await fetch(WORKER+'/api/otp/request', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email:v, block:BLOCK})});
+        if (!r.ok) {
+          const j = await r.json().catch(()=>({}));
+          if (j.error === 'not_in_whitelist') msg.innerHTML = `❌ Цього email немає у whitelist. <a href="mailto:vg@sneco.ua?subject=procurement-dashboard%20whitelist">✉ Запит до vg@sneco.ua</a>`;
+          else msg.textContent = 'Помилка: ' + (j.error || r.status);
+          msg.className='dashauth-msg is-error'; send.disabled=false; send.textContent='Надіслати код'; return;
+        }
+        email = v; renderCode();
+      } catch(e) { msg.textContent='Помилка мережі: '+e.message; msg.className='dashauth-msg is-error'; send.disabled=false; send.textContent='Надіслати код'; }
+    };
+  }
+  function renderCode(){
+    stage.innerHTML = `<div class="dashauth-icon">🔢</div><div class="dashauth-h1">Введіть код з листа</div>
+      <div class="dashauth-desc">${email}<br>Код надіслано — перевірте пошту (включно зі спамом).</div>
+      <input class="dashauth-input code" type="text" id="auth-code" inputmode="numeric" maxlength="6" placeholder="••••••" autofocus>
+      <button class="dashauth-btn" id="auth-verify">Підтвердити</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="#" class="dashauth-back" id="auth-back">← Інший email</a>`;
+    const code = document.getElementById('auth-code');
+    const verify = document.getElementById('auth-verify');
+    const msg = document.getElementById('auth-msg');
+    code.addEventListener('keydown', e => { if(e.key==='Enter') verify.click(); });
+    document.getElementById('auth-back').onclick = e => { e.preventDefault(); renderEmail(); };
+    verify.onclick = async () => {
+      const c = code.value.trim();
+      if (!/^\d{6}$/.test(c)) { msg.textContent='Код — 6 цифр.'; msg.className='dashauth-msg is-error'; return; }
+      verify.disabled=true; verify.textContent='Перевіряємо…'; msg.textContent='';
+      try {
+        const r = await fetch(WORKER+'/api/otp/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, block:BLOCK, code:c})});
+        const j = await r.json();
+        if (!r.ok) { msg.textContent='Невірний код.'; msg.className='dashauth-msg is-error'; verify.disabled=false; verify.textContent='Підтвердити'; return; }
+        unlock(j.token, j.email, j.exp);
+      } catch(e) { msg.textContent='Помилка: '+e.message; msg.className='dashauth-msg is-error'; verify.disabled=false; verify.textContent='Підтвердити'; }
+    };
+  }
+  (async()=>{
+    const sess = await verifyExisting();
+    if (sess) { unlock(sess.token, sess.email, sess.exp); return; }
+    renderEmail();
+  })();
+})();
+</script>
+
+<header>
+  <div>
+    <h1>snEco · Procurement Planning 2026</h1>
+    <div class="meta" id="syncMeta">Завантаження…</div>
+  </div>
+  <div class="meta">Дані з МойСклад → D1 (proc snapshot)</div>
+</header>
+
+<main id="main"><div class="loading-state"><div class="spinner"></div>Тягне дані з D1…</div></main>
+
+<script>
+const WORKER = 'https://sneco-auth.vg-ab6.workers.dev';
+
+const fmt = (n, dec=0) => n == null ? '—' : Number(n).toLocaleString('uk-UA', {maximumFractionDigits: dec, minimumFractionDigits: dec});
+
+async function postJson(token, path, body) {
+  const r = await fetch(WORKER + path, {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) {
+    const txt = await r.text().catch(() => '');
+    const err = new Error(`${path} HTTP ${r.status}${txt ? ': ' + txt.slice(0,200) : ''}`);
+    err.status = r.status;
+    throw err;
+  }
+  return r.json();
+}
+
+async function fetchAll(token, type, params = {}) {
+  const all = [];
+  let offset = 0;
+  const limit = 10000;
+  while (true) {
+    const resp = await postJson(token, '/api/dashboard/data', { type, limit, offset, ...params });
+    all.push(...(resp.items || []));
+    if (!resp.items || resp.items.length < limit) break;
+    offset += limit;
+  }
+  return all;
+}
+
+function rowClass(d) {
+  if (d == null) return '';
+  if (d < 14) return 'bad';
+  if (d < 30) return 'warn';
+  return 'ok';
+}
+
+function categorize(folderPath) {
+  const p = folderPath || '';
+  if (p.includes('СВЕЖИЙ сыр')) return 'fresh_cheese';
+  if (p.includes('СУШЕНЫЙ сыр')) return 'dried_cheese';
+  if (p.includes('Гофротара')) return 'cardboard';
+  if (p.includes('Сырье для производства/Упаковка')) return 'packaging';
+  if (p.includes('Продукция/ПАЧКИ')) return 'final_package';
+  return null;
+}
+
+const CAT_LABEL = {
+  fresh_cheese: 'Свіжий сир',
+  packaging: 'Упаковка',
+  cardboard: 'Гофротара',
+  dried_cheese: 'Сушений сир',
+  final_package: 'Готові пачки',
+};
+
+window.bootDashboard = async function(token) {
+  const main = document.getElementById('main');
+  try {
+    // last-sync info
+    const ls = await fetch(WORKER + '/api/dashboard/last-sync').then(r => r.json()).catch(() => null);
+    let syncTxt = '';
+    if (ls && ls.last) {
+      const dt = new Date((ls.last.finished_at || ls.last.started_at) * 1000);
+      syncTxt = `Останній sync: ${dt.toLocaleString('uk-UA')} · `;
+    }
+
+    // Try fetch stocks first — найдешевший запит
+    let stocks = [];
+    try {
+      stocks = await fetchAll(token, 'stocks');
+    } catch(e) {
+      // Якщо 'stocks' ще не доданий до Worker — показуємо плейсхолдер
+      if (e.status === 400 || e.status === 404) {
+        main.innerHTML = `
+          <div class="note"><strong>⏳ Очікуємо deployment Vadym'а:</strong>
+            schema <code>ms_processings</code>/<code>ms_processing_materials</code>/<code>ms_processing_products</code>/<code>ms_stocks</code>
+            ще не застосована до D1, або entity handlers ще не у Worker. Як тільки Vadym задеплоїть і пробіжить
+            перший <code>procurement-sync</code> — цей дашборд почне показувати дані.</div>
+          <div class="section">
+            <h2>Поки що — локальний preview</h2>
+            <p>Локальна версія (через build.py на твоєму Mac) має повний функціонал:
+              виробничий баланс, прогноз закінчення сировини, графіки по смаках.</p>
+            <p style="margin-top:10px"><a href="local-preview.html" style="color:var(--y);font-weight:600">→ Відкрити local-preview (інлайн з останнім запуском build.py)</a></p>
+          </div>`;
+        document.getElementById('syncMeta').textContent = syncTxt + '⏳ Очікує deploy';
+        return;
+      }
+      throw e;
+    }
+
+    document.getElementById('syncMeta').textContent =
+      `${syncTxt}${stocks.length} stock items`;
+
+    if (stocks.length === 0) {
+      main.innerHTML = `<div class="note"><strong>⏳ Перший sync ще не пройшов.</strong> Чекаємо першого виконання
+        <code>procurement-sync</code> cron'у (або вручну: GitHub Actions → Procurement Sync → Run workflow з input <code>full=true</code>).</div>`;
+      return;
+    }
+
+    // ── Render forecast table from stocks (using stock_days field if present) ──
+    const targets = stocks.filter(s => {
+      const cat = categorize(s.folder_path);
+      return cat && ['fresh_cheese', 'packaging', 'cardboard'].includes(cat);
+    });
+    // Sort by stock_days asc (most critical first), нулі → 0 днів, відсутні → ∞
+    targets.sort((a, b) => {
+      const aD = a.stock_days != null && a.stock_days > 0 ? a.stock_days : 99999;
+      const bD = b.stock_days != null && b.stock_days > 0 ? b.stock_days : 99999;
+      return aD - bD;
+    });
+
+    const totalsByCategory = {};
+    for (const s of targets) {
+      const cat = categorize(s.folder_path);
+      totalsByCategory[cat] = (totalsByCategory[cat] || 0) + 1;
+    }
+
+    const rows = targets.map(s => {
+      const cat = categorize(s.folder_path);
+      const days = s.stock_days != null && s.stock_days > 0 ? s.stock_days : null;
+      return `<tr>
+        <td><span class="muted">${CAT_LABEL[cat] || cat}</span> · ${s.name || s.code || s.assortment_id}</td>
+        <td>${fmt(s.stock, s.uom_name === 'кг' ? 1 : 0)} <span class="muted">${s.uom_name || ''}</span></td>
+        <td>${fmt(s.reserve, s.uom_name === 'кг' ? 1 : 0)}</td>
+        <td class="${rowClass(days)}">${days != null ? fmt(days, 1) + ' дн' : '<span class="muted">∞</span>'}</td>
+      </tr>`;
+    }).join('');
+
+    main.innerHTML = `
+      <div class="kpis">
+        <div class="kpi"><div class="label">Свіжий сир — позицій</div><div class="value">${totalsByCategory.fresh_cheese || 0}</div></div>
+        <div class="kpi"><div class="label">Упаковка — позицій</div><div class="value">${totalsByCategory.packaging || 0}</div></div>
+        <div class="kpi"><div class="label">Гофротара — позицій</div><div class="value">${totalsByCategory.cardboard || 0}</div></div>
+        <div class="kpi"><div class="label">Критичних (&lt; 14 дн)</div><div class="value" style="color:var(--red)">${
+          targets.filter(s => s.stock_days != null && s.stock_days > 0 && s.stock_days < 14).length
+        }</div></div>
+      </div>
+      <div class="section">
+        <h2>Прогноз закінчення сировини · snapshot з МойСклад</h2>
+        <table>
+          <thead><tr><th>Матеріал</th><th>Залишок</th><th>Резерв</th><th>Днів вистачить (МС)</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div style="margin-top:10px;font-size:12px;color:var(--muted)">
+          <span class="bad" style="padding:2px 8px;border-radius:3px">&lt; 14 дн</span> критично ·
+          <span class="warn" style="padding:2px 8px;border-radius:3px">14–30 дн</span> запланувати ·
+          <span class="ok" style="padding:2px 8px;border-radius:3px">&gt; 30 дн</span> ок ·
+          Прогноз береться з поля <code>stockDays</code> МойСкладу (їх formula).
+        </div>
+      </div>
+      <div class="section" style="background:#fafaf6">
+        <h2>v2 — повний виробничий баланс</h2>
+        <p>Виробничий баланс (свіжий → сушений, % yield, помісячна динаміка, готові пачки по смаках) —
+          у роботі. Поточна версія використовує тільки <code>ms_stocks</code> snapshot;
+          повна агрегація з <code>ms_processings</code> + positions буде у наступній ітерації
+          (потребує дооптимізації Worker'а під великі вибірки або pre-aggregation endpoint).</p>
+        <p style="margin-top:10px"><a href="local-preview.html" style="color:var(--y);font-weight:600">→ Тимчасово: відкрити local-preview (повна агрегація з останнього build.py запуску на Pylyp Mac)</a></p>
+      </div>`;
+  } catch(e) {
+    console.error(e);
+    main.innerHTML = `<div class="empty-state">⚠ Помилка завантаження:<br><code>${e.message}</code><br><br>
+      Перевір що ти у whitelist <code>procurement-dashboard</code> і що Vadym задеплоїв entity handlers + schema.</div>`;
+  }
+};
+</script>
+
+</body>
+</html>
