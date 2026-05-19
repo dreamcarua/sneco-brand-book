@@ -138,10 +138,17 @@ def fetch_all(endpoint: str, params: dict = None, date_filter: bool = True, expa
         base_params["expand"] = expand
     if params:
         base_params.update(params)
+    # v2.76.5 CRITICAL FIX: requests urlencode'ить comma у %2C, але MoySklad
+    # ОЧІКУЄ raw comma у expand=agent,state,... → коли comma encoded, MoySklad
+    # ігнорує expand повністю → agent/expenseItem повертаються тільки як {meta}
+    # без name → save_excel пише None для ВСІХ rows.
+    # Fix: будуємо query string вручну з urlencode(safe=',') → comma НЕ encoded.
+    from urllib.parse import urlencode as _urlencode
     t0 = datetime.now()
     while True:
         base_params["offset"] = offset
-        resp = requests.get(url, headers=HEADERS, params=base_params)
+        qs = _urlencode(base_params, safe=',')
+        resp = requests.get(f"{url}?{qs}", headers=HEADERS)
         if resp.status_code != 200:
             print(f"  ⚠️  {endpoint} → HTTP {resp.status_code}: {resp.text[:200]}", flush=True)
             break
@@ -166,9 +173,12 @@ def fetch_report(endpoint: str, extra_params: dict = None) -> list:
     base_params = {"limit": limit, "momentFrom": DATE_FROM}
     if extra_params:
         base_params.update(extra_params)
+    # v2.76.5: те саме що у fetch_all — safe=',' щоб MoySklad парсив expand correctly
+    from urllib.parse import urlencode as _urlencode
     while True:
         base_params["offset"] = offset
-        resp = requests.get(url, headers=HEADERS, params=base_params)
+        qs = _urlencode(base_params, safe=',')
+        resp = requests.get(f"{url}?{qs}", headers=HEADERS)
         if resp.status_code != 200:
             print(f"  ⚠️  {endpoint} → HTTP {resp.status_code}: {resp.text[:200]}")
             break
@@ -184,8 +194,20 @@ def fetch_report(endpoint: str, extra_params: dict = None) -> list:
 
 
 def safe(val, key="name"):
+    """v2.76.5: подвійний lookup — спершу root level (коли expand спрацював),
+    потім meta.{key} (коли expand ігнорований MoySklad і повернуто тільки meta).
+    Цей fallback критичний бо MoySklad часто ігнорує expand=a,b,c для деяких
+    endpoints (особливо paymentin/paymentout, demands, customer_orders).
+    Результат: agent/expenseItem/organization лишались None для ВСІХ rows."""
     if isinstance(val, dict):
-        return val.get(key, "")
+        # Root level (з expand) — найшвидший шлях
+        v = val.get(key)
+        if v: return v
+        # Fallback: meta.{key} (коли expand ігнорований)
+        meta = val.get("meta")
+        if isinstance(meta, dict):
+            return meta.get(key, "") or ""
+        return ""
     return val or ""
 
 
