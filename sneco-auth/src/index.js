@@ -762,8 +762,13 @@ async function handleDashboardData(req, env) {
   // v2.75.4 HOTFIX: НЕ повертаємо raw_json — це масивна JSON колонка яка
   // переповнює CF Worker heap (128MB) на великих таблицях (ms_demand_positions
   // ~50K+ rows × ~2KB raw_json = >200MB response → Worker 503).
-  // raw_json був для fallback parsing, тепер фронт використовує structured cols.
-  const cols = def.cols.filter(c => c !== 'raw_json');
+  // v2.76.0: гібрид — викидаємо raw_json ТІЛЬКИ для масивних таблиць.
+  // Для payments / demands / orders / returns / invoices_out — повертаємо raw_json:
+  //   ~32K × ~500 байт = 16MB, безпечно. Це критично для getExpenseItem fallback
+  //   у Finance dashboard (коли expense_item колонка ще порожня до next full sync).
+  const HEAVY_TABLES = ['demand_positions', 'products', 'counterparties'];
+  const skipRawJson = HEAVY_TABLES.includes(type);
+  const cols = skipRawJson ? def.cols.filter(c => c !== 'raw_json') : def.cols;
   let sql = `SELECT ${cols.join(', ')} FROM ${def.table}`;
   const params = [];
   const where = [];

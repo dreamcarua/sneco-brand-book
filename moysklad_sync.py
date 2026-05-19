@@ -744,8 +744,9 @@ def main():
     print(f"   📦 Витягнуто {len(pos_records)} товарних позицій з {len(rows)} відвантажень", flush=True)
 
     print("\n💳 Оплати вхідні...")
-    # v2.72: + expand=expenseItem,organization,project — для категоризації витрат у Finance Dashboard
-    rows_in = fetch_all("entity/paymentin", expand="agent,state,organization,project")
+    # v2.76.0: + expand=expenseItem для paymentin теж (раніше тільки для paymentout).
+    # MoySklad дозволяє привʼязувати статтю витрат і до вхідних (поверненя/комісії).
+    rows_in = fetch_all("entity/paymentin", expand="agent,state,organization,project,expenseItem")
     print("💳 Оплати вихідні...")
     rows_out = fetch_all("entity/paymentout", expand="agent,state,organization,project,expenseItem")
     records = parse_payments(rows_in, "Вхідний") + parse_payments(rows_out, "Вихідний")
