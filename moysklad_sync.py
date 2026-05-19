@@ -749,6 +749,28 @@ def main():
     rows_in = fetch_all("entity/paymentin", expand="agent,state,organization,project,expenseItem")
     print("💳 Оплати вихідні...")
     rows_out = fetch_all("entity/paymentout", expand="agent,state,organization,project,expenseItem")
+
+    # v2.76.4 DEBUG: показати raw response для першого paymentout — щоб точно знати чи
+    # MoySklad повертає expanded agent.name + expenseItem.name. Видалити після фіксу.
+    if rows_out:
+        import json as _json
+        sample = rows_out[0]
+        print(f"  🔍 DEBUG paymentout sample (id={sample.get('id')}, name={sample.get('name')}):", flush=True)
+        for key in ['agent', 'expenseItem', 'organization', 'state']:
+            v = sample.get(key)
+            if isinstance(v, dict):
+                print(f"     {key}: keys={list(v.keys())[:8]}, name={v.get('name')!r}", flush=True)
+            else:
+                print(f"     {key}: {v!r}", flush=True)
+        # Якщо expenseItem нема → подивимось чи є attribute з name 'Стаття витрат' / 'Статья расходов'
+        attrs = sample.get('attributes', [])
+        if attrs:
+            print(f"     ATTRIBUTES ({len(attrs)}):", flush=True)
+            for a in attrs[:8]:
+                print(f"       - {a.get('name')!r} = {a.get('value')!r} (type={a.get('type')})", flush=True)
+        else:
+            print(f"     ATTRIBUTES: none", flush=True)
+
     records = parse_payments(rows_in, "Вхідний") + parse_payments(rows_out, "Вихідний")
     save_excel(pd.DataFrame(records), "payments", reliable=True)
 
