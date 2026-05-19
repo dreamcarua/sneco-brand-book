@@ -606,7 +606,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.76.0 · unified nav menu + fix "До списку клієнтів" button · Оновлення: щодня 06:00
+  snEco Customer 360 v2.76.1 · unified nav menu + fix "До списку клієнтів" + selectCustomer try/catch · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -615,6 +615,14 @@ body.dash-locked{overflow:hidden}
 // ============================================================================
 const WORKER = 'https://sneco-auth.vg-ab6.workers.dev';
 const STORAGE_KEY = 'snEco-jwt-customer-dashboard';
+
+// v2.76.1 — Global JS error catcher
+window.addEventListener('error', (e) => {
+  console.error('[GLOBAL ERROR]', e.error || e.message, e.filename, e.lineno);
+});
+window.addEventListener('unhandledrejection', (e) => {
+  console.error('[UNHANDLED PROMISE REJECTION]', e.reason);
+});
 
 // Global data caches
 let allCounterparties = [];   // for search/select
@@ -2044,7 +2052,20 @@ window.selectCustomer = function(name){
     </div>
   `;
 
-  renderCustomerView(c);
+  // v2.76.1: try/catch — якщо renderCustomerView кине throw, contentWrap лишиться
+  // зі старим Overview (UI bug в очах юзера). Показуємо помилку + fallback.
+  try {
+    renderCustomerView(c);
+  } catch(err) {
+    console.error('renderCustomerView crashed:', err);
+    document.getElementById('contentWrap').innerHTML = `
+      <div style="background:#fff;border:2px solid var(--red);border-radius:12px;padding:24px;margin:20px 0">
+        <div style="font-size:16px;font-weight:800;color:var(--red);margin-bottom:10px">⚠ Помилка при рендерингу клієнта</div>
+        <div style="font-size:13px;color:var(--d);margin-bottom:12px"><strong>${escapeHtml(c.name)}</strong></div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Деталі (DevTools Console для full stack):</div>
+        <pre style="background:#FAFAF5;padding:12px;border-radius:8px;font-size:11px;overflow:auto;max-height:300px">${escapeHtml(String(err?.message || err))}\n\n${escapeHtml(String(err?.stack || ''))}</pre>
+      </div>`;
+  }
 
   // Тепер selector-bar має ~80px і scroll до contentWrap йде у правильну позицію
   setTimeout(() => {
