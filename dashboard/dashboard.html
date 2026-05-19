@@ -21,6 +21,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .logo-text{color:#fff;font-size:15px;font-weight:700;letter-spacing:-.3px}
 .logo-sub{color:rgba(255,255,255,.4);font-size:11px;margin-top:1px}
 .topbar-right{display:flex;align-items:center;gap:10px}
+/* v2.76.0 — Unified nav menu across all dashboards */
+.nav-menu{display:flex;align-items:center;gap:2px;margin-left:18px;padding-left:18px;border-left:1px solid rgba(255,255,255,.12)}
+.nav-link{color:rgba(255,255,255,.65);text-decoration:none;font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:7px;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.nav-link:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-link.active{background:rgba(254,191,39,.18);color:#FEBF27}
+.nav-toggle{display:none;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:6px;margin-left:8px}
+@media(max-width:1100px){
+  .nav-menu{position:fixed;top:56px;left:0;right:0;background:#1E1E1E;flex-direction:column;align-items:stretch;padding:8px 16px;gap:0;margin:0;border-left:none;border-bottom:1px solid rgba(255,255,255,.1);transform:translateY(-110%);transition:transform .25s;z-index:180;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+  .nav-menu.open{transform:translateY(0)}
+  .nav-link{padding:11px 12px;border-radius:6px}
+  .nav-toggle{display:inline-block}
+}
 .badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
 .badge-green{background:rgba(150,193,31,.2);color:var(--g);border:1px solid rgba(150,193,31,.3)}
 .badge-gray{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1)}
@@ -336,14 +348,26 @@ body.dash-locked{overflow:hidden}
 
 <!-- TOPBAR -->
 <div class="topbar">
-  <div class="logo">
-    <div class="logo-box">sn</div>
-    <div>
-      <div class="logo-text">snEco Analytics</div>
-      <div class="logo-sub">МойСклад · 2023–2026</div>
+  <div style="display:flex;align-items:center;min-width:0;flex:0 1 auto">
+    <div class="logo">
+      <div class="logo-box">sn</div>
+      <div>
+        <div class="logo-text">snEco Analytics</div>
+        <div class="logo-sub">МойСклад · 2023–2026</div>
+      </div>
     </div>
+    <!-- v2.76.0 — Unified nav menu -->
+    <nav class="nav-menu" id="navMenu">
+      <a class="nav-link" href="./customer-360/customer-360.html">👥 Customer 360</a>
+      <a class="nav-link" href="./finance/finance.html">💰 Finance</a>
+      <a class="nav-link active" href="./dashboard.html">📊 Sales</a>
+      <a class="nav-link" href="./inventory/inventory.html">📦 Inventory</a>
+      <a class="nav-link" href="./production/production.html">🏭 Production</a>
+      <a class="nav-link" href="../">📘 Brand Bible</a>
+    </nav>
   </div>
   <div class="topbar-right">
+    <button class="nav-toggle" onclick="document.getElementById('navMenu').classList.toggle('open')" aria-label="Меню">☰</button>
     <span class="badge badge-green" id="syncStatus">✓ Перевіряємо останній sync...</span>
     <span class="badge badge-gray" id="lastUpdate">—</span>
   </div>
@@ -357,6 +381,18 @@ body.dash-locked{overflow:hidden}
   <button class="tab-btn" style="display:none" id="tabbtn-4" onclick="showTab(4)"><span class="tab-icon">📦</span>Склад та закупки</button>
   <button class="tab-btn" style="display:none" id="tabbtn-5" onclick="showTab(5)"><span class="tab-icon">🏭</span>Виробництво</button>
   <button class="tab-btn" id="tabbtn-6" onclick="showTab(6)"><span class="tab-icon">🎯</span>Action Items</button>
+</div>
+
+<!-- v2.75.1: ROLLING PERIOD CHIPS (shortcuts) — швидкі preset'и Year/Q/Month -->
+<div class="filterbar" style="background:#FAFAF5;padding:8px 24px;border-bottom:1px solid var(--border);position:sticky;top:56px;z-index:99">
+  <span class="flabel" style="color:#666">⚡ Швидкий вибір:</span>
+  <button class="fbtn" onclick="setQuickPeriod('month',this)">Поточний місяць</button>
+  <button class="fbtn" onclick="setQuickPeriod('prev-month',this)">Минулий місяць</button>
+  <button class="fbtn" onclick="setQuickPeriod('quarter',this)">Поточний квартал</button>
+  <button class="fbtn" onclick="setQuickPeriod('ytd',this)">YTD <span id="qpYtdLabel"></span></button>
+  <button class="fbtn" onclick="setQuickPeriod('prev-year',this)">Минулий рік</button>
+  <button class="fbtn on" onclick="setQuickPeriod('all',this)">Усе</button>
+  <span style="margin-left:auto;font-size:10.5px;color:var(--muted);font-style:italic">Або вручну Year/Quarter/Month нижче ↓</span>
 </div>
 
 <!-- FILTER BAR -->
@@ -1202,7 +1238,7 @@ body.dash-locked{overflow:hidden}
 </div><!-- /wrap -->
 
 <div class="footer">
-  snEco Analytics v2 · МойСклад API · Джерело правди: оплати ✅ та відвантаження ✅ · Оновлення: щодня 06:00
+  snEco Sales Analytics v2.2 (v2.76.0) · unified nav menu + Quick-period chips + Year/Q/Month filters · МойСклад API · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -1315,8 +1351,45 @@ function setFilter(type,val,btn){
   const group=btn.closest('.filterbar').querySelectorAll('.fbtn');
   btn.closest('.filterbar').querySelectorAll('[onclick*="setFilter(\''+type+'"]').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
+  // v2.75.1: manual filter change → deactivate quick chips
+  document.querySelectorAll('[onclick*="setQuickPeriod"]').forEach(b => b.classList.remove('on'));
   rebuildAll();
 }
+
+// v2.75.1: rolling period chips — shortcuts що виставляють year/q/month за пресетом
+function setQuickPeriod(preset, btn){
+  const now = new Date();
+  const cy = now.getFullYear();
+  const cm = now.getMonth() + 1;        // 1-12
+  const cq = 'Q' + Math.ceil(cm / 3);
+  const pm = cm === 1 ? 12 : cm - 1;
+  const pmY = cm === 1 ? cy - 1 : cy;
+  switch(preset){
+    case 'month':       filters.year = cy.toString();   filters.q = 'all'; filters.month = cm.toString();  break;
+    case 'prev-month':  filters.year = pmY.toString();  filters.q = 'all'; filters.month = pm.toString();  break;
+    case 'quarter':     filters.year = cy.toString();   filters.q = cq;    filters.month = 'all';          break;
+    case 'ytd':         filters.year = cy.toString();   filters.q = 'all'; filters.month = 'all';          break;
+    case 'prev-year':   filters.year = (cy-1).toString(); filters.q = 'all'; filters.month = 'all';        break;
+    case 'all':
+    default:            filters.year = 'all';            filters.q = 'all'; filters.month = 'all';
+  }
+  // Reset visual для existing filterbar buttons
+  document.querySelectorAll('.filterbar .fbtn').forEach(b => b.classList.remove('on'));
+  // Активувати відповідні рядки year/q/month у старому filterbar
+  ['year','q','month'].forEach(type => {
+    const v = filters[type];
+    document.querySelectorAll(`[onclick="setFilter('${type}','${v}',this)"]`).forEach(b => b.classList.add('on'));
+  });
+  // Активувати поточний quick chip
+  if (btn) btn.classList.add('on');
+  rebuildAll();
+}
+
+// Set YTD label on load
+document.addEventListener('DOMContentLoaded', () => {
+  const el = document.getElementById('qpYtdLabel');
+  if (el) el.textContent = new Date().getFullYear();
+});
 
 function syncMetricControls(){
   const classes={'income':'on-y','expenses':'on-r','shipments':'on-g','returns':'on-b'};

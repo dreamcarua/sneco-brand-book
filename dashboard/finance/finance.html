@@ -22,6 +22,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .logo-text{color:#fff;font-size:15px;font-weight:700;letter-spacing:-.3px}
 .logo-sub{color:rgba(255,255,255,.4);font-size:11px;margin-top:1px}
 .topbar-right{display:flex;align-items:center;gap:10px}
+/* v2.76.0 — Unified nav menu across all dashboards */
+.nav-menu{display:flex;align-items:center;gap:2px;margin-left:18px;padding-left:18px;border-left:1px solid rgba(255,255,255,.12)}
+.nav-link{color:rgba(255,255,255,.65);text-decoration:none;font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:7px;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.nav-link:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-link.active{background:rgba(254,191,39,.18);color:#FEBF27}
+.nav-toggle{display:none;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:6px;margin-left:8px}
+@media(max-width:1100px){
+  .nav-menu{position:fixed;top:56px;left:0;right:0;background:#1E1E1E;flex-direction:column;align-items:stretch;padding:8px 16px;gap:0;margin:0;border-left:none;border-bottom:1px solid rgba(255,255,255,.1);transform:translateY(-110%);transition:transform .25s;z-index:180;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+  .nav-menu.open{transform:translateY(0)}
+  .nav-link{padding:11px 12px;border-radius:6px}
+  .nav-toggle{display:inline-block}
+}
 .badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
 .badge-green{background:rgba(150,193,31,.2);color:var(--g);border:1px solid rgba(150,193,31,.3)}
 .badge-gray{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1)}
@@ -182,6 +194,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* ─── LOADER ─── */
 .loader{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--y);border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+/* v3.0.3: animated loader для empty-hero */
+.loader-big{width:64px;height:64px;border:5px solid #eee;border-top-color:var(--y);border-right-color:var(--g);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
+.loader-dots{display:inline-flex;gap:6px;justify-content:center;margin-top:10px}
+.loader-dots span{width:8px;height:8px;border-radius:50%;background:var(--y);animation:bounce 1.2s ease-in-out infinite}
+.loader-dots span:nth-child(2){background:var(--g);animation-delay:.15s}
+.loader-dots span:nth-child(3){background:var(--blue);animation-delay:.30s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-8px);opacity:1}}
 
 /* ─── FOOTER ─── */
 .footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:20px}
@@ -339,14 +358,26 @@ body.dash-locked{overflow:hidden}
 
 <!-- TOPBAR -->
 <div class="topbar">
-  <div class="logo">
-    <div class="logo-box">sn</div>
-    <div>
-      <div class="logo-text">snEco · Finance</div>
-      <div class="logo-sub">Рахунки · Гроші · Витрати по напрямах</div>
+  <div style="display:flex;align-items:center;min-width:0;flex:0 1 auto">
+    <div class="logo">
+      <div class="logo-box">sn</div>
+      <div>
+        <div class="logo-text">snEco · Finance</div>
+        <div class="logo-sub">Рахунки · Гроші · Витрати по напрямах</div>
+      </div>
     </div>
+    <!-- v2.76.0 — Unified nav menu -->
+    <nav class="nav-menu" id="navMenu">
+      <a class="nav-link" href="../customer-360/customer-360.html">👥 Customer 360</a>
+      <a class="nav-link active" href="../finance/finance.html">💰 Finance</a>
+      <a class="nav-link" href="../dashboard.html">📊 Sales</a>
+      <a class="nav-link" href="../inventory/inventory.html">📦 Inventory</a>
+      <a class="nav-link" href="../production/production.html">🏭 Production</a>
+      <a class="nav-link" href="../../">📘 Brand Bible</a>
+    </nav>
   </div>
   <div class="topbar-right">
+    <button class="nav-toggle" onclick="document.getElementById('navMenu').classList.toggle('open')" aria-label="Меню">☰</button>
     <span class="badge badge-green" id="syncStatus">✓ Перевіряємо sync...</span>
     <span class="badge badge-gray" id="lastUpdate">—</span>
   </div>
@@ -384,14 +415,15 @@ body.dash-locked{overflow:hidden}
 <!-- CONTENT -->
 <div class="wrap" id="contentWrap">
   <div class="empty-hero">
-    <div class="eh-icon">💰</div>
+    <div class="loader-big"></div>
     <div class="eh-title">Завантажуємо фінансові дані…</div>
-    <div class="eh-sub"><span class="loader"></span> Рахунки, надходження, витрати з МойСклад</div>
+    <div class="eh-sub">Рахунки, надходження, витрати з МойСклад · ~5-10 сек</div>
+    <div class="loader-dots"><span></span><span></span><span></span></div>
   </div>
 </div>
 
 <div class="footer">
-  snEco Finance Dashboard v3.0.2 · period filter + granularity (sticky + chart) + TOP suppliers + AR rounding fix · MoySklad → D1 → Worker · Cron щодня 06:00
+  snEco Finance Dashboard v3.1.0 (v2.76.0) · expense_item fix (raw_json fallback returns) + unified nav menu · MoySklad → D1 → Worker · Cron щодня 06:00
 </div>
 
 <script>

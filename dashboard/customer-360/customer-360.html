@@ -21,6 +21,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .logo-text{color:#fff;font-size:15px;font-weight:700;letter-spacing:-.3px}
 .logo-sub{color:rgba(255,255,255,.4);font-size:11px;margin-top:1px}
 .topbar-right{display:flex;align-items:center;gap:10px}
+/* v2.76.0 — Unified nav menu across all dashboards */
+.nav-menu{display:flex;align-items:center;gap:2px;margin-left:18px;padding-left:18px;border-left:1px solid rgba(255,255,255,.12)}
+.nav-link{color:rgba(255,255,255,.65);text-decoration:none;font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:7px;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.nav-link:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-link.active{background:rgba(254,191,39,.18);color:var(--y)}
+.nav-toggle{display:none;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:6px;margin-left:8px}
+@media(max-width:1100px){
+  .nav-menu{position:fixed;top:56px;left:0;right:0;background:#1E1E1E;flex-direction:column;align-items:stretch;padding:8px 16px;gap:0;margin:0;border-left:none;border-bottom:1px solid rgba(255,255,255,.1);transform:translateY(-110%);transition:transform .25s;z-index:180;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+  .nav-menu.open{transform:translateY(0)}
+  .nav-link{padding:11px 12px;border-radius:6px}
+  .nav-toggle{display:inline-block}
+}
 .badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
 .badge-green{background:rgba(150,193,31,.2);color:var(--g);border:1px solid rgba(150,193,31,.3)}
 .badge-gray{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1)}
@@ -512,14 +524,26 @@ body.dash-locked{overflow:hidden}
 
 <!-- TOPBAR -->
 <div class="topbar">
-  <div class="logo">
-    <div class="logo-box">sn</div>
-    <div>
-      <div class="logo-text">snEco · Customer 360</div>
-      <div class="logo-sub">Детальний профіль клієнта</div>
+  <div style="display:flex;align-items:center;min-width:0;flex:0 1 auto">
+    <div class="logo">
+      <div class="logo-box">sn</div>
+      <div>
+        <div class="logo-text">snEco · Customer 360</div>
+        <div class="logo-sub">Детальний профіль клієнта</div>
+      </div>
     </div>
+    <!-- v2.76.0 — Unified nav menu -->
+    <nav class="nav-menu" id="navMenu">
+      <a class="nav-link active" href="../customer-360/customer-360.html">👥 Customer 360</a>
+      <a class="nav-link" href="../finance/finance.html">💰 Finance</a>
+      <a class="nav-link" href="../dashboard.html">📊 Sales</a>
+      <a class="nav-link" href="../inventory/inventory.html">📦 Inventory</a>
+      <a class="nav-link" href="../production/production.html">🏭 Production</a>
+      <a class="nav-link" href="../../">📘 Brand Bible</a>
+    </nav>
   </div>
   <div class="topbar-right">
+    <button class="nav-toggle" onclick="document.getElementById('navMenu').classList.toggle('open')" aria-label="Меню">☰</button>
     <span class="badge badge-green" id="syncStatus">✓ Перевіряємо sync...</span>
     <span class="badge badge-gray" id="lastUpdate">—</span>
     <span class="badge badge-gray" id="lastBootBadge" title="Час з моменту останнього завантаження дашборду">🔄 —</span>
@@ -564,7 +588,9 @@ body.dash-locked{overflow:hidden}
     <div class="search-results" id="searchResults"></div>
   </div>
   <div class="quick-pills" id="quickPills">
-    <span style="color:var(--muted);font-size:11px;padding:5px 0">Завантажуємо TOP-10 клієнтів…</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:11px;padding:5px 0">
+      <span class="loader"></span> Готуємо overview…
+    </span>
   </div>
 </div>
 
@@ -580,7 +606,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.75.4 · Overview + Filter chips + Heatmap drill-down + CRM-log D1 backend + MoySklad write-back + normalize legal_address_comment dict-repr · Оновлення: щодня 06:00
+  snEco Customer 360 v2.76.0 · unified nav menu + fix "До списку клієнтів" button · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -1311,7 +1337,10 @@ async function fetchJson(type, opts){
 window.bootCustomer360 = async function(token){
   _token = token;
   updateSyncBadge();
-  document.getElementById('quickPills').innerHTML = '<span style="color:var(--muted);font-size:11px;padding:5px 0">⏳ Завантажуємо дані з D1…</span>';
+  document.getElementById('quickPills').innerHTML = `
+    <span style="display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:11px;padding:5px 0">
+      <span class="loader"></span> Завантажуємо дані з Cloudflare D1…
+    </span>`;
 
   try {
     // Parallel fetch all data (v2.71: + demand_positions for product breakdown)
@@ -1975,23 +2004,19 @@ function setupSearch(){
 }
 
 // v2.68: бережемо HTML списків щоб можна було повернутися "← До списку"
+// v2.76.0: після Overview Redesign (v2.74.0) backup більше не потрібен —
+// просто re-render Overview (це і є "список клієнтів" з усіма movers / action items)
 let _pillsBackup = null;
 
 window.showPillsList = function(){
-  // Повертаємо повний список ТОП-25 / YTD / Dormant
-  if (_pillsBackup) {
-    document.getElementById('quickPills').innerHTML = _pillsBackup;
-  } else {
-    renderQuickPills();
-  }
-  // Очистити вибраного клієнта
+  // v2.76.0 FIX: showPillsList() — повертаємось до Overview (KPIs, movers, action items,
+  // heatmap). Раніше: відновлювали stale _pillsBackup + показували empty-hero. БАГ.
+  // Тепер просто renderOverview() — він і pills, і contentWrap правильно перепопулює.
   document.getElementById('custSearch').value = '';
-  document.getElementById('contentWrap').innerHTML = `
-    <div class="empty-hero">
-      <div class="eh-icon">👥</div>
-      <div class="eh-title">Оберіть клієнта</div>
-      <div class="eh-sub">Введіть назву або ЄДРПОУ у пошуку зверху,<br>або клікніть на швидкий вибір нижче.</div>
-    </div>`;
+  document.getElementById('searchResults')?.classList.remove('open');
+  // Скинути _pillsBackup щоб наступний вибір клієнта знов його записав
+  _pillsBackup = null;
+  renderOverview();
   window.scrollTo({top: 0, behavior: 'smooth'});
 };
 
@@ -2175,20 +2200,34 @@ function renderCustomerView(c){
   const allMonths = [...new Set([...Object.keys(shipByMonth), ...Object.keys(payByMonth)])].sort();
 
   // === Product mix (v2.71: з ms_demand_positions, fallback на raw_json) ===
+  // v2.75.5: + period filter (_productPeriodDays state) + fallback sum = price × quantity
   const productMap = {};   // name → {qty, sum}
   // Primary: demand_positions filtered by agent
   const demandIds = new Set(dems.map(d => d.id).filter(Boolean));
-  const positionsForCust = allDemandPositions.filter(p => {
+  let positionsForCust = allDemandPositions.filter(p => {
     if (p.demand_id && demandIds.has(p.demand_id)) return true;
     if (p.agent_id && c.id && p.agent_id === c.id) return true;
     if (p.agent && c.name && p.agent === c.name) return true;
     return false;
   });
+  // v2.75.5: period filter — обмежити по даті
+  if (_productPeriodDays) {
+    const cutoff = new Date(Date.now() - _productPeriodDays * 86400000).toISOString().slice(0,10);
+    positionsForCust = positionsForCust.filter(p => (p.ms_moment || '').slice(0,10) >= cutoff);
+  }
   positionsForCust.forEach(p => {
     const name = p.product_name || p.assortment_name || p.name || '— без назви —';
+    const qty = Number(p.quantity || p.qty || 0);
+    let sum = (p.sum_kop || 0) / 100;
+    // v2.75.5: MoySklad деколи повертає sum=0 для positions з fallback fetch.
+    // Якщо так — рахуємо самі: price × quantity.
+    if (sum === 0 && qty > 0) {
+      const price = (p.price_kop || 0) / 100;
+      if (price > 0) sum = price * qty;
+    }
     if (!productMap[name]) productMap[name] = { qty: 0, sum: 0 };
-    productMap[name].qty += Number(p.quantity || p.qty || 0);
-    productMap[name].sum += (p.sum_kop || 0) / 100;
+    productMap[name].qty += qty;
+    productMap[name].sum += sum;
   });
   // Fallback: якщо positions порожні — спробувати raw_json
   if (Object.keys(productMap).length === 0) {
