@@ -1325,20 +1325,50 @@ function calcConcentration(allCounterparties){
 }
 
 async function fetchJson(type, opts){
+  // v2.76.1: retry з exponential backoff — "Load failed" фіксили через хвилину,
+  // це transient D1 timeout / cold start / 503. До 3 спроб з 0.5s, 1.5s, 3.5s паузами.
   const body = Object.assign({ type, limit: 50000 }, opts || {});
-  const r = await fetch(WORKER + '/api/dashboard/data', {
-    method: 'POST',
-    headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + _token },
-    body: JSON.stringify(body),
-  });
-  if (!r.ok) {
-    let txt = '';
-    try { txt = await r.text(); } catch(_){}
-    throw new Error(`${type}: HTTP ${r.status}${txt ? ' — ' + txt.slice(0,200) : ''}`);
+  const MAX_ATTEMPTS = 3;
+  const BACKOFF_MS = [500, 1500, 3500];
+  let lastErr = null;
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    try {
+      const ctrl = new AbortController();
+      const timeoutId = setTimeout(() => ctrl.abort(), 45000); // 45s hard timeout
+      const r = await fetch(WORKER + '/api/dashboard/data', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + _token },
+        body: JSON.stringify(body),
+        signal: ctrl.signal,
+      });
+      clearTimeout(timeoutId);
+      if (!r.ok) {
+        let txt = '';
+        try { txt = await r.text(); } catch(_){}
+        // Retry лише для 5xx (server/D1 issues). 4xx — це наша помилка, retry не допоможе.
+        if (r.status >= 500 && attempt < MAX_ATTEMPTS - 1) {
+          console.warn(`[fetchJson ${type}] HTTP ${r.status}, retry #${attempt+1} через ${BACKOFF_MS[attempt]}ms`);
+          await new Promise(res => setTimeout(res, BACKOFF_MS[attempt]));
+          continue;
+        }
+        throw new Error(`${type}: HTTP ${r.status}${txt ? ' — ' + txt.slice(0,200) : ''}`);
+      }
+      const j = await r.json();
+      return j.items || j.rows || j.results || [];
+    } catch (err) {
+      lastErr = err;
+      // Network errors / abort / TypeError → retry
+      const isNetwork = err.name === 'AbortError' || err.name === 'TypeError' ||
+                        String(err.message || '').match(/load failed|network|fetch|timeout/i);
+      if (isNetwork && attempt < MAX_ATTEMPTS - 1) {
+        console.warn(`[fetchJson ${type}] network ${err.message}, retry #${attempt+1} через ${BACKOFF_MS[attempt]}ms`);
+        await new Promise(res => setTimeout(res, BACKOFF_MS[attempt]));
+        continue;
+      }
+      throw err;
+    }
   }
-  const j = await r.json();
-  // Worker returns { items, count, limit, offset } per handleDashboardData()
-  return j.items || j.rows || j.results || [];
+  throw lastErr || new Error(`${type}: усі ${MAX_ATTEMPTS} спроби failed`);
 }
 
 // === Boot ===
