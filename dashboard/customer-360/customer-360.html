@@ -616,7 +616,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.76.5 · Product period chips + fix ReferenceError + sync expand fix (comma encoding) · Оновлення: щодня 06:00
+  snEco Customer 360 v2.77.0 · Movers TOP-20 sliding 30d + New/Lost з фільтрами + exclude роздріб/архівних + sync expand fix · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -650,6 +650,27 @@ let _productPeriodDays = null;
 let _productCustomRange = null;
 // v2.76.3: поточний обраний клієнт (для re-render при зміні product period)
 let _currentCustForProductFilter = null;
+
+// v2.77.0 — фільтри для New / Lost блоків Overview
+let _newPeriodDays = 30;   // 7/30/90/365
+let _lostPeriodDays = 60;  // 30/60/90
+let _lostMinRev = 10000;   // ₴ (10K за замовчуванням)
+
+window.setNewPeriod = function(days){
+  _newPeriodDays = days;
+  renderOverview();
+};
+window.setLostPeriod = function(days){
+  _lostPeriodDays = days;
+  renderOverview();
+};
+window.setLostMinRev = function(){
+  const v = document.getElementById('lostMinRevInput')?.value;
+  const n = parseInt(v, 10);
+  if (isNaN(n) || n < 0) { alert('Введіть число ≥ 0'); return; }
+  _lostMinRev = n;
+  renderOverview();
+};
 
 // v2.76.3 — change product period (chips або custom range)
 window.setProductPeriod = function(preset){
@@ -1131,7 +1152,8 @@ function computeCustomerMetrics(c, allDemands, allReturns){
   if (dems.length === 0) {
     return { totalShipped: 0, ordersCount: 0, avgCadence: null, daysSinceLast: null,
              lastOrder: null, overdueAR: 0, returnRate: 0, trend3m: null,
-             monthRev: 0, prevMonthRev: 0 };
+             monthRev: 0, prevMonthRev: 0,
+             last30Rev: 0, prev30Rev: 0, firstOrder: null };
   }
 
   // Sort by date asc для cadence/trend
@@ -1175,7 +1197,7 @@ function computeCustomerMetrics(c, allDemands, allReturns){
     trend3m = prev3 > 0 ? Math.round((last3 - prev3) / prev3 * 100) : null;
   }
 
-  // MoM — поточний vs попередній місяць (по календарю)
+  // MoM — поточний vs попередній місяць (по календарю) — legacy для backward compat
   const now = new Date();
   const curMonthYM = now.toISOString().slice(0,7);
   const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
@@ -1183,10 +1205,43 @@ function computeCustomerMetrics(c, allDemands, allReturns){
   const monthRev = byMonth[curMonthYM] || 0;
   const prevMonthRev = byMonth[prevMonthYM] || 0;
 
+  // v2.77.0: SLIDING 30d windows (last30 vs prev30) — для movers без bias по календарю
+  const todayMs = Date.now();
+  const cutoffLast30 = new Date(todayMs - 30*86400000).toISOString().slice(0,10);
+  const cutoffPrev30 = new Date(todayMs - 60*86400000).toISOString().slice(0,10);
+  let last30Rev = 0, prev30Rev = 0;
+  sorted.forEach(d => {
+    const dt = (d.ms_moment||'').slice(0,10);
+    const sum = (d.sum_kop||0)/100;
+    if (dt >= cutoffLast30) last30Rev += sum;
+    else if (dt >= cutoffPrev30) prev30Rev += sum;
+  });
+  // First order date (для "new clients" по періоду)
+  const firstOrder = sorted[0].ms_moment;
+
   return {
     totalShipped, ordersCount: sorted.length, avgCadence, daysSinceLast, lastOrder,
-    overdueAR, returnRate, trend3m, monthRev, prevMonthRev, byMonth
+    overdueAR, returnRate, trend3m, monthRev, prevMonthRev, byMonth,
+    last30Rev, prev30Rev, firstOrder
   };
+}
+
+// v2.77.0 — Helper: чи клієнт роздрібний (інтернет-магазин)
+function isRetail(c) {
+  const tags = String(c.tags || '').toLowerCase();
+  return tags.includes('інтернет-магазин') ||
+         tags.includes('интернет-магазин') ||
+         tags.includes('sneco.ua');
+}
+
+// v2.77.0 — Helper: чи контрагент архівний
+function isArchived(c) {
+  return c.archived === 1 || c.archived === true || c.archived === '1';
+}
+
+// v2.77.0 — Composite filter: виключити роздріб + архівних з усіх таблиць movers/new/lost
+function excludeRetailAndArchived(customers) {
+  return customers.filter(c => !isRetail(c) && !isArchived(c));
 }
 
 // Compute health score for a customer (uses computeCustomerMetrics output + crmLog)
@@ -1241,23 +1296,28 @@ function calcPortfolioKPIs(allCounterparties){
 // MOVERS — TOP-10 by % growth + TOP-10 by absolute growth ₴
 // ============================================================================
 function calcMovers(allCounterparties){
-  // Min thresholds щоб виключати noise: cur month rev >= 1000 ₴ OR prev month rev >= 1000 ₴
-  const eligible = allCounterparties.filter(c => {
+  // v2.77.0: sliding 30d window (last30 vs prev30) замість календарних місяців
+  // + exclude retail + archived
+  // + TOP-20 замість TOP-10
+  const pool = excludeRetailAndArchived(allCounterparties);
+
+  // Min thresholds щоб виключати noise: ≥1000 ₴ хоча б в одному вікні
+  const eligible = pool.filter(c => {
     const m = c.__metrics;
-    return m && (m.monthRev >= 1000 || m.prevMonthRev >= 1000);
+    return m && (m.last30Rev >= 1000 || m.prev30Rev >= 1000);
   });
 
-  // TOP-10 ростуть % (growth = cur/prev - 1; якщо prev = 0 → "new" — пропускаємо у % rank)
+  // TOP-20 ростуть % (потрібен база у prev30 щоб не ділити на 0)
   const withPct = eligible
-    .filter(c => c.__metrics.prevMonthRev > 1000)  // потрібен база
-    .map(c => ({ c, pct: (c.__metrics.monthRev - c.__metrics.prevMonthRev) / c.__metrics.prevMonthRev * 100 }));
-  const topGrowPct = withPct.filter(x => x.pct > 0).sort((a,b) => b.pct - a.pct).slice(0, 10);
-  const topDeclinePct = withPct.filter(x => x.pct < 0).sort((a,b) => a.pct - b.pct).slice(0, 10);
+    .filter(c => c.__metrics.prev30Rev > 1000)
+    .map(c => ({ c, pct: (c.__metrics.last30Rev - c.__metrics.prev30Rev) / c.__metrics.prev30Rev * 100 }));
+  const topGrowPct = withPct.filter(x => x.pct > 0).sort((a,b) => b.pct - a.pct).slice(0, 20);
+  const topDeclinePct = withPct.filter(x => x.pct < 0).sort((a,b) => a.pct - b.pct).slice(0, 20);
 
-  // TOP-10 by absolute ₴ change
-  const withAbs = eligible.map(c => ({ c, abs: c.__metrics.monthRev - c.__metrics.prevMonthRev }));
-  const topGrowAbs = withAbs.filter(x => x.abs > 0).sort((a,b) => b.abs - a.abs).slice(0, 10);
-  const topDeclineAbs = withAbs.filter(x => x.abs < 0).sort((a,b) => a.abs - b.abs).slice(0, 10);
+  // TOP-20 by absolute ₴ change (last30 - prev30)
+  const withAbs = eligible.map(c => ({ c, abs: c.__metrics.last30Rev - c.__metrics.prev30Rev }));
+  const topGrowAbs = withAbs.filter(x => x.abs > 0).sort((a,b) => b.abs - a.abs).slice(0, 20);
+  const topDeclineAbs = withAbs.filter(x => x.abs < 0).sort((a,b) => a.abs - b.abs).slice(0, 20);
 
   return { topGrowPct, topDeclinePct, topGrowAbs, topDeclineAbs };
 }
@@ -1265,23 +1325,35 @@ function calcMovers(allCounterparties){
 // ============================================================================
 // NEW + LOST customers
 // ============================================================================
-function calcNewAndLost(allCounterparties){
-  const today = new Date();
-  const curMonthYM = today.toISOString().slice(0,7);
-  const cutoff90 = new Date(Date.now() - 90*86400000).toISOString().slice(0,10);
+function calcNewAndLost(allCounterparties, opts){
+  // v2.77.0: фільтри per користувача
+  //   newPeriodDays: 7/30/90/365 — за який період вважати клієнта "новим"
+  //   lostPeriodDays: 30/60/90 — поріг "lost"
+  //   lostMinRev: мін. сума обороту (₴) щоб лост був релевантний (нудних не показуємо)
+  // + exclude retail + archived
+  opts = opts || {};
+  const newPeriodDays = opts.newPeriodDays || 30;
+  const lostPeriodDays = opts.lostPeriodDays || 60;
+  const lostMinRev = opts.lostMinRev != null ? opts.lostMinRev : 10000;
 
-  const newClients = allCounterparties.filter(c => {
-    const m = c.__metrics;
-    if (!m || !m.byMonth) return false;
-    const firstM = Object.keys(m.byMonth).sort()[0];
-    return firstM === curMonthYM;
-  }).sort((a,b) => (b.__metrics.monthRev||0) - (a.__metrics.monthRev||0)).slice(0, 10);
+  const pool = excludeRetailAndArchived(allCounterparties);
 
-  const lostClients = allCounterparties.filter(c => {
+  const cutoffNew = new Date(Date.now() - newPeriodDays*86400000).toISOString().slice(0,10);
+  const cutoffLost = new Date(Date.now() - lostPeriodDays*86400000).toISOString().slice(0,10);
+
+  // NEW: firstOrder у вікні [now-newPeriodDays, now]
+  const newClients = pool.filter(c => {
     const m = c.__metrics;
-    if (!m || !m.totalShipped || m.totalShipped <= 0) return false;
-    return m.lastOrder && m.lastOrder.slice(0,10) <= cutoff90;
-  }).sort((a,b) => (b.__metrics.totalShipped||0) - (a.__metrics.totalShipped||0)).slice(0, 10);
+    if (!m || !m.firstOrder) return false;
+    return m.firstOrder.slice(0,10) >= cutoffNew;
+  }).sort((a,b) => (b.__metrics.totalShipped||0) - (a.__metrics.totalShipped||0)).slice(0, 20);
+
+  // LOST: lastOrder ≤ cutoffLost І totalShipped ≥ lostMinRev
+  const lostClients = pool.filter(c => {
+    const m = c.__metrics;
+    if (!m || !m.totalShipped || m.totalShipped < lostMinRev) return false;
+    return m.lastOrder && m.lastOrder.slice(0,10) <= cutoffLost;
+  }).sort((a,b) => (b.__metrics.totalShipped||0) - (a.__metrics.totalShipped||0)).slice(0, 20);
 
   return { newClients, lostClients };
 }
@@ -1596,7 +1668,11 @@ function _buildOverviewHtml(){
   // Movers/Heatmap/Actions/NewLost — респектують currentOverviewFilter
   const filtered = applyOverviewFilter(allCounterparties, currentOverviewFilter);
   const movers = calcMovers(filtered);
-  const newLost = calcNewAndLost(filtered);
+  const newLost = calcNewAndLost(filtered, {
+    newPeriodDays: _newPeriodDays,
+    lostPeriodDays: _lostPeriodDays,
+    lostMinRev: _lostMinRev,
+  });
   const actions = calcActionItems(filtered);
   const heatmap = calcSegmentHeatmap(filtered);
 
@@ -1727,14 +1803,15 @@ function _buildOverviewHtml(){
         </div>
       </div>
 
-      <!-- TIER 4: MOVERS — 2 columns (% growth + abs growth) -->
+      <!-- TIER 4: MOVERS — TOP-20, sliding 30d vs prev 30d, exclude retail+archived (v2.77.0) -->
       <div class="ov-section">
-        <div class="ov-section-title">🚀 ТОП-10 ростуть — найшвидше у % та у ₴</div>
+        <div class="ov-section-title">🚀 ТОП-20 ростуть · останні 30 днів vs передостанні 30 днів</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Виключено: роздріб (інтернет-магазин) + архівні</div>
         <div class="ov-movers-grid">
           <div class="ov-mover-card">
-            <div class="ov-mover-card-head">🚀 ТОП-10 % ріст MoM <span class="ovm-sub">cur vs prev month</span></div>
+            <div class="ov-mover-card-head">🚀 ТОП-20 % ріст <span class="ovm-sub">last 30d / prev 30d</span></div>
             ${movers.topGrowPct.length === 0
-              ? `<div class="ov-mover-empty">Нема клієнтів з ростом % MoM</div>`
+              ? `<div class="ov-mover-empty">Нема клієнтів з ростом % за 30/30 днів</div>`
               : movers.topGrowPct.map((x,i) => `
                 <div class="ov-mover-row" onclick="selectCustomer('${escapeAttr(x.c.__key || x.c.name)}')">
                   <div class="ovm-rank">${i+1}</div>
@@ -1742,14 +1819,14 @@ function _buildOverviewHtml(){
                     <div class="ovm-name">${escapeHtml(x.c.name)}</div>
                     <div class="ovm-name-sub">${x.c.edrpou || x.c.inn || ''}</div>
                   </div>
-                  <div class="ovm-prev">${nfm(x.c.__metrics.prevMonthRev)}→${nfm(x.c.__metrics.monthRev)} ₴</div>
+                  <div class="ovm-prev">${nfm(x.c.__metrics.prev30Rev)}→${nfm(x.c.__metrics.last30Rev)} ₴</div>
                   <div class="ovm-delta up">+${Math.round(x.pct)}%</div>
                 </div>`).join('')}
           </div>
           <div class="ov-mover-card">
-            <div class="ov-mover-card-head">💰 ТОП-10 абсолютний ріст ₴ MoM <span class="ovm-sub">прибавка у грошах</span></div>
+            <div class="ov-mover-card-head">💰 ТОП-20 абсолютний ріст ₴ <span class="ovm-sub">last 30d / prev 30d</span></div>
             ${movers.topGrowAbs.length === 0
-              ? `<div class="ov-mover-empty">Нема клієнтів з ростом ₴ MoM</div>`
+              ? `<div class="ov-mover-empty">Нема клієнтів з ростом ₴ за 30/30 днів</div>`
               : movers.topGrowAbs.map((x,i) => `
                 <div class="ov-mover-row" onclick="selectCustomer('${escapeAttr(x.c.__key || x.c.name)}')">
                   <div class="ovm-rank">${i+1}</div>
@@ -1757,18 +1834,18 @@ function _buildOverviewHtml(){
                     <div class="ovm-name">${escapeHtml(x.c.name)}</div>
                     <div class="ovm-name-sub">${x.c.edrpou || x.c.inn || ''}</div>
                   </div>
-                  <div class="ovm-prev">${nfm(x.c.__metrics.prevMonthRev)}→${nfm(x.c.__metrics.monthRev)} ₴</div>
+                  <div class="ovm-prev">${nfm(x.c.__metrics.prev30Rev)}→${nfm(x.c.__metrics.last30Rev)} ₴</div>
                   <div class="ovm-delta up">+${nfm(x.abs)} ₴</div>
                 </div>`).join('')}
           </div>
         </div>
 
-        <div class="ov-section-title" style="margin-top:18px">📉 ТОП-10 падають — найшвидше у % та у ₴</div>
+        <div class="ov-section-title" style="margin-top:18px">📉 ТОП-20 падають · останні 30 днів vs передостанні 30 днів</div>
         <div class="ov-movers-grid">
           <div class="ov-mover-card">
-            <div class="ov-mover-card-head">📉 ТОП-10 % падіння MoM <span class="ovm-sub">cur vs prev month</span></div>
+            <div class="ov-mover-card-head">📉 ТОП-20 % падіння <span class="ovm-sub">last 30d / prev 30d</span></div>
             ${movers.topDeclinePct.length === 0
-              ? `<div class="ov-mover-empty">Нема клієнтів з падінням % MoM</div>`
+              ? `<div class="ov-mover-empty">Нема клієнтів з падінням %</div>`
               : movers.topDeclinePct.map((x,i) => `
                 <div class="ov-mover-row" onclick="selectCustomer('${escapeAttr(x.c.__key || x.c.name)}')">
                   <div class="ovm-rank">${i+1}</div>
@@ -1776,14 +1853,14 @@ function _buildOverviewHtml(){
                     <div class="ovm-name">${escapeHtml(x.c.name)}</div>
                     <div class="ovm-name-sub">${x.c.edrpou || x.c.inn || ''}</div>
                   </div>
-                  <div class="ovm-prev">${nfm(x.c.__metrics.prevMonthRev)}→${nfm(x.c.__metrics.monthRev)} ₴</div>
+                  <div class="ovm-prev">${nfm(x.c.__metrics.prev30Rev)}→${nfm(x.c.__metrics.last30Rev)} ₴</div>
                   <div class="ovm-delta down">${Math.round(x.pct)}%</div>
                 </div>`).join('')}
           </div>
           <div class="ov-mover-card">
-            <div class="ov-mover-card-head">💸 ТОП-10 абсолютне падіння ₴ MoM <span class="ovm-sub">втрати у грошах</span></div>
+            <div class="ov-mover-card-head">💸 ТОП-20 абсолютне падіння ₴ <span class="ovm-sub">last 30d / prev 30d</span></div>
             ${movers.topDeclineAbs.length === 0
-              ? `<div class="ov-mover-empty">Нема клієнтів з падінням ₴ MoM</div>`
+              ? `<div class="ov-mover-empty">Нема клієнтів з падінням ₴</div>`
               : movers.topDeclineAbs.map((x,i) => `
                 <div class="ov-mover-row" onclick="selectCustomer('${escapeAttr(x.c.__key || x.c.name)}')">
                   <div class="ovm-rank">${i+1}</div>
@@ -1791,33 +1868,52 @@ function _buildOverviewHtml(){
                     <div class="ovm-name">${escapeHtml(x.c.name)}</div>
                     <div class="ovm-name-sub">${x.c.edrpou || x.c.inn || ''}</div>
                   </div>
-                  <div class="ovm-prev">${nfm(x.c.__metrics.prevMonthRev)}→${nfm(x.c.__metrics.monthRev)} ₴</div>
+                  <div class="ovm-prev">${nfm(x.c.__metrics.prev30Rev)}→${nfm(x.c.__metrics.last30Rev)} ₴</div>
                   <div class="ovm-delta down">${nfm(x.abs)} ₴</div>
                 </div>`).join('')}
           </div>
         </div>
 
-        <!-- New + Lost -->
+        <!-- v2.77.0 — New + Lost з period chips та min revenue -->
         <div class="ov-secondary-grid">
           <div class="ov-mover-card">
-            <div class="ov-mover-card-head">🆕 Нові клієнти цього місяця <span class="ovm-sub">${newLost.newClients.length}</span></div>
+            <div class="ov-mover-card-head">🆕 Нові клієнти <span class="ovm-sub">${newLost.newClients.length} · перше замовлення в обраному вікні</span></div>
+            <div class="prod-period-bar" style="margin:0 0 8px 0;padding:6px 0;border:none">
+              <span class="prod-period-bar-lbl">Період</span>
+              <button class="prod-chip ${_newPeriodDays===7 ? 'active' : ''}" onclick="setNewPeriod(7)">7 днів</button>
+              <button class="prod-chip ${_newPeriodDays===30 ? 'active' : ''}" onclick="setNewPeriod(30)">30 днів</button>
+              <button class="prod-chip ${_newPeriodDays===90 ? 'active' : ''}" onclick="setNewPeriod(90)">90 днів</button>
+              <button class="prod-chip ${_newPeriodDays===180 ? 'active' : ''}" onclick="setNewPeriod(180)">півроку</button>
+              <button class="prod-chip ${_newPeriodDays===365 ? 'active' : ''}" onclick="setNewPeriod(365)">рік</button>
+            </div>
             ${newLost.newClients.length === 0
-              ? `<div class="ov-mover-empty">Нема нових клієнтів цього місяця</div>`
+              ? `<div class="ov-mover-empty">Нема нових клієнтів за ${_newPeriodDays} днів</div>`
               : newLost.newClients.map((c,i) => `
                 <div class="ov-mover-row" onclick="selectCustomer('${escapeAttr(c.__key || c.name)}')">
                   <div class="ovm-rank">${i+1}</div>
                   <div>
                     <div class="ovm-name">${escapeHtml(c.name)}</div>
-                    <div class="ovm-name-sub">${c.edrpou || c.inn || ''}</div>
+                    <div class="ovm-name-sub">${c.edrpou || c.inn || ''} · перше замовл.: ${dfShort(c.__metrics.firstOrder)}</div>
                   </div>
                   <div class="ovm-prev">${c.__metrics.ordersCount} замовл.</div>
-                  <div class="ovm-delta up">${nfm(c.__metrics.monthRev)} ₴</div>
+                  <div class="ovm-delta up">${nfm(c.__metrics.totalShipped)} ₴</div>
                 </div>`).join('')}
           </div>
           <div class="ov-mover-card">
-            <div class="ov-mover-card-head">💔 Лост — &gt; 90 днів без замовлення <span class="ovm-sub">${newLost.lostClients.length}</span></div>
+            <div class="ov-mover-card-head">💔 Лост <span class="ovm-sub">${newLost.lostClients.length} · не замовляли &gt; ${_lostPeriodDays} днів, LTV ≥ ${nfm(_lostMinRev)} ₴</span></div>
+            <div class="prod-period-bar" style="margin:0 0 8px 0;padding:6px 0;border:none">
+              <span class="prod-period-bar-lbl">Не замовляли</span>
+              <button class="prod-chip ${_lostPeriodDays===30 ? 'active' : ''}" onclick="setLostPeriod(30)">30 днів</button>
+              <button class="prod-chip ${_lostPeriodDays===60 ? 'active' : ''}" onclick="setLostPeriod(60)">60 днів</button>
+              <button class="prod-chip ${_lostPeriodDays===90 ? 'active' : ''}" onclick="setLostPeriod(90)">90 днів</button>
+              <button class="prod-chip ${_lostPeriodDays===180 ? 'active' : ''}" onclick="setLostPeriod(180)">180 днів</button>
+              <span style="color:var(--muted);font-size:11px;margin:0 4px">·</span>
+              <span class="prod-period-bar-lbl">Мін LTV</span>
+              <input type="number" id="lostMinRevInput" class="prod-chip-custom" value="${_lostMinRev}" min="0" step="1000" style="width:90px" title="мінімальна сума обороту, ₴">
+              <button class="prod-chip" onclick="setLostMinRev()">Застосувати</button>
+            </div>
             ${newLost.lostClients.length === 0
-              ? `<div class="ov-mover-empty">Жодного лост-клієнта 🎉</div>`
+              ? `<div class="ov-mover-empty">Жодного лост-клієнта 🎉 (для обраних фільтрів)</div>`
               : newLost.lostClients.map((c,i) => `
                 <div class="ov-mover-row" onclick="selectCustomer('${escapeAttr(c.__key || c.name)}')">
                   <div class="ovm-rank">${i+1}</div>
