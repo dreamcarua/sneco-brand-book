@@ -371,6 +371,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* ─── FOOTER ─── */
 .footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:20px}
 
+/* v2.76.3 — Product period filter chips */
+.prod-period-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px;padding:8px 0 4px;border-top:1px dashed var(--border)}
+.prod-period-bar-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-right:4px}
+.prod-chip{padding:5px 11px;border:1px solid var(--border);background:#fff;color:var(--d);font-size:11px;font-weight:600;border-radius:14px;cursor:pointer;font-family:inherit;transition:all .15s}
+.prod-chip:hover{background:var(--yf);border-color:var(--y)}
+.prod-chip.active{background:var(--y);border-color:var(--y);color:var(--d)}
+.prod-chip-custom{padding:5px 9px;border:1px solid var(--border);background:#fff;font-size:11px;font-weight:500;border-radius:14px;font-family:inherit;color:var(--d);outline:none}
+.prod-chip-custom:focus{border-color:var(--y)}
+.prod-period-info{margin-left:auto;font-size:11px;color:var(--muted);font-weight:500}
+
 /* === OTP gate === */
 #dashauth-overlay{position:fixed;inset:0;background:#1E1E1E;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 #dashauth-overlay.is-hidden{display:none}
@@ -606,7 +616,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.76.2 · FIX ReferenceError _productPeriodDays + try/catch + fetch retry · Оновлення: щодня 06:00
+  snEco Customer 360 v2.76.3 · Product period chips (7d/місяць/квартал/півроку/рік/custom) + fix ReferenceError · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -636,6 +646,38 @@ let allReturns = [];          // for return rate
 // → silent throw → contentWrap не оновлювався → user думав що клік не працює.
 // null = показати ВСІ products (без обмеження по даті), >0 = останні N днів.
 let _productPeriodDays = null;
+// v2.76.3: custom date range — { from: 'YYYY-MM-DD', to: 'YYYY-MM-DD' } або null
+let _productCustomRange = null;
+// v2.76.3: поточний обраний клієнт (для re-render при зміні product period)
+let _currentCustForProductFilter = null;
+
+// v2.76.3 — change product period (chips або custom range)
+window.setProductPeriod = function(preset){
+  // preset: '7d', '30d', '90d', '6m', '1y', 'all', 'custom'
+  if (preset === 'all') {
+    _productPeriodDays = null;
+    _productCustomRange = null;
+  } else if (preset === 'custom') {
+    const from = document.getElementById('prodPeriodFrom')?.value;
+    const to   = document.getElementById('prodPeriodTo')?.value;
+    if (!from || !to) { alert('Введіть обидві дати: від і до'); return; }
+    if (from > to) { alert('Дата "від" не може бути пізніше "до"'); return; }
+    _productPeriodDays = null;
+    _productCustomRange = { from, to };
+  } else {
+    const map = { '7d': 7, '30d': 30, '90d': 90, '6m': 183, '1y': 365 };
+    _productPeriodDays = map[preset] || null;
+    _productCustomRange = null;
+  }
+  if (_currentCustForProductFilter) {
+    renderCustomerView(_currentCustForProductFilter);
+    // Scroll до Product mix секції
+    setTimeout(() => {
+      const el = document.querySelector('[data-block="product-mix"]');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
+};
 
 let _token = null;
 let _charts = {};
@@ -2118,6 +2160,8 @@ function renderCustomerView(c){
   // v2.72.1 HOTFIX: now був undefined у цій функції (визначався лише у bootCustomer360)
   // що зламало YoY block (line 887) + seasonal action (line 1085) → ReferenceError
   const now = new Date();
+  // v2.76.3: запамʼятовуємо клієнта щоб setProductPeriod міг re-render тут же
+  _currentCustForProductFilter = c;
   // Match by ID first (canonical), fallback to name
   const matchCP = (item) =>
     (c.id && item.agent_id && item.agent_id === c.id) ||
@@ -2266,10 +2310,15 @@ function renderCustomerView(c){
     if (p.agent && c.name && p.agent === c.name) return true;
     return false;
   });
-  // v2.75.5: period filter — обмежити по даті
+  // v2.75.5 + v2.76.3: period filter — обмежити по даті (preset або custom range)
   if (_productPeriodDays) {
     const cutoff = new Date(Date.now() - _productPeriodDays * 86400000).toISOString().slice(0,10);
     positionsForCust = positionsForCust.filter(p => (p.ms_moment || '').slice(0,10) >= cutoff);
+  } else if (_productCustomRange) {
+    positionsForCust = positionsForCust.filter(p => {
+      const d = (p.ms_moment || '').slice(0,10);
+      return d >= _productCustomRange.from && d <= _productCustomRange.to;
+    });
   }
   positionsForCust.forEach(p => {
     const name = p.product_name || p.assortment_name || p.name || '— без назви —';
@@ -2741,14 +2790,34 @@ function renderCustomerView(c){
 
     <!-- PRODUCT MIX + TIMELINE -->
     <div class="g2" style="margin-top:14px">
-      <div class="cc">
+      <div class="cc" data-block="product-mix">
         <div class="cc-head">
           <div>
             <div class="cc-title">🛒 ТОП-10 продуктів</div>
-            <div class="cc-sub">${usingPositions ? `ms_demand_positions · ${positionsForCust.length} позицій` : 'fallback з raw_json'}</div>
+            <div class="cc-sub">${usingPositions ? `ms_demand_positions · ${positionsForCust.length} позицій` : 'fallback з raw_json'}${
+              _productPeriodDays ? ` · фільтр: останні ${_productPeriodDays} днів` :
+              _productCustomRange ? ` · фільтр: ${_productCustomRange.from} → ${_productCustomRange.to}` :
+              ' · усі дати'
+            }</div>
           </div>
         </div>
-        <div style="overflow-x:auto">
+        <!-- v2.76.3: period filter chips для ТОП-10 продуктів -->
+        <div class="prod-period-bar">
+          <span class="prod-period-bar-lbl">Період</span>
+          <button class="prod-chip ${(!_productPeriodDays && !_productCustomRange) ? 'active' : ''}" onclick="setProductPeriod('all')">Усі</button>
+          <button class="prod-chip ${_productPeriodDays===7 ? 'active' : ''}" onclick="setProductPeriod('7d')">7 днів</button>
+          <button class="prod-chip ${_productPeriodDays===30 ? 'active' : ''}" onclick="setProductPeriod('30d')">Місяць</button>
+          <button class="prod-chip ${_productPeriodDays===90 ? 'active' : ''}" onclick="setProductPeriod('90d')">Квартал</button>
+          <button class="prod-chip ${_productPeriodDays===183 ? 'active' : ''}" onclick="setProductPeriod('6m')">Півроку</button>
+          <button class="prod-chip ${_productPeriodDays===365 ? 'active' : ''}" onclick="setProductPeriod('1y')">Рік</button>
+          <span style="color:var(--muted);font-size:11px;margin:0 4px">·</span>
+          <input type="date" id="prodPeriodFrom" class="prod-chip-custom" value="${_productCustomRange?.from || ''}" title="Дата від">
+          <span style="color:var(--muted);font-size:11px">→</span>
+          <input type="date" id="prodPeriodTo" class="prod-chip-custom" value="${_productCustomRange?.to || ''}" title="Дата до">
+          <button class="prod-chip ${_productCustomRange ? 'active' : ''}" onclick="setProductPeriod('custom')">Застосувати</button>
+          ${(_productPeriodDays || _productCustomRange) ? `<span class="prod-period-info">📊 ${positionsForCust.length} позицій у періоді</span>` : ''}
+        </div>
+        <div style="overflow-x:auto;margin-top:8px">
           <table class="dt">
             <thead><tr><th style="width:28px">#</th><th>Продукт</th><th style="text-align:right">Кількість</th><th style="text-align:right">Виручка</th><th style="text-align:right">% клієнта</th></tr></thead>
             <tbody>
