@@ -606,7 +606,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.76.1 · unified nav menu + fix "До списку клієнтів" + selectCustomer try/catch · Оновлення: щодня 06:00
+  snEco Customer 360 v2.76.2 · FIX ReferenceError _productPeriodDays + try/catch + fetch retry · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -631,6 +631,11 @@ let allPayments = [];         // for AR, payment cadence
 let allOrders = [];           // for pipeline (unshipped)
 let allInvoices = [];         // for AR overdue
 let allReturns = [];          // for return rate
+// v2.76.1 FIX: оголошуємо _productPeriodDays — використовується у renderCustomerView
+// для filter ТОП-10 продуктів по часовому періоду. До цього було ReferenceError
+// → silent throw → contentWrap не оновлювався → user думав що клік не працює.
+// null = показати ВСІ products (без обмеження по даті), >0 = останні N днів.
+let _productPeriodDays = null;
 
 let _token = null;
 let _charts = {};
