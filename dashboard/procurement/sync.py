@@ -3,6 +3,9 @@
 snEco · Procurement Sync · production-grade
 Тягне з МойСклад → batch POST у Worker /api/dashboard/ingest → D1 tables proc_*.
 
+v2 (2026-05-19): + ThreadPoolExecutor для positions fetch (8x паралельності).
+Раніше: ~50 хв на 2288 processings. Тепер: ~5-8 хв.
+
 Запуск:
     python3 sync.py                  # incremental (last 7 days)
     python3 sync.py --full           # повний 2026 рік
@@ -12,17 +15,6 @@ Env (required):
     MOYSKLAD_TOKEN          з .env або GitHub Secret
     SYNC_API_KEY            з .env або GitHub Secret
     WORKER_URL              default https://sneco-auth.vg-ab6.workers.dev
-
-Entity types що POSTяться:
-    processings              → proc_processings
-    processing_materials     → proc_processing_materials
-    processing_products      → proc_processing_products
-    stocks                   → proc_stocks (TRUNCATE + INSERT)
-    sync_log                 → proc_sync_log (1 row at end)
-
-Залежності у Worker /api/dashboard/ingest (треба у Vadym):
-    accept entity ∈ {processings, processing_materials, processing_products, stocks}
-    accept sync_log payload (як для Sales)
 """
 
 import argparse
@@ -32,6 +24,7 @@ import sys
 import time
 import traceback
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -55,8 +48,9 @@ MS_HEADERS = {
 
 BATCH_SIZE = 400
 MAX_RETRIES = 5
-RATE_LIMIT_SLEEP = 0.1   # secs between МС requests
+RATE_LIMIT_SLEEP = 0.05   # secs between МС requests (зменшено з 0.1 — є retry для 429)
 INGEST_TIMEOUT = 60
+PARALLEL_WORKERS = 8       # v2: parallel positions fetch
 
 YEAR = 2026
 
@@ -81,7 +75,6 @@ def safe_name(obj, default="") -> str:
 
 
 def to_kop(value, default=0) -> int:
-    """МС повертає sum у копійках вже як int. Інколи float. Round."""
     if value is None:
         return default
     return int(round(float(value)))
@@ -89,14 +82,14 @@ def to_kop(value, default=0) -> int:
 
 # ─── МойСклад fetchers ──────────────────────────────────────────────────────
 
-def ms_get(url: str, params: Optional[dict] = None) -> dict:
-    """Single GET with retry/backoff."""
+def ms_get(url: str, params: Optional[dict] = None, session: Optional[requests.Session] = None) -> dict:
+    """Single GET with retry/backoff. v2: optional session для connection reuse."""
+    s = session or requests
     for attempt in range(MAX_RETRIES):
         try:
-            r = requests.get(url, headers=MS_HEADERS, params=params, timeout=60)
+            r = s.get(url, headers=MS_HEADERS, params=params, timeout=60)
             if r.status_code == 429:
                 wait = 2 ** attempt
-                print(f"  ⚠ rate-limited, sleeping {wait}s")
                 time.sleep(wait)
                 continue
             r.raise_for_status()
@@ -105,25 +98,31 @@ def ms_get(url: str, params: Optional[dict] = None) -> dict:
         except requests.RequestException as e:
             if attempt == MAX_RETRIES - 1:
                 raise
-            print(f"  ⚠ retry {attempt+1}/{MAX_RETRIES}: {e}")
             time.sleep(2 ** attempt)
 
 
-def ms_fetch_paginated(endpoint: str, extra_params: Optional[dict] = None) -> List[dict]:
-    """Page through МС endpoint, returning all rows."""
+def ms_fetch_paginated(endpoint: str, extra_params: Optional[dict] = None, session: Optional[requests.Session] = None) -> List[dict]:
     rows, offset, limit = [], 0, 1000
     while True:
         params = {"limit": limit, "offset": offset}
         if extra_params:
             params.update(extra_params)
-        d = ms_get(f"{MS_BASE}/{endpoint}", params=params)
+        d = ms_get(f"{MS_BASE}/{endpoint}", params=params, session=session)
         rows.extend(d.get("rows", []))
         total = d.get("meta", {}).get("size", 0)
         offset += limit
-        print(f"    {endpoint}: {min(offset, total)}/{total}")
         if offset >= total:
             break
     return rows
+
+
+def _fetch_processing_positions(pid: str, kind: str, session: requests.Session) -> tuple:
+    """v2: worker для ThreadPoolExecutor. Returns (pid, kind, positions, error)."""
+    try:
+        positions = ms_fetch_paginated(f"entity/processing/{pid}/{kind}", session=session)
+        return (pid, kind, positions, None)
+    except Exception as e:
+        return (pid, kind, [], str(e))
 
 
 # ─── Ingest to Worker ───────────────────────────────────────────────────────
@@ -148,7 +147,6 @@ def post_batch(entity: str, rows: list) -> dict:
 
 
 def post_sync_log(log: dict):
-    # Реюзаємо існуючий ms_sync_log (від Sales). Trigger 'cron-procurement' відрізняє.
     url = f"{WORKER_URL}/api/dashboard/ingest"
     r = requests.post(
         url,
@@ -169,7 +167,7 @@ def ingest_batched(entity: str, rows: list, dry_run: bool = False) -> int:
         batch = rows[i:i + BATCH_SIZE]
         resp = post_batch(entity, batch)
         sent += resp.get("inserted", len(batch))
-        print(f"    {entity}: {sent}/{len(rows)} ingested")
+        print(f"    {entity}: {sent}/{len(rows)} ingested", flush=True)
     return sent
 
 
@@ -193,7 +191,6 @@ def build_processing_row(p: dict) -> dict:
 
 
 def build_position_rows(processing_id: str, positions: list, side: str) -> list:
-    """side ∈ {'material', 'product'} — щоб скласти composite id."""
     rows = []
     for pos in positions:
         pos_id = pos.get("id") or extract_id(pos.get("meta", {})) or ""
@@ -252,9 +249,8 @@ def main():
 
     started = int(time.time())
     started_iso = datetime.now(timezone.utc).isoformat()
-    print(f"🚀 Procurement sync · {started_iso} · {'FULL' if args.full else 'incremental(7d)'}{' · DRY-RUN' if args.dry_run else ''}")
+    print(f"🚀 Procurement sync · {started_iso} · {'FULL' if args.full else 'incremental(7d)'}{' · DRY-RUN' if args.dry_run else ''}", flush=True)
 
-    # Determine date window
     if args.full:
         date_from = f"{YEAR}-01-01 00:00:00"
         date_to = f"{YEAR}-12-31 23:59:59"
@@ -263,45 +259,61 @@ def main():
         date_from = d_from.strftime("%Y-%m-%d 00:00:00")
         date_to = datetime.now().strftime("%Y-%m-%d 23:59:59")
 
-    # ─── 1. Processings (headers) ──────────────────────────────────────────
-    print(f"\n[1/4] Processings ({date_from} → {date_to})…")
+    # ─── 1. Processings ────────────────────────────────────────────────────
+    print(f"\n[1/4] Processings ({date_from} → {date_to})…", flush=True)
     processings = ms_fetch_paginated(
         "entity/processing",
         {"filter": f"moment>={date_from};moment<={date_to}"}
     )
-    print(f"      → {len(processings)} processings")
+    print(f"      → {len(processings)} processings", flush=True)
 
     proc_rows = [build_processing_row(p) for p in processings]
 
-    # ─── 2. Positions (materials + products) per processing ─────────────────
-    print(f"\n[2/4] Positions for {len(processings)} processings…")
+    # ─── 2. Positions (parallel) ───────────────────────────────────────────
+    print(f"\n[2/4] Positions for {len(processings)} processings (parallel × {PARALLEL_WORKERS})…", flush=True)
     mat_rows, prod_rows = [], []
-    for i, p in enumerate(processings, 1):
-        pid = p["id"]
-        for kind, target in (("materials", mat_rows), ("products", prod_rows)):
-            try:
-                positions = ms_fetch_paginated(f"entity/processing/{pid}/{kind}")
-                target.extend(build_position_rows(pid, positions, kind[:-1]))
-            except Exception as e:
-                print(f"  ⚠ {pid[:8]} {kind}: {e}")
-        if i % 50 == 0 or i == len(processings):
-            elapsed = time.time() - started
-            rate = i / elapsed if elapsed else 0
-            eta = (len(processings) - i) / rate if rate else 0
-            print(f"      {i}/{len(processings)} ({rate:.1f}/s, ETA {eta:.0f}s)")
-    print(f"      → {len(mat_rows)} material positions, {len(prod_rows)} product positions")
+    pos_errors = []
+
+    if processings:
+        with ThreadPoolExecutor(max_workers=PARALLEL_WORKERS) as executor:
+            session = requests.Session()
+            tasks = []
+            for p in processings:
+                pid = p["id"]
+                tasks.append(executor.submit(_fetch_processing_positions, pid, "materials", session))
+                tasks.append(executor.submit(_fetch_processing_positions, pid, "products", session))
+
+            done_count = 0
+            total_tasks = len(tasks)
+            t_phase = time.time()
+            for future in as_completed(tasks):
+                pid, kind, positions, err = future.result()
+                if err:
+                    pos_errors.append(f"{pid[:8]} {kind}: {err}")
+                else:
+                    target = mat_rows if kind == "materials" else prod_rows
+                    target.extend(build_position_rows(pid, positions, kind[:-1]))
+                done_count += 1
+                if done_count % 100 == 0 or done_count == total_tasks:
+                    elapsed = time.time() - t_phase
+                    rate = done_count / elapsed if elapsed else 0
+                    eta = (total_tasks - done_count) / rate if rate else 0
+                    print(f"      {done_count}/{total_tasks} ({rate:.1f}/s, ETA {eta:.0f}s)", flush=True)
+            session.close()
+
+    print(f"      → {len(mat_rows)} material positions, {len(prod_rows)} product positions, {len(pos_errors)} errors", flush=True)
 
     # ─── 3. Stock snapshot ──────────────────────────────────────────────────
-    print(f"\n[3/4] Stock report…")
+    print(f"\n[3/4] Stock report…", flush=True)
     stock_raw = ms_fetch_paginated("report/stock/all")
     snapshot_iso = datetime.now(timezone.utc).isoformat()
     stock_rows = [build_stock_row(s, snapshot_iso) for s in stock_raw]
-    print(f"      → {len(stock_rows)} stock items")
+    print(f"      → {len(stock_rows)} stock items", flush=True)
 
     # ─── 4. Ingest into Worker ──────────────────────────────────────────────
-    print(f"\n[4/4] Ingesting to Worker…")
+    print(f"\n[4/4] Ingesting to Worker…", flush=True)
     counts = {}
-    errors = []
+    errors = list(pos_errors)
     try:
         counts["processings"] = ingest_batched("processings", proc_rows, args.dry_run)
     except Exception as e:
@@ -319,7 +331,6 @@ def main():
     except Exception as e:
         errors.append(f"stocks: {e}")
 
-    # ─── Sync log ───────────────────────────────────────────────────────────
     finished = int(time.time())
     duration = (finished - started) * 1000
     status = "success" if not errors else ("partial" if any(counts.values()) else "failed")
@@ -329,19 +340,19 @@ def main():
         "finished_at": datetime.now(timezone.utc).isoformat(),
         "trigger": args.trigger,
         "status": status,
-        "entities_json": json.dumps(counts, ensure_ascii=False),
-        "errors_json": json.dumps(errors) if errors else None,
+        "entities": counts,  # v2: name matches Worker (раніше було entities_json)
+        "errors": errors if errors else None,
         "duration_ms": duration,
     }
     if not args.dry_run:
         try:
             post_sync_log(log)
-            print(f"📝 sync_log → proc_sync_log")
+            print(f"📝 sync_log → ms_sync_log", flush=True)
         except Exception as e:
             print(f"⚠ failed to write sync_log: {e}")
 
     total = sum(counts.values())
-    print(f"\n🎯 Done · {total} rows · {len(errors)} errors · {duration/1000:.1f}s · status={status}")
+    print(f"\n🎯 Done · {total} rows · {len(errors)} errors · {duration/1000:.1f}s · status={status}", flush=True)
     sys.exit(0 if status == "success" else 1)
 
 

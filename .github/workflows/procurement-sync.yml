@@ -20,7 +20,7 @@ jobs:
   sync:
     name: Fetch МойСклад processings/stock → write proc_* tables in D1
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 120
     permissions:
       contents: read
 
