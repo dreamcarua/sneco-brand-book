@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
 snEco · Procurement Sync · production-grade
-Тягне з МойСклад → batch POST у Worker /api/dashboard/ingest → D1 tables proc_*.
+Тягне з МойСклад → batch POST у Worker /api/dashboard/ingest → D1 tables ms_*.
 
+v3 (2026-05-20): + second-pass retry для failed positions + tolerant status (< 2% = success).
 v2 (2026-05-19): + ThreadPoolExecutor для positions fetch (8x паралельності).
 Раніше: ~50 хв на 2288 processings. Тепер: ~5-8 хв.
 
@@ -51,6 +52,10 @@ MAX_RETRIES = 5
 RATE_LIMIT_SLEEP = 0.05   # secs between МС requests (зменшено з 0.1 — є retry для 429)
 INGEST_TIMEOUT = 60
 PARALLEL_WORKERS = 8       # v2: parallel positions fetch
+
+# v3: tolerant status thresholds
+STATUS_SUCCESS_THRESHOLD = 0.02   # < 2% втрат = success
+STATUS_PARTIAL_THRESHOLD = 0.20   # 2-20% = partial, > 20% = failed
 
 YEAR = 2026
 
@@ -232,6 +237,95 @@ def build_stock_row(s: dict, snapshot_at: str) -> dict:
 
 # ─── Main sync ──────────────────────────────────────────────────────────────
 
+def fetch_positions_parallel(processings: List[dict]) -> tuple:
+    """
+    v3: основний parallel pass + second-pass retry для failed.
+    Returns (mat_rows, prod_rows, failed_tasks, total_tasks, recovered).
+    """
+    mat_rows, prod_rows = [], []
+    failed_tasks = []  # list of (pid, kind) для retry
+    total_tasks = len(processings) * 2  # materials + products
+
+    if not processings:
+        return mat_rows, prod_rows, [], 0, 0
+
+    # ─── Pass 1: parallel ───
+    print(f"      Pass 1 — parallel × {PARALLEL_WORKERS}…", flush=True)
+    with ThreadPoolExecutor(max_workers=PARALLEL_WORKERS) as executor:
+        session = requests.Session()
+        tasks = []
+        for p in processings:
+            pid = p["id"]
+            tasks.append(executor.submit(_fetch_processing_positions, pid, "materials", session))
+            tasks.append(executor.submit(_fetch_processing_positions, pid, "products", session))
+
+        done_count = 0
+        t_phase = time.time()
+        for future in as_completed(tasks):
+            pid, kind, positions, err = future.result()
+            if err:
+                failed_tasks.append((pid, kind))
+            else:
+                target = mat_rows if kind == "materials" else prod_rows
+                target.extend(build_position_rows(pid, positions, kind[:-1]))
+            done_count += 1
+            if done_count % 100 == 0 or done_count == total_tasks:
+                elapsed = time.time() - t_phase
+                rate = done_count / elapsed if elapsed else 0
+                eta = (total_tasks - done_count) / rate if rate else 0
+                print(f"      {done_count}/{total_tasks} ({rate:.1f}/s, ETA {eta:.0f}s)", flush=True)
+        session.close()
+
+    print(f"      Pass 1 done: {total_tasks - len(failed_tasks)}/{total_tasks} ok, {len(failed_tasks)} failed", flush=True)
+
+    # ─── Pass 2: sequential retry for failed ───
+    recovered = 0
+    if failed_tasks:
+        print(f"      Pass 2 — sequential retry для {len(failed_tasks)} failed…", flush=True)
+        session = requests.Session()
+        still_failed = []
+        for pid, kind in failed_tasks:
+            # Longer pause before retry — let МС rate limits reset
+            time.sleep(0.5)
+            pid2, kind2, positions, err = _fetch_processing_positions(pid, kind, session)
+            if err:
+                still_failed.append((pid, kind))
+            else:
+                target = mat_rows if kind == "materials" else prod_rows
+                target.extend(build_position_rows(pid, positions, kind[:-1]))
+                recovered += 1
+        session.close()
+        print(f"      Pass 2 done: recovered {recovered}/{len(failed_tasks)}, still failed: {len(still_failed)}", flush=True)
+        failed_tasks = still_failed
+
+    return mat_rows, prod_rows, failed_tasks, total_tasks, recovered
+
+
+def determine_status(failed_count: int, total_tasks: int, ingest_errors: list) -> tuple:
+    """
+    v3: tolerant status logic.
+    Returns (status, loss_pct).
+    
+    - success: failed_positions / total < 2% AND нема ingest errors
+    - partial: 2-20% AND нема ingest errors
+    - failed: > 20% АБО будь-яка ingest помилка
+    """
+    if ingest_errors:
+        return ("failed", 100.0)
+
+    if total_tasks == 0:
+        return ("success", 0.0)
+
+    loss_pct = (failed_count / total_tasks) * 100
+
+    if failed_count == 0 or (loss_pct / 100) < STATUS_SUCCESS_THRESHOLD:
+        return ("success", loss_pct)
+    elif (loss_pct / 100) < STATUS_PARTIAL_THRESHOLD:
+        return ("partial", loss_pct)
+    else:
+        return ("failed", loss_pct)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--full", action="store_true",
@@ -249,7 +343,7 @@ def main():
 
     started = int(time.time())
     started_iso = datetime.now(timezone.utc).isoformat()
-    print(f"🚀 Procurement sync · {started_iso} · {'FULL' if args.full else 'incremental(7d)'}{' · DRY-RUN' if args.dry_run else ''}", flush=True)
+    print(f"🚀 Procurement sync v3 · {started_iso} · {'FULL' if args.full else 'incremental(7d)'}{' · DRY-RUN' if args.dry_run else ''}", flush=True)
 
     if args.full:
         date_from = f"{YEAR}-01-01 00:00:00"
@@ -269,39 +363,13 @@ def main():
 
     proc_rows = [build_processing_row(p) for p in processings]
 
-    # ─── 2. Positions (parallel) ───────────────────────────────────────────
-    print(f"\n[2/4] Positions for {len(processings)} processings (parallel × {PARALLEL_WORKERS})…", flush=True)
-    mat_rows, prod_rows = [], []
-    pos_errors = []
+    # ─── 2. Positions (v3: parallel + retry pass) ──────────────────────────
+    print(f"\n[2/4] Positions for {len(processings)} processings…", flush=True)
+    mat_rows, prod_rows, failed_tasks, total_tasks, recovered = fetch_positions_parallel(processings)
 
-    if processings:
-        with ThreadPoolExecutor(max_workers=PARALLEL_WORKERS) as executor:
-            session = requests.Session()
-            tasks = []
-            for p in processings:
-                pid = p["id"]
-                tasks.append(executor.submit(_fetch_processing_positions, pid, "materials", session))
-                tasks.append(executor.submit(_fetch_processing_positions, pid, "products", session))
-
-            done_count = 0
-            total_tasks = len(tasks)
-            t_phase = time.time()
-            for future in as_completed(tasks):
-                pid, kind, positions, err = future.result()
-                if err:
-                    pos_errors.append(f"{pid[:8]} {kind}: {err}")
-                else:
-                    target = mat_rows if kind == "materials" else prod_rows
-                    target.extend(build_position_rows(pid, positions, kind[:-1]))
-                done_count += 1
-                if done_count % 100 == 0 or done_count == total_tasks:
-                    elapsed = time.time() - t_phase
-                    rate = done_count / elapsed if elapsed else 0
-                    eta = (total_tasks - done_count) / rate if rate else 0
-                    print(f"      {done_count}/{total_tasks} ({rate:.1f}/s, ETA {eta:.0f}s)", flush=True)
-            session.close()
-
-    print(f"      → {len(mat_rows)} material positions, {len(prod_rows)} product positions, {len(pos_errors)} errors", flush=True)
+    loss_pct = (len(failed_tasks) / total_tasks * 100) if total_tasks else 0
+    print(f"      → {len(mat_rows)} material positions, {len(prod_rows)} product positions", flush=True)
+    print(f"      → {len(failed_tasks)} STILL failed after retry ({loss_pct:.2f}% loss), recovered {recovered}", flush=True)
 
     # ─── 3. Stock snapshot ──────────────────────────────────────────────────
     print(f"\n[3/4] Stock report…", flush=True)
@@ -313,36 +381,48 @@ def main():
     # ─── 4. Ingest into Worker ──────────────────────────────────────────────
     print(f"\n[4/4] Ingesting to Worker…", flush=True)
     counts = {}
-    errors = list(pos_errors)
+    ingest_errors = []
     try:
         counts["processings"] = ingest_batched("processings", proc_rows, args.dry_run)
     except Exception as e:
-        errors.append(f"processings: {e}")
+        ingest_errors.append(f"processings: {e}")
     try:
         counts["processing_materials"] = ingest_batched("processing_materials", mat_rows, args.dry_run)
     except Exception as e:
-        errors.append(f"processing_materials: {e}")
+        ingest_errors.append(f"processing_materials: {e}")
     try:
         counts["processing_products"] = ingest_batched("processing_products", prod_rows, args.dry_run)
     except Exception as e:
-        errors.append(f"processing_products: {e}")
+        ingest_errors.append(f"processing_products: {e}")
     try:
         counts["stocks"] = ingest_batched("stocks", stock_rows, args.dry_run)
     except Exception as e:
-        errors.append(f"stocks: {e}")
+        ingest_errors.append(f"stocks: {e}")
 
     finished = int(time.time())
     duration = (finished - started) * 1000
-    status = "success" if not errors else ("partial" if any(counts.values()) else "failed")
+
+    # v3: tolerant status
+    status, loss_pct_final = determine_status(len(failed_tasks), total_tasks, ingest_errors)
+
+    # Errors for sync_log (truncated)
+    all_errors = []
+    if failed_tasks:
+        all_errors.extend([f"position fetch: {pid[:8]} {kind}" for pid, kind in failed_tasks[:10]])
+        if len(failed_tasks) > 10:
+            all_errors.append(f"... +{len(failed_tasks)-10} more")
+    all_errors.extend(ingest_errors)
 
     log = {
         "started_at": started_iso,
         "finished_at": datetime.now(timezone.utc).isoformat(),
         "trigger": args.trigger,
         "status": status,
-        "entities": counts,  # v2: name matches Worker (раніше було entities_json)
-        "errors": errors if errors else None,
+        "entities": counts,
+        "errors": all_errors if all_errors else None,
         "duration_ms": duration,
+        "loss_pct": round(loss_pct_final, 2),
+        "recovered_count": recovered,
     }
     if not args.dry_run:
         try:
@@ -352,8 +432,10 @@ def main():
             print(f"⚠ failed to write sync_log: {e}")
 
     total = sum(counts.values())
-    print(f"\n🎯 Done · {total} rows · {len(errors)} errors · {duration/1000:.1f}s · status={status}", flush=True)
-    sys.exit(0 if status == "success" else 1)
+    print(f"\n🎯 Done · {total} rows · {len(failed_tasks)} failed pos ({loss_pct_final:.2f}%) · {len(ingest_errors)} ingest errors · {duration/1000:.1f}s · status={status}", flush=True)
+
+    # v3: exit 0 для success ABO partial (cron не повинен fail), 1 для failed
+    sys.exit(0 if status in ("success", "partial") else 1)
 
 
 if __name__ == "__main__":
