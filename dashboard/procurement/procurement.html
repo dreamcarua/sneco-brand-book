@@ -3,17 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>snEco — Procurement Planning 2026</title>
+<title>snEco — Procurement Planning 2026 v2</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--y:#FEBF27;--g:#96C11F;--d:#1E1E1E;--bg:#F4F4EF;--card:#fff;--muted:#8a8a8a;--border:#E5E5DC;--red:#E84040}
+:root{--y:#FEBF27;--g:#96C11F;--d:#1E1E1E;--bg:#F4F4EF;--card:#fff;--muted:#8a8a8a;--border:#E5E5DC;--red:#E84040;--blue:#3B82F6}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--d);font-size:14px;min-height:100vh}
-header{background:#fff;border-bottom:1px solid var(--border);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:24px}
-header h1{font-size:18px;font-weight:700}
-header .meta{font-size:12px;color:var(--muted)}
-main{padding:20px 24px 60px;max-width:1280px;margin:0 auto}
+.topbar{background:var(--d);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.3);color:#fff}
+.topbar .logo{display:flex;align-items:center;gap:10px}
+.topbar .logo-box{width:32px;height:32px;background:var(--y);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:var(--d);letter-spacing:-0.5px}
+.topbar .logo-text{font-size:15px;font-weight:700;letter-spacing:-.3px}
+.topbar .logo-sub{color:rgba(255,255,255,.4);font-size:11px;margin-top:1px}
+.nav-menu{display:flex;align-items:center;gap:2px;margin-left:18px;padding-left:18px;border-left:1px solid rgba(255,255,255,.12)}
+.nav-link{color:rgba(255,255,255,.65);text-decoration:none;font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:7px;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.nav-link:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-link.active{background:rgba(254,191,39,.18);color:#FEBF27}
+@media(max-width:1100px){.nav-menu{display:none}}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.topbar .meta{font-size:11px;color:rgba(255,255,255,.5)}
+
+main{padding:20px 24px 60px;max-width:1320px;margin:0 auto}
+.period-bar{background:#fff;border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;position:sticky;top:56px;z-index:150;box-shadow:0 1px 0 rgba(0,0,0,.02)}
+.period-bar-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.period-chips{display:flex;gap:4px;background:#F1F1EB;padding:3px;border-radius:9px;flex-wrap:wrap}
+.period-chip{padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;color:#555;cursor:pointer;border:none;background:transparent;transition:all .15s;white-space:nowrap;font-family:inherit}
+.period-chip:hover{background:rgba(254,191,39,.18);color:var(--d)}
+.period-chip.active{background:var(--d);color:#fff}
+.period-range-info{font-size:11px;color:var(--muted)}
+
 .section{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:22px}
-.section h2{font-size:14px;margin-bottom:14px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:#444}
+.section h2{font-size:13px;margin-bottom:14px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#444}
+.section .h2-sub{font-size:11px;color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0;margin-left:8px}
 table{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
 th,td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:right;white-space:nowrap}
 th:first-child,td:first-child{text-align:left;font-weight:500;max-width:340px;overflow:hidden;text-overflow:ellipsis}
@@ -21,23 +41,33 @@ thead th{background:#fafaf6;font-weight:600;color:#555;font-size:11px;text-trans
 .bad{background:#fdecec !important;color:var(--red);font-weight:600}
 .warn{background:#fef9e9 !important;color:#c69510;font-weight:600}
 .ok{background:#f0f7e6 !important;color:var(--g);font-weight:600}
-.note{background:#fef9e9;border:1px solid #f1d883;border-left:4px solid var(--y);padding:14px 18px;border-radius:6px;font-size:13px;color:#7a5e10;margin-bottom:18px;line-height:1.6}
+.note{background:#fef9e9;border:1px solid #f1d883;border-left:4px solid var(--y);padding:12px 16px;border-radius:6px;font-size:12.5px;color:#7a5e10;margin:10px 0;line-height:1.55}
 .note strong{color:#5c4500}
 .empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
 .loading-state{padding:60px 20px;text-align:center}
 .loading-state .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--y);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px}
 @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:22px}
-.kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
-.kpi .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
-.kpi .value{font-size:22px;font-weight:700}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--y)}
+.kpi.green::after{background:var(--g)}
+.kpi.red::after{background:var(--red)}
+.kpi.blue::after{background:var(--blue)}
+.kpi .label{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;font-weight:700}
+.kpi .value{font-size:22px;font-weight:800;color:var(--d)}
+.kpi .sub{font-size:10.5px;color:var(--muted);margin-top:3px}
 .muted{color:var(--muted)}
 
-/* OTP-gate (same as finance.html) */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:900px){.g2{grid-template-columns:1fr}}
+.chart-h220{height:220px;position:relative}
+
+/* OTP-gate */
 #dashauth-overlay{position:fixed;inset:0;background:#1E1E1E;z-index:9999;display:flex;align-items:center;justify-content:center}
 #dashauth-overlay.is-hidden{display:none}
 .dashauth-card{background:#fff;width:100%;max-width:440px;border-radius:14px;padding:36px 30px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.dashauth-logo{font-size:24px;font-weight:900;color:#FEBF27;margin-bottom:6px;letter-spacing:-0.5px;text-align:center}
+.dashauth-logo{font-size:24px;font-weight:900;color:#FEBF27;margin-bottom:6px;text-align:center}
 .dashauth-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#888;text-align:center;margin-bottom:24px}
 .dashauth-icon{font-size:36px;text-align:center;margin-bottom:16px}
 .dashauth-h1{font-size:18px;font-weight:800;text-align:center;margin-bottom:6px}
@@ -47,12 +77,12 @@ thead th{background:#fafaf6;font-weight:600;color:#555;font-size:11px;text-trans
 .dashauth-input.code{font-family:'SF Mono',Menlo,monospace;letter-spacing:.4em;text-align:center;font-size:18px}
 .dashauth-btn{width:100%;padding:13px;background:#1E1E1E;color:#fff;border:0;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;margin-top:14px;font-family:inherit}
 .dashauth-btn:hover{background:#000}
-.dashauth-btn:disabled{opacity:.5;cursor:not-allowed}
+.dashauth-btn:disabled{opacity:.5}
 .dashauth-msg{font-size:12.5px;margin-top:12px;text-align:center;min-height:18px}
 .dashauth-msg.is-error{color:#DC2626}
 .dashauth-msg a{color:#FEBF27;font-weight:600}
 .dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
-.dashauth-session{position:fixed;top:8px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:8px}
+.dashauth-session{position:fixed;top:65px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:8px}
 .dashauth-session button{background:none;border:0;color:#96C11F;cursor:pointer;font-size:14px}
 body.dash-locked{overflow:hidden}
 </style>
@@ -75,7 +105,6 @@ body.dash-locked{overflow:hidden}
   const overlay = document.getElementById('dashauth-overlay');
   const stage = document.getElementById('dashauth-stage');
   let email = '';
-
   function unlock(token, em, exp){
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify({token, email:em, exp})); } catch(e){}
     document.body.classList.remove('dash-locked');
@@ -98,7 +127,7 @@ body.dash-locked{overflow:hidden}
   }
   function renderEmail(){
     stage.innerHTML = `<div class="dashauth-icon">📦</div><div class="dashauth-h1">Введіть email</div>
-      <div class="dashauth-desc">Якщо ваш email у whitelist — на нього надійде 6-значний код. Сесія діє 1 годину.</div>
+      <div class="dashauth-desc">Якщо ваш email у whitelist — надійде 6-значний код.</div>
       <input class="dashauth-input" type="email" id="auth-em" placeholder="ім'я@sneco.ua" autofocus>
       <button class="dashauth-btn" id="auth-send">Надіслати код</button>
       <div class="dashauth-msg" id="auth-msg"></div>
@@ -115,17 +144,17 @@ body.dash-locked{overflow:hidden}
         const r = await fetch(WORKER+'/api/otp/request', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email:v, block:BLOCK})});
         if (!r.ok) {
           const j = await r.json().catch(()=>({}));
-          if (j.error === 'not_in_whitelist') msg.innerHTML = `❌ Цього email немає у whitelist. <a href="mailto:vg@sneco.ua?subject=procurement-dashboard%20whitelist">✉ Запит до vg@sneco.ua</a>`;
+          if (j.error === 'not_in_whitelist') msg.innerHTML = `❌ Цього email немає у whitelist. <a href="mailto:vg@sneco.ua?subject=procurement-dashboard">✉ Запит до vg@sneco.ua</a>`;
           else msg.textContent = 'Помилка: ' + (j.error || r.status);
           msg.className='dashauth-msg is-error'; send.disabled=false; send.textContent='Надіслати код'; return;
         }
         email = v; renderCode();
-      } catch(e) { msg.textContent='Помилка мережі: '+e.message; msg.className='dashauth-msg is-error'; send.disabled=false; send.textContent='Надіслати код'; }
+      } catch(e) { msg.textContent='Помилка: '+e.message; msg.className='dashauth-msg is-error'; send.disabled=false; send.textContent='Надіслати код'; }
     };
   }
   function renderCode(){
     stage.innerHTML = `<div class="dashauth-icon">🔢</div><div class="dashauth-h1">Введіть код з листа</div>
-      <div class="dashauth-desc">${email}<br>Код надіслано — перевірте пошту (включно зі спамом).</div>
+      <div class="dashauth-desc">${email}</div>
       <input class="dashauth-input code" type="text" id="auth-code" inputmode="numeric" maxlength="6" placeholder="••••••" autofocus>
       <button class="dashauth-btn" id="auth-verify">Підтвердити</button>
       <div class="dashauth-msg" id="auth-msg"></div>
@@ -155,184 +184,360 @@ body.dash-locked{overflow:hidden}
 })();
 </script>
 
-<header>
-  <div>
-    <h1>snEco · Procurement Planning 2026</h1>
-    <div class="meta" id="syncMeta">Завантаження…</div>
+<div class="topbar">
+  <div style="display:flex;align-items:center;min-width:0">
+    <div class="logo">
+      <div class="logo-box">sn</div>
+      <div>
+        <div class="logo-text">snEco · Procurement</div>
+        <div class="logo-sub">Виробничий баланс · сировина · стоки</div>
+      </div>
+    </div>
+    <nav class="nav-menu">
+      <a class="nav-link" href="../customer-360/customer-360.html">👥 Customer 360</a>
+      <a class="nav-link" href="../finance/finance.html">💰 Finance</a>
+      <a class="nav-link" href="../dashboard.html">📊 Sales</a>
+      <a class="nav-link" href="../inventory/inventory.html">📦 Inventory</a>
+      <a class="nav-link" href="../production/production.html">🏭 Production</a>
+      <a class="nav-link active" href="./procurement.html">📦 Procurement</a>
+      <a class="nav-link" href="../../">📘 Brand Bible</a>
+    </nav>
   </div>
-  <div class="meta">Дані з МойСклад → D1 (proc snapshot)</div>
-</header>
+  <div class="topbar-right">
+    <span class="meta" id="syncMeta">Завантаження…</span>
+  </div>
+</div>
+
+<div class="period-bar" id="periodBar" style="display:none">
+  <span class="period-bar-label">Період</span>
+  <div class="period-chips" id="periodChips">
+    <button class="period-chip" data-period="7d">7 днів</button>
+    <button class="period-chip" data-period="30d">30 днів</button>
+    <button class="period-chip" data-period="90d">90 днів</button>
+    <button class="period-chip active" data-period="180d">180 днів</button>
+    <button class="period-chip" data-period="ytd">2026 YTD</button>
+    <button class="period-chip" data-period="all">Усе</button>
+  </div>
+  <span class="period-range-info" id="periodRangeInfo">—</span>
+</div>
 
 <main id="main"><div class="loading-state"><div class="spinner"></div>Тягне дані з D1…</div></main>
 
 <script>
 const WORKER = 'https://sneco-auth.vg-ab6.workers.dev';
+let _token = null;
+let _data = { stocks:[], processings:[], materials:[], products:[] };
+let _stockByAid = {};
+let _currentPeriod = '180d';
 
 const fmt = (n, dec=0) => n == null ? '—' : Number(n).toLocaleString('uk-UA', {maximumFractionDigits: dec, minimumFractionDigits: dec});
+const fmtKop = (k) => fmt(Math.round((k||0)/100));
+const esc = (s) => String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-async function postJson(token, path, body) {
-  const r = await fetch(WORKER + path, {
-    method: 'POST',
-    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  if (!r.ok) {
-    const txt = await r.text().catch(() => '');
-    const err = new Error(`${path} HTTP ${r.status}${txt ? ': ' + txt.slice(0,200) : ''}`);
-    err.status = r.status;
-    throw err;
-  }
+async function postJson(path, body){
+  const r = await fetch(WORKER+path, {method:'POST', headers:{'Authorization':'Bearer '+_token, 'Content-Type':'application/json'}, body: JSON.stringify(body)});
+  if (!r.ok) { const t = await r.text().catch(()=>''); const e = new Error(`${path} HTTP ${r.status}: ${t.slice(0,200)}`); e.status = r.status; throw e; }
   return r.json();
 }
-
-async function fetchAll(token, type, params = {}) {
-  const all = [];
-  let offset = 0;
-  const limit = 10000;
+async function fetchAll(type, params={}){
+  const all = []; let offset = 0; const limit = 10000;
   while (true) {
-    const resp = await postJson(token, '/api/dashboard/data', { type, limit, offset, ...params });
-    all.push(...(resp.items || []));
-    if (!resp.items || resp.items.length < limit) break;
+    const j = await postJson('/api/dashboard/data', {type, limit, offset, ...params});
+    all.push(...(j.items||[]));
+    if (!j.items || j.items.length < limit) break;
     offset += limit;
   }
   return all;
 }
 
-function rowClass(d) {
-  if (d == null) return '';
-  if (d < 14) return 'bad';
-  if (d < 30) return 'warn';
-  return 'ok';
-}
+function rowClass(d){ if (d == null) return ''; if (d < 14) return 'bad'; if (d < 30) return 'warn'; return 'ok'; }
 
-function categorize(folderPath) {
-  const p = folderPath || '';
-  if (p.includes('СВЕЖИЙ сыр')) return 'fresh_cheese';
-  if (p.includes('СУШЕНЫЙ сыр')) return 'dried_cheese';
-  if (p.includes('Гофротара')) return 'cardboard';
-  if (p.includes('Сырье для производства/Упаковка')) return 'packaging';
-  if (p.includes('Продукция/ПАЧКИ')) return 'final_package';
+function categorize(folderPath){
+  const p = String(folderPath||'').toLowerCase();
+  if (p.includes('свеж') || p.includes('свіж')) return 'fresh_cheese';
+  if (p.includes('сушен')) return 'dried_cheese';
+  if (p.includes('гофро') || p.includes('гофра')) return 'cardboard';
+  if (p.includes('упаковк') || p.includes('пакет') || p.includes('стікер')) return 'packaging';
+  if (p.includes('пачк') || p.includes('продукц') || p.includes('готов')) return 'final_package';
   return null;
 }
+const CAT_LABEL = {fresh_cheese:'Свіжий сир', packaging:'Упаковка', cardboard:'Гофротара', dried_cheese:'Сушений сир', final_package:'Готові пачки'};
 
-const CAT_LABEL = {
-  fresh_cheese: 'Свіжий сир',
-  packaging: 'Упаковка',
-  cardboard: 'Гофротара',
-  dried_cheese: 'Сушений сир',
-  final_package: 'Готові пачки',
-};
+function resolvePeriod(p){
+  const now = new Date(); let from = new Date(now); let label;
+  switch(p){
+    case '7d':   from.setDate(now.getDate()-6);  label='7 днів'; break;
+    case '30d':  from.setDate(now.getDate()-29); label='30 днів'; break;
+    case '90d':  from.setDate(now.getDate()-89); label='90 днів'; break;
+    case '180d': from.setDate(now.getDate()-179); label='180 днів'; break;
+    case 'ytd':  from = new Date(2026,0,1); label='YTD 2026'; break;
+    case 'all':  from = new Date(2023,0,1); label='Усе'; break;
+    default:     from.setDate(now.getDate()-179); label='180 днів';
+  }
+  from.setHours(0,0,0,0);
+  return {from: from.toISOString().slice(0,10), to: now.toISOString().slice(0,10), label};
+}
 
-window.bootDashboard = async function(token) {
+function fmtMonth(ym){
+  const months = ['Січ','Лют','Бер','Кві','Тра','Чер','Лип','Сер','Вер','Жов','Лис','Гру'];
+  const [y, m] = ym.split('-');
+  return `${months[parseInt(m,10)-1]} ${y.slice(2)}`;
+}
+
+window.bootDashboard = async function(token){
+  _token = token;
   const main = document.getElementById('main');
   try {
-    // last-sync info
-    const ls = await fetch(WORKER + '/api/dashboard/last-sync', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'}).then(r => r.ok ? r.json() : null).catch(() => null);
     let syncTxt = '';
-    if (ls && ls.last) {
-      const dt = new Date((ls.last.finished_at || ls.last.started_at) * 1000);
-      syncTxt = `Останній sync: ${dt.toLocaleString('uk-UA')} · `;
-    }
-
-    // Try fetch stocks first — найдешевший запит
-    let stocks = [];
     try {
-      stocks = await fetchAll(token, 'stocks');
-    } catch(e) {
-      // Якщо 'stocks' ще не доданий до Worker — показуємо плейсхолдер
-      if (e.status === 400 || e.status === 404) {
-        main.innerHTML = `
-          <div class="note"><strong>⏳ Очікуємо deployment Vadym'а:</strong>
-            schema <code>ms_processings</code>/<code>ms_processing_materials</code>/<code>ms_processing_products</code>/<code>ms_stocks</code>
-            ще не застосована до D1, або entity handlers ще не у Worker. Як тільки Vadym задеплоїть і пробіжить
-            перший <code>procurement-sync</code> — цей дашборд почне показувати дані.</div>
-          <div class="section">
-            <h2>Поки що — локальний preview</h2>
-            <p>Локальна версія (через build.py на твоєму Mac) має повний функціонал:
-              виробничий баланс, прогноз закінчення сировини, графіки по смаках.</p>
-            <p style="margin-top:10px"><a href="local-preview.html" style="color:var(--y);font-weight:600">→ Відкрити local-preview (інлайн з останнім запуском build.py)</a></p>
-          </div>`;
-        document.getElementById('syncMeta').textContent = syncTxt + '⏳ Очікує deploy';
-        return;
+      const ls = await fetch(WORKER+'/api/dashboard/last-sync', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'}).then(r => r.ok ? r.json() : null);
+      if (ls && ls.last) {
+        const dt = new Date((ls.last.finished_at || ls.last.started_at) * 1000);
+        syncTxt = `Sync: ${dt.toLocaleString('uk-UA', {dateStyle:'short', timeStyle:'short'})}`;
       }
-      throw e;
-    }
+    } catch(e){}
+
+    const [stocks, processings, materials, products] = await Promise.all([
+      fetchAll('stocks'),
+      fetchAll('processings').catch(()=>[]),
+      fetchAll('processing_materials').catch(()=>[]),
+      fetchAll('processing_products').catch(()=>[]),
+    ]);
+    _data = { stocks, processings, materials, products };
+    _stockByAid = {};
+    stocks.forEach(s => { if (s.assortment_id) _stockByAid[s.assortment_id] = s; });
 
     document.getElementById('syncMeta').textContent =
-      `${syncTxt}${stocks.length} stock items`;
+      `${syncTxt} · ${stocks.length} stocks · ${processings.length} processings · ${materials.length+products.length} positions`;
 
-    if (stocks.length === 0) {
-      main.innerHTML = `<div class="note"><strong>⏳ Перший sync ще не пройшов.</strong> Чекаємо першого виконання
-        <code>procurement-sync</code> cron'у (або вручну: GitHub Actions → Procurement Sync → Run workflow з input <code>full=true</code>).</div>`;
+    if (stocks.length === 0 && processings.length === 0) {
+      main.innerHTML = `<div class="note"><strong>⏳ Перший sync ще не пройшов.</strong> Чекаємо <code>procurement-sync</code> з input <code>full=true</code>.</div>`;
       return;
     }
 
-    // ── Render forecast table from stocks (using stock_days field if present) ──
-    const targets = stocks.filter(s => {
-      const cat = categorize(s.folder_path);
-      return cat && ['fresh_cheese', 'packaging', 'cardboard'].includes(cat);
+    document.getElementById('periodBar').style.display = 'flex';
+    document.querySelectorAll('.period-chip').forEach(b => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('.period-chip').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        _currentPeriod = b.dataset.period;
+        render();
+      });
     });
-    // Sort by stock_days asc (most critical first), нулі → 0 днів, відсутні → ∞
-    targets.sort((a, b) => {
-      const aD = a.stock_days != null && a.stock_days > 0 ? a.stock_days : 99999;
-      const bD = b.stock_days != null && b.stock_days > 0 ? b.stock_days : 99999;
-      return aD - bD;
-    });
-
-    const totalsByCategory = {};
-    for (const s of targets) {
-      const cat = categorize(s.folder_path);
-      totalsByCategory[cat] = (totalsByCategory[cat] || 0) + 1;
-    }
-
-    const rows = targets.map(s => {
-      const cat = categorize(s.folder_path);
-      const days = s.stock_days != null && s.stock_days > 0 ? s.stock_days : null;
-      return `<tr>
-        <td><span class="muted">${CAT_LABEL[cat] || cat}</span> · ${s.name || s.code || s.assortment_id}</td>
-        <td>${fmt(s.stock, s.uom_name === 'кг' ? 1 : 0)} <span class="muted">${s.uom_name || ''}</span></td>
-        <td>${fmt(s.reserve, s.uom_name === 'кг' ? 1 : 0)}</td>
-        <td class="${rowClass(days)}">${days != null ? fmt(days, 1) + ' дн' : '<span class="muted">∞</span>'}</td>
-      </tr>`;
-    }).join('');
-
-    main.innerHTML = `
-      <div class="kpis">
-        <div class="kpi"><div class="label">Свіжий сир — позицій</div><div class="value">${totalsByCategory.fresh_cheese || 0}</div></div>
-        <div class="kpi"><div class="label">Упаковка — позицій</div><div class="value">${totalsByCategory.packaging || 0}</div></div>
-        <div class="kpi"><div class="label">Гофротара — позицій</div><div class="value">${totalsByCategory.cardboard || 0}</div></div>
-        <div class="kpi"><div class="label">Критичних (&lt; 14 дн)</div><div class="value" style="color:var(--red)">${
-          targets.filter(s => s.stock_days != null && s.stock_days > 0 && s.stock_days < 14).length
-        }</div></div>
-      </div>
-      <div class="section">
-        <h2>Прогноз закінчення сировини · snapshot з МойСклад</h2>
-        <table>
-          <thead><tr><th>Матеріал</th><th>Залишок</th><th>Резерв</th><th>Днів вистачить (МС)</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-        <div style="margin-top:10px;font-size:12px;color:var(--muted)">
-          <span class="bad" style="padding:2px 8px;border-radius:3px">&lt; 14 дн</span> критично ·
-          <span class="warn" style="padding:2px 8px;border-radius:3px">14–30 дн</span> запланувати ·
-          <span class="ok" style="padding:2px 8px;border-radius:3px">&gt; 30 дн</span> ок ·
-          Прогноз береться з поля <code>stockDays</code> МойСкладу (їх formula).<br>
-          <strong>Резерв = 0</strong> для сировини/упаковки — це нормально (резервуються тільки готові пачки замовленнями покупців).
-        </div>
-      </div>
-      <div class="section" style="background:#fafaf6">
-        <h2>v2 — повний виробничий баланс</h2>
-        <p>Виробничий баланс (свіжий → сушений, % yield, помісячна динаміка, готові пачки по смаках) —
-          у роботі. Поточна версія використовує тільки <code>ms_stocks</code> snapshot;
-          повна агрегація з <code>ms_processings</code> + positions буде у наступній ітерації
-          (потребує дооптимізації Worker'а під великі вибірки або pre-aggregation endpoint).</p>
-        <p style="margin-top:10px"><a href="local-preview.html" style="color:var(--y);font-weight:600">→ Тимчасово: відкрити local-preview (повна агрегація з останнього build.py запуску на Pylyp Mac)</a></p>
-      </div>`;
+    render();
   } catch(e) {
     console.error(e);
-    main.innerHTML = `<div class="empty-state">⚠ Помилка завантаження:<br><code>${e.message}</code><br><br>
-      Перевір що ти у whitelist <code>procurement-dashboard</code> і що Vadym задеплоїв entity handlers + schema.</div>`;
+    main.innerHTML = `<div class="empty-state">⚠ Помилка: <code>${esc(e.message)}</code></div>`;
   }
 };
+
+function render(){
+  const main = document.getElementById('main');
+  const range = resolvePeriod(_currentPeriod);
+  document.getElementById('periodRangeInfo').textContent = `${range.from} → ${range.to} · ${range.label}`;
+  const { stocks, processings, materials, products } = _data;
+
+  const procInWindow = processings.filter(p => {
+    const m = (p.ms_moment||'').slice(0,10);
+    return m >= range.from && m <= range.to && p.applicable;
+  });
+  const procIds = new Set(procInWindow.map(p => p.id));
+  const matsInWindow = materials.filter(m => procIds.has(m.processing_id));
+  const prodsInWindow = products.filter(p => procIds.has(p.processing_id));
+
+  let freshKg=0, driedKg=0;
+  matsInWindow.forEach(m => {
+    const s = _stockByAid[m.assortment_id];
+    const cat = s && categorize(s.folder_path);
+    if (cat === 'fresh_cheese') freshKg += (m.quantity||0);
+  });
+  prodsInWindow.forEach(p => {
+    const s = _stockByAid[p.assortment_id];
+    const cat = s && categorize(s.folder_path);
+    if (cat === 'dried_cheese') driedKg += (p.quantity||0);
+  });
+  const yieldPct = freshKg > 0 ? (driedKg / freshKg * 100) : null;
+
+  const stockTargets = stocks.filter(s => ['fresh_cheese','packaging','cardboard'].includes(categorize(s.folder_path)||''));
+  stockTargets.sort((a,b) => {
+    const aD = a.stock_days != null && a.stock_days > 0 ? a.stock_days : 99999;
+    const bD = b.stock_days != null && b.stock_days > 0 ? b.stock_days : 99999;
+    return aD - bD;
+  });
+  const criticalCount = stockTargets.filter(s => s.stock_days != null && s.stock_days > 0 && s.stock_days < 14).length;
+
+  const packsByName = {};
+  prodsInWindow.forEach(p => {
+    const s = _stockByAid[p.assortment_id];
+    const cat = s && categorize(s.folder_path);
+    if (cat !== 'final_package') return;
+    const name = s ? s.name : ('?'+p.assortment_id.slice(0,6));
+    packsByName[name] = (packsByName[name] || 0) + (p.quantity||0);
+  });
+  const topPacks = Object.entries(packsByName).sort((a,b) => b[1]-a[1]).slice(0, 15);
+  const totalPacks = topPacks.reduce((a,[,v]) => a+v, 0);
+
+  const matsByMonth = {};
+  procInWindow.forEach(p => {
+    const ym = (p.ms_moment||'').slice(0,7);
+    if (!matsByMonth[ym]) matsByMonth[ym] = {fresh:0, packaging:0, cardboard:0, dried:0};
+    materials.filter(m => m.processing_id === p.id).forEach(m => {
+      const s = _stockByAid[m.assortment_id];
+      const cat = s && categorize(s.folder_path);
+      if (cat === 'fresh_cheese') matsByMonth[ym].fresh += (m.quantity||0);
+      if (cat === 'packaging')    matsByMonth[ym].packaging += (m.quantity||0);
+      if (cat === 'cardboard')    matsByMonth[ym].cardboard += (m.quantity||0);
+    });
+    products.filter(pr => pr.processing_id === p.id).forEach(pr => {
+      const s = _stockByAid[pr.assortment_id];
+      const cat = s && categorize(s.folder_path);
+      if (cat === 'dried_cheese') matsByMonth[ym].dried += (pr.quantity||0);
+    });
+  });
+  const months = Object.keys(matsByMonth).sort();
+
+  const byPlan = {};
+  procInWindow.forEach(p => {
+    const plan = p.processing_plan_name || '(без плану)';
+    if (!byPlan[plan]) byPlan[plan] = {count:0, freshIn:0, driedOut:0, packOut:0, sumKop:0};
+    byPlan[plan].count++;
+    byPlan[plan].sumKop += (p.processing_sum_kop||0);
+    materials.filter(m => m.processing_id === p.id).forEach(m => {
+      const s = _stockByAid[m.assortment_id];
+      const cat = s && categorize(s.folder_path);
+      if (cat === 'fresh_cheese') byPlan[plan].freshIn += (m.quantity||0);
+    });
+    products.filter(pr => pr.processing_id === p.id).forEach(pr => {
+      const s = _stockByAid[pr.assortment_id];
+      const cat = s && categorize(s.folder_path);
+      if (cat === 'dried_cheese') byPlan[plan].driedOut += (pr.quantity||0);
+      if (cat === 'final_package') byPlan[plan].packOut += (pr.quantity||0);
+    });
+  });
+  const plans = Object.entries(byPlan).sort((a,b) => b[1].count - a[1].count);
+
+  main.innerHTML = `
+    <div class="kpis">
+      <div class="kpi blue"><div class="label">Свіжий сир ВХІД</div><div class="value">${fmt(freshKg, 1)} кг</div><div class="sub">за ${range.label}</div></div>
+      <div class="kpi green"><div class="label">Сушений сир ВИХІД</div><div class="value">${fmt(driedKg, 1)} кг</div><div class="sub">за ${range.label}</div></div>
+      <div class="kpi"><div class="label">Yield (вихід %)</div><div class="value">${yieldPct != null ? yieldPct.toFixed(1)+'%' : '—'}</div><div class="sub">dried / fresh</div></div>
+      <div class="kpi green"><div class="label">Готових пачок</div><div class="value">${fmt(totalPacks)}</div><div class="sub">сума ТОП-15</div></div>
+      <div class="kpi"><div class="label">Виробничих циклів</div><div class="value">${fmt(procInWindow.length)}</div><div class="sub">applicable</div></div>
+      <div class="kpi red"><div class="label">Критичних &lt; 14 дн</div><div class="value">${criticalCount}</div><div class="sub">сировина/упаковка</div></div>
+    </div>
+
+    <div class="section">
+      <h2>🏭 Виробничий баланс · по техкартах <span class="h2-sub">${plans.length} планів · ${range.label}</span></h2>
+      ${plans.length === 0 ? '<div class="empty-state">Нема processing операцій у періоді</div>' : `
+      <table>
+        <thead><tr>
+          <th>Техкарта</th><th>Циклів</th><th>Свіжий ВХІД, кг</th><th>Сушений ВИХІД, кг</th><th>Готові пачки</th><th>Yield %</th><th>Собівартість ₴</th>
+        </tr></thead>
+        <tbody>
+          ${plans.map(([plan, d]) => {
+            const y = d.freshIn > 0 ? (d.driedOut / d.freshIn * 100) : null;
+            return `<tr>
+              <td>${esc(plan)}</td>
+              <td>${fmt(d.count)}</td>
+              <td>${fmt(d.freshIn, 1)}</td>
+              <td>${fmt(d.driedOut, 1)}</td>
+              <td>${fmt(d.packOut)}</td>
+              <td class="${y != null && y < 15 ? 'bad' : y != null && y < 25 ? 'warn' : 'ok'}">${y != null ? y.toFixed(1) + '%' : '—'}</td>
+              <td>${fmtKop(d.sumKop)}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`}
+    </div>
+
+    <div class="g2">
+      <div class="section">
+        <h2>📈 Помісячно: свіжий ВХІД vs сушений ВИХІД</h2>
+        ${months.length === 0 ? '<div class="empty-state muted">Нема даних</div>' : `<div class="chart-h220"><canvas id="ioChart"></canvas></div>`}
+      </div>
+      <div class="section">
+        <h2>📦 Помісячно: упаковка + гофра</h2>
+        ${months.length === 0 ? '<div class="empty-state muted">Нема даних</div>' : `<div class="chart-h220"><canvas id="packChart"></canvas></div>`}
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>🍪 Готові пачки по смаках <span class="h2-sub">ТОП-15 за ${range.label}</span></h2>
+      ${topPacks.length === 0 ? '<div class="empty-state muted">Нема даних</div>' : `
+      <table>
+        <thead><tr><th>Назва пачки</th><th>Вироблено</th><th>% частка</th></tr></thead>
+        <tbody>
+          ${topPacks.map(([name, qty]) => `
+            <tr>
+              <td>${esc(name)}</td>
+              <td>${fmt(qty)}</td>
+              <td>${totalPacks > 0 ? (qty/totalPacks*100).toFixed(1) : '0'}%</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`}
+    </div>
+
+    <div class="section">
+      <h2>⏳ Прогноз закінчення сировини · snapshot з МойСклад</h2>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px">
+        Резерв = 0 для сировини/упаковки — нормально (резервуються лише готові пачки замовленнями покупців).
+      </div>
+      <table>
+        <thead><tr><th>Матеріал</th><th>Залишок</th><th>Днів вистачить</th></tr></thead>
+        <tbody>
+          ${stockTargets.slice(0, 30).map(s => {
+            const days = s.stock_days != null && s.stock_days > 0 ? s.stock_days : null;
+            const cat = categorize(s.folder_path);
+            return `<tr>
+              <td><span class="muted">${CAT_LABEL[cat] || cat}</span> · ${esc(s.name || s.code || s.assortment_id)}</td>
+              <td>${fmt(s.stock, s.uom_name === 'кг' ? 1 : 0)} <span class="muted">${esc(s.uom_name||'')}</span></td>
+              <td class="${rowClass(days)}">${days != null ? fmt(days, 1) + ' дн' : '<span class="muted">∞</span>'}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      <div style="margin-top:8px;font-size:11px;color:var(--muted)">
+        <span class="bad" style="padding:2px 8px;border-radius:3px">&lt; 14 дн</span> критично ·
+        <span class="warn" style="padding:2px 8px;border-radius:3px">14–30 дн</span> запланувати ·
+        <span class="ok" style="padding:2px 8px;border-radius:3px">&gt; 30 дн</span> ок ·
+        ${stockTargets.length > 30 ? `показано 30 з ${stockTargets.length}` : ''}
+      </div>
+    </div>
+  `;
+
+  if (months.length > 0) {
+    setTimeout(() => {
+      const ctx1 = document.getElementById('ioChart')?.getContext('2d');
+      if (ctx1) {
+        new Chart(ctx1, {
+          type: 'bar',
+          data: {
+            labels: months.map(fmtMonth),
+            datasets: [
+              {label:'Свіжий ВХІД, кг', data: months.map(m => matsByMonth[m].fresh), backgroundColor:'rgba(59,130,246,0.7)'},
+              {label:'Сушений ВИХІД, кг', data: months.map(m => matsByMonth[m].dried), backgroundColor:'rgba(150,193,31,0.7)'},
+            ]
+          },
+          options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{font:{size:10}}}}}
+        });
+      }
+      const ctx2 = document.getElementById('packChart')?.getContext('2d');
+      if (ctx2) {
+        new Chart(ctx2, {
+          type: 'bar',
+          data: {
+            labels: months.map(fmtMonth),
+            datasets: [
+              {label:'Упаковка', data: months.map(m => matsByMonth[m].packaging), backgroundColor:'rgba(254,191,39,0.7)'},
+              {label:'Гофротара', data: months.map(m => matsByMonth[m].cardboard), backgroundColor:'rgba(232,64,64,0.7)'},
+            ]
+          },
+          options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{font:{size:10}}}}}
+        });
+      }
+    }, 50);
+  }
+}
 </script>
 
 </body>
