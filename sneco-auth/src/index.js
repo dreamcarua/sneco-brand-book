@@ -18,9 +18,9 @@
  *   - ALLOWED_ORIGIN (var, default "https://dreamcarua.github.io")
  */
 
-const SUPPORTED_BLOCKS = ['hr', 'prices', 'admin', 'production', 'dashboard', 'inventory-dashboard', 'production-dashboard', 'customer-dashboard', 'finance-dashboard'];
+const SUPPORTED_BLOCKS = ['hr', 'prices', 'admin', 'production', 'dashboard', 'inventory-dashboard', 'production-dashboard', 'customer-dashboard', 'finance-dashboard', 'procurement-dashboard'];
 // Dashboard-family blocks (всі мають доступ до /api/dashboard/data — той самий D1)
-const DASHBOARD_BLOCKS = new Set(['dashboard', 'inventory-dashboard', 'production-dashboard', 'customer-dashboard', 'finance-dashboard']);
+const DASHBOARD_BLOCKS = new Set(['dashboard', 'inventory-dashboard', 'production-dashboard', 'customer-dashboard', 'finance-dashboard', 'procurement-dashboard']);
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;       // 10 MB per file
 const MAX_TITLE_LEN = 200;
 const MAX_BODY_LEN = 10000;
@@ -198,6 +198,7 @@ async function sendOtpEmail(env, email, code, block) {
     'production-dashboard': { uk: 'Production Dashboard', en: 'Production Dashboard', sk: 'Production Dashboard' },
     'customer-dashboard': { uk: 'Customer 360', en: 'Customer 360', sk: 'Customer 360' },
     'finance-dashboard': { uk: 'Finance Dashboard', en: 'Finance Dashboard', sk: 'Finance Dashboard' },
+    'procurement-dashboard': { uk: 'Закупки', en: 'Procurement', sk: 'Nákup' },
   }[block] || { uk: block.toUpperCase(), en: block.toUpperCase(), sk: block.toUpperCase() };
   const subject = `Код доступу / Access code / Prístupový kód · ${blockNice.uk} · snEco`;
   const codeBlock = `
@@ -633,6 +634,23 @@ const DASHBOARD_TABLES = {
   demand_positions: {
     table: 'ms_demand_positions',
     cols: ['demand_id','position_idx','product_name','product_id','quantity','price_kop','sum_kop','discount_pct','agent_id','agent','ms_moment','raw_json','ingested_at'],
+  },
+  // v2.77.5 — Procurement Dashboard (Pylyp PR #1): 4 нові entities для виробничого циклу
+  processings: {
+    table: 'ms_processings',
+    cols: ['id','ms_moment','name','organization_id','organization','processing_plan_id','processing_plan_name','quantity','processing_sum_kop','applicable','raw_json','updated_at'],
+  },
+  processing_materials: {
+    table: 'ms_processing_materials',
+    cols: ['id','processing_id','position_id','assortment_id','quantity','price_kop','raw_json'],
+  },
+  processing_products: {
+    table: 'ms_processing_products',
+    cols: ['id','processing_id','position_id','assortment_id','quantity','price_kop','raw_json'],
+  },
+  stocks: {
+    table: 'ms_stocks',
+    cols: ['assortment_id','name','code','article','folder_name','folder_path','uom_name','stock','in_transit','reserve','quantity','price_kop','sale_price_kop','stock_days','snapshot_at','raw_json'],
   },
 };
 
