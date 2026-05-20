@@ -2730,12 +2730,29 @@ function renderCustomerView(c){
   const nextCrmContact = crmLog.find(e => e.nextDate);
   const nextCrmOverdue = nextCrmContact && nextCrmContact.nextDate < new Date().toISOString().slice(0,10);
 
+  // ============================================================================
+  // v2.78 (multi-currency): аналіз валют для цього клієнта.
+  // Sum_kop вже нормалізовано в UAH (через rate_to_uah з MoySklad). Тут — для UI badge.
+  // ============================================================================
+  const currencyStats = {};
+  [...dems, ...pays, ...ords, ...rets, ...invs].forEach(tx => {
+    const cur = (tx.currency || 'UAH').toUpperCase();
+    if (!currencyStats[cur]) currencyStats[cur] = { count: 0, sum_uah: 0, sum_orig: 0 };
+    currencyStats[cur].count++;
+    currencyStats[cur].sum_uah += (tx.sum_kop || 0) / 100;
+    currencyStats[cur].sum_orig += (tx.sum_orig_kop || tx.sum_kop || 0) / 100;
+  });
+  const nonUahCurrencies = Object.entries(currencyStats).filter(([cur]) => cur !== 'UAH');
+  const hasMultiCurrency = nonUahCurrencies.length > 0;
+  const currencySymbol = { UAH: '₴', EUR: '€', USD: '$', PLN: 'zł', GBP: '£' };
+  const symbolOf = cur => currencySymbol[cur] || cur;
+
   // === Build HTML ===
   const tags = (c.tags||'').split(',').map(t=>t.trim()).filter(Boolean);
   const html = `
     <!-- HEADER CARD -->
     <div class="cust-header">
-      <div class="cust-name">${escapeHtml(c.name)}</div>
+      <div class="cust-name">${escapeHtml(c.name)}${hasMultiCurrency ? ' <span style="display:inline-block;background:#3a5fa5;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;vertical-align:middle;margin-left:6px;letter-spacing:.5px">🌍 MULTI-CURRENCY</span>' : ''}</div>
       <div class="cust-meta">
         ${c.company_type ? `<span class="cust-meta-item">📋 ${escapeHtml(c.company_type)}</span>` : ''}
         ${c.inn ? `<span class="cust-meta-item">🧾 ІНН: ${escapeHtml(c.inn)}</span>` : ''}
@@ -2753,6 +2770,26 @@ function renderCustomerView(c){
         <button class="act-btn" onclick="copySummary('${escapeAttr(c.name)}')">📋 Copy summary</button>
       </div>
     </div>
+
+    ${hasMultiCurrency ? `
+    <!-- v2.78 MULTI-CURRENCY BANNER -->
+    <div style="background:linear-gradient(135deg,#e8f4ff 0%,#fff4e0 100%);border:1px solid #b3d4ff;border-radius:8px;padding:14px 18px;margin:0 0 16px;display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+      <div style="font-size:24px">🌍</div>
+      <div style="flex:1;min-width:240px">
+        <div style="font-weight:600;color:#1a4d8c;font-size:14px;margin-bottom:4px">Multi-currency клієнт</div>
+        <div style="font-size:12.5px;color:#444">Усі суми вище нормалізовано в UAH за курсом на момент кожної транзакції з MoySklad. Оригінальні значення:</div>
+      </div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        ${Object.entries(currencyStats).sort((a,b)=>b[1].sum_uah-a[1].sum_uah).map(([cur, stats]) => `
+          <div style="background:#fff;border:1px solid #d8e5f5;border-radius:6px;padding:8px 12px;text-align:center;min-width:90px">
+            <div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.5px">${cur}</div>
+            <div style="font-size:14px;font-weight:600;color:#1a4d8c">${symbolOf(cur)} ${nfm(stats.sum_orig)}</div>
+            <div style="font-size:10px;color:#888">${stats.count} операц.</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    ` : ''}
 
     <!-- v2.73.0 HEALTH SCORE HERO -->
     <div class="health-hero">
@@ -3150,25 +3187,38 @@ function renderCustomerView(c){
     }
 
     // Render timeline
+    // v2.78: + currency + sum_orig для non-UAH badge
+    const buildEvent = (tx, base) => ({
+      ...base,
+      currency: (tx.currency || 'UAH').toUpperCase(),
+      orig: (tx.sum_orig_kop || tx.sum_kop || 0) / 100,
+    });
     const events = [
-      ...dems.slice(0, 30).map(d => ({type:'demand', date: d.ms_moment, title: `Відвантаження ${d.name||''}`, amount: (d.sum_kop||0)/100, icon:'📦'})),
-      ...pays.slice(0, 30).map(p => ({type:'payment', date: p.ms_moment, title: `Оплата ${p.payment_type||''} ${p.name||''}`, amount: (p.sum_kop||0)/100, icon:'💰'})),
-      ...ords.slice(0, 20).map(o => ({type:'order', date: o.ms_moment, title: `Замовлення ${o.name||''}`, amount: (o.sum_kop||0)/100, icon:'📋'})),
-      ...rets.slice(0, 10).map(r => ({type:'return', date: r.ms_moment, title: `Повернення ${r.name||''}`, amount: -(r.sum_kop||0)/100, icon:'↩️'})),
-      ...invs.slice(0, 10).map(i => ({type:'invoice', date: i.ms_moment, title: `Рахунок ${i.name||''}`, amount: (i.sum_kop||0)/100, icon:'🧾'})),
+      ...dems.slice(0, 30).map(d => buildEvent(d, {type:'demand', date: d.ms_moment, title: `Відвантаження ${d.name||''}`, amount: (d.sum_kop||0)/100, icon:'📦'})),
+      ...pays.slice(0, 30).map(p => buildEvent(p, {type:'payment', date: p.ms_moment, title: `Оплата ${p.payment_type||''} ${p.name||''}`, amount: (p.sum_kop||0)/100, icon:'💰'})),
+      ...ords.slice(0, 20).map(o => buildEvent(o, {type:'order', date: o.ms_moment, title: `Замовлення ${o.name||''}`, amount: (o.sum_kop||0)/100, icon:'📋'})),
+      ...rets.slice(0, 10).map(r => buildEvent(r, {type:'return', date: r.ms_moment, title: `Повернення ${r.name||''}`, amount: -(r.sum_kop||0)/100, icon:'↩️'})),
+      ...invs.slice(0, 10).map(i => buildEvent(i, {type:'invoice', date: i.ms_moment, title: `Рахунок ${i.name||''}`, amount: (i.sum_kop||0)/100, icon:'🧾'})),
     ].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 20);
 
     document.getElementById('timelineBody').innerHTML = events.length
-      ? events.map(e => `
+      ? events.map(e => {
+          const isNonUah = e.currency && e.currency !== 'UAH';
+          const curBadge = isNonUah
+            ? `<div style="font-size:10px;color:#3a5fa5;background:#e8f4ff;padding:1px 6px;border-radius:8px;display:inline-block;margin-top:2px" title="Оригінал у валюті документа">${e.amount<0?'−':''}${symbolOf(e.currency)} ${nf(Math.round(Math.abs(e.orig)))}</div>`
+            : '';
+          return `
         <div class="tl-item">
           <div class="tl-icon ${e.type}">${e.icon}</div>
           <div class="tl-body">
-            <div class="tl-meta">${dfShort(e.date)} · ${e.type}</div>
+            <div class="tl-meta">${dfShort(e.date)} · ${e.type}${isNonUah?' · '+e.currency:''}</div>
             <div class="tl-title">${escapeHtml(e.title)}</div>
           </div>
-          <div class="tl-amount ${e.amount<0?'neg':e.type==='payment'?'pos':''}">${nf(Math.round(e.amount))} ₴</div>
+          <div class="tl-amount ${e.amount<0?'neg':e.type==='payment'?'pos':''}" style="text-align:right">
+            ${nf(Math.round(e.amount))} ₴${curBadge ? '<br>'+curBadge : ''}
+          </div>
         </div>
-      `).join('')
+      `}).join('')
       : `<div class="empty-state"><div class="es-icon">📭</div><div class="es-title">Немає історії</div></div>`;
   }, 50);
 }
