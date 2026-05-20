@@ -1,0 +1,42 @@
+name: Sync Health Check
+
+# Перевіряє статус усіх sync workflows о 08:00 Київ (05:00 UTC) щоденно.
+# Шле email на vg@sneco.ua якщо щось failed або lag > N годин,
+# АБО раз на тиждень (Friday) як summary навіть коли все ок.
+
+on:
+  schedule:
+    # 05:00 UTC = 08:00 Київ EEST (літо) / 07:00 EET (зима)
+    - cron: '0 5 * * *'
+  workflow_dispatch:           # Manual trigger для тесту
+
+jobs:
+  check:
+    name: Check sync workflows + send report email
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install requests
+        run: pip install requests
+
+      - name: Run health check
+        env:
+          GITHUB_TOKEN:   ${{ secrets.GITHUB_TOKEN }}
+          SYNC_API_KEY:   ${{ secrets.SYNC_API_KEY }}
+          WORKER_URL:     ${{ secrets.WORKER_URL }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        run: python3 sync_health_check.py
