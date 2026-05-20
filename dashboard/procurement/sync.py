@@ -3,9 +3,10 @@
 snEco · Procurement Sync · production-grade
 Тягне з МойСклад → batch POST у Worker /api/dashboard/ingest → D1 tables ms_*.
 
+v4 (2026-05-20): + multi-currency (EUR/USD конверсія). sum_kop тепер ЗАВЖДИ у UAH;
+                  оригінал — у *_orig_kop колонках.
 v3 (2026-05-20): + second-pass retry для failed positions + tolerant status (< 2% = success).
 v2 (2026-05-19): + ThreadPoolExecutor для positions fetch (8x паралельності).
-Раніше: ~50 хв на 2288 processings. Тепер: ~5-8 хв.
 
 Запуск:
     python3 sync.py                  # incremental (last 7 days)
@@ -49,13 +50,12 @@ MS_HEADERS = {
 
 BATCH_SIZE = 400
 MAX_RETRIES = 5
-RATE_LIMIT_SLEEP = 0.05   # secs between МС requests (зменшено з 0.1 — є retry для 429)
+RATE_LIMIT_SLEEP = 0.05
 INGEST_TIMEOUT = 60
-PARALLEL_WORKERS = 8       # v2: parallel positions fetch
+PARALLEL_WORKERS = 8
 
-# v3: tolerant status thresholds
-STATUS_SUCCESS_THRESHOLD = 0.02   # < 2% втрат = success
-STATUS_PARTIAL_THRESHOLD = 0.20   # 2-20% = partial, > 20% = failed
+STATUS_SUCCESS_THRESHOLD = 0.02
+STATUS_PARTIAL_THRESHOLD = 0.20
 
 YEAR = 2026
 
@@ -85,10 +85,46 @@ def to_kop(value, default=0) -> int:
     return int(round(float(value)))
 
 
+# ─── Multi-currency (v4) ────────────────────────────────────────────────────
+
+def _fetch_currency_map() -> Dict[str, str]:
+    """v4: тягне всі currency з МойСклад → href → isoCode (UAH/EUR/USD)."""
+    href_map = {}
+    try:
+        r = requests.get(f"{MS_BASE}/entity/currency",
+                         headers=MS_HEADERS,
+                         params={"limit": 1000},
+                         timeout=30)
+        if r.status_code != 200:
+            print(f"  ⚠ currency lookup HTTP {r.status_code} → all docs default to UAH", flush=True)
+            return href_map
+        for row in r.json().get("rows", []):
+            href = (row.get("meta") or {}).get("href", "")
+            iso = row.get("isoCode") or row.get("name", "")
+            if href and iso:
+                href_map[href] = iso
+    except Exception as e:
+        print(f"  ⚠ currency map fetch error: {e}", flush=True)
+    print(f"  💱 currency map: {len(href_map)} валют", flush=True)
+    return href_map
+
+
+def _extract_rate(doc: dict, currency_map: Dict[str, str]) -> tuple:
+    """v4: повертає (iso_code, rate_to_uah) з MoySklad документа.
+    rate.value відсутній або 0 → UAH default (1.0).
+    """
+    rate_obj = doc.get("rate") or {}
+    rate_val = rate_obj.get("value")
+    cur_href = ((rate_obj.get("currency") or {}).get("meta") or {}).get("href", "")
+
+    iso = currency_map.get(cur_href, "UAH")
+    rate = float(rate_val) if (rate_val and rate_val > 0) else 1.0
+    return iso, rate
+
+
 # ─── МойСклад fetchers ──────────────────────────────────────────────────────
 
 def ms_get(url: str, params: Optional[dict] = None, session: Optional[requests.Session] = None) -> dict:
-    """Single GET with retry/backoff. v2: optional session для connection reuse."""
     s = session or requests
     for attempt in range(MAX_RETRIES):
         try:
@@ -122,7 +158,6 @@ def ms_fetch_paginated(endpoint: str, extra_params: Optional[dict] = None, sessi
 
 
 def _fetch_processing_positions(pid: str, kind: str, session: requests.Session) -> tuple:
-    """v2: worker для ThreadPoolExecutor. Returns (pid, kind, positions, error)."""
     try:
         positions = ms_fetch_paginated(f"entity/processing/{pid}/{kind}", session=session)
         return (pid, kind, positions, None)
@@ -176,9 +211,13 @@ def ingest_batched(entity: str, rows: list, dry_run: bool = False) -> int:
     return sent
 
 
-# ─── Row builders ───────────────────────────────────────────────────────────
+# ─── Row builders (v4: multi-currency) ─────────────────────────────────────
 
-def build_processing_row(p: dict) -> dict:
+def build_processing_row(p: dict, currency_map: dict) -> dict:
+    """v4: + currency, rate_to_uah, processing_sum_orig_kop."""
+    iso, rate = _extract_rate(p, currency_map)
+    sum_orig_kop = to_kop(p.get("processingSum", 0))    # у валюті документа
+    sum_uah_kop = int(round(sum_orig_kop * rate))        # нормалізовано в UAH
     return {
         "id": p["id"],
         "ms_moment": p.get("moment"),
@@ -188,33 +227,51 @@ def build_processing_row(p: dict) -> dict:
         "processing_plan_id": extract_id(p.get("processingPlan")),
         "processing_plan_name": safe_name(p.get("processingPlan")),
         "quantity": p.get("quantity", 0),
-        "processing_sum_kop": to_kop(p.get("processingSum", 0)),
+        "processing_sum_kop": sum_uah_kop,
         "applicable": 1 if p.get("applicable", True) else 0,
         "updated_at": p.get("updated"),
+        # v4: multi-currency
+        "currency": iso,
+        "rate_to_uah": rate,
+        "processing_sum_orig_kop": sum_orig_kop,
         "raw_json": json.dumps(p, ensure_ascii=False),
     }
 
 
-def build_position_rows(processing_id: str, positions: list, side: str) -> list:
+def build_position_rows(processing_id: str, positions: list, side: str,
+                         parent_currency: str = "UAH", parent_rate: float = 1.0) -> list:
+    """v4: + parent's currency/rate (positions не мають власної). price_uah = price_orig × rate."""
     rows = []
     for pos in positions:
         pos_id = pos.get("id") or extract_id(pos.get("meta", {})) or ""
+        price_orig_kop = to_kop(pos.get("price", 0))
+        price_uah_kop = int(round(price_orig_kop * parent_rate))
         rows.append({
             "id": f"{processing_id}:{side}:{pos_id}" if pos_id else f"{processing_id}:{side}:{len(rows)}",
             "processing_id": processing_id,
             "position_id": pos_id,
             "assortment_id": extract_id(pos.get("assortment")) or "",
             "quantity": pos.get("quantity", 0),
-            "price_kop": to_kop(pos.get("price", 0)),
+            "price_kop": price_uah_kop,
+            # v4: multi-currency (inherited from parent)
+            "currency": parent_currency,
+            "rate_to_uah": parent_rate,
+            "price_orig_kop": price_orig_kop,
             "raw_json": json.dumps(pos, ensure_ascii=False),
         })
     return rows
 
 
-def build_stock_row(s: dict, snapshot_at: str) -> dict:
+def build_stock_row(s: dict, snapshot_at: str, currency_map: dict) -> dict:
+    """v4: + currency, rate_to_uah, price_orig_kop, sale_price_orig_kop.
+    Stock items зазвичай не мають власної валюти (assortment level),
+    тому фолбек на UAH/1.0 якщо немає rate."""
+    iso, rate = _extract_rate(s, currency_map)
     aid = extract_id(s)
     folder = s.get("folder") or {}
     uom = s.get("uom") or {}
+    price_orig_kop = to_kop(s.get("price", 0))
+    sale_price_orig_kop = to_kop(s.get("salePrice", 0))
     return {
         "assortment_id": aid or "",
         "name": s.get("name"),
@@ -227,27 +284,37 @@ def build_stock_row(s: dict, snapshot_at: str) -> dict:
         "in_transit": s.get("inTransit", 0),
         "reserve": s.get("reserve", 0),
         "quantity": s.get("quantity", 0),
-        "price_kop": to_kop(s.get("price", 0)),
-        "sale_price_kop": to_kop(s.get("salePrice", 0)),
+        "price_kop": int(round(price_orig_kop * rate)),
+        "sale_price_kop": int(round(sale_price_orig_kop * rate)),
         "stock_days": s.get("stockDays", 0),
         "snapshot_at": snapshot_at,
+        # v4: multi-currency
+        "currency": iso,
+        "rate_to_uah": rate,
+        "price_orig_kop": price_orig_kop,
+        "sale_price_orig_kop": sale_price_orig_kop,
         "raw_json": json.dumps(s, ensure_ascii=False),
     }
 
 
 # ─── Main sync ──────────────────────────────────────────────────────────────
 
-def fetch_positions_parallel(processings: List[dict]) -> tuple:
-    """
-    v3: основний parallel pass + second-pass retry для failed.
-    Returns (mat_rows, prod_rows, failed_tasks, total_tasks, recovered).
-    """
+def fetch_positions_parallel(processings: List[dict], currency_map: dict) -> tuple:
+    """v4: positions inherit parent's currency/rate."""
     mat_rows, prod_rows = [], []
-    failed_tasks = []  # list of (pid, kind) для retry
-    total_tasks = len(processings) * 2  # materials + products
+    failed_tasks = []
+    total_tasks = len(processings) * 2
 
     if not processings:
         return mat_rows, prod_rows, [], 0, 0
+
+    # Build parent_id → (currency, rate) map для inheritance
+    parent_currency = {}
+    parent_rate = {}
+    for p in processings:
+        iso, rate = _extract_rate(p, currency_map)
+        parent_currency[p["id"]] = iso
+        parent_rate[p["id"]] = rate
 
     # ─── Pass 1: parallel ───
     print(f"      Pass 1 — parallel × {PARALLEL_WORKERS}…", flush=True)
@@ -267,32 +334,39 @@ def fetch_positions_parallel(processings: List[dict]) -> tuple:
                 failed_tasks.append((pid, kind))
             else:
                 target = mat_rows if kind == "materials" else prod_rows
-                target.extend(build_position_rows(pid, positions, kind[:-1]))
+                target.extend(build_position_rows(
+                    pid, positions, kind[:-1],
+                    parent_currency=parent_currency.get(pid, "UAH"),
+                    parent_rate=parent_rate.get(pid, 1.0),
+                ))
             done_count += 1
             if done_count % 100 == 0 or done_count == total_tasks:
                 elapsed = time.time() - t_phase
-                rate = done_count / elapsed if elapsed else 0
-                eta = (total_tasks - done_count) / rate if rate else 0
-                print(f"      {done_count}/{total_tasks} ({rate:.1f}/s, ETA {eta:.0f}s)", flush=True)
+                rate_per_sec = done_count / elapsed if elapsed else 0
+                eta = (total_tasks - done_count) / rate_per_sec if rate_per_sec else 0
+                print(f"      {done_count}/{total_tasks} ({rate_per_sec:.1f}/s, ETA {eta:.0f}s)", flush=True)
         session.close()
 
     print(f"      Pass 1 done: {total_tasks - len(failed_tasks)}/{total_tasks} ok, {len(failed_tasks)} failed", flush=True)
 
-    # ─── Pass 2: sequential retry for failed ───
+    # ─── Pass 2: sequential retry ───
     recovered = 0
     if failed_tasks:
         print(f"      Pass 2 — sequential retry для {len(failed_tasks)} failed…", flush=True)
         session = requests.Session()
         still_failed = []
         for pid, kind in failed_tasks:
-            # Longer pause before retry — let МС rate limits reset
             time.sleep(0.5)
             pid2, kind2, positions, err = _fetch_processing_positions(pid, kind, session)
             if err:
                 still_failed.append((pid, kind))
             else:
                 target = mat_rows if kind == "materials" else prod_rows
-                target.extend(build_position_rows(pid, positions, kind[:-1]))
+                target.extend(build_position_rows(
+                    pid, positions, kind[:-1],
+                    parent_currency=parent_currency.get(pid, "UAH"),
+                    parent_rate=parent_rate.get(pid, 1.0),
+                ))
                 recovered += 1
         session.close()
         print(f"      Pass 2 done: recovered {recovered}/{len(failed_tasks)}, still failed: {len(still_failed)}", flush=True)
@@ -302,22 +376,11 @@ def fetch_positions_parallel(processings: List[dict]) -> tuple:
 
 
 def determine_status(failed_count: int, total_tasks: int, ingest_errors: list) -> tuple:
-    """
-    v3: tolerant status logic.
-    Returns (status, loss_pct).
-    
-    - success: failed_positions / total < 2% AND нема ingest errors
-    - partial: 2-20% AND нема ingest errors
-    - failed: > 20% АБО будь-яка ingest помилка
-    """
     if ingest_errors:
         return ("failed", 100.0)
-
     if total_tasks == 0:
         return ("success", 0.0)
-
     loss_pct = (failed_count / total_tasks) * 100
-
     if failed_count == 0 or (loss_pct / 100) < STATUS_SUCCESS_THRESHOLD:
         return ("success", loss_pct)
     elif (loss_pct / 100) < STATUS_PARTIAL_THRESHOLD:
@@ -328,12 +391,9 @@ def determine_status(failed_count: int, total_tasks: int, ingest_errors: list) -
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--full", action="store_true",
-                        help="Full year 2026 (default: last 7 days)")
-    parser.add_argument("--dry-run", action="store_true",
-                        help="Fetch + print, do not POST to Worker")
-    parser.add_argument("--trigger", default="manual",
-                        choices=["manual", "cron", "webhook"])
+    parser.add_argument("--full", action="store_true")
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--trigger", default="manual", choices=["manual", "cron", "webhook"])
     args = parser.parse_args()
 
     if not MS_TOKEN:
@@ -343,7 +403,10 @@ def main():
 
     started = int(time.time())
     started_iso = datetime.now(timezone.utc).isoformat()
-    print(f"🚀 Procurement sync v3 · {started_iso} · {'FULL' if args.full else 'incremental(7d)'}{' · DRY-RUN' if args.dry_run else ''}", flush=True)
+    print(f"🚀 Procurement sync v4 (multi-currency) · {started_iso} · {'FULL' if args.full else 'incremental(7d)'}{' · DRY-RUN' if args.dry_run else ''}", flush=True)
+
+    # v4: currency map ОБОВ'ЯЗКОВО на старті
+    currency_map = _fetch_currency_map()
 
     if args.full:
         date_from = f"{YEAR}-01-01 00:00:00"
@@ -353,7 +416,6 @@ def main():
         date_from = d_from.strftime("%Y-%m-%d 00:00:00")
         date_to = datetime.now().strftime("%Y-%m-%d 23:59:59")
 
-    # ─── 1. Processings ────────────────────────────────────────────────────
     print(f"\n[1/4] Processings ({date_from} → {date_to})…", flush=True)
     processings = ms_fetch_paginated(
         "entity/processing",
@@ -361,24 +423,23 @@ def main():
     )
     print(f"      → {len(processings)} processings", flush=True)
 
-    proc_rows = [build_processing_row(p) for p in processings]
+    # v4: build_processing_row тепер потребує currency_map
+    proc_rows = [build_processing_row(p, currency_map) for p in processings]
 
-    # ─── 2. Positions (v3: parallel + retry pass) ──────────────────────────
     print(f"\n[2/4] Positions for {len(processings)} processings…", flush=True)
-    mat_rows, prod_rows, failed_tasks, total_tasks, recovered = fetch_positions_parallel(processings)
+    mat_rows, prod_rows, failed_tasks, total_tasks, recovered = fetch_positions_parallel(processings, currency_map)
 
     loss_pct = (len(failed_tasks) / total_tasks * 100) if total_tasks else 0
     print(f"      → {len(mat_rows)} material positions, {len(prod_rows)} product positions", flush=True)
     print(f"      → {len(failed_tasks)} STILL failed after retry ({loss_pct:.2f}% loss), recovered {recovered}", flush=True)
 
-    # ─── 3. Stock snapshot ──────────────────────────────────────────────────
     print(f"\n[3/4] Stock report…", flush=True)
     stock_raw = ms_fetch_paginated("report/stock/all")
     snapshot_iso = datetime.now(timezone.utc).isoformat()
-    stock_rows = [build_stock_row(s, snapshot_iso) for s in stock_raw]
+    # v4: build_stock_row теж тепер потребує currency_map
+    stock_rows = [build_stock_row(s, snapshot_iso, currency_map) for s in stock_raw]
     print(f"      → {len(stock_rows)} stock items", flush=True)
 
-    # ─── 4. Ingest into Worker ──────────────────────────────────────────────
     print(f"\n[4/4] Ingesting to Worker…", flush=True)
     counts = {}
     ingest_errors = []
@@ -402,10 +463,8 @@ def main():
     finished = int(time.time())
     duration = (finished - started) * 1000
 
-    # v3: tolerant status
     status, loss_pct_final = determine_status(len(failed_tasks), total_tasks, ingest_errors)
 
-    # Errors for sync_log (truncated)
     all_errors = []
     if failed_tasks:
         all_errors.extend([f"position fetch: {pid[:8]} {kind}" for pid, kind in failed_tasks[:10]])
@@ -434,7 +493,6 @@ def main():
     total = sum(counts.values())
     print(f"\n🎯 Done · {total} rows · {len(failed_tasks)} failed pos ({loss_pct_final:.2f}%) · {len(ingest_errors)} ingest errors · {duration/1000:.1f}s · status={status}", flush=True)
 
-    # v3: exit 0 для success ABO partial (cron не повинен fail), 1 для failed
     sys.exit(0 if status in ("success", "partial") else 1)
 
 
