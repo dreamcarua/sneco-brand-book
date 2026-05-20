@@ -811,6 +811,28 @@ function renderDashboard(){
   const netPrev     = cashPrev30 - expPrev30;
   const netDelta    = netPrev !== 0 ? ((netCashFlow - netPrev)/Math.abs(netPrev)*100) : null;
 
+  // v2.78 (multi-currency): аналіз валютного складу payments + invoices у вибраному періоді.
+  // Sum_kop вже нормалізовано в UAH — це для INFO badge, щоб бачити що частина обороту EUR/USD.
+  const _inPeriod = (item) => {
+    const d = String(item.ms_moment||'').slice(0,10);
+    return d >= periodFrom && d <= periodTo;
+  };
+  const currencyBreakdown = {};
+  [...allPayments, ...allInvoices].forEach(item => {
+    if (!_inPeriod(item)) return;
+    const cur = (item.currency || 'UAH').toUpperCase();
+    if (!currencyBreakdown[cur]) currencyBreakdown[cur] = { count: 0, sum_uah: 0, sum_orig: 0 };
+    currencyBreakdown[cur].count++;
+    currencyBreakdown[cur].sum_uah += (item.sum_kop || 0) / 100;
+    currencyBreakdown[cur].sum_orig += (item.sum_orig_kop || item.sum_kop || 0) / 100;
+  });
+  const nonUahCurrencies = Object.entries(currencyBreakdown).filter(([cur]) => cur !== 'UAH');
+  const hasMultiCurrency = nonUahCurrencies.length > 0;
+  const currencySymbol = { UAH: '₴', EUR: '€', USD: '$', PLN: 'zł', GBP: '£' };
+  const symbolOf = cur => currencySymbol[cur] || cur;
+  const totalPeriodUah = Object.values(currencyBreakdown).reduce((a,s) => a + s.sum_uah, 0);
+  const nonUahShare = totalPeriodUah > 0 ? (nonUahCurrencies.reduce((a,[_,s]) => a + s.sum_uah, 0) / totalPeriodUah * 100) : 0;
+
   // Row 2 — поточний стан AR (з invoices)
   // v2.72.3 ROUNDING FIX: фільтрувати на цілих ₴ (Math.round) — MoySklad payedSum
   // іноді з offset 1-99 копійок, display округлює до "0 ₴" але kop > 0.
@@ -1195,6 +1217,26 @@ function renderDashboard(){
       <div class="fin-title">💰 Finance Dashboard</div>
       <div class="fin-sub">Рахунки · Гроші · Витрати по напрямах · AR aging · Очікувані надходження</div>
     </div>
+
+    ${hasMultiCurrency ? `
+    <!-- v2.78 MULTI-CURRENCY BANNER -->
+    <div style="background:linear-gradient(135deg,#e8f4ff 0%,#fff4e0 100%);border:1px solid #b3d4ff;border-radius:8px;padding:14px 18px;margin:14px 0 0;display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+      <div style="font-size:24px">🌍</div>
+      <div style="flex:1;min-width:240px">
+        <div style="font-weight:600;color:#1a4d8c;font-size:14px;margin-bottom:4px">Multi-currency обіг за ${periodLabel}</div>
+        <div style="font-size:12.5px;color:#444">${nonUahShare.toFixed(1)}% обороту — у валютах ≠ UAH. Усі KPIs нормалізовано в UAH за курсом на момент кожної транзакції з MoySklad.</div>
+      </div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        ${Object.entries(currencyBreakdown).sort((a,b)=>b[1].sum_uah-a[1].sum_uah).map(([cur, stats]) => `
+          <div style="background:#fff;border:1px solid #d8e5f5;border-radius:6px;padding:8px 14px;text-align:center;min-width:110px">
+            <div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.5px">${cur}</div>
+            <div style="font-size:14px;font-weight:600;color:#1a4d8c">${symbolOf(cur)} ${nfm(stats.sum_orig)}</div>
+            <div style="font-size:10px;color:#888">${stats.count} операц. · ${nfm(stats.sum_uah)} ₴</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    ` : ''}
 
     <!-- SECTION 1 — KPI ROW 1: за останні 30 днів -->
     <div class="g4">
