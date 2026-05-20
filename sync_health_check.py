@@ -30,10 +30,13 @@ ALERT_EMAIL = "vg@sneco.ua"
 SENDER_EMAIL = "noreply@sneco.ua"
 
 # Експектації по lag-у (годин) — sync має бути не старіше за це
+# Tolerance 26h — flagged тільки якщо sync пропустив цілий день.
+# Це робить health check стійким до manual dispatch у будь-який час доби
+# (бо o 17:00 Київ останній моя sync о 06:00 вже 11h тому, але це OK — наступний завтра).
 EXPECT_LAG_HOURS = {
-    "moysklad-sync.yml": 6,        # 06:00 Київ → перевірка о 08:00 → max 2h, з запасом 6h
-    "procurement-sync.yml": 9,     # 03:00 Київ → перевірка о 08:00 → max 5h, з запасом 9h
-    "daily-briefing.yml": 26,      # 09:00 Київ → перевірка о 08:00 наступного дня → 23h, з запасом 26h
+    "moysklad-sync.yml": 26,        # 06:00 Київ щодня → 26h tolerance = > доби missed
+    "procurement-sync.yml": 26,     # 03:00 Київ щодня → 26h tolerance = > доби missed
+    "daily-briefing.yml": 26,       # 09:00 Київ щодня → 26h tolerance = > доби missed
 }
 
 
