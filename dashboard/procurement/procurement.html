@@ -227,7 +227,7 @@ window.bootDashboard = async function(token) {
   const main = document.getElementById('main');
   try {
     // last-sync info
-    const ls = await fetch(WORKER + '/api/dashboard/last-sync').then(r => r.json()).catch(() => null);
+    const ls = await fetch(WORKER + '/api/dashboard/last-sync', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'}).then(r => r.ok ? r.json() : null).catch(() => null);
     let syncTxt = '';
     if (ls && ls.last) {
       const dt = new Date((ls.last.finished_at || ls.last.started_at) * 1000);
@@ -315,7 +315,8 @@ window.bootDashboard = async function(token) {
           <span class="bad" style="padding:2px 8px;border-radius:3px">&lt; 14 дн</span> критично ·
           <span class="warn" style="padding:2px 8px;border-radius:3px">14–30 дн</span> запланувати ·
           <span class="ok" style="padding:2px 8px;border-radius:3px">&gt; 30 дн</span> ок ·
-          Прогноз береться з поля <code>stockDays</code> МойСкладу (їх formula).
+          Прогноз береться з поля <code>stockDays</code> МойСкладу (їх formula).<br>
+          <strong>Резерв = 0</strong> для сировини/упаковки — це нормально (резервуються тільки готові пачки замовленнями покупців).
         </div>
       </div>
       <div class="section" style="background:#fafaf6">
