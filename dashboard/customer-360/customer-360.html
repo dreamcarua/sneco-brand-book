@@ -2343,12 +2343,42 @@ function _drawBarDataLabels(chart){
   ctx.restore();
 }
 
-// Build the 3 legacy lists (TOP-25 last month / TOP-10 YTD / Dormant)
+// v2.78.11 (Богдан): TOP-25 + TOP-10 → один TOP-100 з period chips. Dormant теж з 30/60/90/180.
+// Глобал state
+if (typeof window._legacyTopPeriod === 'undefined') window._legacyTopPeriod = 'last_month';
+if (typeof window._legacyDormantDays === 'undefined') window._legacyDormantDays = 30;
+
+window.setLegacyTopPeriod = function(key){
+  window._legacyTopPeriod = key;
+  renderOverview();
+};
+window.setLegacyDormantDays = function(days){
+  window._legacyDormantDays = days;
+  renderOverview();
+};
+
+// Compute (start, end) ISO dates для period key
+function _legacyPeriodRange(now, key){
+  const y = now.getFullYear();
+  const m = now.getMonth();
+  switch(key){
+    case '7d':         return { from: new Date(now.getTime() - 7*86400000), to: now, label: 'останні 7 днів' };
+    case '30d':        return { from: new Date(now.getTime() - 30*86400000), to: now, label: 'останні 30 днів' };
+    case 'last_month': { const f = new Date(y, m-1, 1); const t = new Date(y, m, 0); return { from: f, to: t, label: 'минулий місяць' }; }
+    case 'current_q':  { const qStartMonth = Math.floor(m/3)*3; return { from: new Date(y, qStartMonth, 1), to: now, label: 'поточний квартал' }; }
+    case 'ytd':        return { from: new Date(y, 0, 1), to: now, label: 'з початку року' };
+    case 'last_year':  return { from: new Date(y-1, 0, 1), to: new Date(y-1, 11, 31), label: 'минулий рік' };
+    default:           return { from: new Date(y, m-1, 1), to: new Date(y, m, 0), label: 'минулий місяць' };
+  }
+}
+
+// Build the legacy lists (v2.78.11: TOP по period + Dormant по періоду)
 // v2.74.2: приймає filtered pool — respects currentOverviewFilter
 function _buildLegacyListsHtml(customersPool){
   const pool = customersPool || allCounterparties;
   const now = new Date();
-  const cutoff30Days = new Date(now.getTime() - 30*86400000).toISOString().slice(0,10);
+  const dormantDays = window._legacyDormantDays || 30;
+  const cutoffDormant = new Date(now.getTime() - dormantDays*86400000).toISOString().slice(0,10);
 
   // Helper: render a table section
   // v2.68: для dormant section — замість колонки LTV показуємо ОСТАННЄ ЗАМОВЛЕННЯ (дата + сума)
@@ -2424,50 +2454,83 @@ function _buildLegacyListsHtml(customersPool){
     `;
   }
 
-  // SECTION 1: TOP-25 за минулий місяць (з fallback на 30 днів / lifetime коли немає)
-  // v2.74.2: pool тепер input (filtered subset з renderOverview)
-  let basis = 'last month';
-  let sect1Pool = pool.filter(c => (c.__lastMonthRev||0) > 0);
-  if (sect1Pool.length === 0) { basis = 'last 30 days'; sect1Pool = pool.filter(c => (c.__last30Rev||0) > 0); }
-  if (sect1Pool.length === 0) { basis = 'lifetime'; sect1Pool = pool.filter(c => (c.__revenue||0) > 0); }
-  const sortKey1 = basis === 'last month' ? '__lastMonthRev' : basis === 'last 30 days' ? '__last30Rev' : '__revenue';
-  const top25 = sect1Pool.filter(c => !c.archived).sort((a,b) => (b[sortKey1]||0) - (a[sortKey1]||0)).slice(0, 25);
+  // v2.78.11: ОДИН TOP-100 блок з period chips. Динамічно перераховуємо виручку
+  // за обраний період зі allDemands (не використовуємо precomputed __lastMonthRev тощо).
+  const periodKey = window._legacyTopPeriod || 'last_month';
+  const period = _legacyPeriodRange(now, periodKey);
+  const periodFromIso = period.from.toISOString().slice(0,10);
+  const periodToIso = period.to.toISOString().slice(0,10);
 
-  if (top25.length === 0) {
-    return '<div><span style="color:var(--muted);font-size:11px;padding:5px 0">Жодного клієнта з даними. Перевір що sync пройшов.</span></div>';
+  // Reconstruct CP lookup для match demands → customer
+  const cpById = {};
+  const cpByName = {};
+  pool.forEach(c => {
+    if (c.id) cpById[c.id] = c;
+    const nm = (c.name||'').trim();
+    if (nm) cpByName[nm] = c;
+  });
+  // Per-customer revenue у вибраному періоді
+  const periodRev = {};
+  (allDemands||[]).forEach(d => {
+    const dt = (d.ms_moment||'').slice(0,10);
+    if (dt < periodFromIso || dt > periodToIso) return;
+    const cp = (d.agent_id && cpById[d.agent_id]) || (d.agent && cpByName[(d.agent||'').trim()]);
+    const key = cp ? (cp.__key || cp.id || cp.name) : (d.agent_id || d.agent || '__unknown__');
+    periodRev[key] = (periodRev[key] || 0) + (d.sum_kop||0)/100;
+  });
+  // Attach __periodRev до pool clients для рендеру
+  pool.forEach(c => { c.__periodRev = periodRev[c.__key] || 0; });
+
+  const topClients = pool
+    .filter(c => !c.archived && (c.__periodRev || 0) > 0)
+    .sort((a,b) => (b.__periodRev||0) - (a.__periodRev||0))
+    .slice(0, 100);
+
+  // Період chips
+  const periodChips = `
+    <div class="prod-period-bar" style="margin:0 0 10px 0">
+      <span class="prod-period-bar-lbl">Період</span>
+      <button class="prod-chip ${periodKey==='7d' ? 'active' : ''}" onclick="setLegacyTopPeriod('7d')">7 днів</button>
+      <button class="prod-chip ${periodKey==='30d' ? 'active' : ''}" onclick="setLegacyTopPeriod('30d')">30 днів</button>
+      <button class="prod-chip ${periodKey==='last_month' ? 'active' : ''}" onclick="setLegacyTopPeriod('last_month')">Минулий місяць</button>
+      <button class="prod-chip ${periodKey==='current_q' ? 'active' : ''}" onclick="setLegacyTopPeriod('current_q')">Поточний квартал</button>
+      <button class="prod-chip ${periodKey==='ytd' ? 'active' : ''}" onclick="setLegacyTopPeriod('ytd')">З початку року</button>
+      <button class="prod-chip ${periodKey==='last_year' ? 'active' : ''}" onclick="setLegacyTopPeriod('last_year')">Минулий рік</button>
+    </div>`;
+
+  // Dormant з фільтром днів
+  const dormant = pool
+    .filter(c => !c.archived && (c.__revenue||0) > 0 && c.__lastOrder && c.__lastOrder.slice(0,10) < cutoffDormant)
+    .sort((a,b) => (b.__revenue||0) - (a.__revenue||0))
+    .slice(0, 100);
+
+  const dormantChips = `
+    <div class="prod-period-bar" style="margin:0 0 10px 0">
+      <span class="prod-period-bar-lbl">Не замовляли &gt;</span>
+      <button class="prod-chip ${dormantDays===30 ? 'active' : ''}" onclick="setLegacyDormantDays(30)">30 днів</button>
+      <button class="prod-chip ${dormantDays===60 ? 'active' : ''}" onclick="setLegacyDormantDays(60)">60 днів</button>
+      <button class="prod-chip ${dormantDays===90 ? 'active' : ''}" onclick="setLegacyDormantDays(90)">90 днів</button>
+      <button class="prod-chip ${dormantDays===180 ? 'active' : ''}" onclick="setLegacyDormantDays(180)">180 днів</button>
+    </div>`;
+
+  if (topClients.length === 0 && dormant.length === 0) {
+    return `<div>${periodChips}<span style="color:var(--muted);font-size:11px;padding:5px 0">Жодного клієнта з даними у "${period.label}". Спробуй інший період.</span></div>`;
   }
 
-  const label1 = basis === 'last month' ? 'ТОП-25 за минулий місяць'
-                : basis === 'last 30 days' ? 'ТОП-25 за останні 30 днів' : 'ТОП-25 за весь час';
-  const valueLabel1 = basis === 'last month' ? 'За місяць' : basis === 'last 30 days' ? '30 днів' : 'Весь час';
-
-  // SECTION 2: TOP-10 з початку року (YTD) — v2.74.2: pool (filtered)
-  const yearNum = now.getFullYear();
-  const top10ytd = pool
-    .filter(c => !c.archived && (c.__ytdRev||0) > 0)
-    .sort((a,b) => (b.__ytdRev||0) - (a.__ytdRev||0))
-    .slice(0, 10);
-
-  // SECTION 3: Dormant — не замовляли > 30 днів, мають LTV > 0, sorted by LTV desc — v2.74.2: pool
-  const dormant = pool
-    .filter(c => !c.archived && (c.__revenue||0) > 0 && c.__lastOrder && c.__lastOrder.slice(0,10) < cutoff30Days)
-    .sort((a,b) => (b.__revenue||0) - (a.__revenue||0))
-    .slice(0, 10);
-
   const html = [
+    periodChips,
     _renderSection({
-      title: label1, items: top25, valueKey: sortKey1, valueLabel: valueLabel1,
-      valueColor: '#4a7000', badgeBg: 'rgba(150,193,31,.15)', badgeFg: '#4a7000'
+      title: `ТОП-100 клієнтів · ${period.label}`,
+      subtitle: `${topClients.length} з ${pool.filter(c=>!c.archived).length} клієнтів мають продажі`,
+      items: topClients, valueKey: '__periodRev', valueLabel: period.label,
+      valueColor: '#4a7000', badgeBg: 'rgba(150,193,31,.15)', badgeFg: '#4a7000',
+      emptyMsg: 'нема продажів у цьому періоді'
     }),
+    dormantChips,
     _renderSection({
-      title: `ТОП-10 з початку ${yearNum} року`, items: top10ytd,
-      valueKey: '__ytdRev', valueLabel: `YTD ${yearNum}`,
-      valueColor: '#996600', badgeBg: 'rgba(254,191,39,.18)', badgeFg: '#996600',
-      emptyMsg: 'нема продажів у цьому році'
-    }),
-    _renderSection({
-      title: 'Не замовляли > 30 днів — час реактивувати', items: dormant,
-      valueKey: '__revenue', valueLabel: 'LTV', extraCol: 'Не замовляв',
+      title: `Не замовляли > ${dormantDays} днів — час реактивувати`,
+      subtitle: `${dormant.length} клієнтів`,
+      items: dormant, valueKey: '__revenue', valueLabel: 'LTV', extraCol: 'Не замовляв',
       valueColor: 'var(--red)', badgeBg: 'rgba(232,64,64,.10)', badgeFg: '#a00',
       emptyMsg: 'усі активні клієнти замовляли нещодавно ✅'
     })
