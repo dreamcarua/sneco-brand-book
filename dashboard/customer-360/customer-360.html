@@ -679,6 +679,21 @@ window.setNewPeriod = function(days){
   _newPeriodDays = days;
   renderOverview();
 };
+// v2.78.7 (Богдан): sort TOP-100 продуктів картки клієнта
+window.setTopProdSort = function(key){
+  // Toggle direction якщо той самий key, інакше reset to desc
+  if (window._topProdSort === key) {
+    window._topProdSortDir = (window._topProdSortDir === 'desc') ? 'asc' : 'desc';
+  } else {
+    window._topProdSort = key;
+    window._topProdSortDir = 'desc';
+  }
+  // Re-render поточну картку клієнта якщо вона відкрита
+  if (typeof _currentCustKey !== 'undefined' && _currentCustKey) {
+    const c = allCounterparties.find(x => (x.__key === _currentCustKey) || (x.name === _currentCustKey));
+    if (c) renderCustomerView(c);
+  }
+};
 window.setNewPeriodCustom = function(){
   const v = document.getElementById('newPeriodCustom')?.value;
   const n = parseInt(v, 10);
@@ -1155,6 +1170,15 @@ function calcCrossSell(c, allDemandPositions, allCounterparties){
   if (!allDemandPositions || allDemandPositions.length === 0) {
     return { items: [], reason: 'demand_positions ще пуста — чекаємо sync' };
   }
+  // v2.78.8 (Богдан): exclude тару (Гофроящики, packaging) + sort by ТОП SKU останніх 3 місяців
+  const isPackaging = (name) => {
+    if (!name) return true;
+    const n = name.toLowerCase();
+    return n.includes('гофроящ') || n.includes('гофрокороб') || n.includes('пакет ') ||
+           n.includes('пакети ') || n.includes('пакування') || n.includes('тара') ||
+           n.startsWith('opt ') || n.startsWith('all ') || /^(opt|all)\s*\d/i.test(n);
+  };
+
   // Поточний клієнт — список SKU
   const myKey = c.__key || c.id || c.name;
   const myMatch = p => (p.agent_id && (p.agent_id === c.id || p.agent_id === myKey)) || (p.agent === c.name);
@@ -1174,6 +1198,17 @@ function calcCrossSell(c, allDemandPositions, allCounterparties){
   const peerKeys = new Set(peers.map(p => p.id || p.name));
   const peerNames = new Set(peers.map(p => p.name));
 
+  // v2.78.8: ТОП-SKU за останні 3 місяці (приоритет для cross-sell)
+  const cutoff3m = new Date(Date.now() - 90*86400000).toISOString().slice(0,10);
+  const recentSkuRank = {};
+  allDemandPositions.forEach(p => {
+    const dt = (p.ms_moment || '').slice(0,10);
+    if (dt < cutoff3m) return;
+    const name = p.product_name || p.assortment_name || p.name;
+    if (!name || isPackaging(name)) return;
+    recentSkuRank[name] = (recentSkuRank[name] || 0) + (p.sum_kop || 0) / 100;
+  });
+
   // Aggregate SKUs across peers
   const skuStats = {}; // {name: {peerCount, totalSum}}
   allDemandPositions.forEach(p => {
@@ -1181,16 +1216,23 @@ function calcCrossSell(c, allDemandPositions, allCounterparties){
     if (!matchesPeer) return;
     const name = p.product_name || p.assortment_name || p.name;
     if (!name || mySKUs.has(name)) return; // already buys → skip
+    if (isPackaging(name)) return;           // v2.78.8: exclude тару
     if (!skuStats[name]) skuStats[name] = { peerCount: new Set(), totalSum: 0 };
     skuStats[name].peerCount.add(p.agent_id || p.agent);
     skuStats[name].totalSum += (p.sum_kop || 0) / 100;
   });
   const items = Object.entries(skuStats)
-    .map(([name, s]) => ({ name, peerCount: s.peerCount.size, avgPerPeer: s.totalSum / s.peerCount.size }))
+    .map(([name, s]) => ({
+      name,
+      peerCount: s.peerCount.size,
+      avgPerPeer: s.totalSum / s.peerCount.size,
+      recentRank: recentSkuRank[name] || 0   // v2.78.8: snEco-wide popularity 3m
+    }))
     .filter(x => x.peerCount >= 2) // мінімум 2 peers купляють — для статистичної значимості
-    .sort((a, b) => b.avgPerPeer - a.avgPerPeer)
-    .slice(0, 10);
-  return { items, reason: items.length === 0 ? 'усе що peers купляють — клієнт уже бере' : '' };
+    // v2.78.8: primary sort — recent ТОП SKU snEco (3 міс), secondary — avg per peer
+    .sort((a, b) => (b.recentRank - a.recentRank) || (b.avgPerPeer - a.avgPerPeer))
+    .slice(0, 20);
+  return { items, reason: items.length === 0 ? 'усе що peers купляють — клієнт уже бере (або це тільки тара)' : '' };
 }
 
 // ============================================================================
@@ -2737,21 +2779,40 @@ function renderCustomerView(c){
     });
   }
   const productTotal = Object.values(productMap).reduce((a,x) => a + (x.sum||0), 0);
+  // v2.78.7 (Богдан): TOP-100 з scroll + sortable. Sort default = sum DESC. UI клік на header перевпорядковує.
+  const _topProdSortKey = window._topProdSort || 'sum';
+  const _topProdSortDir = window._topProdSortDir || 'desc';
   const topProducts = Object.entries(productMap)
-    .sort((a,b) => (b[1].sum||0) - (a[1].sum||0))
-    .slice(0, 10);
+    .sort((a,b) => {
+      const va = _topProdSortKey === 'qty' ? (a[1].qty||0) : (a[1].sum||0);
+      const vb = _topProdSortKey === 'qty' ? (b[1].qty||0) : (b[1].sum||0);
+      return _topProdSortDir === 'desc' ? vb - va : va - vb;
+    })
+    .slice(0, 100);
   const usingPositions = positionsForCust.length > 0;
 
-  // === Payment cadence (DSO per customer) — обчислюється раніше, бо потрібен у trends ===
+  // v2.78.10 (Богдан bug fix): BAG — раніше рахували (today - payment_planned), що для
+  // оплачених рахунків з planned_date рік тому давало "DSO 339 днів" для healthy клієнта.
+  // Це НЕ DSO, це years since due date. Замінили на середній CREDIT TERM:
+  // days_from_invoice_issued_to_expected_payment для FULLY paid invoices.
+  // Це показує скільки днів клієнт має на оплату (типовий term: 14, 30, 60).
   let custDSO = null;
   if (invs.length) {
-    const paidInvs = invs.filter(i => i.payed_sum_kop && i.payment_planned_moment);
+    const paidInvs = invs.filter(i =>
+      i.payed_sum_kop && i.sum_kop && i.payed_sum_kop >= i.sum_kop * 0.99 &&   // material paid
+      i.ms_moment && i.payment_planned_moment
+    );
     if (paidInvs.length) {
-      const avg = paidInvs.reduce((a,i) => {
+      const validDays = [];
+      paidInvs.forEach(i => {
+        const issued = new Date(i.ms_moment).getTime();
         const planned = new Date(i.payment_planned_moment).getTime();
-        return a + Math.max(0, (Date.now() - planned)/86400000);
-      }, 0) / paidInvs.length;
-      custDSO = Math.round(avg);
+        const days = (planned - issued) / 86400000;
+        if (days >= 0 && days <= 365) validDays.push(days);   // skip outliers > 1 year
+      });
+      if (validDays.length) {
+        custDSO = Math.round(validDays.reduce((a,d) => a + d, 0) / validDays.length);
+      }
     }
   }
 
@@ -2763,12 +2824,23 @@ function renderCustomerView(c){
   const trend3m = prev3 > 0 ? Math.round((last3-prev3)/prev3*100) : null;
   const cashRatio = totalShipped > 0 ? cashCollected/totalShipped*100 : 0;
 
-  // YoY comparison
+  // v2.78.9 (Богдан): YoY apple-to-apple — порівняння YTD vs same-period prev year
+  // Раніше: повний 2026 (з січня по поточний місяць) vs повний 2025 (всі 12 міс) → нечесно
+  // Зараз: 2026-01..2026-currentM vs 2025-01..2025-currentM (той самий період)
   const curYear = String(now.getFullYear());
   const prevYear = String(now.getFullYear() - 1);
-  const curYearRev = Object.entries(shipByMonth).filter(([m]) => m.startsWith(curYear)).reduce((a,[,v]) => a+v, 0);
-  const prevYearRev = Object.entries(shipByMonth).filter(([m]) => m.startsWith(prevYear)).reduce((a,[,v]) => a+v, 0);
+  const currentMonth01 = now.getMonth() + 1;  // 1-12
+  const periodEnd = String(currentMonth01).padStart(2, '0');
+  const lastDayOfMonth = new Date(now.getFullYear(), currentMonth01, 0).getDate();
+  // Включаємо часткові поточний місяць — Богдан хоче "на поточну дату"
+  const curYearRev = Object.entries(shipByMonth)
+    .filter(([m]) => m.startsWith(curYear) && m.slice(5,7) <= periodEnd)
+    .reduce((a,[,v]) => a+v, 0);
+  const prevYearRev = Object.entries(shipByMonth)
+    .filter(([m]) => m.startsWith(prevYear) && m.slice(5,7) <= periodEnd)
+    .reduce((a,[,v]) => a+v, 0);
   const yoyPct = prevYearRev > 0 ? Math.round((curYearRev - prevYearRev)/prevYearRev*100) : null;
+  const yoyPeriodLabel = `січ–${['','січ','лют','бер','кві','тра','чер','лип','сер','вер','жов','лис','гру'][currentMonth01]}`;
 
   // Best / worst month — overall + worst у поточному році
   let bestMonth = null, bestMonthVal = 0;
@@ -2818,9 +2890,9 @@ function renderCustomerView(c){
   } else if (trend3m !== null) {
     sentences.push(`За останні 3 місяці виручка стабільна (${nfm(last3)} ₴ vs ${nfm(prev3)} ₴, зміна ${trend3m}%).`);
   }
-  // YoY
+  // YoY apple-to-apple (v2.78.9): порівняння YTD (того ж періоду)
   if (yoyPct !== null) {
-    sentences.push(`<strong>YoY:</strong> ${yoyPct >= 0 ? '+' : ''}${yoyPct}% за ${curYear} рік порівняно з ${prevYear} (${nfm(curYearRev)} ₴ vs ${nfm(prevYearRev)} ₴).`);
+    sentences.push(`<strong>YoY ${yoyPeriodLabel}:</strong> ${yoyPct >= 0 ? '+' : ''}${yoyPct}% — ${curYear} (${nfm(curYearRev)} ₴) vs ${prevYear} за той самий період (${nfm(prevYearRev)} ₴).`);
   }
   // Best/worst
   if (bestMonth) {
@@ -2844,7 +2916,7 @@ function renderCustomerView(c){
   }
   // DSO per customer
   if (custDSO !== null) {
-    sentences.push(`<strong>DSO для цього клієнта:</strong> ~${custDSO} днів від рахунку до оплати.`);
+    sentences.push(`<strong>Середній credit term:</strong> ${custDSO} днів від рахунку до планової оплати (для повністю оплачених invoices).`);
   }
   // Cash discipline
   if (totalShipped > 0) {
@@ -3220,12 +3292,12 @@ function renderCustomerView(c){
       <div class="cc" data-block="product-mix">
         <div class="cc-head">
           <div>
-            <div class="cc-title">🛒 ТОП-10 продуктів</div>
+            <div class="cc-title">🛒 ТОП-100 продуктів <span style="font-size:10px;color:var(--muted);font-weight:500">(scroll до повного списку)</span></div>
             <div class="cc-sub">${usingPositions ? `ms_demand_positions · ${positionsForCust.length} позицій` : 'fallback з raw_json'}${
               _productPeriodDays ? ` · фільтр: останні ${_productPeriodDays} днів` :
               _productCustomRange ? ` · фільтр: ${_productCustomRange.from} → ${_productCustomRange.to}` :
               ' · усі дати'
-            }</div>
+            } · sort ${_topProdSortKey === 'qty' ? '↓ кількість' : '↓ виручка'}</div>
           </div>
         </div>
         <!-- v2.76.3: period filter chips для ТОП-10 продуктів -->
@@ -3244,9 +3316,17 @@ function renderCustomerView(c){
           <button class="prod-chip ${_productCustomRange ? 'active' : ''}" onclick="setProductPeriod('custom')">Застосувати</button>
           ${(_productPeriodDays || _productCustomRange) ? `<span class="prod-period-info">📊 ${positionsForCust.length} позицій у періоді</span>` : ''}
         </div>
-        <div style="overflow-x:auto;margin-top:8px">
-          <table class="dt">
-            <thead><tr><th style="width:28px">#</th><th>Продукт</th><th style="text-align:right">Кількість</th><th style="text-align:right">Виручка</th><th style="text-align:right">% клієнта</th></tr></thead>
+        <div style="overflow-y:auto;max-height:560px;margin-top:8px;scrollbar-width:thin">
+          <table class="dt" style="position:relative">
+            <thead style="position:sticky;top:0;background:#FAFAF5;z-index:2">
+              <tr>
+                <th style="width:28px">#</th>
+                <th>Продукт</th>
+                <th style="text-align:right;cursor:pointer;user-select:none" onclick="window.setTopProdSort('qty')" title="Клік щоб сортувати">Кількість ${_topProdSortKey==='qty' ? (_topProdSortDir==='desc'?'↓':'↑') : '⇅'}</th>
+                <th style="text-align:right;cursor:pointer;user-select:none" onclick="window.setTopProdSort('sum')" title="Клік щоб сортувати">Виручка ${_topProdSortKey==='sum' ? (_topProdSortDir==='desc'?'↓':'↑') : '⇅'}</th>
+                <th style="text-align:right">% клієнта</th>
+              </tr>
+            </thead>
             <tbody>
               ${topProducts.length
                 ? topProducts.map(([p,obj],i) => {
