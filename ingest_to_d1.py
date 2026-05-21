@@ -45,6 +45,9 @@ KOP_COLS = {
     "sale_price_kop", "buy_price_kop", "min_price_kop",
     "balance_kop", "overdue_debt_kop",  # v2.67
     "price_kop",                         # v2.70: для ms_demand_positions
+    # v2.78 (multi-currency): оригінальні суми у валюті документа теж у kopecks-style
+    "sum_orig_kop", "price_orig_kop",
+    "processing_sum_orig_kop", "sale_price_orig_kop",
 }
 
 # Map xlsx file → entity slug + column rename map (xlsx header → D1 column).
@@ -62,6 +65,9 @@ ENTITY_MAP = {
             "Організація": "organization",
             "Склад": "store",
             "Сума, грн": "sum_kop",
+            "Сума ориг, грн": "sum_orig_kop",   # v2.78
+            "Валюта": "currency",                 # v2.78
+            "Курс UAH": "rate_to_uah",            # v2.78
             "Оплачено, грн": "payed_sum_kop",
             "Стан": "state",
             # EN aliases (fallback) ─────────────────────────────────────
@@ -91,6 +97,9 @@ ENTITY_MAP = {
             "Контрагент ID": "agent_id",
             "Організація": "organization",
             "Сума, грн": "sum_kop",
+            "Сума ориг, грн": "sum_orig_kop",   # v2.78
+            "Валюта": "currency",                 # v2.78
+            "Курс UAH": "rate_to_uah",            # v2.78
             "Стаття витрат": "expense_item",        # v2.72 — категорія витрат для cash-flow
             "Стаття витрат ID": "expense_item_id",  # v2.72
             "Призначення": "payment_purpose",       # v2.72
@@ -120,6 +129,9 @@ ENTITY_MAP = {
             "Контрагент ID": "agent_id",
             "Організація": "organization",
             "Сума, грн": "sum_kop",
+            "Сума ориг, грн": "sum_orig_kop",   # v2.78
+            "Валюта": "currency",                 # v2.78
+            "Курс UAH": "rate_to_uah",            # v2.78
             "Оплачено, грн": "payed_sum_kop",
             "Відвантажено, грн": "shipped_sum_kop",
             "Стан": "state",
@@ -149,6 +161,9 @@ ENTITY_MAP = {
             "Контрагент ID": "agent_id",
             "Склад": "store",
             "Сума, грн": "sum_kop",
+            "Сума ориг, грн": "sum_orig_kop",   # v2.78
+            "Валюта": "currency",                 # v2.78
+            "Курс UAH": "rate_to_uah",            # v2.78
             # EN aliases ─────────
             "id": "id",
             "moment": "ms_moment",
@@ -239,6 +254,9 @@ ENTITY_MAP = {
             "Контрагент": "agent",
             "Контрагент ID": "agent_id",
             "Сума, грн": "sum_kop",
+            "Сума ориг, грн": "sum_orig_kop",   # v2.78
+            "Валюта": "currency",                 # v2.78
+            "Курс UAH": "rate_to_uah",            # v2.78
             "Оплачено, грн": "payed_sum_kop",
             "Стан": "state",
             "Очікувана оплата": "payment_planned_moment",
@@ -298,8 +316,12 @@ ENTITY_MAP = {
             "Товар":           "product_name",
             "Товар ID":        "product_id",
             "Кількість":       "quantity",
-            "Ціна, грн":       "price_kop",       # KOP × 100
-            "Сума, грн":       "sum_kop",         # KOP × 100
+            "Ціна, грн":       "price_kop",       # KOP × 100 (v2.78: вже UAH)
+            "Сума, грн":       "sum_kop",         # KOP × 100 (v2.78: вже UAH)
+            "Ціна ориг, грн":  "price_orig_kop",  # v2.78: KOP × 100
+            "Сума ориг, грн":  "sum_orig_kop",    # v2.78: KOP × 100
+            "Валюта":          "currency",         # v2.78
+            "Курс UAH":        "rate_to_uah",      # v2.78
             "Знижка %":        "discount_pct",
             "Контрагент ID":   "agent_id",
             "Контрагент":      "agent",

@@ -284,12 +284,16 @@ def save_excel(df: pd.DataFrame, name: str, reliable: bool = True):
 
 # ── Парсери ───────────────────────────────────────────────────────────────────
 
-def parse_demands(rows, agent_map=None, org_map=None):
+def parse_demands(rows, agent_map=None, org_map=None, currency_map=None):
     """v2.70: парсимо ТІЛЬКИ header — один рядок per demand (унікальний id).
     Positions винесено у parse_demand_positions() щоб ingest_to_d1 не дублював.
-    v2.77.2: + agent_map/org_map fallback resolve href→name (MoySklad ігнорує expand)."""
+    v2.77.2: + agent_map/org_map fallback resolve href→name (MoySklad ігнорує expand).
+    v2.78 (multi-currency): + currency_map. Sum_uah = sum_orig × rate. Зберігаємо ОБИДВА."""
+    currency_map = currency_map or {}
     records = []
     for r in rows:
+        iso, rate, sum_orig_grn, sum_uah_grn = _extract_rate_info(r, currency_map)
+        payed_orig = r.get("payedSum", 0) / 100
         base = {
             "id":               r.get("id"),
             "Дата":             r.get("moment", "")[:10],
@@ -298,10 +302,13 @@ def parse_demands(rows, agent_map=None, org_map=None):
             "Контрагент ID":    _extract_id(r.get("agent")),
             "Організація":      safe(r.get("organization")) or _resolve_href(r.get("organization"), org_map),
             "Склад":            safe(r.get("store")),
-            "Сума, грн":        r.get("sum", 0) / 100,
-            "ПДВ, грн":         r.get("vatSum", 0) / 100,
-            "Знижка, грн":      r.get("discountSum", 0) / 100,
-            "Оплачено, грн":    r.get("payedSum", 0) / 100,
+            "Сума, грн":        sum_uah_grn,                # v2.78: нормалізовано в UAH
+            "Сума ориг, грн":   sum_orig_grn,               # v2.78: оригінал у валюті документа
+            "Валюта":           iso,                         # v2.78
+            "Курс UAH":         rate,                        # v2.78
+            "ПДВ, грн":         (r.get("vatSum", 0) / 100) * rate,
+            "Знижка, грн":      (r.get("discountSum", 0) / 100) * rate,
+            "Оплачено, грн":    payed_orig * rate,           # v2.78: payedSum теж нормалізовано
             "Стан":             safe(r.get("state")),
             "Проект":           safe(r.get("project")),
             "Канал збуту":      safe(r.get("salesChannel")),
@@ -368,7 +375,7 @@ def _fetch_positions_parallel(demand_ids, workers=5):
     return result
 
 
-def parse_demand_positions(rows):
+def parse_demand_positions(rows, currency_map=None):
     """v2.70: окремий парсер для positions з ms_demands.
     Один рядок per (demand_id, position_idx). Дозволяє правильно ingest'ити у
     окрему D1 таблицю ms_demand_positions і отримувати TOP-10 продуктів per клієнт.
@@ -377,7 +384,12 @@ def parse_demand_positions(rows):
       Pass 1 — збираємо demand_ids у яких positions без inline rows
       Pass 2 — ThreadPoolExecutor паралельно fetch positions для них
       Pass 3 — assemble records з усіх позицій
-    Скорочує fallback з ~75 хв (sequential) до ~15-20 хв (5 workers parallel)."""
+    Скорочує fallback з ~75 хв (sequential) до ~15-20 хв (5 workers parallel).
+
+    v2.78 (multi-currency): + currency_map. Кожна позиція успадковує валюту і курс
+    від parent-demand. Зберігаємо ОБИДВА: price_orig/price_uah, sum_orig/sum_uah.
+    """
+    currency_map = currency_map or {}
     if not rows:
         return []
 
@@ -411,15 +423,24 @@ def parse_demand_positions(rows):
         moment = (r.get("moment", "") or "")[:10]
         pos_rows = inline_rows.get(demand_id) or fallback_rows.get(demand_id, [])
 
+        # v2.78: валюта і курс — від parent demand (positions не мають власної)
+        iso, rate, _, _ = _extract_rate_info(r, currency_map)
+
         for idx, p in enumerate(pos_rows):
+            price_orig = (p.get("price", 0) or 0) / 100
+            sum_orig = (p.get("sum", 0) or 0) / 100
             records.append({
                 "demand_id":   demand_id,
                 "position_idx": idx,
                 "Товар":       safe(p.get("assortment")),
                 "Товар ID":    _extract_id(p.get("assortment")),
                 "Кількість":   p.get("quantity", 0),
-                "Ціна, грн":   p.get("price", 0) / 100,
-                "Сума, грн":   p.get("sum", 0) / 100,
+                "Ціна, грн":       price_orig * rate,    # v2.78: UAH після конверсії
+                "Ціна ориг, грн":  price_orig,            # v2.78: оригінал
+                "Сума, грн":       sum_orig * rate,       # v2.78: UAH після конверсії
+                "Сума ориг, грн":  sum_orig,              # v2.78: оригінал
+                "Валюта":          iso,                    # v2.78
+                "Курс UAH":        rate,                   # v2.78
                 "Знижка %":    p.get("discount", 0),
                 "Контрагент ID": agent_id,
                 "Контрагент":   agent_name,
@@ -428,10 +449,15 @@ def parse_demand_positions(rows):
     return records
 
 
-def parse_customerorders(rows, agent_map=None, org_map=None):
-    """v2.77.2: + agent_map/org_map fallback resolve."""
+def parse_customerorders(rows, agent_map=None, org_map=None, currency_map=None):
+    """v2.77.2: + agent_map/org_map fallback resolve.
+    v2.78 (multi-currency): + currency_map. Sum_uah = sum_orig × rate."""
+    currency_map = currency_map or {}
     records = []
     for r in rows:
+        iso, rate, sum_orig_grn, sum_uah_grn = _extract_rate_info(r, currency_map)
+        payed_orig = (r.get("payedSum", 0) or 0) / 100
+        shipped_orig = (r.get("shippedSum", 0) or 0) / 100
         base = {
             "id":                   r.get("id"),
             "Дата":                 r.get("moment", "")[:10],
@@ -439,9 +465,12 @@ def parse_customerorders(rows, agent_map=None, org_map=None):
             "Контрагент":           safe(r.get("agent")) or _resolve_href(r.get("agent"), agent_map),
             "Контрагент ID":        _extract_id(r.get("agent")),
             "Організація":          safe(r.get("organization")) or _resolve_href(r.get("organization"), org_map),
-            "Сума, грн":            r.get("sum", 0) / 100,
-            "Оплачено, грн":        r.get("payedSum", 0) / 100,
-            "Відвантажено, грн":    r.get("shippedSum", 0) / 100,
+            "Сума, грн":            sum_uah_grn,
+            "Сума ориг, грн":       sum_orig_grn,
+            "Валюта":               iso,
+            "Курс UAH":             rate,
+            "Оплачено, грн":        payed_orig * rate,
+            "Відвантажено, грн":    shipped_orig * rate,
             "Стан":                 safe(r.get("state")),
             "Проект":               safe(r.get("project")),
             "Канал збуту":          safe(r.get("salesChannel")),
@@ -461,10 +490,13 @@ def parse_customerorders(rows, agent_map=None, org_map=None):
     return records
 
 
-def parse_salesreturns(rows, agent_map=None):
-    """v2.77.2: + agent_map fallback resolve."""
+def parse_salesreturns(rows, agent_map=None, currency_map=None):
+    """v2.77.2: + agent_map fallback resolve.
+    v2.78 (multi-currency): + currency_map."""
+    currency_map = currency_map or {}
     records = []
     for r in rows:
+        iso, rate, sum_orig_grn, sum_uah_grn = _extract_rate_info(r, currency_map)
         base = {
             "id":           r.get("id"),
             "Дата":         r.get("moment", "")[:10],
@@ -472,7 +504,10 @@ def parse_salesreturns(rows, agent_map=None):
             "Контрагент":   safe(r.get("agent")) or _resolve_href(r.get("agent"), agent_map),
             "Контрагент ID": _extract_id(r.get("agent")),
             "Склад":        safe(r.get("store")),
-            "Сума, грн":    r.get("sum", 0) / 100,
+            "Сума, грн":    sum_uah_grn,
+            "Сума ориг, грн": sum_orig_grn,
+            "Валюта":       iso,
+            "Курс UAH":     rate,
             "Стан":         safe(r.get("state")),
             "Коментар":     r.get("description", ""),
         }
@@ -483,7 +518,9 @@ def parse_salesreturns(rows, agent_map=None):
                 rec = base.copy()
                 rec["Товар"]     = safe(p.get("assortment"))
                 rec["Кількість"] = p.get("quantity", 0)
-                rec["Ціна, грн"] = p.get("price", 0) / 100
+                price_orig = (p.get("price", 0) or 0) / 100
+                rec["Ціна, грн"] = price_orig * rate
+                rec["Ціна ориг, грн"] = price_orig
                 records.append(rec)
         else:
             records.append(base)
@@ -584,26 +621,91 @@ def _resolve_href(obj, href_map):
     return href_map.get(href, "") if href_map and href else ""
 
 
-def parse_payments(rows, ptype, agent_map=None, expense_map=None, org_map=None):
+def parse_payments(rows, ptype, agent_map=None, expense_map=None, org_map=None, currency_map=None):
     """v2.72: + expenseItem (Стаття витрат) — критично для Finance Dashboard.
     v2.77.2: + agent_map/expense_map/org_map — fallback resolve href→name коли
-    MoySklad ігнорує expand. Без цього всі поля приходять як {meta:{href}} без name."""
-    return [{
-        "id":              r.get("id"),
-        "Тип":             ptype,
-        "Дата":            r.get("moment", "")[:10],
-        "Номер":           r.get("name"),
-        "Контрагент":      safe(r.get("agent")) or _resolve_href(r.get("agent"), agent_map),
-        "Контрагент ID":   _extract_id(r.get("agent")),
-        "Організація":     safe(r.get("organization")) or _resolve_href(r.get("organization"), org_map),
-        "Сума, грн":       r.get("sum", 0) / 100,
-        "Призначення":     r.get("paymentPurpose", ""),
-        "Стаття витрат":   safe(r.get("expenseItem")) or _resolve_href(r.get("expenseItem"), expense_map),
-        "Стаття витрат ID": _extract_id(r.get("expenseItem")),
-        "Рахунок":         safe(r.get("agentAccount")) or safe(r.get("organizationAccount")),
-        "Проект":          safe(r.get("project")),
-        "Стан":            safe(r.get("state")),
-    } for r in rows]
+    MoySklad ігнорує expand. Без цього всі поля приходять як {meta:{href}} без name.
+    v2.78 (multi-currency): + currency_map. ⚠ EUR-payments тепер показуються правильно (×rate)."""
+    currency_map = currency_map or {}
+    out = []
+    for r in rows:
+        iso, rate, sum_orig_grn, sum_uah_grn = _extract_rate_info(r, currency_map)
+        out.append({
+            "id":              r.get("id"),
+            "Тип":             ptype,
+            "Дата":            r.get("moment", "")[:10],
+            "Номер":           r.get("name"),
+            "Контрагент":      safe(r.get("agent")) or _resolve_href(r.get("agent"), agent_map),
+            "Контрагент ID":   _extract_id(r.get("agent")),
+            "Організація":     safe(r.get("organization")) or _resolve_href(r.get("organization"), org_map),
+            "Сума, грн":       sum_uah_grn,
+            "Сума ориг, грн":  sum_orig_grn,
+            "Валюта":          iso,
+            "Курс UAH":        rate,
+            "Призначення":     r.get("paymentPurpose", ""),
+            "Стаття витрат":   safe(r.get("expenseItem")) or _resolve_href(r.get("expenseItem"), expense_map),
+            "Стаття витрат ID": _extract_id(r.get("expenseItem")),
+            "Рахунок":         safe(r.get("agentAccount")) or safe(r.get("organizationAccount")),
+            "Проект":          safe(r.get("project")),
+            "Стан":            safe(r.get("state")),
+        })
+    return out
+
+
+def _fetch_currency_map():
+    """v2.78 (multi-currency): тягне ВСІ валюти з MoySklad і будує href → isoCode mapping.
+    MoySklad currency має: name (повна назва), isoCode ('UAH'/'EUR'/'USD'), majorUnit тощо.
+    Використовуємо isoCode (3-літерний) — це канонічний код.
+    Fallback: name якщо isoCode відсутній. Empty map якщо API fail (UAH default).
+    """
+    import time as _time
+    url = f"{BASE_URL}/entity/currency"
+    href_map = {}
+    try:
+        r = requests.get(url, headers=HEADERS, params={"limit": 1000}, timeout=30)
+        if r.status_code != 200:
+            print(f"  ⚠️  currency lookup HTTP {r.status_code} → all docs default to UAH", flush=True)
+            return href_map
+        for row in r.json().get("rows", []):
+            href = (row.get("meta") or {}).get("href", "")
+            iso = row.get("isoCode") or row.get("name", "")
+            if href and iso:
+                href_map[href] = iso
+    except Exception as e:
+        print(f"  ⚠️  currency map fetch error: {e} → all docs default to UAH", flush=True)
+    print(f"  💱 currency map: {len(href_map)} валют (UAH, EUR, USD…)", flush=True)
+    return href_map
+
+
+def _extract_rate_info(doc, currency_map):
+    """v2.78: повертає (iso_code, rate_to_uah, sum_orig_grn, sum_uah_grn) з MoySklad документа.
+
+    MoySklad doc.rate = {currency: {meta:{href}}, value: <float>}
+    - value = курс у одиницях base currency (UAH) за 1 одиницю валюти документа
+    - sum = сума в копійках валюти документа (якщо EUR — то євроцентах!)
+
+    Якщо rate.value відсутній або 0 → 1.0 (UAH passthrough).
+    Якщо currency не у map → 'UAH' (default).
+
+    Повертає 4 значення для зручності parse_* функцій:
+      iso_code      : 'UAH' / 'EUR' / 'USD'
+      rate_to_uah   : 1.0 / 41.5 / 39.2
+      sum_orig_grn  : сума у валюті документа (грн-style float, як було)
+      sum_uah_grn   : сума у грн (UAH після конверсії)
+    """
+    rate_obj = doc.get("rate") or {}
+    rate_val = rate_obj.get("value")
+    cur_href = ((rate_obj.get("currency") or {}).get("meta") or {}).get("href", "")
+
+    iso = currency_map.get(cur_href, "UAH")
+    # Якщо rate.value не задано — MoySklad це робить для UAH-документів (= 1.0)
+    rate = float(rate_val) if (rate_val and rate_val > 0) else 1.0
+
+    sum_kop_raw = doc.get("sum", 0)
+    sum_orig_grn = sum_kop_raw / 100  # у валюті документа
+    sum_uah_grn = sum_orig_grn * rate  # нормалізовано в UAH
+
+    return iso, rate, sum_orig_grn, sum_uah_grn
 
 
 def fetch_lookup_map(endpoint):
@@ -656,20 +758,30 @@ def fetch_lookup_map(endpoint):
     return href_map
 
 
-def parse_invoicesout(rows, agent_map=None):
-    """v2.77.2: + agent_map fallback resolve."""
-    return [{
-        "id":           r.get("id"),
-        "Дата":         r.get("moment", "")[:10],
-        "Номер":        r.get("name"),
-        "Контрагент":   safe(r.get("agent")) or _resolve_href(r.get("agent"), agent_map),
-        "Контрагент ID": _extract_id(r.get("agent")),
-        "Сума, грн":    r.get("sum", 0) / 100,
-        "Оплачено, грн":r.get("payedSum", 0) / 100,
-        "Стан":         safe(r.get("state")),
-        # v2.65: planned payment date — критично для AR aging у Finance Dashboard
-        "Очікувана оплата": (r.get("paymentPlannedMoment") or "")[:10],
-    } for r in rows]
+def parse_invoicesout(rows, agent_map=None, currency_map=None):
+    """v2.77.2: + agent_map fallback resolve.
+    v2.78 (multi-currency): + currency_map. EUR-рахунки тепер нормалізовано в UAH."""
+    currency_map = currency_map or {}
+    out = []
+    for r in rows:
+        iso, rate, sum_orig_grn, sum_uah_grn = _extract_rate_info(r, currency_map)
+        payed_orig = (r.get("payedSum", 0) or 0) / 100
+        out.append({
+            "id":           r.get("id"),
+            "Дата":         r.get("moment", "")[:10],
+            "Номер":        r.get("name"),
+            "Контрагент":   safe(r.get("agent")) or _resolve_href(r.get("agent"), agent_map),
+            "Контрагент ID": _extract_id(r.get("agent")),
+            "Сума, грн":    sum_uah_grn,
+            "Сума ориг, грн": sum_orig_grn,
+            "Валюта":       iso,
+            "Курс UAH":     rate,
+            "Оплачено, грн": payed_orig * rate,
+            "Стан":         safe(r.get("state")),
+            # v2.65: planned payment date — критично для AR aging у Finance Dashboard
+            "Очікувана оплата": (r.get("paymentPlannedMoment") or "")[:10],
+        })
+    return out
 
 
 def parse_supply(rows):  # ⚠️ дані можуть бути неповними
@@ -845,13 +957,15 @@ def main():
     expense_map = fetch_lookup_map("entity/expenseitem")
     org_map = fetch_lookup_map("entity/organization")
     cp_map = fetch_lookup_map("entity/counterparty")
+    # v2.78 (multi-currency): currency map для resolve isoCode і конверсії у UAH
+    currency_map = _fetch_currency_map()
 
     print("\n📦 Відвантаження...")
     # v2.70: + expand=positions.assortment щоб витягти товарні позиції з кожного відвантаження
     rows = fetch_all("entity/demand", expand="agent,store,organization,state,positions.assortment")
-    save_excel(pd.DataFrame(parse_demands(rows, agent_map=cp_map, org_map=org_map)), "demands", reliable=True)
+    save_excel(pd.DataFrame(parse_demands(rows, agent_map=cp_map, org_map=org_map, currency_map=currency_map)), "demands", reliable=True)
     # v2.70: окремо позиції — для ТОП-10 продуктів per клієнт у Customer 360
-    pos_records = parse_demand_positions(rows)
+    pos_records = parse_demand_positions(rows, currency_map=currency_map)
     save_excel(pd.DataFrame(pos_records), "demand_positions", reliable=True)
     print(f"   📦 Витягнуто {len(pos_records)} товарних позицій з {len(rows)} відвантажень", flush=True)
 
@@ -882,17 +996,18 @@ def main():
             print(f"     ATTRIBUTES: none", flush=True)
 
     # v2.77.2: pass lookup maps щоб resolve href→name
-    records = parse_payments(rows_in, "Вхідний", agent_map=cp_map, expense_map=expense_map, org_map=org_map) \
-            + parse_payments(rows_out, "Вихідний", agent_map=cp_map, expense_map=expense_map, org_map=org_map)
+    # v2.78: + currency_map для EUR/USD конверсії
+    records = parse_payments(rows_in, "Вхідний", agent_map=cp_map, expense_map=expense_map, org_map=org_map, currency_map=currency_map) \
+            + parse_payments(rows_out, "Вихідний", agent_map=cp_map, expense_map=expense_map, org_map=org_map, currency_map=currency_map)
     save_excel(pd.DataFrame(records), "payments", reliable=True)
 
     print("\n🛒 Замовлення покупців...")
     rows = fetch_all("entity/customerorder", expand="agent,state")
-    save_excel(pd.DataFrame(parse_customerorders(rows, agent_map=cp_map, org_map=org_map)), "customer_orders", reliable=True)
+    save_excel(pd.DataFrame(parse_customerorders(rows, agent_map=cp_map, org_map=org_map, currency_map=currency_map)), "customer_orders", reliable=True)
 
     print("\n↩️  Повернення від покупців...")
     rows = fetch_all("entity/salesreturn", expand="agent,store,state")
-    save_excel(pd.DataFrame(parse_salesreturns(rows, agent_map=cp_map)), "sales_returns", reliable=True)
+    save_excel(pd.DataFrame(parse_salesreturns(rows, agent_map=cp_map, currency_map=currency_map)), "sales_returns", reliable=True)
 
     print("\n👥 Контрагенти...", flush=True)
     # При SYNC_MODE=full витягуємо ВСІХ контрагентів (не тільки updated за вікно),
@@ -932,7 +1047,7 @@ def main():
         if rows:
             print(f"   🔍 sample row keys: {list(rows[0].keys())[:10]}", flush=True)
             print(f"   🔍 sample row.name={rows[0].get('name')}, moment={rows[0].get('moment','')[:10]}, sum={rows[0].get('sum',0)/100}", flush=True)
-        parsed = parse_invoicesout(rows, agent_map=cp_map)
+        parsed = parse_invoicesout(rows, agent_map=cp_map, currency_map=currency_map)
         print(f"   ✅ parse_invoicesout returned {len(parsed)} records", flush=True)
         save_excel(pd.DataFrame(parsed), "invoices_out", reliable=True)
         print(f"   📋 Завантажено рахунків: {len(rows)}", flush=True)

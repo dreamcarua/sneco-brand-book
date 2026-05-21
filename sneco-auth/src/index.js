@@ -592,22 +592,25 @@ function escapeHtmlSrv(s) {
 // =====================================================================
 
 // Maps entity name → table + allowed columns (whitelist for safety)
+// v2.78 (multi-currency, 2026-05-20): + currency, rate_to_uah, sum_orig_kop у транзакційних
+// таблицях. sum_kop тепер ЗАВЖДИ у UAH (нормалізовано через rate_to_uah), sum_orig_kop —
+// оригінал у валюті документа (EUR-сценах для EUR-doc, UAH-копійках для UAH-doc).
 const DASHBOARD_TABLES = {
   demands: {
     table: 'ms_demands',
-    cols: ['id','ms_moment','name','sum_kop','organization','agent','agent_id','store','contract','state','applicable','vat_included','vat_enabled','payed_sum_kop','raw_json','ingested_at'],
+    cols: ['id','ms_moment','name','sum_kop','organization','agent','agent_id','store','contract','state','applicable','vat_included','vat_enabled','payed_sum_kop','currency','rate_to_uah','sum_orig_kop','raw_json','ingested_at'],
   },
   payments: {
     table: 'ms_payments',
-    cols: ['id','ms_moment','payment_type','name','sum_kop','organization','agent','agent_id','account','expense_item','expense_item_id','payment_purpose','raw_json','ingested_at'],
+    cols: ['id','ms_moment','payment_type','name','sum_kop','organization','agent','agent_id','account','expense_item','expense_item_id','payment_purpose','currency','rate_to_uah','sum_orig_kop','raw_json','ingested_at'],
   },
   orders: {
     table: 'ms_orders',
-    cols: ['id','ms_moment','name','sum_kop','shipped_sum_kop','payed_sum_kop','organization','agent','agent_id','store','contract','state','delivery_planned_moment','raw_json','ingested_at'],
+    cols: ['id','ms_moment','name','sum_kop','shipped_sum_kop','payed_sum_kop','organization','agent','agent_id','store','contract','state','delivery_planned_moment','currency','rate_to_uah','sum_orig_kop','raw_json','ingested_at'],
   },
   returns: {
     table: 'ms_returns',
-    cols: ['id','ms_moment','name','sum_kop','organization','agent','agent_id','store','demand_id','raw_json','ingested_at'],
+    cols: ['id','ms_moment','name','sum_kop','organization','agent','agent_id','store','demand_id','currency','rate_to_uah','sum_orig_kop','raw_json','ingested_at'],
   },
   products: {
     table: 'ms_products',
@@ -619,7 +622,7 @@ const DASHBOARD_TABLES = {
   },
   invoices_out: {
     table: 'ms_invoices_out',
-    cols: ['id','ms_moment','name','sum_kop','organization','agent','agent_id','payment_planned_moment','payed_sum_kop','state','raw_json','ingested_at'],
+    cols: ['id','ms_moment','name','sum_kop','organization','agent','agent_id','payment_planned_moment','payed_sum_kop','state','currency','rate_to_uah','sum_orig_kop','raw_json','ingested_at'],
   },
   moves: {
     table: 'ms_moves',
@@ -633,24 +636,24 @@ const DASHBOARD_TABLES = {
   // Customer 360 використовує для TOP-10 продуктів per клієнт.
   demand_positions: {
     table: 'ms_demand_positions',
-    cols: ['demand_id','position_idx','product_name','product_id','quantity','price_kop','sum_kop','discount_pct','agent_id','agent','ms_moment','raw_json','ingested_at'],
+    cols: ['demand_id','position_idx','product_name','product_id','quantity','price_kop','sum_kop','discount_pct','agent_id','agent','ms_moment','currency','rate_to_uah','sum_orig_kop','price_orig_kop','raw_json','ingested_at'],
   },
   // v2.77.5 — Procurement Dashboard (Pylyp PR #1): 4 нові entities для виробничого циклу
   processings: {
     table: 'ms_processings',
-    cols: ['id','ms_moment','name','organization_id','organization','processing_plan_id','processing_plan_name','quantity','processing_sum_kop','applicable','raw_json','updated_at'],
+    cols: ['id','ms_moment','name','organization_id','organization','processing_plan_id','processing_plan_name','quantity','processing_sum_kop','applicable','currency','rate_to_uah','processing_sum_orig_kop','raw_json','updated_at'],
   },
   processing_materials: {
     table: 'ms_processing_materials',
-    cols: ['id','processing_id','position_id','assortment_id','quantity','price_kop','raw_json'],
+    cols: ['id','processing_id','position_id','assortment_id','quantity','price_kop','currency','rate_to_uah','price_orig_kop','raw_json'],
   },
   processing_products: {
     table: 'ms_processing_products',
-    cols: ['id','processing_id','position_id','assortment_id','quantity','price_kop','raw_json'],
+    cols: ['id','processing_id','position_id','assortment_id','quantity','price_kop','currency','rate_to_uah','price_orig_kop','raw_json'],
   },
   stocks: {
     table: 'ms_stocks',
-    cols: ['assortment_id','name','code','article','folder_name','folder_path','uom_name','stock','in_transit','reserve','quantity','price_kop','sale_price_kop','stock_days','snapshot_at','raw_json'],
+    cols: ['assortment_id','name','code','article','folder_name','folder_path','uom_name','stock','in_transit','reserve','quantity','price_kop','sale_price_kop','stock_days','snapshot_at','currency','rate_to_uah','price_orig_kop','sale_price_orig_kop','raw_json'],
   },
 };
 
