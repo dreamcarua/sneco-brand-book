@@ -722,6 +722,21 @@ window.setCustMetric = function(m){
   }
 };
 
+// v2.78.13 (Богдан): Overview-level "Продажі за смаками" — multi-select SKU + metric toggle
+if (typeof window._ovSKUFilter === 'undefined') window._ovSKUFilter = null;
+if (typeof window._ovMetric === 'undefined') window._ovMetric = 'sum';
+if (typeof window._ovProdPeriod === 'undefined') window._ovProdPeriod = 'last_month';
+window.toggleOvSKU = function(skuName){
+  if (!window._ovSKUFilter) window._ovSKUFilter = new Set();
+  if (window._ovSKUFilter.has(skuName)) window._ovSKUFilter.delete(skuName);
+  else window._ovSKUFilter.add(skuName);
+  if (window._ovSKUFilter.size === 0) window._ovSKUFilter = null;
+  renderOverview();
+};
+window.resetOvSKUFilter = function(){ window._ovSKUFilter = null; renderOverview(); };
+window.setOvMetric = function(m){ window._ovMetric = m; renderOverview(); };
+window.setOvProdPeriod = function(k){ window._ovProdPeriod = k; renderOverview(); };
+
 // v2.78.7 (Богдан): sort TOP-100 продуктів картки клієнта
 window.setTopProdSort = function(key){
   // Toggle direction якщо той самий key, інакше reset to desc
@@ -2026,6 +2041,9 @@ function _buildOverviewHtml(){
         </div>
       </div>
 
+      <!-- v2.78.13 (Богдан): Продажі за смаками — портфельний breakdown SKU з multi-select + metric toggle -->
+      ${_buildPortfolioSKUHtml()}
+
       <!-- TIER 3: ПДЗ — Прострочена дебіторка + action items (v2.78.4: TOP-100 з scroll) -->
       <div class="ov-section">
         <div class="ov-section-title">🎯 Прострочена дебіторка (ПДЗ) — дзвонити сьогодні <button class="ovm-xlsx-btn" onclick="event.stopPropagation(); exportBlockXLSX('pdz')">⬇ Excel</button></div>
@@ -2384,6 +2402,126 @@ function _drawBarDataLabels(chart){
     ctx.fillText(label, x, y);
   });
   ctx.restore();
+}
+
+// v2.78.13 (Богдан): "Продажі за смаками" на Overview — портфельний SKU breakdown
+function _buildPortfolioSKUHtml(){
+  if (!allDemandPositions || allDemandPositions.length === 0) {
+    return `<div class="ov-section"><div class="ov-section-title">📦 Продажі за смаками (портфель)</div>
+      <div class="ov-mover-empty">demand_positions пуста — чекаємо sync</div></div>`;
+  }
+  const now = new Date();
+  const period = _legacyPeriodRange(now, window._ovProdPeriod || 'last_month');
+  const fromIso = period.from.toISOString().slice(0,10);
+  const toIso = period.to.toISOString().slice(0,10);
+
+  // Aggregate per-SKU
+  const skuMap = {};
+  allDemandPositions.forEach(p => {
+    const dt = (p.ms_moment || '').slice(0,10);
+    if (dt < fromIso || dt > toIso) return;
+    const name = p.product_name || p.assortment_name || p.name;
+    if (!name) return;
+    const qty = Number(p.quantity || 0);
+    let sum = (p.sum_kop || 0) / 100;
+    if (sum === 0 && qty > 0) {
+      const price = (p.price_kop || 0) / 100;
+      if (price > 0) sum = price * qty;
+    }
+    if (!skuMap[name]) skuMap[name] = { qty: 0, sum: 0, kg: 0 };
+    skuMap[name].qty += qty;
+    skuMap[name].sum += sum;
+    skuMap[name].kg += (window.extractWeightG(name) * qty) / 1000;
+  });
+
+  const filter = window._ovSKUFilter;
+  const metric = window._ovMetric || 'sum';
+  const filteredSkuMap = filter
+    ? Object.fromEntries(Object.entries(skuMap).filter(([n]) => filter.has(n)))
+    : skuMap;
+  const total = Object.values(filteredSkuMap).reduce((a,x) => a + (x[metric]||0), 0);
+  const allSkus = Object.entries(skuMap).sort((a,b) => (b[1].sum||0)-(a[1].sum||0)).map(([n])=>n);
+  const top = Object.entries(filteredSkuMap)
+    .sort((a,b) => (b[1][metric]||0) - (a[1][metric]||0))
+    .slice(0, 100);
+
+  const metricLabel = metric==='kg' ? '⚖ Вага кг' : metric==='qty' ? '🔢 Штук' : '💰 Виручка ₴';
+
+  const periodChips = `
+    <div class="prod-period-bar" style="margin:0 0 8px 0">
+      <span class="prod-period-bar-lbl">Період</span>
+      <button class="prod-chip ${window._ovProdPeriod==='7d' ? 'active' : ''}" onclick="setOvProdPeriod('7d')">7 днів</button>
+      <button class="prod-chip ${window._ovProdPeriod==='30d' ? 'active' : ''}" onclick="setOvProdPeriod('30d')">30 днів</button>
+      <button class="prod-chip ${window._ovProdPeriod==='last_month' ? 'active' : ''}" onclick="setOvProdPeriod('last_month')">Минулий місяць</button>
+      <button class="prod-chip ${window._ovProdPeriod==='current_q' ? 'active' : ''}" onclick="setOvProdPeriod('current_q')">Поточний квартал</button>
+      <button class="prod-chip ${window._ovProdPeriod==='ytd' ? 'active' : ''}" onclick="setOvProdPeriod('ytd')">З початку року</button>
+      <button class="prod-chip ${window._ovProdPeriod==='last_year' ? 'active' : ''}" onclick="setOvProdPeriod('last_year')">Минулий рік</button>
+    </div>`;
+
+  const metricChips = `
+    <div class="prod-period-bar" style="margin:0 0 8px 0">
+      <span class="prod-period-bar-lbl">Метрика</span>
+      <button class="prod-chip ${metric==='sum' ? 'active' : ''}" onclick="setOvMetric('sum')">💰 Виручка ₴</button>
+      <button class="prod-chip ${metric==='qty' ? 'active' : ''}" onclick="setOvMetric('qty')">🔢 Штук</button>
+      <button class="prod-chip ${metric==='kg' ? 'active' : ''}" onclick="setOvMetric('kg')">⚖ Вага кг</button>
+      <span style="color:var(--muted);font-size:11px;margin:0 4px">·</span>
+      <details style="display:inline-block;position:relative">
+        <summary class="prod-chip ${filter?'active':''}" style="cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:4px">
+          📦 SKU ${filter?`(${filter.size})`:''} ▾
+        </summary>
+        <div style="position:absolute;top:100%;left:0;background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px;max-height:340px;overflow-y:auto;min-width:320px;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,.12);margin-top:4px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:11px">
+            <span style="color:var(--muted)">Multi-select усіх SKU портфеля</span>
+            ${filter ? `<a href="javascript:void(0)" onclick="resetOvSKUFilter()" style="color:var(--red)">скинути</a>` : ''}
+          </div>
+          ${allSkus.map(sku => `
+            <label style="display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background='#FFF9E5'" onmouseout="this.style.background=''">
+              <input type="checkbox" ${filter?.has(sku)?'checked':''} onchange="toggleOvSKU('${escapeAttr(sku)}')" style="cursor:pointer">
+              <span>${escapeHtml(sku)}</span>
+            </label>`).join('')}
+        </div>
+      </details>
+    </div>`;
+
+  const table = top.length === 0
+    ? `<div class="ov-mover-empty">Жодного SKU у цьому періоді ${filter?'(після фільтру)':''}</div>`
+    : `<div style="overflow-y:auto;max-height:560px;scrollbar-width:thin">
+        <table class="dt" style="position:relative;width:100%">
+          <thead style="position:sticky;top:0;background:#FAFAF5;z-index:2">
+            <tr>
+              <th style="width:28px">#</th>
+              <th>SKU</th>
+              <th style="text-align:right">Шт</th>
+              <th style="text-align:right">Вага кг</th>
+              <th style="text-align:right">Виручка ₴</th>
+              <th style="text-align:right">% портфелю <span style="font-size:9px;color:var(--muted)">(${metricLabel.split(' ').pop()})</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${top.map(([n,obj],i) => {
+              const v = obj[metric] || 0;
+              const pct = total > 0 ? (v/total*100).toFixed(1) : '0';
+              return `<tr>
+                <td class="rank">${i+1}</td>
+                <td style="font-size:12px">${escapeHtml(n)}</td>
+                <td style="text-align:right;${metric==='qty'?'font-weight:700;color:#4a7000':'color:#555'}">${obj.qty ? nf(Math.round(obj.qty)) : '—'}</td>
+                <td style="text-align:right;${metric==='kg'?'font-weight:700;color:#4a7000':'color:#555'}">${obj.kg ? nf(obj.kg.toFixed(2)) : '—'}</td>
+                <td style="text-align:right;${metric==='sum'?'font-weight:700;color:#4a7000':'font-weight:500'}">${nfm(obj.sum)}</td>
+                <td style="text-align:right;color:var(--muted);font-size:11px">${pct}%</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>`;
+
+  return `
+    <div class="ov-section">
+      <div class="ov-section-title">📦 Продажі за смаками · ${period.label} · ${metricLabel}${filter?` · фільтр ${filter.size} SKU`:''}</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Усі SKU портфеля snEco у обраному періоді. Multi-select SKU + toggle метрики. Вага парситься з назви (28г/14г/500г).</div>
+      ${periodChips}
+      ${metricChips}
+      ${table}
+    </div>`;
 }
 
 // v2.78.11 (Богдан): TOP-25 + TOP-10 → один TOP-100 з period chips. Dormant теж з 30/60/90/180.
