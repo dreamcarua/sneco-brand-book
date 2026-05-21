@@ -679,6 +679,49 @@ window.setNewPeriod = function(days){
   _newPeriodDays = days;
   renderOverview();
 };
+// v2.78.12 (Богдан): універсальні helper'и для multi-select SKU + metric toggle (вага/шт/₴)
+// Витягуємо вагу з назви SKU: "snEco Гауда 28г", "snEco \"Чеддер\" 500г", "Микс 14/20г" → грами
+window.extractWeightG = function(name){
+  if (!name) return 0;
+  // Шукаємо ШТУКИ × ВАГУ для коробів: "25 упаковок ... 28г" → 25 × 28
+  const showbox = name.match(/(\d+)\s*(?:уп|шт)[^,]*?(\d+)\s*[гgr]/i);
+  if (showbox) return parseInt(showbox[1],10) * parseInt(showbox[2],10);
+  // Простий "28г" / "500 г" / "14 g"
+  const single = name.match(/(\d+)\s*[гgr](?:рам|\b)/i);
+  if (single) return parseInt(single[1], 10);
+  return 0;
+};
+
+// Customer 360 state: vybrаніSKU (Set) + metric ('sum'/'qty'/'kg')
+if (typeof window._custSKUFilter === 'undefined') window._custSKUFilter = null;  // null = усі
+if (typeof window._custMetric === 'undefined') window._custMetric = 'sum';        // 'sum' | 'qty' | 'kg'
+
+window.toggleCustSKU = function(skuName){
+  if (!window._custSKUFilter) window._custSKUFilter = new Set();
+  if (window._custSKUFilter.has(skuName)) window._custSKUFilter.delete(skuName);
+  else window._custSKUFilter.add(skuName);
+  if (window._custSKUFilter.size === 0) window._custSKUFilter = null;
+  // Re-render картки клієнта
+  if (typeof _currentCustKey !== 'undefined' && _currentCustKey) {
+    const c = allCounterparties.find(x => x.__key === _currentCustKey || x.name === _currentCustKey);
+    if (c) renderCustomerView(c);
+  }
+};
+window.resetCustSKUFilter = function(){
+  window._custSKUFilter = null;
+  if (typeof _currentCustKey !== 'undefined' && _currentCustKey) {
+    const c = allCounterparties.find(x => x.__key === _currentCustKey || x.name === _currentCustKey);
+    if (c) renderCustomerView(c);
+  }
+};
+window.setCustMetric = function(m){
+  window._custMetric = m;
+  if (typeof _currentCustKey !== 'undefined' && _currentCustKey) {
+    const c = allCounterparties.find(x => x.__key === _currentCustKey || x.name === _currentCustKey);
+    if (c) renderCustomerView(c);
+  }
+};
+
 // v2.78.7 (Богдан): sort TOP-100 продуктів картки клієнта
 window.setTopProdSort = function(key){
   // Toggle direction якщо той самий key, інакше reset to desc
@@ -2825,9 +2868,11 @@ function renderCustomerView(c){
       const price = (p.price_kop || 0) / 100;
       if (price > 0) sum = price * qty;
     }
-    if (!productMap[name]) productMap[name] = { qty: 0, sum: 0 };
+    if (!productMap[name]) productMap[name] = { qty: 0, sum: 0, kg: 0 };
     productMap[name].qty += qty;
     productMap[name].sum += sum;
+    // v2.78.12: вага в кг (грами з SKU × quantity / 1000)
+    productMap[name].kg += (window.extractWeightG(name) * qty) / 1000;
   });
   // Fallback: якщо positions порожні — спробувати raw_json
   if (Object.keys(productMap).length === 0) {
@@ -2836,22 +2881,32 @@ function renderCustomerView(c){
       try { raw = typeof d.raw_json === 'string' ? JSON.parse(d.raw_json) : (d.raw_json||{}); } catch(e){}
       const prod = raw['Товар'] || raw['product'] || null;
       if (prod) {
-        if (!productMap[prod]) productMap[prod] = { qty: 0, sum: 0 };
+        if (!productMap[prod]) productMap[prod] = { qty: 0, sum: 0, kg: 0 };
         productMap[prod].sum += (d.sum_kop||0)/100;
       }
     });
   }
-  const productTotal = Object.values(productMap).reduce((a,x) => a + (x.sum||0), 0);
-  // v2.78.7 (Богдан): TOP-100 з scroll + sortable. Sort default = sum DESC. UI клік на header перевпорядковує.
-  const _topProdSortKey = window._topProdSort || 'sum';
+  // v2.78.12 (Богдан): apply SKU multi-select filter якщо є
+  const _custSKUFilter = window._custSKUFilter;
+  const _custMetric = window._custMetric || 'sum';
+  const filteredProductMap = _custSKUFilter
+    ? Object.fromEntries(Object.entries(productMap).filter(([n]) => _custSKUFilter.has(n)))
+    : productMap;
+  const productTotal = Object.values(filteredProductMap).reduce((a,x) => a + (x[_custMetric]||0), 0);
+  // v2.78.7 (Богдан): TOP-100 з scroll + sortable. v2.78.12: filtered + metric-aware.
+  const _topProdSortKey = window._topProdSort || _custMetric;
   const _topProdSortDir = window._topProdSortDir || 'desc';
-  const topProducts = Object.entries(productMap)
+  const topProducts = Object.entries(filteredProductMap)
     .sort((a,b) => {
-      const va = _topProdSortKey === 'qty' ? (a[1].qty||0) : (a[1].sum||0);
-      const vb = _topProdSortKey === 'qty' ? (b[1].qty||0) : (b[1].sum||0);
+      const va = a[1][_topProdSortKey] || 0;
+      const vb = b[1][_topProdSortKey] || 0;
       return _topProdSortDir === 'desc' ? vb - va : va - vb;
     })
     .slice(0, 100);
+  // Список ВСІХ SKU клієнта (для dropdown multi-select) — sorted by sum DESC
+  const allClientSKUs = Object.entries(productMap)
+    .sort((a,b) => (b[1].sum||0) - (a[1].sum||0))
+    .map(([n]) => n);
   const usingPositions = positionsForCust.length > 0;
 
   // v2.78.10 (Богдан bug fix): BAG — раніше рахували (today - payment_planned), що для
@@ -3354,14 +3409,38 @@ function renderCustomerView(c){
     <div class="g2" style="margin-top:14px">
       <div class="cc" data-block="product-mix">
         <div class="cc-head">
-          <div>
+          <div style="flex:1">
             <div class="cc-title">🛒 ТОП-100 продуктів <span style="font-size:10px;color:var(--muted);font-weight:500">(scroll до повного списку)</span></div>
             <div class="cc-sub">${usingPositions ? `ms_demand_positions · ${positionsForCust.length} позицій` : 'fallback з raw_json'}${
               _productPeriodDays ? ` · фільтр: останні ${_productPeriodDays} днів` :
               _productCustomRange ? ` · фільтр: ${_productCustomRange.from} → ${_productCustomRange.to}` :
               ' · усі дати'
-            } · sort ${_topProdSortKey === 'qty' ? '↓ кількість' : '↓ виручка'}</div>
+            } · показ: ${_custMetric === 'kg' ? '⚖ Вага кг' : _custMetric === 'qty' ? '🔢 Штук' : '💰 Виручка ₴'}${_custSKUFilter ? ` · фільтр ${_custSKUFilter.size} SKU` : ''}</div>
           </div>
+        </div>
+        <!-- v2.78.12 (Богдан): metric chips + multi-select SKU dropdown -->
+        <div class="prod-period-bar" style="margin:8px 0 6px 0">
+          <span class="prod-period-bar-lbl">Метрика</span>
+          <button class="prod-chip ${_custMetric==='sum' ? 'active' : ''}" onclick="setCustMetric('sum')">💰 Виручка ₴</button>
+          <button class="prod-chip ${_custMetric==='qty' ? 'active' : ''}" onclick="setCustMetric('qty')">🔢 Штук</button>
+          <button class="prod-chip ${_custMetric==='kg' ? 'active' : ''}" onclick="setCustMetric('kg')">⚖ Вага кг</button>
+          <span style="color:var(--muted);font-size:11px;margin:0 4px">·</span>
+          <details style="display:inline-block;position:relative">
+            <summary class="prod-chip ${_custSKUFilter?'active':''}" style="cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:4px">
+              📦 Smaki/SKU ${_custSKUFilter?`(${_custSKUFilter.size})`:''} ▾
+            </summary>
+            <div style="position:absolute;top:100%;left:0;background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px;max-height:300px;overflow-y:auto;min-width:280px;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,.12);margin-top:4px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:11px">
+                <span style="color:var(--muted)">Обрати декілька (multi-select)</span>
+                ${_custSKUFilter ? `<a href="javascript:void(0)" onclick="resetCustSKUFilter()" style="color:var(--red)">скинути</a>` : ''}
+              </div>
+              ${allClientSKUs.map(sku => `
+                <label style="display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background='#FFF9E5'" onmouseout="this.style.background=''">
+                  <input type="checkbox" ${_custSKUFilter?.has(sku)?'checked':''} onchange="toggleCustSKU('${escapeAttr(sku)}')" style="cursor:pointer">
+                  <span>${escapeHtml(sku)}</span>
+                </label>`).join('')}
+            </div>
+          </details>
         </div>
         <!-- v2.76.3: period filter chips для ТОП-10 продуктів -->
         <div class="prod-period-bar">
@@ -3385,24 +3464,28 @@ function renderCustomerView(c){
               <tr>
                 <th style="width:28px">#</th>
                 <th>Продукт</th>
-                <th style="text-align:right;cursor:pointer;user-select:none" onclick="window.setTopProdSort('qty')" title="Клік щоб сортувати">Кількість ${_topProdSortKey==='qty' ? (_topProdSortDir==='desc'?'↓':'↑') : '⇅'}</th>
-                <th style="text-align:right;cursor:pointer;user-select:none" onclick="window.setTopProdSort('sum')" title="Клік щоб сортувати">Виручка ${_topProdSortKey==='sum' ? (_topProdSortDir==='desc'?'↓':'↑') : '⇅'}</th>
-                <th style="text-align:right">% клієнта</th>
+                <th style="text-align:right;cursor:pointer;user-select:none" onclick="window.setTopProdSort('qty')" title="Клік щоб сортувати">Шт ${_topProdSortKey==='qty' ? (_topProdSortDir==='desc'?'↓':'↑') : '⇅'}</th>
+                <th style="text-align:right;cursor:pointer;user-select:none" onclick="window.setTopProdSort('kg')" title="Клік щоб сортувати">Вага кг ${_topProdSortKey==='kg' ? (_topProdSortDir==='desc'?'↓':'↑') : '⇅'}</th>
+                <th style="text-align:right;cursor:pointer;user-select:none" onclick="window.setTopProdSort('sum')" title="Клік щоб сортувати">Виручка ₴ ${_topProdSortKey==='sum' ? (_topProdSortDir==='desc'?'↓':'↑') : '⇅'}</th>
+                <th style="text-align:right">% клієнта <span style="font-size:9px;color:var(--muted)">(за обр. метрикою)</span></th>
               </tr>
             </thead>
             <tbody>
               ${topProducts.length
                 ? topProducts.map(([p,obj],i) => {
-                    const sharePct = productTotal > 0 ? (obj.sum/productTotal*100).toFixed(1) : '0';
+                    const metricVal = obj[_custMetric] || 0;
+                    const sharePct = productTotal > 0 ? (metricVal/productTotal*100).toFixed(1) : '0';
+                    const highlight = _custMetric;
                     return `<tr>
                       <td class="rank">${i+1}</td>
                       <td style="font-size:12px">${escapeHtml(p)}</td>
-                      <td style="text-align:right;color:#555">${obj.qty ? nf(Math.round(obj.qty)) : '—'}</td>
-                      <td style="text-align:right;font-weight:600">${nfm(obj.sum)} ₴</td>
+                      <td style="text-align:right;${highlight==='qty'?'font-weight:700;color:#4a7000':'color:#555'}">${obj.qty ? nf(Math.round(obj.qty)) : '—'}</td>
+                      <td style="text-align:right;${highlight==='kg'?'font-weight:700;color:#4a7000':'color:#555'}">${obj.kg ? nf(obj.kg.toFixed(2)) : '—'}</td>
+                      <td style="text-align:right;${highlight==='sum'?'font-weight:700;color:#4a7000':'font-weight:500'}">${nfm(obj.sum)}</td>
                       <td style="text-align:right;color:var(--muted);font-size:11px">${sharePct}%</td>
                     </tr>`;
                   }).join('')
-                : `<tr><td colspan="5"><div class="empty-state"><div class="es-icon">🛒</div><div class="es-title">Чекає на синхронізацію demand_positions</div><div class="es-sub">Запустіть Run у GitHub Actions або перевірте чи ingest наповнює таблицю</div></div></td></tr>`
+                : `<tr><td colspan="6"><div class="empty-state"><div class="es-icon">🛒</div><div class="es-title">${_custSKUFilter ? 'Жодного SKU з обраних не співпадає з фільтрами періоду' : 'Чекає на синхронізацію demand_positions'}</div><div class="es-sub">${_custSKUFilter ? 'Спробуй інші SKU або скинь фільтр' : 'Запустіть Run у GitHub Actions або перевірте чи ingest наповнює таблицю'}</div></div></td></tr>`
               }
             </tbody>
           </table>
