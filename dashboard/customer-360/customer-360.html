@@ -1379,11 +1379,23 @@ function calcNewAndLost(allCounterparties, opts){
     return m.firstOrder.slice(0,10) >= cutoffNew;
   }).sort((a,b) => (b.__metrics.totalShipped||0) - (a.__metrics.totalShipped||0)).slice(0, 100);
 
-  // LOST: lastOrder ≤ cutoffLost І totalShipped ≥ lostMinRev
+  // v2.78.3 (Богдан): LOST тепер window-based КОГОРТИ, не open-ended ≥.
+  //   30 днів  → клієнти що не замовляли 1-30 днів (нещодавно випали)
+  //   60 днів  → точно 31-60 днів
+  //   90 днів  → точно 61-90 днів
+  //   180 днів → точно 91-180 днів
+  // Тобто 32 дн не потрапляє у фільтр "30 днів" — це чітко "когорта 60 днів".
+  const LOST_RANGES = { 30: [1, 30], 60: [31, 60], 90: [61, 90], 180: [91, 180] };
+  const lostRange = LOST_RANGES[lostPeriodDays] || [Math.max(1, lostPeriodDays - 30), lostPeriodDays];
+  const lostOldest = new Date(Date.now() - lostRange[1] * 86400000).toISOString().slice(0,10);
+  const lostNewest = new Date(Date.now() - lostRange[0] * 86400000).toISOString().slice(0,10);
+
   const lostClients = pool.filter(c => {
     const m = c.__metrics;
     if (!m || !m.totalShipped || m.totalShipped < lostMinRev) return false;
-    return m.lastOrder && m.lastOrder.slice(0,10) <= cutoffLost;
+    if (!m.lastOrder) return false;
+    const lo = m.lastOrder.slice(0,10);
+    return lo >= lostOldest && lo <= lostNewest;
   }).sort((a,b) => (b.__metrics.totalShipped||0) - (a.__metrics.totalShipped||0)).slice(0, 100);
 
   return { newClients, lostClients };
@@ -1933,7 +1945,7 @@ function _buildOverviewHtml(){
                 </div>`).join('')}
           </div>
           <div class="ov-mover-card">
-            <div class="ov-mover-card-head">💔 Лост <span class="ovm-sub">${newLost.lostClients.length} · не замовляли &gt; ${_lostPeriodDays} днів, LTV ≥ ${nfm(_lostMinRev)} ₴</span></div>
+            <div class="ov-mover-card-head">💔 Лост · когорта ${_lostPeriodDays === 30 ? '1–30' : _lostPeriodDays === 60 ? '31–60' : _lostPeriodDays === 90 ? '61–90' : '91–180'} днів <span class="ovm-sub">${newLost.lostClients.length} клієнтів · LTV ≥ ${nfm(_lostMinRev)} ₴ · sort ↓ LTV</span></div>
             <div class="prod-period-bar" style="margin:0 0 8px 0;padding:6px 0;border:none">
               <span class="prod-period-bar-lbl">Не замовляли</span>
               <button class="prod-chip ${_lostPeriodDays===30 ? 'active' : ''}" onclick="setLostPeriod(30)">30 днів</button>
