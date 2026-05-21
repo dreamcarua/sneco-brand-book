@@ -1178,8 +1178,19 @@ function computeCustomerMetrics(c, allDemands, allReturns){
 
   // Overdue AR — demands з ms_moment > 30 днів і balance > 0
   const cutoff30 = new Date(Date.now() - 30*86400000).toISOString().slice(0,10);
+  // v2.78.1 (materiality threshold): MoySklad rounding artifacts створюють fake debts
+  // (рахунок 27895₴ оплачено 27894.26₴ → 0.74₴ "борг" = 0.003%). Ігнорувати < 1%.
+  const DEBT_THRESHOLD_PCT = 0.01;
+  const isMaterialDebt_csm = (d) => {
+    const sk = d.sum_kop || 0;
+    if (sk <= 0) return false;
+    const diff = sk - (d.payed_sum_kop || 0);
+    return diff > 0 && diff >= sk * DEBT_THRESHOLD_PCT;
+  };
   let overdueAR = 0;
   sorted.forEach(d => {
+    // v2.78.1: фільтр material debts only
+    if (!isMaterialDebt_csm(d)) return;
     const balanceUah = Math.round(((d.sum_kop||0) - (d.payed_sum_kop||0)) / 100);
     if (balanceUah > 0 && (d.ms_moment||'').slice(0,10) <= cutoff30) overdueAR += balanceUah;
   });
@@ -2305,8 +2316,17 @@ function renderCustomerView(c){
   // (напр. sum=4369023, paid=4369000 → balance=23 копійки → display округлює до "0 ₴",
   // але фільтр > 0 kop пропускав ці рядки у "Прострочену дебіторку").
   // Тепер фільтруємо на цілих гривнях (як на дисплеї).
-  const debtUah = d => Math.round(((d.sum_kop||0) - (d.payed_sum_kop||0)) / 100);
-  const openDemands = dems.filter(d => debtUah(d) > 0);
+  // v2.78.1 (materiality threshold 1%): ігнорувати rounding artifacts.
+  // Приклад: рахунок 27895₴ оплачено 27894.26₴ → diff 0.74₴ (0.003%) → НЕ борг.
+  const DEBT_THRESHOLD_PCT = 0.01;
+  const isMaterialDebt = (d) => {
+    const sk = d.sum_kop || 0;
+    if (sk <= 0) return false;
+    const diff = sk - (d.payed_sum_kop || 0);
+    return diff > 0 && diff >= sk * DEBT_THRESHOLD_PCT;
+  };
+  const debtUah = d => isMaterialDebt(d) ? Math.round(((d.sum_kop||0) - (d.payed_sum_kop||0)) / 100) : 0;
+  const openDemands = dems.filter(isMaterialDebt);
   const overdueDemands = openDemands.filter(d => (d.ms_moment||'').slice(0,10) <= dueCutoff);
   const freshDemands = openDemands.filter(d => (d.ms_moment||'').slice(0,10) > dueCutoff);
   const overdueAR = overdueDemands.reduce((a,d) => a + ((d.sum_kop||0)-(d.payed_sum_kop||0))/100, 0);
