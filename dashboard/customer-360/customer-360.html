@@ -638,7 +638,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.78.27 · GROUP BY toggle (SKU/Пакування/Смак) ТЕПЕР ВИДНО на головній (forgot to insert chips у return) + ТАКОЖ у картці клієнта TOP-100 продуктів · Cross-sell peers = 25 ТОП + 25 similar · Combined badge color fix · Оновлення: щодня 06:00
+  snEco Customer 360 v2.78.28 · Космічний 28г = 14г Чеддер + 14г МОЦАРЕЛЛА (виправлено, було помилково "Гауда") · GROUP BY toggle (SKU/Пакування/Смак) на головній + у картці клієнта · Cross-sell peers = 25 ТОП + 25 similar · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -2589,11 +2589,11 @@ window.detectPortfolioFlavors = function(name) {
   const totalWeight = window.extractWeightG(name);
   if (totalWeight === 0) return [];
 
-  // Космічний — 50/50 Чеддер + Гауда (одна назва, два рядки aggregation)
+  // Космічний — 50/50 Чеддер + Моцарелла (виправлено 22.05.2026: НЕ Гауда!)
   if (n.includes('космічн') || n.includes('cosmic')) {
     return [
       { flavor: 'Чеддер', weight: totalWeight / 2 },
-      { flavor: 'Гауда', weight: totalWeight / 2 },
+      { flavor: 'Моцарелла', weight: totalWeight / 2 },
     ];
   }
   // Мікси з горіхами — окрема група, рахуємо тільки сирову половину
