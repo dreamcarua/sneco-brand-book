@@ -190,7 +190,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ov-legacy-lists summary::-webkit-details-marker{display:none}
 .ov-legacy-lists summary::after{content:'▾';color:var(--muted)}
 .ov-legacy-lists details[open] summary::after{content:'▴'}
-.ov-legacy-lists details > div{margin-top:6px;max-height:480px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+/* v2.78.20: scroll тепер у кожній окремій таблиці _renderSection (340px max), а не на outer wrapper */
+.ov-legacy-lists details > div{margin-top:6px}
 .ov-legacy-lists details > div::-webkit-scrollbar{width:6px}
 .ov-legacy-lists details > div::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
@@ -637,7 +638,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.78.19 · Paginated fetch 10K chunks (Workers Free CPU fix — гарантовано без "через раз") · Combined badge · Cross-sell ТОП-10 list · isPackaging короб/showbox · компактніший Overview 480px · Богдан fixes · Оновлення: щодня 06:00
+  snEco Customer 360 v2.78.21 · Вага кг РАХУЄТЬСЯ (cyrillic \b regex fix) · Global isPackagingSKU (Гофроящики/Логістика/Короб без упаковок виключено зі ВСІХ блоків — Overview Продажі за смаками, TOP-100 продуктів, Cross-sell) · "(N упаковок)" розпізнається як товар не тара · ТОП-100 per-section scroll · Paginated fetch · Combined badge · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -681,17 +682,37 @@ window.setNewPeriod = function(days){
   _newPeriodDays = days;
   renderOverview();
 };
-// v2.78.12 (Богдан): універсальні helper'и для multi-select SKU + metric toggle (вага/шт/₴)
-// Витягуємо вагу з назви SKU: "snEco Гауда 28г", "snEco \"Чеддер\" 500г", "Микс 14/20г" → грами
+// v2.78.21 (Богдан): regex FIX — \b у JS не вважає кирилицю word char → "28г" не matched.
+// Замінено на negative lookahead (?![а-яa-z\d]) — match число + г якщо далі не літера/цифра.
+// ShowBox формат: "ShowBox (15 упаковок) ... 28г" → 15 × 28 = 420г
 window.extractWeightG = function(name){
   if (!name) return 0;
-  // Шукаємо ШТУКИ × ВАГУ для коробів: "25 упаковок ... 28г" → 25 × 28
-  const showbox = name.match(/(\d+)\s*(?:уп|шт)[^,]*?(\d+)\s*[гgr]/i);
+  // Pattern 1: ShowBox-стиль "Короб ShowBox (15 упаковок) ... 28г" → штуки × грам
+  const showbox = name.match(/(\d+)\s*(?:упаков|уп\.|уп\s|шт)[\s\S]*?(\d+)\s*(?:гр|г|g)(?![а-яa-z\d])/i);
   if (showbox) return parseInt(showbox[1],10) * parseInt(showbox[2],10);
-  // Простий "28г" / "500 г" / "14 g"
-  const single = name.match(/(\d+)\s*[гgr](?:рам|\b)/i);
+  // Pattern 2: simple "28г" / "500 г" / "14гр" / "100 gram"
+  const single = name.match(/(\d+)\s*(?:гр|г|gram|g)(?![а-яa-z\d])/i);
   if (single) return parseInt(single[1], 10);
   return 0;
+};
+
+// v2.78.21 (Богдан): GLOBAL packaging filter — використовується у cross-sell, Overview SKU breakdown, TOP-100 продуктів
+// Логіка: якщо у назві є "(N упаковок)" — це ТОВАР (showbox наповнений), а не packaging.
+// Інакше — перевіряємо ознаки тари: гофроящ, короб без дужок, showbox без дужок, логістика тощо.
+window.isPackagingSKU = function(name){
+  if (!name) return true;
+  const n = name.toLowerCase().trim();
+  // Якщо у назві "(N упаков..." — це товар у коробі (наповнений) → НЕ packaging
+  if (/\(\s*\d+\s*упаков/i.test(n)) return false;
+  return n.includes('гофроящ') || n.includes('гофрокороб') ||
+         n.includes('логістик') || n.includes('доставк') || n.includes('перевезен') ||
+         n.includes('короб') ||
+         n.includes('showbox') || n.includes('show box') || n.includes('show-box') ||
+         n.includes('пакет ') || n.includes('пакети ') || n.includes('пакування') ||
+         n.includes('тара') || n.includes('стікер') || n.includes('наклейк') ||
+         n.includes('етикетк') || n.includes('label') || n.includes('скотч') ||
+         n.includes('плівк') || n.includes('пачка') ||
+         n.startsWith('opt ') || n.startsWith('all ') || /^(opt|all)\s*\d/i.test(n);
 };
 
 // Customer 360 state: vybrаніSKU (Set) + metric ('sum'/'qty'/'kg')
@@ -1230,18 +1251,8 @@ function calcCrossSell(c, allDemandPositions, allCounterparties){
   if (!allDemandPositions || allDemandPositions.length === 0) {
     return { items: [], reason: 'demand_positions ще пуста — чекаємо sync' };
   }
-  // v2.78.18 (Богдан): exclude тару — розширено: + "короб", "showbox", "наклейка", "стікер", "скотч", "плівка", "етикетка"
-  const isPackaging = (name) => {
-    if (!name) return true;
-    const n = name.toLowerCase();
-    return n.includes('гофроящ') || n.includes('гофрокороб') || n.includes('короб') ||
-           n.includes('showbox') || n.includes('show box') || n.includes('show-box') ||
-           n.includes('пакет ') || n.includes('пакети ') || n.includes('пакування') ||
-           n.includes('тара') || n.includes('стікер') || n.includes('наклейк') ||
-           n.includes('етикетк') || n.includes('label') || n.includes('скотч') ||
-           n.includes('плівк') || n.includes('пачка') ||
-           n.startsWith('opt ') || n.startsWith('all ') || /^(opt|all)\s*\d/i.test(n);
-  };
+  // v2.78.21: використовуємо глобальний isPackagingSKU (вище). "(N упаковок)" → товар, не packaging.
+  const isPackaging = window.isPackagingSKU;
 
   // Поточний клієнт — список SKU
   const myKey = c.__key || c.id || c.name;
@@ -2539,13 +2550,13 @@ function _buildPortfolioSKUHtml(){
   const fromIso = period.from.toISOString().slice(0,10);
   const toIso = period.to.toISOString().slice(0,10);
 
-  // Aggregate per-SKU
+  // Aggregate per-SKU (v2.78.21: + exclude packaging — Гофроящики, Логістика, Короб без упаковок тощо)
   const skuMap = {};
   allDemandPositions.forEach(p => {
     const dt = (p.ms_moment || '').slice(0,10);
     if (dt < fromIso || dt > toIso) return;
     const name = p.product_name || p.assortment_name || p.name;
-    if (!name) return;
+    if (!name || window.isPackagingSKU(name)) return;
     const qty = Number(p.quantity || 0);
     let sum = (p.sum_kop || 0) / 100;
     if (sum === 0 && qty > 0) {
@@ -2705,10 +2716,11 @@ function _buildLegacyListsHtml(customersPool){
         <span style="color:${opts.badgeFg||'var(--muted)'};background:${opts.badgeBg||'transparent'};padding:${opts.badgeBg?'3px 9px':'0'};border-radius:10px">${opts.title}</span>
         <span style="font-size:10px;color:var(--muted);font-weight:600">${opts.subtitle ? opts.subtitle + ' · ' : ''}Σ ${nfm(sum)}₴</span>
       </div>
-      <div style="width:100%;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden">
+      <!-- v2.78.20 (Богдан): ТОП-10 видно + scroll до повного списку (max-height ~320px = 10 рядків × 28px + header) -->
+      <div style="width:100%;background:#fff;border:1px solid var(--border);border-radius:10px;overflow-y:auto;max-height:340px;scrollbar-width:thin;scrollbar-color:var(--border) transparent">
         <table style="width:100%;border-collapse:collapse;font-size:12.5px">
           <thead>
-            <tr style="background:#FAFAF5;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700">
+            <tr style="background:#FAFAF5;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700;position:sticky;top:0;z-index:2">
               <th style="width:26px;padding:7px 8px;text-align:right">#</th>
               <th style="padding:7px 10px;text-align:left">Клієнт</th>
               <th style="padding:7px 10px;text-align:right;white-space:nowrap">${opts.valueLabel}</th>
@@ -3138,6 +3150,8 @@ function renderCustomerView(c){
   }
   positionsForCust.forEach(p => {
     const name = p.product_name || p.assortment_name || p.name || '— без назви —';
+    // v2.78.21 (Богдан): exclude packaging (Гофроящики, Логістика, Короб без упаковок тощо)
+    if (window.isPackagingSKU(name)) return;
     const qty = Number(p.quantity || p.qty || 0);
     let sum = (p.sum_kop || 0) / 100;
     // v2.75.5: MoySklad деколи повертає sum=0 для positions з fallback fetch.
