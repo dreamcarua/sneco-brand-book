@@ -638,7 +638,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.78.25 · Cross-sell FIX: avg ₴/peer тепер з fallback price×qty (sum_kop=0 bug) + Потенціал ₴ = avg × peerCount (загальний ринок серед peers) · Продажі за смаками — 3 GROUP BY режими · Космічний 28г = 14г Чеддер + 14г Гауда · Combined badge text color fix · Оновлення: щодня 06:00
+  snEco Customer 360 v2.78.26 · Cross-sell peers = 25 ТОП-кращих snEco + 25 найближчих (кращі знають правильні SKU) · Avg/Потенціал з fallback price×qty · Продажі за смаками 3 GROUP BY режими · Combined badge color fix · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -1263,15 +1263,30 @@ function calcCrossSell(c, allDemandPositions, allCounterparties){
     if (name) mySKUs.add(name);
   });
 
-  // Peer tier — клієнти з revenue у +/- 50% від нашого
+  // v2.78.26 (Богдан): peers = 25 кращих snEco (top revenue) + 25 найближчих по revenue
+  // "Кращі на то і кращі що купляють правильні SKU" — overlapнуть автоматично через Set.
   const myRev = c.__revenue || 0;
-  if (myRev <= 0) return { items: [], reason: 'клієнт без revenue — peers не визначені' };
-  const peers = allCounterparties.filter(x =>
-    x !== c && x.__revenue > myRev * 0.5 && x.__revenue < myRev * 1.5
-  );
-  if (peers.length === 0) return { items: [], reason: 'нема peers у tier' };
+  const allWithRev = allCounterparties.filter(x => x !== c && x.__revenue > 0)
+    .sort((a, b) => b.__revenue - a.__revenue);
+  if (allWithRev.length === 0) return { items: [], reason: 'нема активних клієнтів для порівняння' };
+
+  // (1) ТОП-25 snEco — best performers, знають правильні SKU
+  const topPeers = allWithRev.slice(0, 25);
+  // (2) Similar-25 — найближчі по lifetime revenue (виключаємо вже-обраних з ТОП)
+  const topSet = new Set(topPeers);
+  const similarPeers = allWithRev
+    .filter(x => !topSet.has(x))
+    .map(x => ({ c: x, diff: Math.abs(x.__revenue - myRev) }))
+    .sort((a, b) => a.diff - b.diff)
+    .slice(0, 25)
+    .map(x => x.c);
+  // Merge — без duplicates (хоча topSet exclude вже)
+  const peers = [...topPeers, ...similarPeers];
+  if (peers.length === 0) return { items: [], reason: 'нема peers' };
   const peerKeys = new Set(peers.map(p => p.id || p.name));
   const peerNames = new Set(peers.map(p => p.name));
+  const topPeerCount = topPeers.length;
+  const similarPeerCount = similarPeers.length;
 
   // v2.78.8: ТОП-SKU за останні 3 місяці (приоритет для cross-sell)
   const cutoff3m = new Date(Date.now() - 90*86400000).toISOString().slice(0,10);
@@ -1319,6 +1334,8 @@ function calcCrossSell(c, allDemandPositions, allCounterparties){
   return {
     items,
     totalPeers: peers.length,
+    topPeerCount,
+    similarPeerCount,
     myRev,
     reason: items.length === 0 ? 'усе що peers купляють — клієнт уже бере (або це тільки тара)' : ''
   };
@@ -3967,8 +3984,8 @@ function renderCustomerView(c){
     ${crossSell.items.length > 0 ? `
       <div class="sec">🎯 Cross-sell opportunity — ТОП-10 SKU що peers купляють, а ${escapeHtml(c.name)} ще ні</div>
       <div style="background:#fafaf5;border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:8px;font-size:12.5px;color:var(--d);line-height:1.55">
-        <b>Як читати:</b> <b>peers</b> — клієнти snEco з виручкою у діапазоні ±50% від цього клієнта (${nfm(crossSell.myRev)} ₴ lifetime), всього <b>${crossSell.totalPeers} peers</b> у tier'і. Sort: спершу за популярністю SKU в snEco за останні 3 міс, далі за avg ₴/peer.
-        <br>💡 <b>Як використовувати:</b> позиції з найвищим % peers + хорошим avg ₴ → дзвонок клієнту, запропонувати SKU №1 у списку. Якщо щось у списку — клієнт цього не купляв ЖОДНОГО разу за всю історію.
+        <b>Як читати:</b> <b>peers</b> = <b>${crossSell.topPeerCount} ТОП-кращих snEco</b> (за lifetime revenue — вони знають правильні SKU) + <b>${crossSell.similarPeerCount} найближчих</b> по розміру до цього клієнта (${nfm(crossSell.myRev)} ₴ lifetime). Загалом <b>${crossSell.totalPeers} peers</b>. Sort: спершу за популярністю SKU в snEco за останні 3 міс, далі за avg ₴/peer.
+        <br>💡 <b>Як використовувати:</b> SKU з найвищим % peers (особливо якщо це ТОП-25 кращих купляють масово) → дзвонок клієнту з пропозицією. У списку лише те, чого клієнт НІКОЛИ не купляв.
       </div>
       <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden">
         <div style="display:grid;grid-template-columns:36px 1fr 90px 130px 150px;gap:10px;padding:10px 14px;background:#FAFAF5;border-bottom:1px solid var(--border);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)">
