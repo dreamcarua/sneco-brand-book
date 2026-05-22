@@ -638,7 +638,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.78.21 · Вага кг РАХУЄТЬСЯ (cyrillic \b regex fix) · Global isPackagingSKU (Гофроящики/Логістика/Короб без упаковок виключено зі ВСІХ блоків — Overview Продажі за смаками, TOP-100 продуктів, Cross-sell) · "(N упаковок)" розпізнається як товар не тара · ТОП-100 per-section scroll · Paginated fetch · Combined badge · Оновлення: щодня 06:00
+  snEco Customer 360 v2.78.22 · SEQUENTIAL fetch (стабільно 99% без "через раз" навіть на Workers Free) · Вага кг рахується · Global isPackagingSKU виключає Гофроящики/Логістика/Короб · ТОП-100 per-section scroll · Paginated 10K chunks · Combined badge · Cross-sell ТОП-10 list · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -1801,16 +1801,22 @@ window.bootCustomer360 = async function(token){
   try {
     // v2.78.14: Promise.allSettled щоб бачити ЯКА з 7 fetch падає (не загальний "Load failed")
     const names = ['counterparties','demands','payments','orders','invoices_out','returns','demand_positions'];
-    // v2.78.19: paginated fetch — 10K chunks замість 50K моноліту (Workers Free 10ms CPU)
-    const settled = await Promise.allSettled([
-      fetchJsonPaginated('counterparties'),
-      fetchJsonPaginated('demands'),
-      fetchJsonPaginated('payments'),
-      fetchJsonPaginated('orders'),
-      fetchJsonPaginated('invoices_out'),
-      fetchJsonPaginated('returns'),
-      fetchJsonPaginated('demand_positions'),
-    ]);
+    // v2.78.22: SEQUENTIAL fetch — одна таблиця за раз. Промі.allSettled з 7 паралельних
+    // burst'ів спинав 7 cold isolates одночасно → CPU спайки → 503 з втратою CORS headers
+    // → browser "Access-Control-Allow-Origin not allowed". Sequential = 1 isolate stay warm =
+    // стабільно ~99% без "через раз". Trade-off: +5-10s завантаження.
+    const settled = [];
+    for (const t of ['counterparties','demands','payments','orders','invoices_out','returns','demand_positions']) {
+      const _t0 = performance.now();
+      try {
+        const value = await fetchJsonPaginated(t);
+        settled.push({ status: 'fulfilled', value });
+        console.log(`[seq ${t}] OK ${value?.length||0} rows за ${Math.round(performance.now()-_t0)}ms`);
+      } catch (err) {
+        settled.push({ status: 'rejected', reason: err });
+        console.error(`[seq ${t}] FAIL за ${Math.round(performance.now()-_t0)}ms:`, err);
+      }
+    }
     const failures = [];
     settled.forEach((s, i) => {
       if (s.status === 'rejected') {
