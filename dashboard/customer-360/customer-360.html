@@ -637,7 +637,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.78.18 · Combined badge FIX · Cross-sell ТОП-10 list з поясненнями · isPackaging короб/showbox/наклейки · компактніше Overview (480px max-height, tight padding) · Богдан fixes: materiality · TOP-100 sort · Lost cohorts · YoY YTD · credit term · multi-currency · multi-select SKU · Оновлення: щодня 06:00
+  snEco Customer 360 v2.78.19 · Paginated fetch 10K chunks (Workers Free CPU fix — гарантовано без "через раз") · Combined badge · Cross-sell ТОП-10 list · isPackaging короб/showbox · компактніший Overview 480px · Богдан fixes · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -1711,13 +1711,30 @@ function calcConcentration(allCounterparties){
   return { share: total > 0 ? (top5Sum / total * 100) : 0, top5, total };
 }
 
+// v2.78.19: PAGINATED fetch — розбиває великі запити на 10K chunks щоб обійти Workers Free CPU 10ms limit.
+// payments/invoices_out >20K rows → JSON.stringify >10ms CPU → "Load failed". З pagination кожен chunk
+// швидкий, повторювати 3 рази замість 1 — все одно швидше + надійніше.
+async function fetchJsonPaginated(type, opts = {}) {
+  const PAGE = 10000;
+  let all = [];
+  let offset = 0;
+  while (true) {
+    const chunk = await fetchJson(type, { ...opts, limit: PAGE, offset });
+    if (!chunk || chunk.length === 0) break;
+    all = all.concat(chunk);
+    if (chunk.length < PAGE) break;
+    offset += PAGE;
+    if (offset > 200000) { console.warn(`[fetchJsonPaginated ${type}] safety stop at 200K`); break; }
+  }
+  return all;
+}
+
 async function fetchJson(type, opts){
   // v2.76.1: retry з exponential backoff — "Load failed" фіксили через хвилину,
   // це transient D1 timeout / cold start / 503. До 3 спроб з 0.5s, 1.5s, 3.5s паузами.
-  // v2.78.15: + exclude_raw_json:true — Customer 360 не використовує raw_json, але це
-  // ~80% розміру response. Без цього: 22K demands × 2KB raw_json = 44MB → Worker
-  // heap overflow → CF drop connection mid-response → browser "Load failed".
-  const body = Object.assign({ type, limit: 50000, exclude_raw_json: true }, opts || {});
+  // v2.78.15: + exclude_raw_json:true — Customer 360 не використовує raw_json.
+  // v2.78.19: default limit 50000 → 10000. Виклик через fetchJsonPaginated для повного списку.
+  const body = Object.assign({ type, limit: 10000, exclude_raw_json: true }, opts || {});
   const MAX_ATTEMPTS = 3;
   const BACKOFF_MS = [500, 1500, 3500];
   let lastErr = null;
@@ -1773,14 +1790,15 @@ window.bootCustomer360 = async function(token){
   try {
     // v2.78.14: Promise.allSettled щоб бачити ЯКА з 7 fetch падає (не загальний "Load failed")
     const names = ['counterparties','demands','payments','orders','invoices_out','returns','demand_positions'];
+    // v2.78.19: paginated fetch — 10K chunks замість 50K моноліту (Workers Free 10ms CPU)
     const settled = await Promise.allSettled([
-      fetchJson('counterparties'),
-      fetchJson('demands'),
-      fetchJson('payments'),
-      fetchJson('orders'),
-      fetchJson('invoices_out'),
-      fetchJson('returns'),
-      fetchJson('demand_positions'),
+      fetchJsonPaginated('counterparties'),
+      fetchJsonPaginated('demands'),
+      fetchJsonPaginated('payments'),
+      fetchJsonPaginated('orders'),
+      fetchJsonPaginated('invoices_out'),
+      fetchJsonPaginated('returns'),
+      fetchJsonPaginated('demand_positions'),
     ]);
     const failures = [];
     settled.forEach((s, i) => {
