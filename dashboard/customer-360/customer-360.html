@@ -113,8 +113,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ov-trend-chart .chart-h180{height:180px;position:relative}
 
 /* Action items inline table */
-/* v2.78.4: scroll до TOP-100, sticky empty/header якщо буде. ≈ 14-15 рядків visible. */
-.ov-actions-table{background:#fff;border:1px solid var(--border);border-radius:10px;overflow-y:auto;max-height:560px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+/* v2.78.15 (Богдан): уніфікований max-height 760px = ~20 рядків visible на всіх блоках головної */
+.ov-actions-table{background:#fff;border:1px solid var(--border);border-radius:10px;overflow-y:auto;max-height:760px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 .ov-actions-table::-webkit-scrollbar{width:6px}
 .ov-actions-table::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 .ov-actions-table::-webkit-scrollbar-thumb:hover{background:var(--muted)}
@@ -134,8 +134,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* Movers — 2 columns */
 .ov-movers-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media(max-width:760px){.ov-movers-grid{grid-template-columns:1fr}}
-/* v2.78.2: TOP-100 with scroll. Card max-height ≈ 20 rows visible by default; sticky head. */
-.ov-mover-card{background:#fff;border:1px solid var(--border);border-radius:10px;overflow-y:auto;max-height:680px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+/* v2.78.15 (Богдан): уніфікований max-height 760px = ~20 рядків на mover-card */
+.ov-mover-card{background:#fff;border:1px solid var(--border);border-radius:10px;overflow-y:auto;max-height:760px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 .ov-mover-card::-webkit-scrollbar{width:6px}
 .ov-mover-card::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 .ov-mover-card::-webkit-scrollbar-thumb:hover{background:var(--muted)}
@@ -190,7 +190,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ov-legacy-lists summary::-webkit-details-marker{display:none}
 .ov-legacy-lists summary::after{content:'▾';color:var(--muted)}
 .ov-legacy-lists details[open] summary::after{content:'▴'}
-.ov-legacy-lists details > div{margin-top:6px}
+.ov-legacy-lists details > div{margin-top:6px;max-height:760px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.ov-legacy-lists details > div::-webkit-scrollbar{width:6px}
+.ov-legacy-lists details > div::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
 /* ─── v2.73.0 Phase B — PRINT-FRIENDLY PDF ─── */
 @media print {
@@ -635,7 +637,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.78.14 · Богдан fixes: materiality 1% · TOP-100 movers/продуктів scroll+sort · Lost cohorts · Cross-sell priority · YoY YTD · credit term · multi-currency · multi-select SKU · Promise.allSettled error tracking · Оновлення: щодня 06:00
+  snEco Customer 360 v2.78.15 · Богдан fixes: materiality 1% · TOP-100 movers/продуктів scroll+sort · Lost cohorts · Cross-sell priority · YoY YTD · credit term · multi-currency · multi-select SKU · ПДЗ+Продажі за смаками опущено вниз · уніф. 20-row scroll · exclude_raw_json (Worker heap fix) · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -1702,7 +1704,10 @@ function calcConcentration(allCounterparties){
 async function fetchJson(type, opts){
   // v2.76.1: retry з exponential backoff — "Load failed" фіксили через хвилину,
   // це transient D1 timeout / cold start / 503. До 3 спроб з 0.5s, 1.5s, 3.5s паузами.
-  const body = Object.assign({ type, limit: 50000 }, opts || {});
+  // v2.78.15: + exclude_raw_json:true — Customer 360 не використовує raw_json, але це
+  // ~80% розміру response. Без цього: 22K demands × 2KB raw_json = 44MB → Worker
+  // heap overflow → CF drop connection mid-response → browser "Load failed".
+  const body = Object.assign({ type, limit: 50000, exclude_raw_json: true }, opts || {});
   const MAX_ATTEMPTS = 3;
   const BACKOFF_MS = [500, 1500, 3500];
   let lastErr = null;
@@ -2059,34 +2064,7 @@ function _buildOverviewHtml(){
         </div>
       </div>
 
-      <!-- v2.78.13 (Богдан): Продажі за смаками — портфельний breakdown SKU з multi-select + metric toggle -->
-      ${_buildPortfolioSKUHtml()}
-
-      <!-- TIER 3: ПДЗ — Прострочена дебіторка + action items (v2.78.4: TOP-100 з scroll) -->
-      <div class="ov-section">
-        <div class="ov-section-title">🎯 Прострочена дебіторка (ПДЗ) — дзвонити сьогодні <button class="ovm-xlsx-btn" onclick="event.stopPropagation(); exportBlockXLSX('pdz')">⬇ Excel</button></div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Sort: критичні (борг) → dormant (давно не замовляли) → declining (падіння тренду). ↕ scroll у блоці до ТОП-100. Кліки → exportPDZ() для Excel.</div>
-        <div class="ov-actions-table" id="pdzTable">
-          ${actions.length === 0 ? `
-            <div class="ov-actions-empty">✅ Жодних критичних action items зараз — все під контролем</div>
-          ` : actions.map(it => `
-            <div class="ov-actions-row" onclick="selectCustomer('${escapeAttr(it.c.__key || it.c.name)}')">
-              <div class="ova-sev">${it.icon}</div>
-              <div>
-                <div class="ova-name">${escapeHtml(it.c.name)}</div>
-                <div class="ova-meta">${escapeHtml(it.meta)}</div>
-              </div>
-              <div class="ova-issue">${escapeHtml(it.issue)}</div>
-              <div class="ova-amount">${nfm(it.amount)} ₴</div>
-              <div class="ova-actions">
-                ${it.c.phone ? `<a class="ova-btn" href="tel:${escapeAttr(it.c.phone.replace(/\D/g,''))}" onclick="event.stopPropagation()">📞</a>` : ''}
-                ${it.c.email ? `<a class="ova-btn" href="mailto:${escapeAttr(it.c.email)}" onclick="event.stopPropagation()">✉</a>` : ''}
-                <button class="ova-btn" onclick="event.stopPropagation(); selectCustomer('${escapeAttr(it.c.__key || it.c.name)}')">→</button>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
+      <!-- v2.78.15 (Богдан): "📦 Продажі за смаками" і "🎯 ПДЗ" опущені нижче Legacy lists ("Не замовляли > 30 днів") — див. кінець Overview -->
 
       <!-- TIER 4: MOVERS — TOP-100, sliding 30d vs prev 30d, exclude retail+archived (v2.77.0 → v2.78.2) -->
       <div class="ov-section">
@@ -2260,6 +2238,36 @@ function _buildOverviewHtml(){
           ${legacyHtml}
         </div>
       </div>
+
+      <!-- v2.78.15 (Богдан): Опущено нижче "Не замовляли > 30 днів — час реактивувати" -->
+      <!-- TIER 7a: Прострочена дебіторка (ПДЗ) — переміщено сюди -->
+      <div class="ov-section">
+        <div class="ov-section-title">🎯 Прострочена дебіторка (ПДЗ) — дзвонити сьогодні <button class="ovm-xlsx-btn" onclick="event.stopPropagation(); exportBlockXLSX('pdz')">⬇ Excel</button></div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Sort: критичні (борг) → dormant (давно не замовляли) → declining (падіння тренду). ↕ scroll у блоці до ТОП-100. ~20 рядків visible.</div>
+        <div class="ov-actions-table" id="pdzTable">
+          ${actions.length === 0 ? `
+            <div class="ov-actions-empty">✅ Жодних критичних action items зараз — все під контролем</div>
+          ` : actions.map(it => `
+            <div class="ov-actions-row" onclick="selectCustomer('${escapeAttr(it.c.__key || it.c.name)}')">
+              <div class="ova-sev">${it.icon}</div>
+              <div>
+                <div class="ova-name">${escapeHtml(it.c.name)}</div>
+                <div class="ova-meta">${escapeHtml(it.meta)}</div>
+              </div>
+              <div class="ova-issue">${escapeHtml(it.issue)}</div>
+              <div class="ova-amount">${nfm(it.amount)} ₴</div>
+              <div class="ova-actions">
+                ${it.c.phone ? `<a class="ova-btn" href="tel:${escapeAttr(it.c.phone.replace(/\D/g,''))}" onclick="event.stopPropagation()">📞</a>` : ''}
+                ${it.c.email ? `<a class="ova-btn" href="mailto:${escapeAttr(it.c.email)}" onclick="event.stopPropagation()">✉</a>` : ''}
+                <button class="ova-btn" onclick="event.stopPropagation(); selectCustomer('${escapeAttr(it.c.__key || it.c.name)}')">→</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- TIER 7b: Продажі за смаками — портфельний breakdown SKU з multi-select + metric toggle -->
+      ${_buildPortfolioSKUHtml()}
 
     </div>
   `;
