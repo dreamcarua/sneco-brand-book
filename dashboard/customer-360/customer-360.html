@@ -638,7 +638,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.78.30 · Cross-sell PERIOD TOGGLE (3 міс / 12 міс / Lifetime) — можна переключати залежно від потреби · Космічний = Чеддер+Моцарелла · GROUP BY toggle на головній + у картці клієнта · Peers = 25 ТОП + 25 similar · Оновлення: щодня 06:00
+  snEco Customer 360 v2.78.31 · 🔴 CRITICAL: Combined customer KPI fix (matchCounterparty global) · 📅 Timeline хронологія взаємодій · 📥 Excel export всього клієнта одним multi-sheet файлом · ⌨ Keyboard shortcuts (/ search, n note, Esc close) · Cross-sell PERIOD TOGGLE · Космічний=Чеддер+Моцарелла · GROUP BY toggle · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -1272,11 +1272,9 @@ function calcCrossSell(c, allDemandPositions, allCounterparties){
   // v2.78.21: використовуємо глобальний isPackagingSKU (вище). "(N упаковок)" → товар, не packaging.
   const isPackaging = window.isPackagingSKU;
 
-  // Поточний клієнт — список SKU
-  const myKey = c.__key || c.id || c.name;
-  const myMatch = p => (p.agent_id && (p.agent_id === c.id || p.agent_id === myKey)) || (p.agent === c.name);
+  // v2.78.31: combined-aware match — для combined клієнтів збираємо SKU всіх членів
   const mySKUs = new Set();
-  allDemandPositions.filter(myMatch).forEach(p => {
+  allDemandPositions.filter(p => window.matchCounterparty(p, c)).forEach(p => {
     const name = p.product_name || p.assortment_name || p.name;
     if (name) mySKUs.add(name);
   });
@@ -1435,10 +1433,28 @@ function filterByTierHealth(customers, tier, health){
 // v2.74.0 — OVERVIEW HELPERS (для першого екрана)
 // ============================================================================
 
+// v2.78.31 (Богдан audit): COMBINED-AWARE matcher — критично для 5+ combined клієнтів.
+// БЕЗ цього combined master.id = "combined:..." не матчить жоден demand → ALL KPIs = 0.
+// Зберігаємо memberIds/memberNames Set'и на c для performance (computeCustomerMetrics
+// викликається 11K раз у boot).
+window.matchCounterparty = function(item, c) {
+  if (!item || !c) return false;
+  if (c.__combined && Array.isArray(c.__members)) {
+    if (!c.__memberIdsSet) {
+      c.__memberIdsSet = new Set(c.__members.map(m => m.id).filter(Boolean));
+      c.__memberNamesSet = new Set(c.__members.map(m => (m.name||'').trim()).filter(Boolean));
+    }
+    return (item.agent_id && c.__memberIdsSet.has(item.agent_id)) ||
+           (item.agent && c.__memberNamesSet.has((item.agent||'').trim()));
+  }
+  return (c.id && item.agent_id && item.agent_id === c.id) ||
+         (item.agent && item.agent === c.name);
+};
+
 // Per-customer metrics — computed once у boot для всіх 11K клієнтів
 // (зберігаються як c.__metrics для швидкого доступу у renderOverview / movers / heatmap)
 function computeCustomerMetrics(c, allDemands, allReturns){
-  const matchCP = d => (d.agent_id && d.agent_id === c.id) || (d.agent === c.name);
+  const matchCP = d => window.matchCounterparty(d, c);
   const dems = allDemands.filter(matchCP);
   const rets = allReturns.filter(matchCP);
 
@@ -3050,6 +3066,33 @@ function setupSearch(){
   document.addEventListener('click', e => {
     if (!e.target.closest('.search-wrap')) results.classList.remove('open');
   });
+
+  // v2.78.31 (Богдан audit): KEYBOARD SHORTCUTS
+  // "/" або "s" → focus у пошук · Esc → закрити dropdown / повернутись до списку · "n" → нова CRM-нотатка
+  document.addEventListener('keydown', e => {
+    // Якщо у input/textarea/contenteditable — не перехоплювати
+    const tag = (e.target.tagName||'').toLowerCase();
+    const isEditable = ['input','textarea','select'].includes(tag) || e.target.isContentEditable;
+    if (isEditable && e.key !== 'Escape') return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+    if (e.key === '/' || e.key === 's') {
+      e.preventDefault();
+      input.focus();
+      input.select();
+    } else if (e.key === 'Escape') {
+      results.classList.remove('open');
+      if (isEditable) e.target.blur();
+      // Якщо клієнтську картку відкрито — повернутись до списку
+      if (typeof _currentCustKey !== 'undefined' && _currentCustKey && typeof window.showPillsList === 'function') {
+        window.showPillsList();
+      }
+    } else if (e.key === 'n' && _currentCustKey) {
+      // 'n' для нової CRM-нотатки якщо клієнт відкритий
+      const btn = document.querySelector('[onclick*="openNewNote"], [onclick*="addCrmNote"]');
+      if (btn) { e.preventDefault(); btn.click(); }
+    }
+  });
 }
 
 // v2.68: бережемо HTML списків щоб можна було повернутися "← До списку"
@@ -3126,20 +3169,8 @@ function renderCustomerView(c){
   const now = new Date();
   // v2.76.3: запамʼятовуємо клієнта щоб setProductPeriod міг re-render тут же
   _currentCustForProductFilter = c;
-  // v2.78.16: combined-aware matcher — для master перевіряємо ВСІХ members
-  // (each member має свій id + name; demands прив'язані до member, не до master).
-  let matchCP;
-  if (c.__combined && Array.isArray(c.__members) && c.__members.length) {
-    const memberIds = new Set(c.__members.map(m => m.id).filter(Boolean));
-    const memberNames = new Set(c.__members.map(m => (m.name||'').trim()).filter(Boolean));
-    matchCP = (item) =>
-      (item.agent_id && memberIds.has(item.agent_id)) ||
-      (item.agent && memberNames.has((item.agent||'').trim()));
-  } else {
-    matchCP = (item) =>
-      (c.id && item.agent_id && item.agent_id === c.id) ||
-      (item.agent && item.agent === c.name);
-  }
+  // v2.78.31: уніфіковано через global window.matchCounterparty (combined-aware)
+  const matchCP = (item) => window.matchCounterparty(item, c);
   const dems = allDemands.filter(matchCP).sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''));
   const pays = allPayments.filter(matchCP).sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''));
   const ords = allOrders.filter(matchCP).sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''));
@@ -3722,6 +3753,7 @@ function renderCustomerView(c){
         ${c.phone ? `<a href="tel:${escapeAttr(c.phone)}" class="act-btn">📞 Подзвонити</a>` : ''}
         <button class="act-btn" onclick="window.print()">🖨 Print / PDF</button>
         <button class="act-btn" onclick="copySummary('${escapeAttr(c.name)}')">📋 Copy summary</button>
+        <button class="act-btn" onclick="exportCustomerXLSX('${escapeAttr(c.__key || c.name)}')">📥 Excel</button>
       </div>
     </div>
 
@@ -3794,17 +3826,49 @@ function renderCustomerView(c){
 
     <!-- KPI STRIP — AR row -->
     <div class="g2" style="margin-top:14px">
-      <div class="kpi cg">
+      <div class="kpi cg" title="Виставлено + не сплачено, але термін оплати ще не настав">
         <div class="kpi-lbl">📋 Дебіторка в межах терміну (≤30 дн)</div>
         <div class="kpi-val">${nfm(freshAR)} ₴</div>
         <div class="kpi-sub">${freshDemands.length} рахунків</div>
       </div>
-      <div class="kpi cr">
+      <div class="kpi cr" title="Виставлено + не сплачено, термін >30 днів — критично, дзвонити">
         <div class="kpi-lbl">🔴 Протерміновано (>30 дн)</div>
         <div class="kpi-val" style="color:${overdueAR>0?'var(--red)':'var(--d)'}">${nfm(overdueAR)} ₴</div>
         <div class="kpi-sub">${overdueDemands.length} рахунків</div>
       </div>
     </div>
+
+    <!-- v2.78.31 (Богдан audit): AR AGING BUCKETS — стандартна 30/60/90/90+ розкладка -->
+    ${(() => {
+      if (overdueDemands.length === 0) return '';
+      const buckets = { '1-30': 0, '31-60': 0, '61-90': 0, '90+': 0 };
+      const cnt = { '1-30': 0, '31-60': 0, '61-90': 0, '90+': 0 };
+      overdueDemands.forEach(d => {
+        const days = Math.floor((Date.now() - new Date(d.ms_moment).getTime()) / 86400000);
+        const debt = ((d.sum_kop||0) - (d.payed_sum_kop||0)) / 100;
+        let bk;
+        if (days <= 60) bk = '31-60';        // overdueDemands вже >30
+        else if (days <= 90) bk = '61-90';
+        else bk = '90+';
+        // 1-30 не може бути overdue по нашому правилу (cutoff 30d). Skip.
+        buckets[bk] += debt; cnt[bk]++;
+      });
+      const total = overdueAR || 1;
+      return `
+        <div class="sec">📊 AR aging · розподіл протермінованої дебіторки за віком <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0">(старіші = вищий ризик списання)</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+          ${['31-60','61-90','90+'].map(b => {
+            const pct = (buckets[b]/total*100).toFixed(0);
+            const color = b === '31-60' ? 'var(--y)' : b === '61-90' ? '#f57c00' : 'var(--red)';
+            return `
+              <div style="background:#fff;border:1px solid var(--border);border-left:3px solid ${color};border-radius:8px;padding:11px 14px">
+                <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">${b} днів</div>
+                <div style="font-size:18px;font-weight:700;color:${color};margin:4px 0">${nfm(buckets[b])} ₴</div>
+                <div style="font-size:11.5px;color:var(--muted)">${cnt[b]} рах. · <b style="color:${color}">${pct}%</b> від total</div>
+              </div>`;
+          }).join('')}
+        </div>`;
+    })()}
 
     <!-- AOV + Rank + ReturnRate + Pipeline (overdueAR переніс наверх у KPI Strip) -->
     <div class="g3" style="margin-top:14px">
@@ -4091,6 +4155,49 @@ function renderCustomerView(c){
     <!-- NOTES from raw_json -->
     ${renderNotes(c)}
 
+    <!-- v2.78.31 (Богдан audit): TIMELINE — хронологічний feed взаємодій (demands + payments + CRM-notes) -->
+    ${(() => {
+      const events = [];
+      dems.slice(0, 50).forEach(d => events.push({
+        date: d.ms_moment, type: 'demand', icon: '📦',
+        title: `Замовлення ${d.name || ''}`, sum: (d.sum_kop||0)/100, color: '#4a7000', bg: 'rgba(150,193,31,.10)'
+      }));
+      pays.slice(0, 50).forEach(p => {
+        const t = String(p.payment_type||'').toLowerCase();
+        const inb = t.includes('вхід') || t.includes('incoming') || t.includes('paymentin');
+        events.push({
+          date: p.ms_moment, type: inb?'paymentin':'paymentout', icon: inb?'💵':'💸',
+          title: `${inb?'Оплата вх.':'Оплата вих.'} ${p.name || ''}`,
+          sum: (p.sum_kop||0)/100, color: inb?'#4a7000':'#a00', bg: inb?'rgba(150,193,31,.10)':'rgba(232,64,64,.10)'
+        });
+      });
+      // CRM notes from localStorage (sync'd cached)
+      const myKey = c.__key || c.id || c.name;
+      try {
+        const crmLog = (typeof loadCrmLog === 'function') ? loadCrmLog(myKey) : [];
+        crmLog.slice(0, 20).forEach(n => events.push({
+          date: n.date, type: 'crm', icon: '💬',
+          title: `CRM ${n.type||''}: ${(n.summary||'').slice(0,80)}`,
+          sum: null, color: '#7e57c2', bg: 'rgba(126,87,194,.10)'
+        }));
+      } catch(e) { /* ignore */ }
+      events.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+      const top = events.slice(0, 60);
+      if (top.length === 0) return '';
+      return `
+        <div class="sec">📅 Timeline · хронологія взаємодій <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0">(останні 60 подій — demands · payments · CRM-нотатки)</span></div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow-y:auto;max-height:480px;padding:4px 0;scrollbar-width:thin">
+          ${top.map(e => `
+            <div style="display:grid;grid-template-columns:80px 24px 1fr 110px;gap:10px;padding:7px 14px;border-bottom:1px solid var(--border);font-size:12.5px;align-items:center">
+              <div style="color:var(--muted);font-size:11px;font-family:monospace">${(e.date||'').slice(0,10)}</div>
+              <div style="background:${e.bg};color:${e.color};width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px">${e.icon}</div>
+              <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escapeAttr(e.title)}">${escapeHtml(e.title)}</div>
+              <div style="text-align:right;font-weight:${e.sum?'600':'400'};color:${e.color}">${e.sum !== null ? nfm(e.sum) + ' ₴' : ''}</div>
+            </div>
+          `).join('')}
+        </div>`;
+    })()}
+
     <!-- TRENDS (v2.69) -->
     <div class="sec">📈 Тренди клієнта</div>
     <div class="cc" style="font-size:13.5px;line-height:1.7;color:#333">
@@ -4357,6 +4464,106 @@ function renderNotes(c){
       </div>` : ''}
   `;
 }
+
+// v2.78.31 (Богдан audit): Excel export ВСЬОГО клієнта одним multi-sheet .xlsx
+// Sheets: Summary / Demands / Payments / Positions / CRM-log / Returns
+window.exportCustomerXLSX = function(custKey) {
+  const c = allCounterparties.find(x => (x.__key === custKey) || (x.name === custKey));
+  if (!c) { alert('Клієнт не знайдено'); return; }
+  if (typeof XLSX === 'undefined') { alert('SheetJS не завантажено'); return; }
+  const wb = XLSX.utils.book_new();
+  const match = (item) => window.matchCounterparty(item, c);
+  const dems = allDemands.filter(match);
+  const pays = allPayments.filter(match);
+  const ords = allOrders.filter(match);
+  const rets = allReturns.filter(match);
+  const invs = allInvoices.filter(match);
+  const positions = allDemandPositions.filter(match);
+  // Summary
+  const summary = [{
+    'Клієнт': c.name,
+    'ЄДРПОУ/ІНН': c.edrpou || c.inn || '',
+    'Email': c.email || '',
+    'Телефон': c.phone || '',
+    'Адреса': c.legal_address || c.actual_address || '',
+    'Combined': c.__combined ? `Так (${c.__members?.length||0} ФОП)` : 'Ні',
+    'Lifetime revenue ₴': Math.round(c.__revenue || 0),
+    'Замовлень': dems.length,
+    'Платежів': pays.length,
+    'Permission_term ₴': c.balance_kop ? Math.round(c.balance_kop/100) : 0,
+  }];
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summary), 'Summary');
+  // Demands
+  if (dems.length) {
+    const demRows = dems.map(d => ({
+      'Дата': (d.ms_moment||'').slice(0,10),
+      'Назва': d.name || '',
+      'Сума, ₴': Math.round((d.sum_kop||0)/100),
+      'Сплачено, ₴': Math.round((d.payed_sum_kop||0)/100),
+      'Валюта': d.currency || 'UAH',
+      'Контрагент (реал)': d.agent || '',
+      'Стан': d.state || '',
+      'Склад': d.store || '',
+    }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(demRows), 'Demands');
+  }
+  // Payments
+  if (pays.length) {
+    const payRows = pays.map(p => ({
+      'Дата': (p.ms_moment||'').slice(0,10),
+      'Тип': p.payment_type || '',
+      'Назва': p.name || '',
+      'Сума, ₴': Math.round((p.sum_kop||0)/100),
+      'Валюта': p.currency || 'UAH',
+      'Контрагент': p.agent || '',
+      'Стаття витрат': p.expense_item || '',
+      'Призначення': p.payment_purpose || '',
+    }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(payRows), 'Payments');
+  }
+  // Positions (SKU breakdown)
+  if (positions.length) {
+    const posRows = positions.map(p => ({
+      'Дата': (p.ms_moment||'').slice(0,10),
+      'Продукт': p.product_name || '',
+      'Кількість': p.quantity || 0,
+      'Ціна, ₴': Math.round((p.price_kop||0)/100),
+      'Сума, ₴': Math.round((p.sum_kop||0)/100),
+      'Знижка %': p.discount_pct || 0,
+    }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(posRows), 'Positions');
+  }
+  // Orders, Invoices, Returns
+  if (ords.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(ords.map(o => ({
+    'Дата': (o.ms_moment||'').slice(0,10), 'Назва': o.name||'',
+    'Сума, ₴': Math.round((o.sum_kop||0)/100), 'Відвантажено, ₴': Math.round((o.shipped_sum_kop||0)/100),
+    'Стан': o.state||'', 'Валюта': o.currency||'UAH',
+  }))), 'Orders');
+  if (invs.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(invs.map(i => ({
+    'Дата': (i.ms_moment||'').slice(0,10), 'Назва': i.name||'',
+    'Сума, ₴': Math.round((i.sum_kop||0)/100), 'Сплачено, ₴': Math.round((i.payed_sum_kop||0)/100),
+    'Планова оплата': (i.payment_planned_moment||'').slice(0,10),
+    'Стан': i.state||'',
+  }))), 'Invoices');
+  if (rets.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rets.map(r => ({
+    'Дата': (r.ms_moment||'').slice(0,10), 'Назва': r.name||'',
+    'Сума, ₴': Math.round((r.sum_kop||0)/100), 'Валюта': r.currency||'UAH',
+  }))), 'Returns');
+  // CRM log
+  try {
+    const crmLog = (typeof loadCrmLog === 'function') ? loadCrmLog(c.__key || c.id || c.name) : [];
+    if (crmLog.length) {
+      const crmRows = crmLog.map(n => ({
+        'Дата': n.date || '', 'Тип': n.type || '',
+        'Summary': n.summary || '', 'Next step': n.next_step || '',
+        'Next date': n.next_date || '', 'Author': n.author_email || n.author_name || '',
+      }));
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(crmRows), 'CRM-log');
+    }
+  } catch(e) { /* ignore */ }
+  const fname = (c.name || 'customer').replace(/[\\/:*?"<>|]/g,'_').slice(0,40) + '_' + new Date().toISOString().slice(0,10) + '.xlsx';
+  XLSX.writeFile(wb, fname);
+};
 
 window.copySummary = function(name){
   const c = allCounterparties.find(x => x.name === name);
