@@ -243,6 +243,9 @@ ENTITY_MAP = {
             "description": "description",
             "balance": "balance_kop",
             "overdueDebt": "overdue_debt_kop",
+            # v2.78.16: combined customer field (custom MoySklad attribute)
+            "Комбінований": "combined_key",
+            "combined_key": "combined_key",
         },
     },
     "invoices_out": {

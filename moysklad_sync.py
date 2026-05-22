@@ -527,6 +527,60 @@ def parse_salesreturns(rows, agent_map=None, currency_map=None):
     return records
 
 
+def _extract_combined_key(r):
+    """v2.78.16: extract 'Комбінований контрагент' custom attribute з MoySklad counterparty.
+    Тип поля = string. Усі counterparties з тим же значенням = одна combined-група.
+    Поверне None якщо поле порожнє або відсутнє.
+
+    v2.78.17 ROBUST: substring match замість exact — щоб ловити варіації типу
+    'Комбінований', 'Комбінований клієнт', 'Combined', 'Combined customer'
+    і будь-які інші формулювання які можуть використати колеги."""
+    attrs = r.get("attributes") or []
+    if not isinstance(attrs, list):
+        return None
+    for attr in attrs:
+        if not isinstance(attr, dict):
+            continue
+        name = (attr.get("name") or "").strip().lower()
+        # Match by substring keyword — широкий пошук
+        if not ("комбін" in name or "комбин" in name or "combined" in name):
+            continue
+        val = attr.get("value")
+        if isinstance(val, str):
+            v = val.strip()
+            return v or None
+        # Тип "Контрагент" (link) — value це {meta, name}
+        if isinstance(val, dict):
+            n = (val.get("name") or "").strip()
+            return n or None
+    return None
+
+
+def _debug_counterparty_attrs(rows):
+    """v2.78.17 DIAGNOSTIC: scan attribute names from first 1000 rows.
+    Без цього неможливо зрозуміти чому combined_key=0 — або attributes не приходять
+    від API, або назва атрибуту інша ніж очікуємо."""
+    seen = {}  # name → sample value
+    rows_with_attrs = 0
+    for r in rows[:1000]:
+        attrs = r.get("attributes") or []
+        if attrs:
+            rows_with_attrs += 1
+        for a in attrs:
+            if isinstance(a, dict) and a.get("name"):
+                if a["name"] not in seen:
+                    v = a.get("value")
+                    sample = (v if isinstance(v, str) else (v or {}).get("name", "?")) if v is not None else ""
+                    seen[a["name"]] = str(sample)[:40]
+    if not seen:
+        print(f"[counterparty attrs DEBUG] ⚠⚠⚠ Жодного counterparty не має attributes у API response (з перших 1000). MoySklad може потребувати інший endpoint або custom-поля не публікуються через API.", flush=True)
+    else:
+        print(f"[counterparty attrs DEBUG] Знайдено {len(seen)} унікальних attribute names у перших {rows_with_attrs}/1000 counterparty з attributes:", flush=True)
+        for name, sample in sorted(seen.items()):
+            marker = " ← MATCH (combined)" if any(k in name.lower() for k in ("комбін", "комбин", "combined")) else ""
+            print(f"  • {name}: '{sample}'{marker}", flush=True)
+
+
 def parse_counterparties(rows):
     return [{
         "id":                   r.get("id"),
@@ -547,6 +601,8 @@ def parse_counterparties(rows):
         "Борг прострочений":    (r.get("overdueDebt", 0) / 100) if r.get("overdueDebt") else 0,
         "Статус":               safe(r.get("state")),
         "Коментар":             r.get("description", ""),
+        # v2.78.16: custom attribute для merge юр.форм одного клієнта
+        "Комбінований":         _extract_combined_key(r) or "",
     } for r in rows]
 
 
@@ -1016,6 +1072,9 @@ def main():
         rows = fetch_all("entity/counterparty", date_filter=False)
     else:
         rows = fetch_all("entity/counterparty", filter_field="updated")
+    # v2.78.17: DIAGNOSTIC — показати які attribute names приходять з MoySklad
+    # (треба щоб зрозуміти точну назву поля "Комбінований контрагент" і чи приходить взагалі)
+    _debug_counterparty_attrs(rows)
     save_excel(pd.DataFrame(parse_counterparties(rows)), "counterparties", reliable=True)
 
     print("\n🏷️  Товари...", flush=True)
