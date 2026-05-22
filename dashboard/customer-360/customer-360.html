@@ -638,7 +638,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.78.26 · Cross-sell peers = 25 ТОП-кращих snEco + 25 найближчих (кращі знають правильні SKU) · Avg/Потенціал з fallback price×qty · Продажі за смаками 3 GROUP BY режими · Combined badge color fix · Оновлення: щодня 06:00
+  snEco Customer 360 v2.78.27 · GROUP BY toggle (SKU/Пакування/Смак) ТЕПЕР ВИДНО на головній (forgot to insert chips у return) + ТАКОЖ у картці клієнта TOP-100 продуктів · Cross-sell peers = 25 ТОП + 25 similar · Combined badge color fix · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -759,6 +759,15 @@ window.toggleOvSKU = function(skuName){
 window.resetOvSKUFilter = function(){ window._ovSKUFilter = null; renderOverview(); };
 window.setOvMetric = function(m){ window._ovMetric = m; renderOverview(); };
 window.setOvProdPeriod = function(k){ window._ovProdPeriod = k; renderOverview(); };
+
+// v2.78.27 (Богдан): GROUP BY toggle у картці клієнта (TOP-100 продуктів)
+window.setCustGroupBy = function(g) {
+  window._custGroupBy = g;
+  if (typeof _currentCustKey !== 'undefined' && _currentCustKey) {
+    const c = allCounterparties.find(x => (x.__key === _currentCustKey) || (x.name === _currentCustKey));
+    if (c) renderCustomerView(c);
+  }
+};
 
 // v2.78.7 (Богдан): sort TOP-100 продуктів картки клієнта
 window.setTopProdSort = function(key){
@@ -2778,11 +2787,13 @@ function _buildPortfolioSKUHtml(){
         </table>
       </div>`;
 
+  const groupLabel = groupBy === 'sku' ? 'Окремі SKU' : groupBy === 'packaging' ? 'За пакуванням' : 'За смаком';
   return `
     <div class="ov-section">
-      <div class="ov-section-title">📦 Продажі за смаками · ${period.label} · ${metricLabel}${filter?` · фільтр ${filter.size} SKU`:''}</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Усі SKU портфеля snEco у обраному періоді. Multi-select SKU + toggle метрики. Вага парситься з назви (28г/14г/500г).</div>
+      <div class="ov-section-title">📦 Продажі за смаками · ${period.label} · ${metricLabel} · ${groupLabel}${filter?` · фільтр ${filter.size}`:''}</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Multi-level breakdown продажів портфеля snEco. Перемикач режиму групування + multi-select фільтр + toggle метрики. Вага парситься з назви SKU (28г/14г/500г) + Космічний 28г розбивається на 14г Чеддер + 14г Гауда + Мікси з горіхами — окрема група.</div>
       ${periodChips}
+      ${groupChips}
       ${metricChips}
       ${table}
     </div>`;
@@ -3277,23 +3288,48 @@ function renderCustomerView(c){
       return d >= _productCustomRange.from && d <= _productCustomRange.to;
     });
   }
+  // v2.78.27 (Богдан): GROUP BY toggle і в картці клієнта (SKU/Пакування/Смак) — як на Overview
+  const _custGroupBy = window._custGroupBy || 'sku';
   positionsForCust.forEach(p => {
     const name = p.product_name || p.assortment_name || p.name || '— без назви —';
-    // v2.78.21 (Богдан): exclude packaging (Гофроящики, Логістика, Короб без упаковок тощо)
     if (window.isPackagingSKU(name)) return;
     const qty = Number(p.quantity || p.qty || 0);
     let sum = (p.sum_kop || 0) / 100;
-    // v2.75.5: MoySklad деколи повертає sum=0 для positions з fallback fetch.
-    // Якщо так — рахуємо самі: price × quantity.
     if (sum === 0 && qty > 0) {
       const price = (p.price_kop || 0) / 100;
       if (price > 0) sum = price * qty;
     }
-    if (!productMap[name]) productMap[name] = { qty: 0, sum: 0, kg: 0 };
-    productMap[name].qty += qty;
-    productMap[name].sum += sum;
-    // v2.78.12: вага в кг (грами з SKU × quantity / 1000)
-    productMap[name].kg += (window.extractWeightG(name) * qty) / 1000;
+    const totalKg = (window.extractWeightG(name) * qty) / 1000;
+
+    if (_custGroupBy === 'packaging') {
+      const pkg = window.detectPortfolioPackaging(name);
+      if (!productMap[pkg]) productMap[pkg] = { qty: 0, sum: 0, kg: 0 };
+      productMap[pkg].qty += qty;
+      productMap[pkg].sum += sum;
+      productMap[pkg].kg += totalKg;
+    } else if (_custGroupBy === 'flavor') {
+      const flavors = window.detectPortfolioFlavors(name);
+      if (flavors.length === 0) {
+        if (!productMap['Інше']) productMap['Інше'] = { qty: 0, sum: 0, kg: 0 };
+        productMap['Інше'].qty += qty;
+        productMap['Інше'].sum += sum;
+        productMap['Інше'].kg += totalKg;
+      } else {
+        const totalW = flavors.reduce((a,f) => a + f.weight, 0) || 1;
+        flavors.forEach(f => {
+          const share = f.weight / totalW;
+          if (!productMap[f.flavor]) productMap[f.flavor] = { qty: 0, sum: 0, kg: 0 };
+          if (f === flavors[0]) productMap[f.flavor].qty += qty;
+          productMap[f.flavor].sum += sum * share;
+          productMap[f.flavor].kg += totalKg * share;
+        });
+      }
+    } else {
+      if (!productMap[name]) productMap[name] = { qty: 0, sum: 0, kg: 0 };
+      productMap[name].qty += qty;
+      productMap[name].sum += sum;
+      productMap[name].kg += totalKg;
+    }
   });
   // Fallback: якщо positions порожні — спробувати raw_json
   if (Object.keys(productMap).length === 0) {
@@ -3847,6 +3883,13 @@ function renderCustomerView(c){
               ' · усі дати'
             } · показ: ${_custMetric === 'kg' ? '⚖ Вага кг' : _custMetric === 'qty' ? '🔢 Штук' : '💰 Виручка ₴'}${_custSKUFilter ? ` · фільтр ${_custSKUFilter.size} SKU` : ''}</div>
           </div>
+        </div>
+        <!-- v2.78.27 (Богдан): GROUP BY toggle у картці клієнта (як в Overview "Продажі за смаками") -->
+        <div class="prod-period-bar" style="margin:8px 0 6px 0">
+          <span class="prod-period-bar-lbl">Групування</span>
+          <button class="prod-chip ${(window._custGroupBy||'sku')==='sku' ? 'active' : ''}" onclick="setCustGroupBy('sku')">📦 Окремі SKU</button>
+          <button class="prod-chip ${window._custGroupBy==='packaging' ? 'active' : ''}" onclick="setCustGroupBy('packaging')">⚖ За пакуванням (28г · 14г · 500г)</button>
+          <button class="prod-chip ${window._custGroupBy==='flavor' ? 'active' : ''}" onclick="setCustGroupBy('flavor')">🧀 За смаком (Гауда · Чеддер · ...)</button>
         </div>
         <!-- v2.78.12 (Богдан): metric chips + multi-select SKU dropdown -->
         <div class="prod-period-bar" style="margin:8px 0 6px 0">
