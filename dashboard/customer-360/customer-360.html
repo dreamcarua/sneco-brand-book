@@ -420,10 +420,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .dashauth-msg a{color:#FEBF27;font-weight:600;text-decoration:underline}
 .dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
 .dashauth-back:hover{color:#FEBF27}
-/* v2.77.4: top:170px — Customer 360 selector-bar з search+quickPills може бути ~110px */
-.dashauth-session{position:fixed;top:170px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-family:-apple-system,sans-serif;font-weight:600;display:flex;align-items:center;gap:8px}
-@media(max-width:760px){.dashauth-session{top:auto;bottom:12px;right:12px;left:12px;justify-content:center}}
-.dashauth-session button{background:none;border:0;color:#96C11F;cursor:pointer;font-size:14px;padding:0;line-height:1}
+/* v2.78.32: auth session badge inline у topbar справа (не floating). Стиснутий, прозорий. */
+.dashauth-session{display:inline-flex;align-items:center;gap:6px;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:4px 10px;border-radius:12px;font-size:10.5px;font-family:-apple-system,sans-serif;font-weight:600;margin-left:8px;white-space:nowrap}
+.dashauth-session button{background:none;border:0;color:#96C11F;cursor:pointer;font-size:13px;padding:0;line-height:1;opacity:.8}
+.dashauth-session button:hover{opacity:1}
+@media(max-width:760px){.dashauth-session{font-size:10px;padding:3px 7px}}
 body.dash-locked{overflow:hidden}
 </style>
 </head>
@@ -455,15 +456,19 @@ body.dash-locked{overflow:hidden}
     if (typeof window.bootCustomer360 === 'function') window.bootCustomer360(token);
   }
   function showSessionBadge(em, exp){
-    const b = document.createElement('div');
+    // v2.78.32: attach у topbar-right поряд з sync badge (не floating right) — більше не "живе своїм життям"
+    const b = document.createElement('span');
     b.className = 'dashauth-session';
     const totalMins = Math.max(0, Math.floor((exp*1000 - Date.now())/60000));
     const timeLabel = totalMins >= 60
       ? Math.floor(totalMins/60) + 'h ' + (totalMins%60 ? (totalMins%60) + 'm' : '')
       : totalMins + 'min';
-    b.innerHTML = '✓ ' + em + ' · ' + timeLabel.trim() + ' <button title="Lock">🔒</button>';
+    // Стиснутий вміст: іконка ✓ + ініціали email + час + кнопка lock
+    const initials = em.split('@')[0].slice(0, 12);
+    b.innerHTML = '✓ ' + initials + ' · ' + timeLabel.trim() + ' <button title="Lock — вийти">🔒</button>';
     b.querySelector('button').onclick = () => { localStorage.removeItem(STORAGE_KEY); location.reload(); };
-    document.body.appendChild(b);
+    const target = document.querySelector('.topbar-right') || document.body;
+    target.appendChild(b);
   }
   async function verifyExisting(){
     let s; try { s = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null'); } catch(e){}
@@ -638,7 +643,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.78.31 · 🔴 CRITICAL: Combined customer KPI fix (matchCounterparty global) · 📅 Timeline хронологія взаємодій · 📥 Excel export всього клієнта одним multi-sheet файлом · ⌨ Keyboard shortcuts (/ search, n note, Esc close) · Cross-sell PERIOD TOGGLE · Космічний=Чеддер+Моцарелла · GROUP BY toggle · Оновлення: щодня 06:00
+  snEco Customer 360 v2.78.32 · 📈 Health Trend sparklines (revenue + orders MoM 6 міс) + 6 типів ANOMALY ALERTS (revenue drop · cadence break · return spike · AR aging · new SKU · concentration) · Compact selector-bar + auth badge inline · CRM-notes MoySklad sync FIX (ctx.waitUntil) · Combined KPI fix · Excel export · Keyboard / s n Esc · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -3129,11 +3134,9 @@ window.selectCustomer = function(name){
   if (pillsEl && !_pillsBackup) {
     _pillsBackup = pillsEl.innerHTML;
   }
+  // v2.78.32: компактний — тільки кнопка "← До списку" (ім'я клієнта вже у h1 нижче, дубль зайвий)
   pillsEl.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;width:100%">
-      <button onclick="showPillsList()" style="background:rgba(254,191,39,.18);color:#996600;border:1px solid rgba(254,191,39,.35);padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px">← До списку клієнтів</button>
-      <span style="font-size:11px;color:var(--muted);font-weight:600">Вибрано: <strong style="color:var(--d)">${escapeHtml(c.name)}</strong></span>
-    </div>
+    <button onclick="showPillsList()" style="background:rgba(254,191,39,.18);color:#996600;border:1px solid rgba(254,191,39,.35);padding:5px 12px;border-radius:8px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px">← До списку клієнтів</button>
   `;
 
   // v2.76.1: try/catch — якщо renderCustomerView кине throw, contentWrap лишиться
@@ -4155,46 +4158,179 @@ function renderCustomerView(c){
     <!-- NOTES from raw_json -->
     ${renderNotes(c)}
 
-    <!-- v2.78.31 (Богдан audit): TIMELINE — хронологічний feed взаємодій (demands + payments + CRM-notes) -->
+    <!-- v2.78.32 (Богдан): HEALTH TREND + ANOMALY ALERTS (заміна Timeline що був мало-функціональний) -->
     ${(() => {
-      const events = [];
-      dems.slice(0, 50).forEach(d => events.push({
-        date: d.ms_moment, type: 'demand', icon: '📦',
-        title: `Замовлення ${d.name || ''}`, sum: (d.sum_kop||0)/100, color: '#4a7000', bg: 'rgba(150,193,31,.10)'
-      }));
-      pays.slice(0, 50).forEach(p => {
-        const t = String(p.payment_type||'').toLowerCase();
-        const inb = t.includes('вхід') || t.includes('incoming') || t.includes('paymentin');
-        events.push({
-          date: p.ms_moment, type: inb?'paymentin':'paymentout', icon: inb?'💵':'💸',
-          title: `${inb?'Оплата вх.':'Оплата вих.'} ${p.name || ''}`,
-          sum: (p.sum_kop||0)/100, color: inb?'#4a7000':'#a00', bg: inb?'rgba(150,193,31,.10)':'rgba(232,64,64,.10)'
-        });
+      // Build last 6 months revenue + returns + AOV per month
+      const mNames = ['січ','лют','бер','кві','тра','чер','лип','сер','вер','жов','лис','гру'];
+      const now2 = new Date();
+      const months6 = [];
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now2.getFullYear(), now2.getMonth() - i, 1);
+        months6.push({ key: d.toISOString().slice(0,7), label: mNames[d.getMonth()] });
+      }
+      const revByMonth = {};
+      const ordByMonth = {};
+      const retByMonth = {};
+      dems.forEach(d => {
+        const ym = (d.ms_moment||'').slice(0,7);
+        if (!ym) return;
+        revByMonth[ym] = (revByMonth[ym]||0) + (d.sum_kop||0)/100;
+        ordByMonth[ym] = (ordByMonth[ym]||0) + 1;
       });
-      // CRM notes from localStorage (sync'd cached)
-      const myKey = c.__key || c.id || c.name;
+      rets.forEach(r => {
+        const ym = (r.ms_moment||'').slice(0,7);
+        if (!ym) return;
+        retByMonth[ym] = (retByMonth[ym]||0) + (r.sum_kop||0)/100;
+      });
+      const revSeries = months6.map(m => revByMonth[m.key]||0);
+      const ordSeries = months6.map(m => ordByMonth[m.key]||0);
+      const maxRev = Math.max(...revSeries, 1);
+      const maxOrd = Math.max(...ordSeries, 1);
+      // SVG sparkline helper
+      const W = 220, H = 44, P = 4;
+      const sparkPath = (series, max) => {
+        if (series.every(v => v === 0)) return '';
+        const stepX = (W - P*2) / Math.max(1, series.length - 1);
+        return series.map((v, i) => {
+          const x = P + i * stepX;
+          const y = H - P - (v / max) * (H - P*2);
+          return (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
+        }).join(' ');
+      };
+      const revPath = sparkPath(revSeries, maxRev);
+      const ordPath = sparkPath(ordSeries, maxOrd);
+      // Last point dots for sparkline
+      const lastDot = (series, max) => {
+        if (series[series.length-1] === 0) return null;
+        const stepX = (W - P*2) / Math.max(1, series.length - 1);
+        const x = P + (series.length - 1) * stepX;
+        const y = H - P - (series[series.length-1] / max) * (H - P*2);
+        return { x: x.toFixed(1), y: y.toFixed(1) };
+      };
+      const revDot = lastDot(revSeries, maxRev);
+      const ordDot = lastDot(ordSeries, maxOrd);
+      // Trend deltas — last vs prev month
+      const revLast = revSeries[5] || 0;
+      const revPrev = revSeries[4] || 0;
+      const revDelta = revPrev > 0 ? ((revLast - revPrev) / revPrev * 100) : (revLast > 0 ? 100 : 0);
+      const ordLast = ordSeries[5] || 0;
+      const ordPrev = ordSeries[4] || 0;
+      const ordDelta = ordPrev > 0 ? ((ordLast - ordPrev) / ordPrev * 100) : (ordLast > 0 ? 100 : 0);
+
+      // ─── ANOMALY DETECTION ───
+      const alerts = [];
+      // 1. Revenue drop > 30%
+      if (revPrev > 0 && revDelta < -30) {
+        alerts.push({ type: 'danger', icon: '📉', title: `Місячна виручка впала ${Math.round(revDelta)}%`, sub: `${nfm(revLast)} ₴ vs ${nfm(revPrev)} ₴ попередній міс` });
+      } else if (revPrev > 0 && revDelta > 30) {
+        alerts.push({ type: 'good', icon: '🚀', title: `Місячна виручка зросла +${Math.round(revDelta)}%`, sub: `${nfm(revLast)} ₴ vs ${nfm(revPrev)} ₴ попередній міс — продовжуй пушити` });
+      }
+      // 2. Cadence anomaly — if daysSinceLast > 2× avg cadence
+      if (avgCadenceDays && daysSinceLast !== null && daysSinceLast > avgCadenceDays * 2) {
+        alerts.push({ type: 'danger', icon: '⏰', title: `Cadence порушено: ${daysSinceLast} днів без замовлень`, sub: `Норма для клієнта — кожні ${avgCadenceDays} днів. Час дзвонити.` });
+      } else if (avgCadenceDays && daysSinceLast !== null && daysSinceLast > avgCadenceDays * 1.5) {
+        alerts.push({ type: 'warn', icon: '⏰', title: `Близько до cadence: ${daysSinceLast} днів (норма ${avgCadenceDays})`, sub: `Уже мав би замовити. Превентивний дзвінок?` });
+      }
+      // 3. Return rate spike — last 30 днів returns / shipments > 2× lifetime avg
+      const cutoff30 = new Date(Date.now() - 30*86400000).toISOString().slice(0,10);
+      const recentRets = rets.filter(r => (r.ms_moment||'').slice(0,10) >= cutoff30).reduce((a,r)=>a+(r.sum_kop||0)/100, 0);
+      const recentShips = dems.filter(d => (d.ms_moment||'').slice(0,10) >= cutoff30).reduce((a,d)=>a+(d.sum_kop||0)/100, 0);
+      const recentRetRate = recentShips > 0 ? (recentRets/recentShips*100) : 0;
+      if (returnRate > 0 && recentRetRate > returnRate * 2 && recentRetRate > 3) {
+        alerts.push({ type: 'danger', icon: '↩', title: `Return rate подвоївся: ${recentRetRate.toFixed(1)}% за 30 днів`, sub: `Lifetime avg: ${returnRate.toFixed(1)}%. Запитай про причини повернень.` });
+      }
+      // 4. AR overdue alert
+      if (overdueAR > 0) {
+        const oldestDays = overdueDemands.length ? Math.max(...overdueDemands.map(d => Math.floor((Date.now() - new Date(d.ms_moment).getTime())/86400000))) : 0;
+        alerts.push({
+          type: oldestDays > 90 ? 'danger' : 'warn',
+          icon: '💸',
+          title: `Протерміновано ${nfm(overdueAR)} ₴ (${overdueDemands.length} рах.)`,
+          sub: `Найстаріший борг: ${oldestDays} днів. ${oldestDays > 90 ? 'КРИТИЧНО — pre-write-off зона.' : 'Час дзвонити по оплаті.'}`
+        });
+      }
+      // 5. New SKU positive signal — позиція з останніх 60 днів якої не було раніше
       try {
-        const crmLog = (typeof loadCrmLog === 'function') ? loadCrmLog(myKey) : [];
-        crmLog.slice(0, 20).forEach(n => events.push({
-          date: n.date, type: 'crm', icon: '💬',
-          title: `CRM ${n.type||''}: ${(n.summary||'').slice(0,80)}`,
-          sum: null, color: '#7e57c2', bg: 'rgba(126,87,194,.10)'
-        }));
+        const cutoff60 = new Date(Date.now() - 60*86400000).toISOString().slice(0,10);
+        const recentSKUs = new Set(allDemandPositions.filter(p => matchCP(p) && (p.ms_moment||'').slice(0,10) >= cutoff60).map(p => p.product_name).filter(Boolean));
+        const oldSKUs = new Set(allDemandPositions.filter(p => matchCP(p) && (p.ms_moment||'').slice(0,10) < cutoff60).map(p => p.product_name).filter(Boolean));
+        const newSKUs = [...recentSKUs].filter(s => !oldSKUs.has(s));
+        if (newSKUs.length > 0) {
+          alerts.push({ type: 'good', icon: '✨', title: `${newSKUs.length} нових SKU у кошику (60 днів)`, sub: newSKUs.slice(0,3).join(' · ') + (newSKUs.length > 3 ? ` + ${newSKUs.length-3} ще` : '') });
+        }
       } catch(e) { /* ignore */ }
-      events.sort((a,b) => (b.date||'').localeCompare(a.date||''));
-      const top = events.slice(0, 60);
-      if (top.length === 0) return '';
+      // 6. Concentration risk — якщо ТОП-3 SKU дають >80% revenue
+      try {
+        const skuRev = {};
+        allDemandPositions.filter(matchCP).forEach(p => {
+          const n = p.product_name;
+          if (n && !window.isPackagingSKU(n)) skuRev[n] = (skuRev[n]||0) + (p.sum_kop||0)/100;
+        });
+        const skuTotal = Object.values(skuRev).reduce((a,v)=>a+v,0);
+        if (skuTotal > 0) {
+          const top3 = Object.values(skuRev).sort((a,b)=>b-a).slice(0,3).reduce((a,v)=>a+v,0);
+          const top3Pct = (top3/skuTotal*100);
+          if (top3Pct > 80 && Object.keys(skuRev).length > 5) {
+            alerts.push({ type: 'warn', icon: '⚖', title: `Концентрація: ТОП-3 SKU = ${top3Pct.toFixed(0)}% виручки`, sub: `Ризик якщо популярний SKU зникне з лінійки. Cross-sell інших SKU зменшить ризик.` });
+          }
+        }
+      } catch(e){}
+      // Якщо нема ніяких alerts — позитивний meta-alert
+      if (alerts.length === 0) {
+        alerts.push({ type: 'good', icon: '✅', title: 'Без аномалій', sub: 'Клієнт стабільний. Жодних відхилень від норм за 30 днів.' });
+      }
+
+      const ALERT_STYLE = {
+        good:   { bg: 'rgba(150,193,31,.10)', border: '#96C11F', color: '#4a7000' },
+        warn:   { bg: 'rgba(254,191,39,.13)', border: '#FEBF27', color: '#996600' },
+        danger: { bg: 'rgba(232,64,64,.10)', border: '#E84040', color: '#a00' },
+      };
+
       return `
-        <div class="sec">📅 Timeline · хронологія взаємодій <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0">(останні 60 подій — demands · payments · CRM-нотатки)</span></div>
-        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow-y:auto;max-height:480px;padding:4px 0;scrollbar-width:thin">
-          ${top.map(e => `
-            <div style="display:grid;grid-template-columns:80px 24px 1fr 110px;gap:10px;padding:7px 14px;border-bottom:1px solid var(--border);font-size:12.5px;align-items:center">
-              <div style="color:var(--muted);font-size:11px;font-family:monospace">${(e.date||'').slice(0,10)}</div>
-              <div style="background:${e.bg};color:${e.color};width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px">${e.icon}</div>
-              <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escapeAttr(e.title)}">${escapeHtml(e.title)}</div>
-              <div style="text-align:right;font-weight:${e.sum?'600':'400'};color:${e.color}">${e.sum !== null ? nfm(e.sum) + ' ₴' : ''}</div>
+        <div class="sec">📈 Health Trend &amp; Alerts <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0">(динаміка 6 міс + автоматичні аномалії за 30 днів)</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+          <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+              <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">💰 Виручка по місяцях</div>
+              <div style="font-size:13px;font-weight:700;color:${revDelta >= 0 ? '#4a7000' : '#a00'}">${revDelta >= 0 ? '↑ +' : '↓ '}${Math.abs(revDelta).toFixed(0)}% MoM</div>
             </div>
-          `).join('')}
+            <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:${H}px">
+              <path d="${revPath}" fill="none" stroke="#96C11F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              ${revDot ? `<circle cx="${revDot.x}" cy="${revDot.y}" r="3.5" fill="#96C11F" stroke="#fff" stroke-width="1.5"/>` : ''}
+            </svg>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:4px">
+              ${months6.map(m => `<span>${m.label}</span>`).join('')}
+            </div>
+            <div style="font-size:11.5px;color:var(--d);margin-top:6px"><b>${nfm(revLast)} ₴</b> поточний міс · попер. <b>${nfm(revPrev)} ₴</b></div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+              <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">📦 Замовлень по місяцях</div>
+              <div style="font-size:13px;font-weight:700;color:${ordDelta >= 0 ? '#4a7000' : '#a00'}">${ordDelta >= 0 ? '↑ +' : '↓ '}${Math.abs(ordDelta).toFixed(0)}% MoM</div>
+            </div>
+            <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:${H}px">
+              <path d="${ordPath}" fill="none" stroke="#FEBF27" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              ${ordDot ? `<circle cx="${ordDot.x}" cy="${ordDot.y}" r="3.5" fill="#FEBF27" stroke="#fff" stroke-width="1.5"/>` : ''}
+            </svg>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:4px">
+              ${months6.map(m => `<span>${m.label}</span>`).join('')}
+            </div>
+            <div style="font-size:11.5px;color:var(--d);margin-top:6px"><b>${ordLast}</b> замовл. поточний міс · попер. <b>${ordPrev}</b></div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px">
+          ${alerts.map(a => {
+            const s = ALERT_STYLE[a.type] || ALERT_STYLE.warn;
+            return `
+              <div style="background:${s.bg};border-left:3px solid ${s.border};border-radius:6px;padding:8px 12px;display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:center;font-size:12.5px">
+                <div style="font-size:15px">${a.icon}</div>
+                <div>
+                  <div style="font-weight:600;color:${s.color}">${escapeHtml(a.title)}</div>
+                  <div style="color:var(--muted);font-size:11.5px;margin-top:1px">${escapeHtml(a.sub)}</div>
+                </div>
+              </div>`;
+          }).join('')}
         </div>`;
     })()}
 
