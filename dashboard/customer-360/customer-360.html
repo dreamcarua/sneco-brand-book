@@ -638,7 +638,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.78.28 · Космічний 28г = 14г Чеддер + 14г МОЦАРЕЛЛА (виправлено, було помилково "Гауда") · GROUP BY toggle (SKU/Пакування/Смак) на головній + у картці клієнта · Cross-sell peers = 25 ТОП + 25 similar · Оновлення: щодня 06:00
+  snEco Customer 360 v2.78.29 · Cross-sell ОБМЕЖЕНО ОСТАННІМИ 12 МІС (раніше lifetime → 13M Гауда за роки = не релевантна "opportunity") · Космічний = Чеддер+Моцарелла · GROUP BY toggle на головній + у картці клієнта · Cross-sell peers = 25 ТОП + 25 similar · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -1309,12 +1309,17 @@ function calcCrossSell(c, allDemandPositions, allCounterparties){
   });
 
   // Aggregate SKUs across peers
-  // v2.78.25 (Богдан): + fallback price × qty якщо sum_kop=0 (MoySklad partial fetch bug).
-  // Без цього avgPerPeer=0 і колонка показує "—" для всіх.
+  // v2.78.29 (Богдан): обмежено ОСТАННІМИ 12 МІСЯЦЯМИ — lifetime суми були не релевантні
+  // (Гауда 28г з 34 peers за 3 роки = 13M ₴ ← це не "поточна opportunity"). Тепер показуємо
+  // що peers купляли за останній рік — relevant signal для KAM-дзвінка.
+  // + fallback price × qty якщо sum_kop=0 (MoySklad partial fetch bug).
+  const cutoff12m = new Date(Date.now() - 365*86400000).toISOString().slice(0,10);
   const skuStats = {}; // {name: {peerCount, totalSum}}
   allDemandPositions.forEach(p => {
     const matchesPeer = (p.agent_id && peerKeys.has(p.agent_id)) || (p.agent && peerNames.has(p.agent));
     if (!matchesPeer) return;
+    // v2.78.29: тільки positions за останні 12 міс
+    if ((p.ms_moment || '').slice(0,10) < cutoff12m) return;
     const name = p.product_name || p.assortment_name || p.name;
     if (!name || mySKUs.has(name)) return; // already buys → skip
     if (isPackaging(name)) return;           // v2.78.8: exclude тару
@@ -4027,7 +4032,7 @@ function renderCustomerView(c){
     ${crossSell.items.length > 0 ? `
       <div class="sec">🎯 Cross-sell opportunity — ТОП-10 SKU що peers купляють, а ${escapeHtml(c.name)} ще ні</div>
       <div style="background:#fafaf5;border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:8px;font-size:12.5px;color:var(--d);line-height:1.55">
-        <b>Як читати:</b> <b>peers</b> = <b>${crossSell.topPeerCount} ТОП-кращих snEco</b> (за lifetime revenue — вони знають правильні SKU) + <b>${crossSell.similarPeerCount} найближчих</b> по розміру до цього клієнта (${nfm(crossSell.myRev)} ₴ lifetime). Загалом <b>${crossSell.totalPeers} peers</b>. Sort: спершу за популярністю SKU в snEco за останні 3 міс, далі за avg ₴/peer.
+        <b>Як читати:</b> <b>peers</b> = <b>${crossSell.topPeerCount} ТОП-кращих snEco</b> (за lifetime revenue — вони знають правильні SKU) + <b>${crossSell.similarPeerCount} найближчих</b> по розміру до цього клієнта (${nfm(crossSell.myRev)} ₴ lifetime). Загалом <b>${crossSell.totalPeers} peers</b>. <b>Avg/Потенціал ₴ рахуються за останні 12 місяців</b> (не lifetime) — це releavnt opportunity, не історія. Sort: спершу за популярністю SKU в snEco за останні 3 міс, далі за avg ₴/peer.
         <br>💡 <b>Як використовувати:</b> SKU з найвищим % peers (особливо якщо це ТОП-25 кращих купляють масово) → дзвонок клієнту з пропозицією. У списку лише те, чого клієнт НІКОЛИ не купляв.
       </div>
       <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden">
