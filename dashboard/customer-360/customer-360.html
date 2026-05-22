@@ -638,7 +638,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.78.24 · Продажі за смаками — 3 GROUP BY режими (Окремі SKU / За пакуванням / За смаком: Гауда/Чеддер/Сулугуні/Мікси з горіхами/Оливки) · Космічний 28г = 14г Чеддер + 14г Гауда · ShowBox→28г · Combined badge text color fix · PARALLEL fetch · Оновлення: щодня 06:00
+  snEco Customer 360 v2.78.25 · Cross-sell FIX: avg ₴/peer тепер з fallback price×qty (sum_kop=0 bug) + Потенціал ₴ = avg × peerCount (загальний ринок серед peers) · Продажі за смаками — 3 GROUP BY режими · Космічний 28г = 14г Чеддер + 14г Гауда · Combined badge text color fix · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -1285,6 +1285,8 @@ function calcCrossSell(c, allDemandPositions, allCounterparties){
   });
 
   // Aggregate SKUs across peers
+  // v2.78.25 (Богдан): + fallback price × qty якщо sum_kop=0 (MoySklad partial fetch bug).
+  // Без цього avgPerPeer=0 і колонка показує "—" для всіх.
   const skuStats = {}; // {name: {peerCount, totalSum}}
   allDemandPositions.forEach(p => {
     const matchesPeer = (p.agent_id && peerKeys.has(p.agent_id)) || (p.agent && peerNames.has(p.agent));
@@ -1294,7 +1296,13 @@ function calcCrossSell(c, allDemandPositions, allCounterparties){
     if (isPackaging(name)) return;           // v2.78.8: exclude тару
     if (!skuStats[name]) skuStats[name] = { peerCount: new Set(), totalSum: 0 };
     skuStats[name].peerCount.add(p.agent_id || p.agent);
-    skuStats[name].totalSum += (p.sum_kop || 0) / 100;
+    let sum = (p.sum_kop || 0) / 100;
+    if (sum === 0) {
+      const qty = Number(p.quantity || 0);
+      const price = (p.price_kop || 0) / 100;
+      if (qty > 0 && price > 0) sum = price * qty;
+    }
+    skuStats[name].totalSum += sum;
   });
   const items = Object.entries(skuStats)
     .map(([name, s]) => ({
@@ -3966,15 +3974,17 @@ function renderCustomerView(c){
         <div style="display:grid;grid-template-columns:36px 1fr 90px 130px 150px;gap:10px;padding:10px 14px;background:#FAFAF5;border-bottom:1px solid var(--border);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)">
           <div>#</div><div>SKU</div><div style="text-align:right">Peers</div><div style="text-align:right">Avg ₴/peer</div><div style="text-align:right">Потенціал ₴</div>
         </div>
-        ${crossSell.items.map((it, i) => `
+        ${crossSell.items.map((it, i) => {
+          const potential = it.avgPerPeer * it.peerCount;  // загальний ринок для SKU серед peers
+          return `
           <div style="display:grid;grid-template-columns:36px 1fr 90px 130px 150px;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12.5px;align-items:center">
             <div style="font-weight:700;color:var(--y)">${i+1}</div>
             <div style="font-weight:600">${escapeHtml(it.name)}</div>
             <div style="text-align:right"><b>${it.peerCount}</b><span style="color:var(--muted)"> / ${crossSell.totalPeers}</span> <span style="color:var(--muted);font-size:11px">(${Math.round(it.peerCount/crossSell.totalPeers*100)}%)</span></div>
-            <div style="text-align:right">${it.avgPerPeer > 0 ? nfm(it.avgPerPeer) + ' ₴' : '<span style="color:var(--muted)" title="positions sum_kop порожні — порахувати потенціал не можемо">—</span>'}</div>
-            <div style="text-align:right;font-weight:700;color:${it.avgPerPeer > 0 ? 'var(--g)' : 'var(--muted)'}">${it.avgPerPeer > 0 ? '≈ ' + nfm(it.avgPerPeer) + ' ₴' : '—'}</div>
-          </div>
-        `).join('')}
+            <div style="text-align:right" title="Середня сума, яку 1 peer (клієнт схожого розміру) витрачає на цей SKU">${it.avgPerPeer > 0 ? nfm(it.avgPerPeer) + ' ₴' : '<span style="color:var(--muted)">—</span>'}</div>
+            <div style="text-align:right;font-weight:700;color:${potential > 0 ? 'var(--g)' : 'var(--muted)'}" title="Загальний ринок SKU серед peers: avg × кількість peers що купляють">${potential > 0 ? nfm(potential) + ' ₴' : '—'}</div>
+          </div>`;
+        }).join('')}
       </div>
     ` : `
       <div class="sec">🎯 Cross-sell opportunity</div>
