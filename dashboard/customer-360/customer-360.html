@@ -647,7 +647,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.78.33 · 🔄 SWAP: Health Trend & Alerts замість Timeline біля ТОП-100 + Timeline (хронологія) повернено під Адресами · Compact selector-bar (search прихований коли клієнт обраний) · Sparklines + 6 alerts · CRM-notes ctx.waitUntil · Combined KPI fix · Excel export · Keyboard / n Esc · Оновлення: щодня 06:00
+  snEco Customer 360 v2.78.34 · Health Trend збагачено: Health Score gauge + Segment (VIP/At-risk/Critical) + Rank · Lifetime KPIs (LTV, AOV vs peer, Cadence vs peer, Payment ratio) · YoY YTD badge · 6 alerts · Compact selector-bar · CRM-notes ctx.waitUntil · Combined KPI fix · Excel export · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -4401,33 +4401,122 @@ function renderCustomerView(c){
         warn: { bg: 'rgba(254,191,39,.13)', border: '#FEBF27', color: '#996600' },
         danger: { bg: 'rgba(232,64,64,.10)', border: '#E84040', color: '#a00' },
       };
+      // v2.78.34 (Богдан): + Lifetime KPIs + peer comparison + share-of-wallet + payment ratio + YoY
+      const ltvLifetime = c.__revenue || totalShipped || 0;
+      const firstOrderDate = c.__metrics?.firstOrder || (dems.length ? dems[dems.length-1].ms_moment : null);
+      const monthsActive = firstOrderDate
+        ? Math.max(1, Math.floor((Date.now() - new Date(firstOrderDate).getTime()) / (86400000*30)))
+        : null;
+      const ltvPerMonth = monthsActive ? ltvLifetime / monthsActive : 0;
+      // Payment ratio (cash collected / shipped)
+      const paymentRatio = totalShipped > 0 ? Math.min(100, (cashCollected / totalShipped * 100)) : 0;
+      // YoY same-period
+      const curY = new Date().getFullYear();
+      const curM = String(new Date().getMonth()+1).padStart(2,'0');
+      const ytdRev = dems.filter(d => {
+        const m = (d.ms_moment||'').slice(0,7); return m.startsWith(String(curY)) && m.slice(5,7) <= curM;
+      }).reduce((a,d) => a + (d.sum_kop||0)/100, 0);
+      const lyytdRev = dems.filter(d => {
+        const m = (d.ms_moment||'').slice(0,7); return m.startsWith(String(curY-1)) && m.slice(5,7) <= curM;
+      }).reduce((a,d) => a + (d.sum_kop||0)/100, 0);
+      const yoyDelta = lyytdRev > 0 ? ((ytdRev - lyytdRev) / lyytdRev * 100) : null;
+      // Peer comparison — використовуємо global всі counterparties
+      const allActives = (typeof allCounterparties !== 'undefined' ? allCounterparties : []).filter(x => x !== c && x.__revenue > 0 && x.__metrics);
+      const avgAOV = allActives.length ? allActives.reduce((a,x) => a + (x.__metrics.aov || 0), 0) / allActives.length : 0;
+      const avgCadAll = allActives.filter(x=>x.__metrics.avgCadence).length
+        ? allActives.filter(x=>x.__metrics.avgCadence).reduce((a,x)=>a+x.__metrics.avgCadence, 0)
+            / allActives.filter(x=>x.__metrics.avgCadence).length
+        : null;
+      const aovDelta = avgAOV > 0 ? ((aov - avgAOV) / avgAOV * 100) : null;
+      const cadDelta = (avgCadAll && avgCadenceDays) ? (avgCadenceDays - avgCadAll) : null;
+      // Customer segment
+      let segment = '— Без даних'; let segColor = 'var(--muted)';
+      if (totalShipped > 0) {
+        if (healthScore.total >= 70 && ltvLifetime > 100000) { segment = '💎 VIP'; segColor = '#4a7000'; }
+        else if (healthScore.total >= 70) { segment = '🟢 Регулярний'; segColor = '#4a7000'; }
+        else if (healthScore.total >= 40) { segment = '🟡 At-risk'; segColor = '#996600'; }
+        else { segment = '🔴 Критичний'; segColor = '#a00'; }
+      }
+
       target.innerHTML = `
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-          <div style="background:#fafaf5;border:1px solid var(--border);border-radius:8px;padding:10px 12px">
-            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
-              <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">💰 Виручка MoM</div>
-              <div style="font-size:12.5px;font-weight:700;color:${revDelta >= 0 ? '#4a7000' : '#a00'}">${revDelta >= 0 ? '↑+' : '↓'}${Math.abs(revDelta).toFixed(0)}%</div>
+        <!-- HEALTH SCORE + SEGMENT row -->
+        <div style="display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;background:linear-gradient(135deg,#fafaf5 0%,#fff 100%);border:1px solid var(--border);border-radius:8px;padding:11px 14px;margin-bottom:10px">
+          <div style="text-align:center">
+            <div style="font-size:24px;font-weight:800;color:${healthColor};line-height:1">${healthScore.total}</div>
+            <div style="font-size:9px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-top:2px">Health</div>
+          </div>
+          <div>
+            <div style="font-size:11.5px;color:var(--d);font-weight:600">${healthLabel} · <span style="color:${segColor}">${segment}</span></div>
+            <div style="font-size:10.5px;color:var(--muted);margin-top:3px">${healthScore.breakdown.map(b => `<span style="margin-right:8px"><b style="color:var(--d)">${b.pts}</b><span style="opacity:.6">/${b.max}</span> ${b.label}</span>`).join('')}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Rank</div>
+            <div style="font-size:15px;font-weight:700;color:var(--d)">${rank === 1 ? 'ТОП-1' : rank > 0 ? '#'+rank : '—'}</div>
+            <div style="font-size:9.5px;color:var(--muted)">${sharePct.toFixed(2)}% портфеля</div>
+          </div>
+        </div>
+
+        <!-- LIFETIME KPIs row -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px">
+          <div style="background:#fff;border:1px solid var(--border);border-radius:6px;padding:8px 10px">
+            <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)">💎 LTV</div>
+            <div style="font-size:14px;font-weight:700;color:var(--d);margin-top:2px">${nfm(ltvLifetime)} ₴</div>
+            <div style="font-size:9.5px;color:var(--muted)">${monthsActive||'?'} міс · ${nfm(ltvPerMonth)}/міс</div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:6px;padding:8px 10px">
+            <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)">📦 AOV</div>
+            <div style="font-size:14px;font-weight:700;color:var(--d);margin-top:2px">${nfm(aov)} ₴</div>
+            <div style="font-size:9.5px;color:${aovDelta && aovDelta > 0 ? '#4a7000' : aovDelta && aovDelta < 0 ? '#a00' : 'var(--muted)'}">${aovDelta !== null ? (aovDelta >= 0 ? '↑+' : '↓') + Math.abs(aovDelta).toFixed(0) + '% vs peer' : 'vs peer: —'}</div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:6px;padding:8px 10px">
+            <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)">⏱ Cadence</div>
+            <div style="font-size:14px;font-weight:700;color:var(--d);margin-top:2px">${avgCadenceDays ? avgCadenceDays + ' дн' : '—'}</div>
+            <div style="font-size:9.5px;color:${cadDelta !== null && cadDelta < 0 ? '#4a7000' : cadDelta !== null && cadDelta > 0 ? '#a00' : 'var(--muted)'}">${cadDelta !== null ? (cadDelta < 0 ? '↓' : '↑') + Math.abs(Math.round(cadDelta)) + 'д vs peer' : 'vs peer: —'}</div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:6px;padding:8px 10px">
+            <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)">💵 Pay ratio</div>
+            <div style="font-size:14px;font-weight:700;color:${paymentRatio >= 90 ? '#4a7000' : paymentRatio >= 70 ? '#996600' : '#a00'};margin-top:2px">${paymentRatio.toFixed(0)}%</div>
+            <div style="font-size:9.5px;color:var(--muted)">${nfm(cashCollected)} / ${nfm(totalShipped)}</div>
+          </div>
+        </div>
+
+        <!-- YoY badge якщо є дані попереднього року -->
+        ${yoyDelta !== null ? `
+          <div style="background:${yoyDelta >= 0 ? 'rgba(150,193,31,.10)' : 'rgba(232,64,64,.10)'};border:1px solid ${yoyDelta >= 0 ? '#96C11F' : '#E84040'};border-radius:6px;padding:7px 12px;margin-bottom:10px;display:flex;justify-content:space-between;font-size:11.5px">
+            <div><b>📅 YoY (${curY} YTD vs ${curY-1} YTD)</b></div>
+            <div style="font-weight:700;color:${yoyDelta >= 0 ? '#4a7000' : '#a00'}">${yoyDelta >= 0 ? '↑+' : '↓'}${Math.abs(yoyDelta).toFixed(0)}% · ${nfm(ytdRev)} ₴ vs ${nfm(lyytdRev)} ₴</div>
+          </div>
+        ` : ''}
+
+        <!-- SPARKLINES — revenue + orders MoM -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <div style="background:#fafaf5;border:1px solid var(--border);border-radius:6px;padding:8px 10px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px">
+              <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)">💰 Виручка MoM</div>
+              <div style="font-size:11.5px;font-weight:700;color:${revDelta >= 0 ? '#4a7000' : '#a00'}">${revDelta >= 0 ? '↑+' : '↓'}${Math.abs(revDelta).toFixed(0)}%</div>
             </div>
             <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:${H}px">
               <path d="${revPath}" fill="none" stroke="#96C11F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               ${revDot ? `<circle cx="${revDot.x}" cy="${revDot.y}" r="3.5" fill="#96C11F" stroke="#fff" stroke-width="1.5"/>` : ''}
             </svg>
-            <div style="display:flex;justify-content:space-between;font-size:9.5px;color:var(--muted);margin-top:2px">${months6.map(m => `<span>${m.label}</span>`).join('')}</div>
-            <div style="font-size:11px;color:var(--d);margin-top:4px"><b>${nfm(revLast)} ₴</b> · попер. ${nfm(revPrev)} ₴</div>
+            <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-top:1px">${months6.map(m => `<span>${m.label}</span>`).join('')}</div>
+            <div style="font-size:10.5px;color:var(--d);margin-top:3px"><b>${nfm(revLast)} ₴</b> · попер. ${nfm(revPrev)} ₴</div>
           </div>
-          <div style="background:#fafaf5;border:1px solid var(--border);border-radius:8px;padding:10px 12px">
-            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
-              <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">📦 Замовлень MoM</div>
-              <div style="font-size:12.5px;font-weight:700;color:${ordDelta >= 0 ? '#4a7000' : '#a00'}">${ordDelta >= 0 ? '↑+' : '↓'}${Math.abs(ordDelta).toFixed(0)}%</div>
+          <div style="background:#fafaf5;border:1px solid var(--border);border-radius:6px;padding:8px 10px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px">
+              <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)">📦 Замовлень MoM</div>
+              <div style="font-size:11.5px;font-weight:700;color:${ordDelta >= 0 ? '#4a7000' : '#a00'}">${ordDelta >= 0 ? '↑+' : '↓'}${Math.abs(ordDelta).toFixed(0)}%</div>
             </div>
             <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:${H}px">
               <path d="${ordPath}" fill="none" stroke="#FEBF27" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               ${ordDot ? `<circle cx="${ordDot.x}" cy="${ordDot.y}" r="3.5" fill="#FEBF27" stroke="#fff" stroke-width="1.5"/>` : ''}
             </svg>
-            <div style="display:flex;justify-content:space-between;font-size:9.5px;color:var(--muted);margin-top:2px">${months6.map(m => `<span>${m.label}</span>`).join('')}</div>
-            <div style="font-size:11px;color:var(--d);margin-top:4px"><b>${ordLast}</b> · попер. ${ordPrev}</div>
+            <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-top:1px">${months6.map(m => `<span>${m.label}</span>`).join('')}</div>
+            <div style="font-size:10.5px;color:var(--d);margin-top:3px"><b>${ordLast}</b> · попер. ${ordPrev} · разом ${ordersCount}</div>
           </div>
         </div>
+
+        <!-- ALERTS -->
         <div style="display:flex;flex-direction:column;gap:5px">
           ${alerts.map(a => {
             const s = STY[a.type] || STY.warn;
