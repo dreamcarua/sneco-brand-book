@@ -113,12 +113,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ov-trend-chart .chart-h180{height:180px;position:relative}
 
 /* Action items inline table */
-/* v2.78.15 (Богдан): уніфікований max-height 760px = ~20 рядків visible на всіх блоках головної */
-.ov-actions-table{background:#fff;border:1px solid var(--border);border-radius:10px;overflow-y:auto;max-height:760px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+/* v2.78.18 (Богдан): компактніше — max-height 480px (~10 рядків з тіснішим padding) */
+.ov-actions-table{background:#fff;border:1px solid var(--border);border-radius:10px;overflow-y:auto;max-height:480px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 .ov-actions-table::-webkit-scrollbar{width:6px}
 .ov-actions-table::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 .ov-actions-table::-webkit-scrollbar-thumb:hover{background:var(--muted)}
-.ov-actions-row{display:grid;grid-template-columns:24px 1fr 140px 100px 130px;gap:10px;padding:9px 14px;align-items:center;border-bottom:1px solid var(--border);font-size:12.5px;cursor:pointer;transition:background .12s}
+.ov-actions-row{display:grid;grid-template-columns:24px 1fr 140px 100px 130px;gap:10px;padding:6px 12px;align-items:center;border-bottom:1px solid var(--border);font-size:12px;cursor:pointer;transition:background .12s;line-height:1.35}
 .ov-actions-row:hover{background:#FFF9E5}
 .ov-actions-row:last-child{border:none}
 .ov-actions-row .ova-sev{font-size:13px}
@@ -134,8 +134,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* Movers — 2 columns */
 .ov-movers-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media(max-width:760px){.ov-movers-grid{grid-template-columns:1fr}}
-/* v2.78.15 (Богдан): уніфікований max-height 760px = ~20 рядків на mover-card */
-.ov-mover-card{background:#fff;border:1px solid var(--border);border-radius:10px;overflow-y:auto;max-height:760px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+/* v2.78.18 (Богдан): компактніше — max-height 480px */
+.ov-mover-card{background:#fff;border:1px solid var(--border);border-radius:10px;overflow-y:auto;max-height:480px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 .ov-mover-card::-webkit-scrollbar{width:6px}
 .ov-mover-card::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 .ov-mover-card::-webkit-scrollbar-thumb:hover{background:var(--muted)}
@@ -145,7 +145,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ovm-xlsx-btn{background:#2E8B57;color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:10.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:3px;margin-left:8px;letter-spacing:0;text-transform:none;font-family:inherit;transition:background .12s}
 .ovm-xlsx-btn:hover{background:#226d44}
 .ov-section-title .ovm-xlsx-btn{font-weight:600;font-size:11px}
-.ov-mover-row{display:grid;grid-template-columns:24px 1fr 90px 80px;gap:8px;padding:8px 14px;align-items:center;border-bottom:1px dashed var(--border);font-size:12px;cursor:pointer;transition:background .12s}
+.ov-mover-row{display:grid;grid-template-columns:24px 1fr 90px 80px;gap:8px;padding:5px 12px;align-items:center;border-bottom:1px dashed var(--border);font-size:11.5px;cursor:pointer;transition:background .12s;line-height:1.3}
 .ov-mover-row:hover{background:#FFF9E5}
 .ov-mover-row:last-child{border:none}
 .ov-mover-row .ovm-rank{font-weight:800;color:var(--y);text-align:right}
@@ -190,7 +190,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ov-legacy-lists summary::-webkit-details-marker{display:none}
 .ov-legacy-lists summary::after{content:'▾';color:var(--muted)}
 .ov-legacy-lists details[open] summary::after{content:'▴'}
-.ov-legacy-lists details > div{margin-top:6px;max-height:760px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.ov-legacy-lists details > div{margin-top:6px;max-height:480px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 .ov-legacy-lists details > div::-webkit-scrollbar{width:6px}
 .ov-legacy-lists details > div::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
@@ -637,7 +637,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.78.17 · Combined контрагенти (robust substring match + diagnostic) · Богдан fixes: materiality 1% · TOP-100 scroll+sort · Lost cohorts · Cross-sell priority · YoY YTD · credit term · multi-currency · multi-select SKU · ПДЗ+Продажі за смаками опущено вниз · 20-row scroll · Worker raw_json skip · Оновлення: щодня 06:00
+  snEco Customer 360 v2.78.18 · Combined badge FIX · Cross-sell ТОП-10 list з поясненнями · isPackaging короб/showbox/наклейки · компактніше Overview (480px max-height, tight padding) · Богдан fixes: materiality · TOP-100 sort · Lost cohorts · YoY YTD · credit term · multi-currency · multi-select SKU · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -1230,12 +1230,16 @@ function calcCrossSell(c, allDemandPositions, allCounterparties){
   if (!allDemandPositions || allDemandPositions.length === 0) {
     return { items: [], reason: 'demand_positions ще пуста — чекаємо sync' };
   }
-  // v2.78.8 (Богдан): exclude тару (Гофроящики, packaging) + sort by ТОП SKU останніх 3 місяців
+  // v2.78.18 (Богдан): exclude тару — розширено: + "короб", "showbox", "наклейка", "стікер", "скотч", "плівка", "етикетка"
   const isPackaging = (name) => {
     if (!name) return true;
     const n = name.toLowerCase();
-    return n.includes('гофроящ') || n.includes('гофрокороб') || n.includes('пакет ') ||
-           n.includes('пакети ') || n.includes('пакування') || n.includes('тара') ||
+    return n.includes('гофроящ') || n.includes('гофрокороб') || n.includes('короб') ||
+           n.includes('showbox') || n.includes('show box') || n.includes('show-box') ||
+           n.includes('пакет ') || n.includes('пакети ') || n.includes('пакування') ||
+           n.includes('тара') || n.includes('стікер') || n.includes('наклейк') ||
+           n.includes('етикетк') || n.includes('label') || n.includes('скотч') ||
+           n.includes('плівк') || n.includes('пачка') ||
            n.startsWith('opt ') || n.startsWith('all ') || /^(opt|all)\s*\d/i.test(n);
   };
 
@@ -1285,14 +1289,20 @@ function calcCrossSell(c, allDemandPositions, allCounterparties){
     .map(([name, s]) => ({
       name,
       peerCount: s.peerCount.size,
-      avgPerPeer: s.totalSum / s.peerCount.size,
+      avgPerPeer: s.peerCount.size > 0 ? s.totalSum / s.peerCount.size : 0,
+      totalSum: s.totalSum,
       recentRank: recentSkuRank[name] || 0   // v2.78.8: snEco-wide popularity 3m
     }))
     .filter(x => x.peerCount >= 2) // мінімум 2 peers купляють — для статистичної значимості
     // v2.78.8: primary sort — recent ТОП SKU snEco (3 міс), secondary — avg per peer
     .sort((a, b) => (b.recentRank - a.recentRank) || (b.avgPerPeer - a.avgPerPeer))
-    .slice(0, 20);
-  return { items, reason: items.length === 0 ? 'усе що peers купляють — клієнт уже бере (або це тільки тара)' : '' };
+    .slice(0, 10);   // v2.78.18 (Богдан): ТОП-10 замість 20 — список з поясненнями замість 20 карток
+  return {
+    items,
+    totalPeers: peers.length,
+    myRev,
+    reason: items.length === 0 ? 'усе що peers купляють — клієнт уже бере (або це тільки тара)' : ''
+  };
 }
 
 // ============================================================================
@@ -3475,7 +3485,7 @@ function renderCustomerView(c){
   const html = `
     <!-- HEADER CARD -->
     <div class="cust-header">
-      <div class="cust-name">${escapeHtml(c.name)}${c.__combined ? ' <span style="display:inline-block;background:#7e57c2;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;vertical-align:middle;margin-left:6px;letter-spacing:.5px" title="Об\'єднано ' + (c.__members?.length||0) + ' юр.форм через поле \'Комбінований контрагент\' у MoySklad">🔗 COMBINED · ${c.__members?.length||0}</span>' : ''}${hasMultiCurrency ? ' <span style="display:inline-block;background:#3a5fa5;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;vertical-align:middle;margin-left:6px;letter-spacing:.5px">🌍 MULTI-CURRENCY</span>' : ''}</div>
+      <div class="cust-name">${escapeHtml(c.name)}${c.__combined ? ` <span style="display:inline-block;background:#7e57c2;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;vertical-align:middle;margin-left:6px;letter-spacing:.5px" title="Обʼєднано ${c.__members?.length||0} юр.форм через MoySklad поле Комбінований контрагент">🔗 COMBINED · ${c.__members?.length||0}</span>` : ''}${hasMultiCurrency ? ' <span style="display:inline-block;background:#3a5fa5;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;vertical-align:middle;margin-left:6px;letter-spacing:.5px">🌍 MULTI-CURRENCY</span>' : ''}</div>
       ${c.__combined && c.__members?.length ? `
         <div style="background:#f3edff;border:1px solid #d1bff2;border-radius:8px;padding:10px 14px;margin:8px 0 0;font-size:12.5px">
           <div style="font-weight:600;color:#5e3aa0;margin-bottom:6px">🔗 Об'єднані юр.форми (${c.__members.length}):</div>
@@ -3809,21 +3819,27 @@ function renderCustomerView(c){
       `}).join('')}
     </div>
 
-    <!-- v2.73.0 — CROSS-SELL OPPORTUNITY -->
+    <!-- v2.78.18 (Богдан): CROSS-SELL OPPORTUNITY — список ТОП-10 з поясненнями -->
     ${crossSell.items.length > 0 ? `
-      <div class="sec">🎯 Cross-sell opportunity · SKU що peers купляють, а ${escapeHtml(c.name)} — ні</div>
-      <div class="cs-grid">
-        ${crossSell.items.map(it => `
-          <div class="cs-item">
-            <div>
-              <div class="cs-name">${escapeHtml(it.name)}</div>
-              <div class="cs-info">${it.peerCount} peer${it.peerCount===1?'':'s'} купляють</div>
-            </div>
-            <div class="cs-opp">${nfm(it.avgPerPeer)} ₴</div>
+      <div class="sec">🎯 Cross-sell opportunity — ТОП-10 SKU що peers купляють, а ${escapeHtml(c.name)} ще ні</div>
+      <div style="background:#fafaf5;border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:8px;font-size:12.5px;color:var(--d);line-height:1.55">
+        <b>Як читати:</b> <b>peers</b> — клієнти snEco з виручкою у діапазоні ±50% від цього клієнта (${nfm(crossSell.myRev)} ₴ lifetime), всього <b>${crossSell.totalPeers} peers</b> у tier'і. Sort: спершу за популярністю SKU в snEco за останні 3 міс, далі за avg ₴/peer.
+        <br>💡 <b>Як використовувати:</b> позиції з найвищим % peers + хорошим avg ₴ → дзвонок клієнту, запропонувати SKU №1 у списку. Якщо щось у списку — клієнт цього не купляв ЖОДНОГО разу за всю історію.
+      </div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:36px 1fr 90px 130px 150px;gap:10px;padding:10px 14px;background:#FAFAF5;border-bottom:1px solid var(--border);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)">
+          <div>#</div><div>SKU</div><div style="text-align:right">Peers</div><div style="text-align:right">Avg ₴/peer</div><div style="text-align:right">Потенціал ₴</div>
+        </div>
+        ${crossSell.items.map((it, i) => `
+          <div style="display:grid;grid-template-columns:36px 1fr 90px 130px 150px;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12.5px;align-items:center">
+            <div style="font-weight:700;color:var(--y)">${i+1}</div>
+            <div style="font-weight:600">${escapeHtml(it.name)}</div>
+            <div style="text-align:right"><b>${it.peerCount}</b><span style="color:var(--muted)"> / ${crossSell.totalPeers}</span> <span style="color:var(--muted);font-size:11px">(${Math.round(it.peerCount/crossSell.totalPeers*100)}%)</span></div>
+            <div style="text-align:right">${it.avgPerPeer > 0 ? nfm(it.avgPerPeer) + ' ₴' : '<span style="color:var(--muted)" title="positions sum_kop порожні — порахувати потенціал не можемо">—</span>'}</div>
+            <div style="text-align:right;font-weight:700;color:${it.avgPerPeer > 0 ? 'var(--g)' : 'var(--muted)'}">${it.avgPerPeer > 0 ? '≈ ' + nfm(it.avgPerPeer) + ' ₴' : '—'}</div>
           </div>
         `).join('')}
       </div>
-      <div style="font-size:11px;color:var(--muted);margin-top:8px;font-style:italic">💡 Σ avg per peer — потенційна opportunity якщо клієнт додасть ці SKU у замовлення. Peers = клієнти з revenue +/- 50% від цього.</div>
     ` : `
       <div class="sec">🎯 Cross-sell opportunity</div>
       <div class="cc" style="font-size:13px;color:var(--muted);font-style:italic">${crossSell.reason}</div>
