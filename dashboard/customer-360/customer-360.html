@@ -41,6 +41,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* ─── SELECTOR ─── */
 .selector-bar{background:#fff;border-bottom:1px solid var(--border);padding:14px 24px;position:sticky;top:56px;z-index:150;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+/* v2.78.33: compact mode коли клієнт відкритий — приховуємо search, показуємо тільки back button */
+.selector-bar.compact{padding:8px 24px}
+.selector-bar.compact .search-wrap{display:none}
+.selector-bar.compact .quick-pills{margin-top:0;justify-content:flex-start}
 .search-wrap{position:relative;max-width:600px;margin:0 auto}
 .search-input{width:100%;padding:11px 16px 11px 42px;border:2px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s;background:#fff}
 .search-input:focus{border-color:var(--y)}
@@ -643,7 +647,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.78.32 · 📈 Health Trend sparklines (revenue + orders MoM 6 міс) + 6 типів ANOMALY ALERTS (revenue drop · cadence break · return spike · AR aging · new SKU · concentration) · Compact selector-bar + auth badge inline · CRM-notes MoySklad sync FIX (ctx.waitUntil) · Combined KPI fix · Excel export · Keyboard / s n Esc · Оновлення: щодня 06:00
+  snEco Customer 360 v2.78.33 · 🔄 SWAP: Health Trend & Alerts замість Timeline біля ТОП-100 + Timeline (хронологія) повернено під Адресами · Compact selector-bar (search прихований коли клієнт обраний) · Sparklines + 6 alerts · CRM-notes ctx.waitUntil · Combined KPI fix · Excel export · Keyboard / n Esc · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -3106,6 +3110,8 @@ function setupSearch(){
 let _pillsBackup = null;
 
 window.showPillsList = function(){
+  // v2.78.33: вертаємось до списку — знімаємо compact mode щоб search знов з'явився
+  document.querySelector('.selector-bar')?.classList.remove('compact');
   // v2.76.0 FIX: showPillsList() — повертаємось до Overview (KPIs, movers, action items,
   // heatmap). Раніше: відновлювали stale _pillsBackup + показували empty-hero. БАГ.
   // Тепер просто renderOverview() — він і pills, і contentWrap правильно перепопулює.
@@ -3134,7 +3140,8 @@ window.selectCustomer = function(name){
   if (pillsEl && !_pillsBackup) {
     _pillsBackup = pillsEl.innerHTML;
   }
-  // v2.78.32: компактний — тільки кнопка "← До списку" (ім'я клієнта вже у h1 нижче, дубль зайвий)
+  // v2.78.33: compact mode — search прихований через CSS клас, тільки back-button лівий
+  document.querySelector('.selector-bar')?.classList.add('compact');
   pillsEl.innerHTML = `
     <button onclick="showPillsList()" style="background:rgba(254,191,39,.18);color:#996600;border:1px solid rgba(254,191,39,.35);padding:5px 12px;border-radius:8px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px">← До списку клієнтів</button>
   `;
@@ -4046,14 +4053,15 @@ function renderCustomerView(c){
           </table>
         </div>
       </div>
-      <div class="cc">
+      <!-- v2.78.33 (Богдан): Health Trend & Alerts замість Timeline біля ТОП-100 продуктів -->
+      <div class="cc" id="healthTrendBlock">
         <div class="cc-head">
           <div>
-            <div class="cc-title">🕐 Останні 20 подій</div>
-            <div class="cc-sub">Хронологія активності</div>
+            <div class="cc-title">📈 Health Trend &amp; Alerts</div>
+            <div class="cc-sub">Динаміка 6 міс + автоматичні аномалії за 30 днів</div>
           </div>
         </div>
-        <div class="timeline" id="timelineBody"></div>
+        <div id="healthTrendBody" style="padding:8px 0"></div>
       </div>
     </div>
 
@@ -4158,179 +4166,45 @@ function renderCustomerView(c){
     <!-- NOTES from raw_json -->
     ${renderNotes(c)}
 
-    <!-- v2.78.32 (Богдан): HEALTH TREND + ANOMALY ALERTS (заміна Timeline що був мало-функціональний) -->
+    <!-- v2.78.33: ПОВЕРНУТО Timeline (chronological feed) — як було у v2.78.31 -->
     ${(() => {
-      // Build last 6 months revenue + returns + AOV per month
-      const mNames = ['січ','лют','бер','кві','тра','чер','лип','сер','вер','жов','лис','гру'];
-      const now2 = new Date();
-      const months6 = [];
-      for (let i = 5; i >= 0; i--) {
-        const d = new Date(now2.getFullYear(), now2.getMonth() - i, 1);
-        months6.push({ key: d.toISOString().slice(0,7), label: mNames[d.getMonth()] });
-      }
-      const revByMonth = {};
-      const ordByMonth = {};
-      const retByMonth = {};
-      dems.forEach(d => {
-        const ym = (d.ms_moment||'').slice(0,7);
-        if (!ym) return;
-        revByMonth[ym] = (revByMonth[ym]||0) + (d.sum_kop||0)/100;
-        ordByMonth[ym] = (ordByMonth[ym]||0) + 1;
-      });
-      rets.forEach(r => {
-        const ym = (r.ms_moment||'').slice(0,7);
-        if (!ym) return;
-        retByMonth[ym] = (retByMonth[ym]||0) + (r.sum_kop||0)/100;
-      });
-      const revSeries = months6.map(m => revByMonth[m.key]||0);
-      const ordSeries = months6.map(m => ordByMonth[m.key]||0);
-      const maxRev = Math.max(...revSeries, 1);
-      const maxOrd = Math.max(...ordSeries, 1);
-      // SVG sparkline helper
-      const W = 220, H = 44, P = 4;
-      const sparkPath = (series, max) => {
-        if (series.every(v => v === 0)) return '';
-        const stepX = (W - P*2) / Math.max(1, series.length - 1);
-        return series.map((v, i) => {
-          const x = P + i * stepX;
-          const y = H - P - (v / max) * (H - P*2);
-          return (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
-        }).join(' ');
-      };
-      const revPath = sparkPath(revSeries, maxRev);
-      const ordPath = sparkPath(ordSeries, maxOrd);
-      // Last point dots for sparkline
-      const lastDot = (series, max) => {
-        if (series[series.length-1] === 0) return null;
-        const stepX = (W - P*2) / Math.max(1, series.length - 1);
-        const x = P + (series.length - 1) * stepX;
-        const y = H - P - (series[series.length-1] / max) * (H - P*2);
-        return { x: x.toFixed(1), y: y.toFixed(1) };
-      };
-      const revDot = lastDot(revSeries, maxRev);
-      const ordDot = lastDot(ordSeries, maxOrd);
-      // Trend deltas — last vs prev month
-      const revLast = revSeries[5] || 0;
-      const revPrev = revSeries[4] || 0;
-      const revDelta = revPrev > 0 ? ((revLast - revPrev) / revPrev * 100) : (revLast > 0 ? 100 : 0);
-      const ordLast = ordSeries[5] || 0;
-      const ordPrev = ordSeries[4] || 0;
-      const ordDelta = ordPrev > 0 ? ((ordLast - ordPrev) / ordPrev * 100) : (ordLast > 0 ? 100 : 0);
-
-      // ─── ANOMALY DETECTION ───
-      const alerts = [];
-      // 1. Revenue drop > 30%
-      if (revPrev > 0 && revDelta < -30) {
-        alerts.push({ type: 'danger', icon: '📉', title: `Місячна виручка впала ${Math.round(revDelta)}%`, sub: `${nfm(revLast)} ₴ vs ${nfm(revPrev)} ₴ попередній міс` });
-      } else if (revPrev > 0 && revDelta > 30) {
-        alerts.push({ type: 'good', icon: '🚀', title: `Місячна виручка зросла +${Math.round(revDelta)}%`, sub: `${nfm(revLast)} ₴ vs ${nfm(revPrev)} ₴ попередній міс — продовжуй пушити` });
-      }
-      // 2. Cadence anomaly — if daysSinceLast > 2× avg cadence
-      if (avgCadenceDays && daysSinceLast !== null && daysSinceLast > avgCadenceDays * 2) {
-        alerts.push({ type: 'danger', icon: '⏰', title: `Cadence порушено: ${daysSinceLast} днів без замовлень`, sub: `Норма для клієнта — кожні ${avgCadenceDays} днів. Час дзвонити.` });
-      } else if (avgCadenceDays && daysSinceLast !== null && daysSinceLast > avgCadenceDays * 1.5) {
-        alerts.push({ type: 'warn', icon: '⏰', title: `Близько до cadence: ${daysSinceLast} днів (норма ${avgCadenceDays})`, sub: `Уже мав би замовити. Превентивний дзвінок?` });
-      }
-      // 3. Return rate spike — last 30 днів returns / shipments > 2× lifetime avg
-      const cutoff30 = new Date(Date.now() - 30*86400000).toISOString().slice(0,10);
-      const recentRets = rets.filter(r => (r.ms_moment||'').slice(0,10) >= cutoff30).reduce((a,r)=>a+(r.sum_kop||0)/100, 0);
-      const recentShips = dems.filter(d => (d.ms_moment||'').slice(0,10) >= cutoff30).reduce((a,d)=>a+(d.sum_kop||0)/100, 0);
-      const recentRetRate = recentShips > 0 ? (recentRets/recentShips*100) : 0;
-      if (returnRate > 0 && recentRetRate > returnRate * 2 && recentRetRate > 3) {
-        alerts.push({ type: 'danger', icon: '↩', title: `Return rate подвоївся: ${recentRetRate.toFixed(1)}% за 30 днів`, sub: `Lifetime avg: ${returnRate.toFixed(1)}%. Запитай про причини повернень.` });
-      }
-      // 4. AR overdue alert
-      if (overdueAR > 0) {
-        const oldestDays = overdueDemands.length ? Math.max(...overdueDemands.map(d => Math.floor((Date.now() - new Date(d.ms_moment).getTime())/86400000))) : 0;
-        alerts.push({
-          type: oldestDays > 90 ? 'danger' : 'warn',
-          icon: '💸',
-          title: `Протерміновано ${nfm(overdueAR)} ₴ (${overdueDemands.length} рах.)`,
-          sub: `Найстаріший борг: ${oldestDays} днів. ${oldestDays > 90 ? 'КРИТИЧНО — pre-write-off зона.' : 'Час дзвонити по оплаті.'}`
+      const events = [];
+      dems.slice(0, 50).forEach(d => events.push({
+        date: d.ms_moment, type: 'demand', icon: '📦',
+        title: `Замовлення ${d.name || ''}`, sum: (d.sum_kop||0)/100, color: '#4a7000', bg: 'rgba(150,193,31,.10)'
+      }));
+      pays.slice(0, 50).forEach(p => {
+        const t = String(p.payment_type||'').toLowerCase();
+        const inb = t.includes('вхід') || t.includes('incoming') || t.includes('paymentin');
+        events.push({
+          date: p.ms_moment, type: inb?'paymentin':'paymentout', icon: inb?'💵':'💸',
+          title: `${inb?'Оплата вх.':'Оплата вих.'} ${p.name || ''}`,
+          sum: (p.sum_kop||0)/100, color: inb?'#4a7000':'#a00', bg: inb?'rgba(150,193,31,.10)':'rgba(232,64,64,.10)'
         });
-      }
-      // 5. New SKU positive signal — позиція з останніх 60 днів якої не було раніше
+      });
+      const myKey = c.__key || c.id || c.name;
       try {
-        const cutoff60 = new Date(Date.now() - 60*86400000).toISOString().slice(0,10);
-        const recentSKUs = new Set(allDemandPositions.filter(p => matchCP(p) && (p.ms_moment||'').slice(0,10) >= cutoff60).map(p => p.product_name).filter(Boolean));
-        const oldSKUs = new Set(allDemandPositions.filter(p => matchCP(p) && (p.ms_moment||'').slice(0,10) < cutoff60).map(p => p.product_name).filter(Boolean));
-        const newSKUs = [...recentSKUs].filter(s => !oldSKUs.has(s));
-        if (newSKUs.length > 0) {
-          alerts.push({ type: 'good', icon: '✨', title: `${newSKUs.length} нових SKU у кошику (60 днів)`, sub: newSKUs.slice(0,3).join(' · ') + (newSKUs.length > 3 ? ` + ${newSKUs.length-3} ще` : '') });
-        }
+        const crmLog = (typeof loadCrmLog === 'function') ? loadCrmLog(myKey) : [];
+        crmLog.slice(0, 20).forEach(n => events.push({
+          date: n.date, type: 'crm', icon: '💬',
+          title: `CRM ${n.type||''}: ${(n.summary||'').slice(0,80)}`,
+          sum: null, color: '#7e57c2', bg: 'rgba(126,87,194,.10)'
+        }));
       } catch(e) { /* ignore */ }
-      // 6. Concentration risk — якщо ТОП-3 SKU дають >80% revenue
-      try {
-        const skuRev = {};
-        allDemandPositions.filter(matchCP).forEach(p => {
-          const n = p.product_name;
-          if (n && !window.isPackagingSKU(n)) skuRev[n] = (skuRev[n]||0) + (p.sum_kop||0)/100;
-        });
-        const skuTotal = Object.values(skuRev).reduce((a,v)=>a+v,0);
-        if (skuTotal > 0) {
-          const top3 = Object.values(skuRev).sort((a,b)=>b-a).slice(0,3).reduce((a,v)=>a+v,0);
-          const top3Pct = (top3/skuTotal*100);
-          if (top3Pct > 80 && Object.keys(skuRev).length > 5) {
-            alerts.push({ type: 'warn', icon: '⚖', title: `Концентрація: ТОП-3 SKU = ${top3Pct.toFixed(0)}% виручки`, sub: `Ризик якщо популярний SKU зникне з лінійки. Cross-sell інших SKU зменшить ризик.` });
-          }
-        }
-      } catch(e){}
-      // Якщо нема ніяких alerts — позитивний meta-alert
-      if (alerts.length === 0) {
-        alerts.push({ type: 'good', icon: '✅', title: 'Без аномалій', sub: 'Клієнт стабільний. Жодних відхилень від норм за 30 днів.' });
-      }
-
-      const ALERT_STYLE = {
-        good:   { bg: 'rgba(150,193,31,.10)', border: '#96C11F', color: '#4a7000' },
-        warn:   { bg: 'rgba(254,191,39,.13)', border: '#FEBF27', color: '#996600' },
-        danger: { bg: 'rgba(232,64,64,.10)', border: '#E84040', color: '#a00' },
-      };
-
+      events.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+      const top = events.slice(0, 60);
+      if (top.length === 0) return '';
       return `
-        <div class="sec">📈 Health Trend &amp; Alerts <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0">(динаміка 6 міс + автоматичні аномалії за 30 днів)</span></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-          <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px">
-            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
-              <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">💰 Виручка по місяцях</div>
-              <div style="font-size:13px;font-weight:700;color:${revDelta >= 0 ? '#4a7000' : '#a00'}">${revDelta >= 0 ? '↑ +' : '↓ '}${Math.abs(revDelta).toFixed(0)}% MoM</div>
+        <div class="sec">📅 Timeline · хронологія взаємодій <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0">(останні 60 подій — demands · payments · CRM-нотатки)</span></div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow-y:auto;max-height:480px;padding:4px 0;scrollbar-width:thin">
+          ${top.map(e => `
+            <div style="display:grid;grid-template-columns:80px 24px 1fr 110px;gap:10px;padding:7px 14px;border-bottom:1px solid var(--border);font-size:12.5px;align-items:center">
+              <div style="color:var(--muted);font-size:11px;font-family:monospace">${(e.date||'').slice(0,10)}</div>
+              <div style="background:${e.bg};color:${e.color};width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px">${e.icon}</div>
+              <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escapeAttr(e.title)}">${escapeHtml(e.title)}</div>
+              <div style="text-align:right;font-weight:${e.sum?'600':'400'};color:${e.color}">${e.sum !== null ? nfm(e.sum) + ' ₴' : ''}</div>
             </div>
-            <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:${H}px">
-              <path d="${revPath}" fill="none" stroke="#96C11F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              ${revDot ? `<circle cx="${revDot.x}" cy="${revDot.y}" r="3.5" fill="#96C11F" stroke="#fff" stroke-width="1.5"/>` : ''}
-            </svg>
-            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:4px">
-              ${months6.map(m => `<span>${m.label}</span>`).join('')}
-            </div>
-            <div style="font-size:11.5px;color:var(--d);margin-top:6px"><b>${nfm(revLast)} ₴</b> поточний міс · попер. <b>${nfm(revPrev)} ₴</b></div>
-          </div>
-          <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px">
-            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
-              <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">📦 Замовлень по місяцях</div>
-              <div style="font-size:13px;font-weight:700;color:${ordDelta >= 0 ? '#4a7000' : '#a00'}">${ordDelta >= 0 ? '↑ +' : '↓ '}${Math.abs(ordDelta).toFixed(0)}% MoM</div>
-            </div>
-            <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:${H}px">
-              <path d="${ordPath}" fill="none" stroke="#FEBF27" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              ${ordDot ? `<circle cx="${ordDot.x}" cy="${ordDot.y}" r="3.5" fill="#FEBF27" stroke="#fff" stroke-width="1.5"/>` : ''}
-            </svg>
-            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:4px">
-              ${months6.map(m => `<span>${m.label}</span>`).join('')}
-            </div>
-            <div style="font-size:11.5px;color:var(--d);margin-top:6px"><b>${ordLast}</b> замовл. поточний міс · попер. <b>${ordPrev}</b></div>
-          </div>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px">
-          ${alerts.map(a => {
-            const s = ALERT_STYLE[a.type] || ALERT_STYLE.warn;
-            return `
-              <div style="background:${s.bg};border-left:3px solid ${s.border};border-radius:6px;padding:8px 12px;display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:center;font-size:12.5px">
-                <div style="font-size:15px">${a.icon}</div>
-                <div>
-                  <div style="font-weight:600;color:${s.color}">${escapeHtml(a.title)}</div>
-                  <div style="color:var(--muted);font-size:11.5px;margin-top:1px">${escapeHtml(a.sub)}</div>
-                </div>
-              </div>`;
-          }).join('')}
+          `).join('')}
         </div>`;
     })()}
 
@@ -4440,40 +4314,134 @@ function renderCustomerView(c){
       });
     }
 
-    // Render timeline
-    // v2.78: + currency + sum_orig для non-UAH badge
-    const buildEvent = (tx, base) => ({
-      ...base,
-      currency: (tx.currency || 'UAH').toUpperCase(),
-      orig: (tx.sum_orig_kop || tx.sum_kop || 0) / 100,
-    });
-    const events = [
-      ...dems.slice(0, 30).map(d => buildEvent(d, {type:'demand', date: d.ms_moment, title: `Відвантаження ${d.name||''}`, amount: (d.sum_kop||0)/100, icon:'📦'})),
-      ...pays.slice(0, 30).map(p => buildEvent(p, {type:'payment', date: p.ms_moment, title: `Оплата ${p.payment_type||''} ${p.name||''}`, amount: (p.sum_kop||0)/100, icon:'💰'})),
-      ...ords.slice(0, 20).map(o => buildEvent(o, {type:'order', date: o.ms_moment, title: `Замовлення ${o.name||''}`, amount: (o.sum_kop||0)/100, icon:'📋'})),
-      ...rets.slice(0, 10).map(r => buildEvent(r, {type:'return', date: r.ms_moment, title: `Повернення ${r.name||''}`, amount: -(r.sum_kop||0)/100, icon:'↩️'})),
-      ...invs.slice(0, 10).map(i => buildEvent(i, {type:'invoice', date: i.ms_moment, title: `Рахунок ${i.name||''}`, amount: (i.sum_kop||0)/100, icon:'🧾'})),
-    ].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 20);
-
-    document.getElementById('timelineBody').innerHTML = events.length
-      ? events.map(e => {
-          const isNonUah = e.currency && e.currency !== 'UAH';
-          const curBadge = isNonUah
-            ? `<div style="font-size:10px;color:#3a5fa5;background:#e8f4ff;padding:1px 6px;border-radius:8px;display:inline-block;margin-top:2px" title="Оригінал у валюті документа">${e.amount<0?'−':''}${symbolOf(e.currency)} ${nf(Math.round(Math.abs(e.orig)))}</div>`
-            : '';
-          return `
-        <div class="tl-item">
-          <div class="tl-icon ${e.type}">${e.icon}</div>
-          <div class="tl-body">
-            <div class="tl-meta">${dfShort(e.date)} · ${e.type}${isNonUah?' · '+e.currency:''}</div>
-            <div class="tl-title">${escapeHtml(e.title)}</div>
+    // v2.78.33 (Богдан): Render Health Trend & Alerts замість Timeline біля ТОП-100 продуктів
+    const target = document.getElementById('healthTrendBody');
+    if (target) {
+      const mNames2 = ['січ','лют','бер','кві','тра','чер','лип','сер','вер','жов','лис','гру'];
+      const now2 = new Date();
+      const months6 = [];
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now2.getFullYear(), now2.getMonth() - i, 1);
+        months6.push({ key: d.toISOString().slice(0,7), label: mNames2[d.getMonth()] });
+      }
+      const revByMonthLocal = {}, ordByMonthLocal = {};
+      dems.forEach(d => {
+        const ym = (d.ms_moment||'').slice(0,7); if (!ym) return;
+        revByMonthLocal[ym] = (revByMonthLocal[ym]||0) + (d.sum_kop||0)/100;
+        ordByMonthLocal[ym] = (ordByMonthLocal[ym]||0) + 1;
+      });
+      const revSeries = months6.map(m => revByMonthLocal[m.key]||0);
+      const ordSeries = months6.map(m => ordByMonthLocal[m.key]||0);
+      const maxRev = Math.max(...revSeries, 1);
+      const maxOrd = Math.max(...ordSeries, 1);
+      const W = 220, H = 44, P = 4;
+      const sparkPath = (series, max) => {
+        if (series.every(v => v === 0)) return '';
+        const stepX = (W - P*2) / Math.max(1, series.length - 1);
+        return series.map((v, i) => {
+          const x = P + i * stepX, y = H - P - (v / max) * (H - P*2);
+          return (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
+        }).join(' ');
+      };
+      const lastDot = (series, max) => {
+        if (series[series.length-1] === 0) return null;
+        const stepX = (W - P*2) / Math.max(1, series.length - 1);
+        const x = P + (series.length - 1) * stepX;
+        const y = H - P - (series[series.length-1] / max) * (H - P*2);
+        return { x: x.toFixed(1), y: y.toFixed(1) };
+      };
+      const revPath = sparkPath(revSeries, maxRev), ordPath = sparkPath(ordSeries, maxOrd);
+      const revDot = lastDot(revSeries, maxRev), ordDot = lastDot(ordSeries, maxOrd);
+      const revLast = revSeries[5]||0, revPrev = revSeries[4]||0;
+      const revDelta = revPrev > 0 ? ((revLast - revPrev) / revPrev * 100) : (revLast > 0 ? 100 : 0);
+      const ordLast = ordSeries[5]||0, ordPrev = ordSeries[4]||0;
+      const ordDelta = ordPrev > 0 ? ((ordLast - ordPrev) / ordPrev * 100) : (ordLast > 0 ? 100 : 0);
+      // ANOMALY DETECTION
+      const alerts = [];
+      if (revPrev > 0 && revDelta < -30) alerts.push({ type: 'danger', icon: '📉', title: `Виручка ↓ ${Math.round(revDelta)}%`, sub: `${nfm(revLast)} ₴ vs ${nfm(revPrev)} ₴ попер. міс` });
+      else if (revPrev > 0 && revDelta > 30) alerts.push({ type: 'good', icon: '🚀', title: `Виручка ↑ +${Math.round(revDelta)}%`, sub: `${nfm(revLast)} ₴ vs ${nfm(revPrev)} ₴ попер. міс — пушити далі` });
+      if (avgCadenceDays && daysSinceLast !== null && daysSinceLast > avgCadenceDays * 2)
+        alerts.push({ type: 'danger', icon: '⏰', title: `Cadence порушено: ${daysSinceLast} днів`, sub: `Норма ${avgCadenceDays} днів. Час дзвонити.` });
+      else if (avgCadenceDays && daysSinceLast !== null && daysSinceLast > avgCadenceDays * 1.5)
+        alerts.push({ type: 'warn', icon: '⏰', title: `Близько до cadence: ${daysSinceLast}д (норма ${avgCadenceDays})`, sub: 'Превентивний дзвінок' });
+      const cutoff30 = new Date(Date.now() - 30*86400000).toISOString().slice(0,10);
+      const recentRets = rets.filter(r => (r.ms_moment||'').slice(0,10) >= cutoff30).reduce((a,r)=>a+(r.sum_kop||0)/100, 0);
+      const recentShips = dems.filter(d => (d.ms_moment||'').slice(0,10) >= cutoff30).reduce((a,d)=>a+(d.sum_kop||0)/100, 0);
+      const recentRetRate = recentShips > 0 ? (recentRets/recentShips*100) : 0;
+      if (returnRate > 0 && recentRetRate > returnRate * 2 && recentRetRate > 3)
+        alerts.push({ type: 'danger', icon: '↩', title: `Return rate ↑ ${recentRetRate.toFixed(1)}% (30д)`, sub: `Lifetime: ${returnRate.toFixed(1)}%. Питати про причини.` });
+      if (overdueAR > 0) {
+        const oldestDays = overdueDemands.length ? Math.max(...overdueDemands.map(d => Math.floor((Date.now() - new Date(d.ms_moment).getTime())/86400000))) : 0;
+        alerts.push({ type: oldestDays > 90 ? 'danger' : 'warn', icon: '💸', title: `Протерміновано ${nfm(overdueAR)} ₴`, sub: `Найстарше: ${oldestDays}д. ${oldestDays > 90 ? 'КРИТИЧНО pre-write-off' : 'Дзвонити по оплаті.'}` });
+      }
+      try {
+        const cutoff60 = new Date(Date.now() - 60*86400000).toISOString().slice(0,10);
+        const recentSKUs = new Set(allDemandPositions.filter(p => matchCP(p) && (p.ms_moment||'').slice(0,10) >= cutoff60).map(p => p.product_name).filter(Boolean));
+        const oldSKUs = new Set(allDemandPositions.filter(p => matchCP(p) && (p.ms_moment||'').slice(0,10) < cutoff60).map(p => p.product_name).filter(Boolean));
+        const newSKUs = [...recentSKUs].filter(s => !oldSKUs.has(s));
+        if (newSKUs.length > 0) alerts.push({ type: 'good', icon: '✨', title: `${newSKUs.length} нових SKU (60д)`, sub: newSKUs.slice(0,3).join(' · ') + (newSKUs.length > 3 ? ` + ${newSKUs.length-3} ще` : '') });
+      } catch(e){}
+      try {
+        const skuRev = {};
+        allDemandPositions.filter(matchCP).forEach(p => {
+          const n = p.product_name;
+          if (n && !window.isPackagingSKU(n)) skuRev[n] = (skuRev[n]||0) + (p.sum_kop||0)/100;
+        });
+        const skuTotal = Object.values(skuRev).reduce((a,v)=>a+v,0);
+        if (skuTotal > 0) {
+          const top3 = Object.values(skuRev).sort((a,b)=>b-a).slice(0,3).reduce((a,v)=>a+v,0);
+          const top3Pct = (top3/skuTotal*100);
+          if (top3Pct > 80 && Object.keys(skuRev).length > 5)
+            alerts.push({ type: 'warn', icon: '⚖', title: `Концентрація ТОП-3 SKU: ${top3Pct.toFixed(0)}%`, sub: 'Ризик якщо популярний SKU зникне. Cross-sell зменшить ризик.' });
+        }
+      } catch(e){}
+      if (alerts.length === 0) alerts.push({ type: 'good', icon: '✅', title: 'Без аномалій', sub: 'Клієнт стабільний.' });
+      const STY = {
+        good: { bg: 'rgba(150,193,31,.10)', border: '#96C11F', color: '#4a7000' },
+        warn: { bg: 'rgba(254,191,39,.13)', border: '#FEBF27', color: '#996600' },
+        danger: { bg: 'rgba(232,64,64,.10)', border: '#E84040', color: '#a00' },
+      };
+      target.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+          <div style="background:#fafaf5;border:1px solid var(--border);border-radius:8px;padding:10px 12px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+              <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">💰 Виручка MoM</div>
+              <div style="font-size:12.5px;font-weight:700;color:${revDelta >= 0 ? '#4a7000' : '#a00'}">${revDelta >= 0 ? '↑+' : '↓'}${Math.abs(revDelta).toFixed(0)}%</div>
+            </div>
+            <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:${H}px">
+              <path d="${revPath}" fill="none" stroke="#96C11F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              ${revDot ? `<circle cx="${revDot.x}" cy="${revDot.y}" r="3.5" fill="#96C11F" stroke="#fff" stroke-width="1.5"/>` : ''}
+            </svg>
+            <div style="display:flex;justify-content:space-between;font-size:9.5px;color:var(--muted);margin-top:2px">${months6.map(m => `<span>${m.label}</span>`).join('')}</div>
+            <div style="font-size:11px;color:var(--d);margin-top:4px"><b>${nfm(revLast)} ₴</b> · попер. ${nfm(revPrev)} ₴</div>
           </div>
-          <div class="tl-amount ${e.amount<0?'neg':e.type==='payment'?'pos':''}" style="text-align:right">
-            ${nf(Math.round(e.amount))} ₴${curBadge ? '<br>'+curBadge : ''}
+          <div style="background:#fafaf5;border:1px solid var(--border);border-radius:8px;padding:10px 12px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+              <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">📦 Замовлень MoM</div>
+              <div style="font-size:12.5px;font-weight:700;color:${ordDelta >= 0 ? '#4a7000' : '#a00'}">${ordDelta >= 0 ? '↑+' : '↓'}${Math.abs(ordDelta).toFixed(0)}%</div>
+            </div>
+            <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:${H}px">
+              <path d="${ordPath}" fill="none" stroke="#FEBF27" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              ${ordDot ? `<circle cx="${ordDot.x}" cy="${ordDot.y}" r="3.5" fill="#FEBF27" stroke="#fff" stroke-width="1.5"/>` : ''}
+            </svg>
+            <div style="display:flex;justify-content:space-between;font-size:9.5px;color:var(--muted);margin-top:2px">${months6.map(m => `<span>${m.label}</span>`).join('')}</div>
+            <div style="font-size:11px;color:var(--d);margin-top:4px"><b>${ordLast}</b> · попер. ${ordPrev}</div>
           </div>
         </div>
-      `}).join('')
-      : `<div class="empty-state"><div class="es-icon">📭</div><div class="es-title">Немає історії</div></div>`;
+        <div style="display:flex;flex-direction:column;gap:5px">
+          ${alerts.map(a => {
+            const s = STY[a.type] || STY.warn;
+            return `
+              <div style="background:${s.bg};border-left:3px solid ${s.border};border-radius:5px;padding:7px 10px;display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:center;font-size:12px">
+                <div style="font-size:14px">${a.icon}</div>
+                <div>
+                  <div style="font-weight:600;color:${s.color}">${a.title}</div>
+                  <div style="color:var(--muted);font-size:11px;margin-top:1px">${a.sub}</div>
+                </div>
+              </div>`;
+          }).join('')}
+        </div>`;
+    }
   }, 50);
 }
 
