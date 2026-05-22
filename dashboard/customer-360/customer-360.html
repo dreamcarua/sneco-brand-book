@@ -637,7 +637,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.78.15 · Богдан fixes: materiality 1% · TOP-100 movers/продуктів scroll+sort · Lost cohorts · Cross-sell priority · YoY YTD · credit term · multi-currency · multi-select SKU · ПДЗ+Продажі за смаками опущено вниз · уніф. 20-row scroll · exclude_raw_json (Worker heap fix) · Оновлення: щодня 06:00
+  snEco Customer 360 v2.78.16 · Combined контрагенти (merge юр.форм через MS custom-поле) · Богдан fixes: materiality 1% · TOP-100 scroll+sort · Lost cohorts · Cross-sell priority · YoY YTD · credit term · multi-currency · multi-select SKU · ПДЗ+Продажі за смаками опущено вниз · 20-row scroll · Worker raw_json skip · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -1805,13 +1805,83 @@ window.bootCustomer360 = async function(token){
     const ytdStart = now.getFullYear() + '-01-01';  // v2.66: для ТОП-10 з початку року
     const cutoff30 = new Date(now.getTime() - 30*86400000).toISOString().slice(0,10);
 
+    // ─── v2.78.16: COMBINED COUNTERPARTY pre-processing ───────────────────────
+    // Group counterparties за полем combined_key (custom MS attribute "Комбінований контрагент").
+    // Кожна група з ≥2 членами → 1 virtual master з агрегатами.
+    // Search/cards/movers потім працюють з master як з єдиним клієнтом.
+    // Backward-compat: counterparties без combined_key (NULL/'') — лишаються unique.
+    const _combinedGroups = {};
+    allCounterparties.forEach(c => {
+      const ck = (c.combined_key || '').trim();
+      if (!ck) return;
+      if (!_combinedGroups[ck]) _combinedGroups[ck] = [];
+      _combinedGroups[ck].push(c);
+    });
+    const _memberKeyToMaster = {};  // id|name → masterKey (для demand routing)
+    const _combinedMasters = [];
+    Object.entries(_combinedGroups).forEach(([combinedKey, members]) => {
+      if (members.length < 2) return;  // одиничний з полем — лишаємо як unique
+      const masterKey = 'combined:' + combinedKey;
+      // Найновіший по тегу архіву/балансу — для контактів
+      const primary = members.slice().sort((a,b) => (b.balance_kop||0) - (a.balance_kop||0))[0] || members[0];
+      const master = {
+        id: masterKey,
+        __key: masterKey,
+        __combined: true,
+        __virtual: false,
+        name: combinedKey,
+        full_name: combinedKey + ' · ' + members.length + ' юр.форм',
+        combined_key: combinedKey,
+        __members: members.map(m => ({
+          id: m.id, name: m.name,
+          edrpou: m.edrpou || m.inn || '',
+          phone: m.phone || '', email: m.email || '',
+          archived: !!m.archived, state: m.state,
+        })),
+        inn: primary.inn || '',
+        edrpou: primary.edrpou || primary.inn || '',
+        phone: primary.phone || members.find(m=>m.phone)?.phone || '',
+        email: primary.email || members.find(m=>m.email)?.email || '',
+        legal_address: primary.legal_address || '',
+        legal_address_comment: primary.legal_address_comment || '',
+        actual_address: primary.actual_address || '',
+        state: primary.state,
+        archived: members.every(m => !!m.archived),
+        balance_kop: members.reduce((s,m) => s + (m.balance_kop||0), 0),
+        overdue_debt_kop: members.reduce((s,m) => s + (m.overdue_debt_kop||0), 0),
+        tags: [...new Set(members.flatMap(m => String(m.tags||'').split(',').map(t=>t.trim()).filter(Boolean)))].join(', '),
+        company_type: primary.company_type || 'combined',
+        description: 'Combined: ' + members.map(m=>m.name).join(' + '),
+      };
+      members.forEach(m => {
+        if (m.id) _memberKeyToMaster[m.id] = master;
+        if (m.name) _memberKeyToMaster[(m.name||'').trim()] = master;
+      });
+      _combinedMasters.push(master);
+    });
+    // Видаляємо merged members з allCounterparties, додаємо masters
+    if (_combinedMasters.length) {
+      allCounterparties = allCounterparties.filter(c => {
+        const k1 = c.id, k2 = (c.name||'').trim();
+        return !(_memberKeyToMaster[k1] || _memberKeyToMaster[k2]);
+      }).concat(_combinedMasters);
+      console.log(`[combined] Merged ${_combinedMasters.length} групи (${Object.values(_combinedGroups).reduce((s,m)=>s+(m.length>=2?m.length:0),0)} member counterparties → ${_combinedMasters.length} virtual masters)`);
+    }
+
     // Build CP lookup tables: by ID (primary) and by name (fallback)
+    // v2.78.16: cpById/cpByName ТАКОЖ містять mapping member.id/name → MASTER counterparty,
+    // щоб demands/payments member'ів автоматично роутились на virtual combined master.
     const cpById = {};
     const cpByName = {};
     allCounterparties.forEach(c => {
       if (c.id) cpById[c.id] = c;
       const nm = (c.name||'').trim();
       if (nm) cpByName[nm] = c;
+    });
+    // Додаємо member→master alias mappings
+    Object.entries(_memberKeyToMaster).forEach(([k, master]) => {
+      if (!cpById[k]) cpById[k] = master;
+      if (!cpByName[k]) cpByName[k] = master;
     });
 
     // For each demand: figure out which CP it belongs to
@@ -2756,8 +2826,14 @@ function setupSearch(){
     if (q.length < 2) { results.classList.remove('open'); return; }
     const matches = allCounterparties
       .filter(c => {
-        const blob = `${c.name||''} ${c.inn||''} ${c.edrpou||''} ${c.email||''} ${c.code||''}`.toLowerCase();
-        return blob.includes(q);
+        // v2.78.16: combined-master — додаємо у пошук імена/EDRPOU усіх членів
+        let blob = `${c.name||''} ${c.inn||''} ${c.edrpou||''} ${c.email||''} ${c.code||''}`;
+        if (c.__combined && Array.isArray(c.__members)) {
+          c.__members.forEach(m => {
+            blob += ` ${m.name||''} ${m.edrpou||''} ${m.email||''}`;
+          });
+        }
+        return blob.toLowerCase().includes(q);
       })
       .sort((a,b) => (b.__revenue||0) - (a.__revenue||0))
       .slice(0, 20);
@@ -2855,10 +2931,20 @@ function renderCustomerView(c){
   const now = new Date();
   // v2.76.3: запамʼятовуємо клієнта щоб setProductPeriod міг re-render тут же
   _currentCustForProductFilter = c;
-  // Match by ID first (canonical), fallback to name
-  const matchCP = (item) =>
-    (c.id && item.agent_id && item.agent_id === c.id) ||
-    (item.agent && item.agent === c.name);
+  // v2.78.16: combined-aware matcher — для master перевіряємо ВСІХ members
+  // (each member має свій id + name; demands прив'язані до member, не до master).
+  let matchCP;
+  if (c.__combined && Array.isArray(c.__members) && c.__members.length) {
+    const memberIds = new Set(c.__members.map(m => m.id).filter(Boolean));
+    const memberNames = new Set(c.__members.map(m => (m.name||'').trim()).filter(Boolean));
+    matchCP = (item) =>
+      (item.agent_id && memberIds.has(item.agent_id)) ||
+      (item.agent && memberNames.has((item.agent||'').trim()));
+  } else {
+    matchCP = (item) =>
+      (c.id && item.agent_id && item.agent_id === c.id) ||
+      (item.agent && item.agent === c.name);
+  }
   const dems = allDemands.filter(matchCP).sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''));
   const pays = allPayments.filter(matchCP).sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''));
   const ords = allOrders.filter(matchCP).sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''));
@@ -3389,7 +3475,16 @@ function renderCustomerView(c){
   const html = `
     <!-- HEADER CARD -->
     <div class="cust-header">
-      <div class="cust-name">${escapeHtml(c.name)}${hasMultiCurrency ? ' <span style="display:inline-block;background:#3a5fa5;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;vertical-align:middle;margin-left:6px;letter-spacing:.5px">🌍 MULTI-CURRENCY</span>' : ''}</div>
+      <div class="cust-name">${escapeHtml(c.name)}${c.__combined ? ' <span style="display:inline-block;background:#7e57c2;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;vertical-align:middle;margin-left:6px;letter-spacing:.5px" title="Об\'єднано ' + (c.__members?.length||0) + ' юр.форм через поле \'Комбінований контрагент\' у MoySklad">🔗 COMBINED · ${c.__members?.length||0}</span>' : ''}${hasMultiCurrency ? ' <span style="display:inline-block;background:#3a5fa5;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;vertical-align:middle;margin-left:6px;letter-spacing:.5px">🌍 MULTI-CURRENCY</span>' : ''}</div>
+      ${c.__combined && c.__members?.length ? `
+        <div style="background:#f3edff;border:1px solid #d1bff2;border-radius:8px;padding:10px 14px;margin:8px 0 0;font-size:12.5px">
+          <div style="font-weight:600;color:#5e3aa0;margin-bottom:6px">🔗 Об'єднані юр.форми (${c.__members.length}):</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            ${c.__members.map(m => `<span style="background:#fff;border:1px solid #d1bff2;padding:3px 9px;border-radius:12px;font-size:11.5px${m.archived?';opacity:.5':''}">${escapeHtml(m.name)}${m.edrpou?` <span style="color:#888">${escapeHtml(m.edrpou)}</span>`:''}${m.archived?' 🗄':''}</span>`).join('')}
+          </div>
+          <div style="font-size:10.5px;color:#7e57c2;margin-top:6px">Усі метрики (revenue / ПДЗ / тренди / cross-sell) — сума по всіх членах. Контакти показані для найактивнішого члена.</div>
+        </div>
+      ` : ''}
       <div class="cust-meta">
         ${c.company_type ? `<span class="cust-meta-item">📋 ${escapeHtml(c.company_type)}</span>` : ''}
         ${c.inn ? `<span class="cust-meta-item">🧾 ІНН: ${escapeHtml(c.inn)}</span>` : ''}
