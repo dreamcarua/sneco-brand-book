@@ -638,7 +638,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.78.23 · PARALLEL fetch (~10s, Workers Paid plan активно) · Вага кг рахується · Global isPackagingSKU виключає Гофроящики/Логістика/Короб · ТОП-100 per-section scroll · Paginated 10K chunks · Combined badge · Cross-sell ТОП-10 list · Оновлення: щодня 06:00
+  snEco Customer 360 v2.78.24 · Продажі за смаками — 3 GROUP BY режими (Окремі SKU / За пакуванням / За смаком: Гауда/Чеддер/Сулугуні/Мікси з горіхами/Оливки) · Космічний 28г = 14г Чеддер + 14г Гауда · ShowBox→28г · Combined badge text color fix · PARALLEL fetch · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -2543,6 +2543,65 @@ function _drawBarDataLabels(chart){
   ctx.restore();
 }
 
+// v2.78.24 (Богдан): GROUP BY helpers — За пакуванням (28г/14г/500г) і За смаком (Гауда/Чеддер/...)
+// Знає про:
+//   • Космічний = 50/50 Чеддер+Гауда (1 SKU → 2 рядки flavor)
+//   • Мікси з горіхами (Гауда+Фундук, Моцарелла+Кеш'ю, Прімаджіо+Волоський) = окрема група, half сирова частина
+//   • Оливки (Хрустка Зелена) = окрема група (не сир)
+//   • ShowBox (15×28г) → packaging = '28г' (одиниця у коробі)
+window.detectPortfolioFlavors = function(name) {
+  if (!name) return [];
+  const n = name.toLowerCase();
+  const totalWeight = window.extractWeightG(name);
+  if (totalWeight === 0) return [];
+
+  // Космічний — 50/50 Чеддер + Гауда (одна назва, два рядки aggregation)
+  if (n.includes('космічн') || n.includes('cosmic')) {
+    return [
+      { flavor: 'Чеддер', weight: totalWeight / 2 },
+      { flavor: 'Гауда', weight: totalWeight / 2 },
+    ];
+  }
+  // Мікси з горіхами — окрема група, рахуємо тільки сирову половину
+  if (n.includes('мікс') || /\+\s*(фундук|кеш|волось|мигдаль|hazelnut|cashew|almond|walnut)/i.test(n)) {
+    return [{ flavor: 'Мікси з горіхами', weight: totalWeight / 2 }];
+  }
+  // Single flavors
+  const KW = [
+    ['blue royale', 'Blue Royale'], ['блю', 'Blue Royale'],
+    ['суперфуд', 'Суперфуд'], ['superfood', 'Суперфуд'], ['fitness', 'Суперфуд'],
+    ['хрустка зелена', 'Оливки'], ['оливк', 'Оливки'], ['olive', 'Оливки'],
+    ['гауда', 'Гауда'], ['gouda', 'Гауда'],
+    ['чеддер', 'Чеддер'], ['cheddar', 'Чеддер'],
+    ['сулугун', 'Сулугуні'], ['suluguni', 'Сулугуні'],
+    ['моцарелл', 'Моцарелла'], ['mozzarell', 'Моцарелла'],
+    ['емменталь', 'Емменталь'], ['емменталь', 'Емменталь'], ['emmental', 'Емменталь'],
+    ['прімаджі', 'Прімаджіо'], ['примаджи', 'Прімаджіо'], ['primaggio', 'Прімаджіо'],
+    ['пармезан', 'Пармезан'], ['parmesan', 'Пармезан'],
+  ];
+  for (const [kw, flavor] of KW) {
+    if (n.includes(kw)) return [{ flavor, weight: totalWeight }];
+  }
+  return [{ flavor: 'Інше', weight: totalWeight }];
+};
+
+window.detectPortfolioPackaging = function(name) {
+  if (!name) return '?';
+  // Беремо ОСТАННІЙ числовий g pattern (для ShowBox "15 уп ... 28г" → "28г")
+  const matches = [...name.matchAll(/(\d+)\s*(?:гр|г|gram|g)(?![а-яa-z\d])/gi)];
+  if (matches.length === 0) return '?';
+  const lastMatch = matches[matches.length - 1];
+  return lastMatch[1] + 'г';
+};
+
+if (typeof window._ovGroupBy === 'undefined') window._ovGroupBy = 'sku';   // 'sku' | 'packaging' | 'flavor'
+window.setOvGroupBy = function(g) {
+  window._ovGroupBy = g;
+  // Скинути SKU фільтр при зміні режиму бо вибрані SKU могли бути у попередньому grouping
+  window._ovSKUFilter = null;
+  renderOverview();
+};
+
 // v2.78.13 (Богдан): "Продажі за смаками" на Overview — портфельний SKU breakdown
 function _buildPortfolioSKUHtml(){
   if (!allDemandPositions || allDemandPositions.length === 0) {
@@ -2554,7 +2613,8 @@ function _buildPortfolioSKUHtml(){
   const fromIso = period.from.toISOString().slice(0,10);
   const toIso = period.to.toISOString().slice(0,10);
 
-  // Aggregate per-SKU (v2.78.21: + exclude packaging — Гофроящики, Логістика, Короб без упаковок тощо)
+  // v2.78.24 (Богдан): 3 режими GROUP BY — 'sku' (current), 'packaging' (28г/14г/500г), 'flavor' (Гауда/Чеддер/...)
+  const groupBy = window._ovGroupBy || 'sku';
   const skuMap = {};
   allDemandPositions.forEach(p => {
     const dt = (p.ms_moment || '').slice(0,10);
@@ -2567,10 +2627,42 @@ function _buildPortfolioSKUHtml(){
       const price = (p.price_kop || 0) / 100;
       if (price > 0) sum = price * qty;
     }
-    if (!skuMap[name]) skuMap[name] = { qty: 0, sum: 0, kg: 0 };
-    skuMap[name].qty += qty;
-    skuMap[name].sum += sum;
-    skuMap[name].kg += (window.extractWeightG(name) * qty) / 1000;
+    const totalKg = (window.extractWeightG(name) * qty) / 1000;
+
+    if (groupBy === 'packaging') {
+      // Group by пакування "28г", "14г", "500г", "20г" etc
+      const pkg = window.detectPortfolioPackaging(name);
+      if (!skuMap[pkg]) skuMap[pkg] = { qty: 0, sum: 0, kg: 0 };
+      skuMap[pkg].qty += qty;
+      skuMap[pkg].sum += sum;
+      skuMap[pkg].kg += totalKg;
+    } else if (groupBy === 'flavor') {
+      // Group by смак — 1 SKU може дати кілька flavor рядків (Космічний)
+      const flavors = window.detectPortfolioFlavors(name);
+      if (flavors.length === 0) {
+        if (!skuMap['Інше']) skuMap['Інше'] = { qty: 0, sum: 0, kg: 0 };
+        skuMap['Інше'].qty += qty;
+        skuMap['Інше'].sum += sum;
+        skuMap['Інше'].kg += totalKg;
+      } else {
+        const totalWeightInName = flavors.reduce((a,f) => a + f.weight, 0) || 1;
+        flavors.forEach(f => {
+          const share = f.weight / totalWeightInName; // частка цього flavor у SKU (Космічний → 0.5)
+          if (!skuMap[f.flavor]) skuMap[f.flavor] = { qty: 0, sum: 0, kg: 0 };
+          // qty: рахуємо штуки разово на найбільший flavor (для Космічного — qty=qty, не *0.5 щоб не половинити одиниці)
+          // Для уникнення подвоєння — qty додається тільки для першого flavor; для решти 0
+          if (f === flavors[0]) skuMap[f.flavor].qty += qty;
+          skuMap[f.flavor].sum += sum * share;
+          skuMap[f.flavor].kg += totalKg * share;
+        });
+      }
+    } else {
+      // Default: окремі SKU
+      if (!skuMap[name]) skuMap[name] = { qty: 0, sum: 0, kg: 0 };
+      skuMap[name].qty += qty;
+      skuMap[name].sum += sum;
+      skuMap[name].kg += totalKg;
+    }
   });
 
   const filter = window._ovSKUFilter;
@@ -2597,6 +2689,14 @@ function _buildPortfolioSKUHtml(){
       <button class="prod-chip ${window._ovProdPeriod==='last_year' ? 'active' : ''}" onclick="setOvProdPeriod('last_year')">Минулий рік</button>
     </div>`;
 
+  const groupChips = `
+    <div class="prod-period-bar" style="margin:0 0 8px 0">
+      <span class="prod-period-bar-lbl">Групування</span>
+      <button class="prod-chip ${groupBy==='sku' ? 'active' : ''}" onclick="setOvGroupBy('sku')">📦 Окремі SKU</button>
+      <button class="prod-chip ${groupBy==='packaging' ? 'active' : ''}" onclick="setOvGroupBy('packaging')">⚖ За пакуванням (28г · 14г · 500г)</button>
+      <button class="prod-chip ${groupBy==='flavor' ? 'active' : ''}" onclick="setOvGroupBy('flavor')">🧀 За смаком (Гауда · Чеддер · ...)</button>
+    </div>`;
+
   const metricChips = `
     <div class="prod-period-bar" style="margin:0 0 8px 0">
       <span class="prod-period-bar-lbl">Метрика</span>
@@ -2606,7 +2706,7 @@ function _buildPortfolioSKUHtml(){
       <span style="color:var(--muted);font-size:11px;margin:0 4px">·</span>
       <details style="display:inline-block;position:relative">
         <summary class="prod-chip ${filter?'active':''}" style="cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:4px">
-          📦 SKU ${filter?`(${filter.size})`:''} ▾
+          📦 ${groupBy==='sku'?'SKU':groupBy==='packaging'?'Пакування':'Смак'} ${filter?`(${filter.size})`:''} ▾
         </summary>
         <div style="position:absolute;top:100%;left:0;background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px;max-height:340px;overflow-y:auto;min-width:320px;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,.12);margin-top:4px">
           <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:11px">
@@ -3526,7 +3626,7 @@ function renderCustomerView(c){
         <div style="background:#f3edff;border:1px solid #d1bff2;border-radius:8px;padding:10px 14px;margin:8px 0 0;font-size:12.5px">
           <div style="font-weight:600;color:#5e3aa0;margin-bottom:6px">🔗 Об'єднані юр.форми (${c.__members.length}):</div>
           <div style="display:flex;flex-wrap:wrap;gap:6px">
-            ${c.__members.map(m => `<span style="background:#fff;border:1px solid #d1bff2;padding:3px 9px;border-radius:12px;font-size:11.5px${m.archived?';opacity:.5':''}">${escapeHtml(m.name)}${m.edrpou?` <span style="color:#888">${escapeHtml(m.edrpou)}</span>`:''}${m.archived?' 🗄':''}</span>`).join('')}
+            ${c.__members.map(m => `<span style="background:#fff;color:#3a2870;border:1px solid #d1bff2;padding:3px 9px;border-radius:12px;font-size:11.5px;font-weight:500${m.archived?';opacity:.5':''}">${escapeHtml(m.name)}${m.edrpou?` <span style="color:#8a7aa3;font-weight:400">${escapeHtml(m.edrpou)}</span>`:''}${m.archived?' 🗄':''}</span>`).join('')}
           </div>
           <div style="font-size:10.5px;color:#7e57c2;margin-top:6px">Усі метрики (revenue / ПДЗ / тренди / cross-sell) — сума по всіх членах. Контакти показані для найактивнішого члена.</div>
         </div>
