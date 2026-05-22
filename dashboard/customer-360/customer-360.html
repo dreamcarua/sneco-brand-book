@@ -635,7 +635,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.77.4 · Portfolio KPIs exclude роздріб/архівних + verstka fix chips · Оновлення: щодня 06:00
+  snEco Customer 360 v2.78.14 · Богдан fixes: materiality 1% · TOP-100 movers/продуктів scroll+sort · Lost cohorts · Cross-sell priority · YoY YTD · credit term · multi-currency · multi-select SKU · Promise.allSettled error tracking · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -1756,16 +1756,34 @@ window.bootCustomer360 = async function(token){
     </span>`;
 
   try {
-    // Parallel fetch all data (v2.71: + demand_positions for product breakdown)
-    const [cp, dem, pay, ord, inv, ret, dpos] = await Promise.all([
+    // v2.78.14: Promise.allSettled щоб бачити ЯКА з 7 fetch падає (не загальний "Load failed")
+    const names = ['counterparties','demands','payments','orders','invoices_out','returns','demand_positions'];
+    const settled = await Promise.allSettled([
       fetchJson('counterparties'),
       fetchJson('demands'),
       fetchJson('payments'),
       fetchJson('orders'),
       fetchJson('invoices_out'),
       fetchJson('returns'),
-      fetchJson('demand_positions').catch(e => { console.warn('demand_positions недоступні:', e.message); return []; }),
+      fetchJson('demand_positions'),
     ]);
+    const failures = [];
+    settled.forEach((s, i) => {
+      if (s.status === 'rejected') {
+        console.error(`[${names[i]}] FAILED:`, s.reason);
+        failures.push(`${names[i]}: ${s.reason?.message || s.reason}`);
+      } else {
+        console.log(`[${names[i]}] OK — ${s.value?.length || 0} rows`);
+      }
+    });
+    // demand_positions некритично — як було
+    const critFailures = failures.filter(f => !f.startsWith('demand_positions:'));
+    if (critFailures.length) {
+      throw new Error('Failed fetches:\n• ' + critFailures.join('\n• '));
+    }
+    const [cp, dem, pay, ord, inv, ret, dpos] = settled.map((s,i) =>
+      s.status === 'fulfilled' ? s.value : (names[i]==='demand_positions' ? [] : null)
+    );
     allCounterparties = cp || [];
     allDemands = dem || [];
     allPayments = pay || [];
