@@ -9388,9 +9388,14 @@ h3.block-title:first-of-type { margin-top: 0; }
     <div class="ideas-form-row">
       <textarea data-role="body" maxlength="10000" placeholder="Опишіть пропозицію детально / Describe the idea in detail"></textarea>
     </div>
-    <div class="ideas-form-grid">
+    <!-- v2.78.42: name/email видно тільки для не-залогінених. JS приховує/показує. -->
+    <div class="ideas-form-grid" data-role="author-fields">
       <input type="text" data-role="name" maxlength="80" placeholder="Ваше ім'я / Your name">
       <input type="email" data-role="email" maxlength="200" placeholder="Email">
+    </div>
+    <div class="ideas-form-row" data-role="author-badge" style="display:none;font-size:11.5px;color:var(--text-muted);padding:2px 2px 6px">
+      <span data-lang="uk">Подаєш від:</span><span data-lang="en">Posting as:</span><span data-lang="sk">Podávaš ako:</span>
+      <strong data-role="author-badge-email" style="color:var(--text);margin-left:6px"></strong>
     </div>
     <div class="ideas-form-row">
       <div class="ideas-attach-zone" id="ideas-attach-zone">
@@ -12738,9 +12743,25 @@ h3.block-title:first-of-type { margin-top: 0; }
     newBtn.addEventListener('click', () => {
       formEl.style.display = formEl.style.display === 'none' ? 'block' : 'none';
       if (formEl.style.display === 'block') {
-        const prefs = authorPrefs();
-        formEl.querySelector('[data-role="name"]').value = prefs.name || '';
-        formEl.querySelector('[data-role="email"]').value = prefs.email || '';
+        // v2.78.42: session-aware — приховуємо name/email якщо залогінений
+        const sess = snAuth.anySession ? snAuth.anySession() : null;
+        const fields = formEl.querySelector('[data-role="author-fields"]');
+        const badge = formEl.querySelector('[data-role="author-badge"]');
+        const badgeEmail = formEl.querySelector('[data-role="author-badge-email"]');
+        if (sess && sess.email) {
+          if (fields) fields.style.display = 'none';
+          if (badge) badge.style.display = '';
+          if (badgeEmail) badgeEmail.textContent = sess.email;
+          formEl._activeAuthorEmail = sess.email;
+          formEl._activeAuthorName = sess.name || sess.email.split('@')[0];
+        } else {
+          if (fields) fields.style.display = '';
+          if (badge) badge.style.display = 'none';
+          formEl._activeAuthorEmail = null;
+          const prefs = authorPrefs();
+          formEl.querySelector('[data-role="name"]').value = prefs.name || '';
+          formEl.querySelector('[data-role="email"]').value = prefs.email || '';
+        }
         formEl.querySelector('[data-role="title"]').focus();
       }
     });
@@ -12783,19 +12804,26 @@ h3.block-title:first-of-type { margin-top: 0; }
     formEl.querySelector('[data-role="submit"]').addEventListener('click', async () => {
       const title = formEl.querySelector('[data-role="title"]').value.trim();
       const body = formEl.querySelector('[data-role="body"]').value.trim();
-      const name = formEl.querySelector('[data-role="name"]').value.trim();
-      const email = formEl.querySelector('[data-role="email"]').value.trim();
       const msgEl = formEl.querySelector('[data-role="msg"]');
       msgEl.className = 'otp-msg';
+      let name, email;
+      // v2.78.42: беремо author з сесії якщо залогінений
+      if (formEl._activeAuthorEmail) {
+        email = formEl._activeAuthorEmail;
+        name = formEl._activeAuthorName || email.split('@')[0];
+      } else {
+        name = (formEl.querySelector('[data-role="name"]')?.value || '').trim();
+        email = (formEl.querySelector('[data-role="email"]')?.value || '').trim();
+        if (!name || !email) { msgEl.classList.add('is-error'); msgEl.textContent = isEn() ? 'Name and email required' : 'Ім\'я та email обов\'язкові'; return; }
+      }
       if (title.length < 4) { msgEl.classList.add('is-error'); msgEl.textContent = isEn() ? 'Title too short' : 'Назва коротка'; return; }
-      if (!name || !email) { msgEl.classList.add('is-error'); msgEl.textContent = isEn() ? 'Name and email required' : 'Ім\'я та email обов\'язкові'; return; }
       if (pendingAttachments.some(a => a._uploading)) { msgEl.classList.add('is-error'); msgEl.textContent = isEn() ? 'Wait for upload' : 'Зачекайте'; return; }
       try {
         await snAuth.post('/api/ideas/create', {
           title, body, author_name: name, author_email: email,
           attachments: pendingAttachments.map(({_uploading, ...rest}) => rest),
         });
-        saveAuthor(name, email);
+        if (!formEl._activeAuthorEmail) saveAuthor(name, email);
         formEl.querySelector('[data-role="title"]').value = '';
         formEl.querySelector('[data-role="body"]').value = '';
         pendingAttachments = [];
