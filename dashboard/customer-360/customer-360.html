@@ -435,6 +435,7 @@ body.dash-locked{overflow:hidden}
 <body class="dash-locked">
 
 <!-- ===== OTP GATE OVERLAY ===== -->
+<script src="../auth-google.js"></script>
 <div id="dashauth-overlay">
   <div class="dashauth-card">
     <div class="dashauth-logo">snEco</div>
@@ -486,13 +487,26 @@ body.dash-locked{overflow:hidden}
   function renderEmail(){
     stage.innerHTML = `
       <div class="dashauth-icon">👥</div>
-      <div class="dashauth-h1">Введіть email</div>
-      <div class="dashauth-desc">Customer 360 — детальний аналіз кожного клієнта. Якщо ваш email у whitelist — на нього надійде 6-значний код. Сесія діє 1 годину.</div>
-      <input class="dashauth-input" type="email" id="auth-em" placeholder="ім'я@sneco.ua" autocomplete="email" autofocus>
-      <button class="dashauth-btn" id="auth-send">Надіслати код</button>
+      <div class="dashauth-h1">Customer 360</div>
+      <div class="dashauth-desc">Детальний аналіз кожного клієнта. Авторизуйся через Google (швидко) або введи email для OTP-коду. Сесія діє 30 днів.</div>
+      <div id="google-signin-btn" style="display:flex;justify-content:center;margin:18px 0 8px"></div>
+      <div style="font-size:11px;color:#777;text-align:center;margin:8px 0 4px">— або через email-код —</div>
+      <input class="dashauth-input" type="email" id="auth-em" placeholder="ім'я@sneco.ua" autocomplete="email">
+      <button class="dashauth-btn" id="auth-send">Надіслати код на email</button>
       <div class="dashauth-msg" id="auth-msg"></div>
       <a href="../" class="dashauth-back">← Каталог дашбордів</a>
     `;
+    // v2.78.35 (Богдан): Google Sign-In primary, OTP fallback
+    if (window.SnecoAuth) {
+      const gBtn = document.getElementById('google-signin-btn');
+      window.SnecoAuth.signInWithGoogle(BLOCK, gBtn,
+        (j) => unlock(j.token, j.email, j.exp),
+        (errMsg) => {
+          const msgEl = document.getElementById('auth-msg');
+          if (msgEl) { msgEl.textContent = errMsg; msgEl.className = 'dashauth-msg is-error'; }
+        }
+      );
+    }
     const em = document.getElementById('auth-em');
     const send = document.getElementById('auth-send');
     const msg = document.getElementById('auth-msg');
@@ -647,7 +661,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.78.34 · Health Trend збагачено: Health Score gauge + Segment (VIP/At-risk/Critical) + Rank · Lifetime KPIs (LTV, AOV vs peer, Cadence vs peer, Payment ratio) · YoY YTD badge · 6 alerts · Compact selector-bar · CRM-notes ctx.waitUntil · Combined KPI fix · Excel export · Оновлення: щодня 06:00
+  snEco Customer 360 v2.78.35 · 🔐 Google OAuth (primary) + OTP fallback + JWT 30 діб · Health Trend gauge + KPIs + sparklines + 6 alerts · CRM-notes ctx.waitUntil · Combined KPI fix · Excel export · Оновлення: щодня 06:00
 </div>
 
 <script>
