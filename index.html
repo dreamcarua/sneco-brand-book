@@ -12510,7 +12510,9 @@ h3.block-title:first-of-type { margin-top: 0; }
       if (isAdmin) {
         const btns = [];
         if (wf === 'open' || wf === 'changes_requested') {
-          btns.push(`<button class="is-primary" data-role="draft-proposal">💡 ${isEn() ? 'Propose solution (AI draft)' : 'Запропонувати рішення (AI draft)'}</button>`);
+          btns.push(`<button class="is-primary" data-role="draft-proposal">🤖 ${isEn() ? 'AI draft (auto)' : 'AI draft (авто)'}</button>`);
+          // v2.78.44: Manual draft через Cowork — копіює prompt, відкриває порожній modal
+          btns.push(`<button data-role="manual-draft" style="background:#7e57c2;color:#fff;border-color:#5e3aa0">✍ ${isEn() ? 'Manual draft via Cowork' : 'Підготувати з Cowork (краща якість)'}</button>`);
         }
         if (draftProposal) {
           btns.push(`<button data-role="edit-draft" data-pid="${escapeHtml2(draftProposal.id)}">✏ ${isEn() ? 'Edit draft' : 'Редагувати draft'} (v${draftProposal.version})</button>`);
@@ -12633,6 +12635,110 @@ h3.block-title:first-of-type { margin-top: 0; }
           await toggleCard(card); await toggleCard(card);
           await loadList();
         });
+      });
+      // v2.78.44: Manual draft via Cowork — copy prompt + open empty modal
+      const manualDraftBtn = bodyEl.querySelector('[data-role="manual-draft"]');
+      if (manualDraftBtn) manualDraftBtn.addEventListener('click', async () => {
+        const dateStr = new Date(idea.created_at * 1000).toLocaleDateString('uk-UA');
+        const sectionsList = sections.map(s => `- ${s.id}: ${s.label}`).join('\n');
+        const prompt = `Підготуй draft рішення для пропозиції команди snEco.
+
+# Контекст
+Це Brand Bible snEco (live HTML на brand.sneco.ua) — фірмовий keeper of brand DNA. Рішення = додати/оновити секцію Brand Bible, або задокументувати процес, або створити sales-tool.
+
+# Бренд snEco
+- Український виробник хрустких сирних снеків зі 100% натурального сиру
+- Технологія: VacWave Bio Nutrition (запатентована, Patent UA №139035, НЕ NASA)
+- Заводи: Мукачево (UA) + Гуменне (SK)
+- Виручка ~$1М/рік, 25x зростання за 6 років
+- Сертифікати: FSSC 22000, ISO 22000, HACCP, IFS Food v8, FDA USA
+- Нагороди: SIAL Grand Prix 2024, Forbes Next 250
+
+# Продукти
+- Чисті сири 28г / 14г / 500г: Cheddar, Gouda, Parmesan, Mozzarella, Smoked Suluguni, Smoked Emmental, Blue Royale, Primaggio, Fitness/Superfood
+- Дитяча лінійка: Космічний 28г = 14г Чеддер + 14г Моцарелла (НЕ Гауда!)
+- Мікси з горіхами 20г (10г сиру + 10г горіха): Gouda+Hazelnut, Cheddar+Almond, Mozzarella+Cashew, Primaggio+Walnut
+- Окремо: Оливка сушена "Хрустка Зелена" 14г
+- Опт-короби: ShowBox (15 упаковок)
+
+# Команда
+- Вадим (vg@sneco.ua) — CEO, стратегія/маркетинг/продажі/експорт
+- Пилип — Co-founder, виробництво/фінанси
+- Богдан — COO
+- Ярослав — KAM
+- Ірина — Head of Export
+- Валерія — виробництво
+- Валентина — sales/KAM
+- Альона — маркетинг/контент
+
+# Ринки
+- 🇺🇦 Україна — ДОМАШНІЙ РИНОК (НЕ експорт!), 25+ ритейл-мереж
+- 🇸🇰 Словаччина — Sneco SK
+- 🇸🇪 Швеція — ICA+Coop через Arvid Nordquist
+- 🇪🇪 Естонія — PrimeService
+- 🇩🇪 Німеччина — NVC GmbH (ексклюзив)
+- 🇵🇱 Польща, 🇺🇸 США — в процесі
+
+# Доступні секції Brand Bible
+${sectionsList}
+
+# Пропозиція (на яку треба draft)
+
+**Назва:** ${idea.title}
+**Автор:** ${idea.author_name}
+**Дата:** ${dateStr}
+**Опис:**
+${idea.body || '(автор не залишив детального опису)'}
+
+# Що треба
+
+Поверни ТІЛЬКИ valid JSON, БЕЗ markdown fences, БЕЗ пояснень:
+
+{
+  "section": "<id однієї з секцій вище — найбільш доречна>",
+  "title": "<коротка назва рішення, 30-70 символів — конкретно про ЩО ми робимо>",
+  "body": "<2-4 короткі параграфи з конкретними кроками. Якщо SOP — пиши '1. ... 2. ... 3. ...'. Якщо нова інформація для Brand Bible — описуй ЯКУ конкретно (поля, структура, дані). Без води, без загальних фраз.>",
+  "example": "<жива конкретика. Якщо таблиця у Brand Bible — ASCII-таблиця з реальними snEco-даними. Якщо sales-копія — реальний текст. Якщо чеклист — реальні пункти snEco. Конкретно і застосовно.>"
+}`;
+
+        // Copy to clipboard
+        let copied = false;
+        try { await navigator.clipboard.writeText(prompt); copied = true; } catch(e) {}
+
+        // Create empty proposal (status='draft') so modal can save
+        manualDraftBtn.disabled = true;
+        const origText = manualDraftBtn.textContent;
+        manualDraftBtn.textContent = '⏳ ' + (isEn() ? 'Creating empty draft…' : 'Створюю порожній draft…');
+        try {
+          const saveResp = await snAuth.post('/api/ideas/save-proposal', {
+            idea_id: idea.id, section: 'other', title: '(чекаю draft від Cowork)', body: '', example: '',
+          }, { token: ideaToken });
+          const emptyProp = {
+            id: saveResp.proposal_id,
+            version: saveResp.version || 1,
+            section: 'other', title: '', body: '', example: '',
+            status: 'draft', ai_generated: 0,
+          };
+          // Show instruction first
+          const instructionMsg = copied
+            ? (isEn()
+                ? '✓ Prompt copied to clipboard.\n\nNow:\n1. Paste prompt to your Cowork chat with Claude\n2. Claude will return JSON\n3. Copy each field (section, title, body, example) into the modal that just opened\n4. Click "Send to author"'
+                : '✓ Prompt скопійовано у clipboard.\n\nЗараз:\n1. Paste prompt у Cowork-чат з Claude\n2. Claude поверне JSON\n3. Скопіюй кожне поле (section, title, body, example) у модалку що щойно відкрилась\n4. Натисни "Відправити автору"')
+            : (isEn()
+                ? '⚠ Could not auto-copy. Manually copy this prompt:\n\n' + prompt.slice(0, 200) + '…'
+                : '⚠ Не вдалось скопіювати. Скопіюй prompt вручну.\n\n' + prompt.slice(0, 200) + '…');
+          alert(instructionMsg);
+          // Then open modal
+          openProposalModal(idea, emptyProp, sections, async () => {
+            await toggleCard(card); await toggleCard(card);
+            await loadList();
+          });
+        } catch (e) {
+          alert('Error: ' + e.message);
+        } finally {
+          manualDraftBtn.disabled = false;
+          manualDraftBtn.textContent = origText;
+        }
       });
       // Approve / request changes (author)
       const approveBtn = bodyEl.querySelector('[data-role="approve"]');
