@@ -9359,6 +9359,17 @@ h3.block-title:first-of-type { margin-top: 0; }
     <span data-lang="en">Place for ideas, tickets and suggestions from the team. Anyone can submit (name + email). Sorted newest first. Admins (vg/fg) mark as done or reopen. Comments and files anytime.</span><span data-lang="sk">Miesto pre nápady, tikety a návrhy od tímu. Vytvára ich každý (meno + email). Triedené od nových po staré. Adminovia (vg/fg) označujú „✓ hotovo" alebo vracajú do práce. Komentáre a súbory — kedykoľvek.</span>
   </div>
 
+  <!-- v2.78.40: Login banner — для workflow дій (Запропонувати рішення / Approve / Audit) -->
+  <div id="ideas-auth-banner" style="margin:16px 0 20px;padding:14px 18px;background:linear-gradient(180deg,#fff9e5 0%,#fff3d6 100%);border:1px solid rgba(254,191,39,.5);border-left:3px solid #FEBF27;border-radius:8px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <div style="flex:1;min-width:260px;font-size:13px;line-height:1.5;color:#7a5a00">
+      <strong style="color:#1E1E1E"><span data-lang="uk">🔐 Залогінься для повного доступу</span><span data-lang="en">🔐 Sign in for full access</span><span data-lang="sk">🔐 Prihlás sa pre plný prístup</span></strong><br>
+      <span data-lang="uk">Без логіна — лише перегляд. З логіном (Google або email-OTP): автори бачать кнопки <b>✅ Погодити / 💬 Запросити зміни</b>, адміни — <b>💡 Запропонувати рішення (AI draft)</b>, всі — повну історію змін.</span>
+      <span data-lang="en">Without login — view-only. Logged in (Google or email-OTP): authors see <b>✅ Approve / 💬 Request changes</b>, admins see <b>💡 Propose solution (AI draft)</b>, everyone sees full audit log.</span>
+      <span data-lang="sk">Bez prihlásenia — iba prezeranie. Prihlásený (Google alebo email-OTP): autori vidia <b>✅ Schváliť / 💬 Požiadať o zmeny</b>, admin vidí <b>💡 Návrh riešenia (AI draft)</b>.</span>
+    </div>
+    <div id="ideas-auth-actions" style="display:flex;gap:8px;align-items:center"></div>
+  </div>
+
   <div class="ideas-toolbar">
     <div class="ideas-filter" id="ideas-filter">
       <button data-filter="open" class="is-active"><span data-lang="uk">Відкриті</span><span data-lang="en">Open</span><span data-lang="sk">Otvorené</span></button>
@@ -12078,6 +12089,140 @@ h3.block-title:first-of-type { margin-top: 0; }
     let currentFilter = (location.hash || '').startsWith('#idea-') ? 'all' : 'open';
     let cachedIdeas = [];
     let pendingAttachments = [];   // for new-idea form
+
+    // v2.78.40: Login banner — Google Sign-In + OTP entry для ideas workflow
+    function renderIdeasAuthBanner() {
+      const banner = document.getElementById('ideas-auth-banner');
+      const actions = document.getElementById('ideas-auth-actions');
+      if (!banner || !actions) return;
+      const sess = snAuth.anySession ? snAuth.anySession() : (snAuth.sessionFor('admin') || snAuth.sessionFor('ideas') || snAuth.sessionFor('dashboard'));
+      if (sess && sess.email) {
+        // Logged in — show user info + sign-out
+        banner.style.background = 'linear-gradient(180deg,#e6f4d8 0%,#d4ecc0 100%)';
+        banner.style.borderColor = 'rgba(150,193,31,.5)';
+        banner.style.borderLeftColor = '#96C11F';
+        banner.querySelector('div').innerHTML = `
+          <strong style="color:#1E1E1E">✅ ${sess.isAdmin ? (isEn() ? 'Logged in as admin' : 'Залогінений як адмін') : (isEn() ? 'Logged in' : 'Залогінений')}</strong><br>
+          <span style="color:#557a00;font-family:ui-monospace,Menlo,monospace">${escapeHtml2(sess.email)}</span>
+          ${sess.isAdmin ? ' · <span style="color:#996600;font-weight:600">' + (isEn() ? 'You can propose solutions' : 'Можеш пропонувати рішення') + '</span>' : ''}
+        `;
+        actions.innerHTML = `<button id="ideas-signout-btn" style="padding:8px 14px;background:#fff;border:1px solid #d4ecc0;color:#557a00;border-radius:6px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:inherit">🔒 ${isEn() ? 'Sign out' : 'Вийти'}</button>`;
+        document.getElementById('ideas-signout-btn').onclick = () => {
+          // Clear all sessions
+          try {
+            const ks = [];
+            for (let i = 0; i < sessionStorage.length; i++) { const k = sessionStorage.key(i); if (k && k.startsWith('snauth:')) ks.push(k); }
+            ks.forEach(k => sessionStorage.removeItem(k));
+          } catch(e){}
+          renderIdeasAuthBanner();
+          loadList(); // re-render with logged-out state
+        };
+      } else {
+        // Logged out — show Google + OTP buttons
+        actions.innerHTML = `
+          <div id="ideas-google-slot" style="min-width:200px"></div>
+          <button id="ideas-otp-btn" style="padding:9px 16px;background:#1E1E1E;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:inherit">📧 ${isEn() ? 'Email OTP' : 'Email-код'}</button>
+        `;
+        // Mount Google Sign-In
+        if (window.SnecoAuth?.signInWithGoogle) {
+          const slot = document.getElementById('ideas-google-slot');
+          window.SnecoAuth.signInWithGoogle('ideas-author', slot,
+            (j) => {
+              // success — persist to sessionStorage so other sections see it
+              snAuth.saveSession('ideas-author', {
+                email: j.email,
+                token: j.token,
+                exp: j.exp || (Math.floor(Date.now()/1000) + 30*86400),
+                isAdmin: j.isAdmin || false,
+              });
+              renderIdeasAuthBanner();
+              loadList();
+            },
+            (err) => { console.warn('Google sign-in error:', err); }
+          );
+        }
+        document.getElementById('ideas-otp-btn').onclick = () => {
+          // Reuse the standard OTP form via prompt-style modal
+          showIdeasOtpModal();
+        };
+      }
+    }
+
+    function showIdeasOtpModal() {
+      const overlay = document.createElement('div');
+      overlay.className = 'idea-modal-overlay';
+      overlay.innerHTML = `
+        <div class="idea-modal" style="max-width:420px">
+          <div class="idea-modal-header">
+            <h3>📧 ${isEn() ? 'Email login' : 'Вхід через email'}</h3>
+            <button class="idea-modal-close" data-role="close">×</button>
+          </div>
+          <div class="idea-modal-body">
+            <div class="idea-modal-field">
+              <label>Email</label>
+              <input type="email" data-role="email" placeholder="you@sneco.ua" autocomplete="email">
+            </div>
+            <div class="idea-modal-field" data-role="code-field" style="display:none">
+              <label>${isEn() ? 'Code from email' : 'Код з листа'}</label>
+              <input type="text" data-role="code" maxlength="6" placeholder="123456" inputmode="numeric" style="letter-spacing:4px;font-size:18px;text-align:center">
+            </div>
+            <div style="font-size:11px;color:#888;margin-top:8px" data-role="status"></div>
+          </div>
+          <div class="idea-modal-footer">
+            <button class="ghost" data-role="cancel">${isEn() ? 'Cancel' : 'Скасувати'}</button>
+            <button class="primary" data-role="send">${isEn() ? 'Send code' : 'Надіслати код'}</button>
+          </div>
+        </div>`;
+      document.body.appendChild(overlay);
+      const close = () => overlay.remove();
+      overlay.querySelector('[data-role="close"]').onclick = close;
+      overlay.querySelector('[data-role="cancel"]').onclick = close;
+      overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+      const emailEl = overlay.querySelector('[data-role="email"]');
+      const codeEl = overlay.querySelector('[data-role="code"]');
+      const codeField = overlay.querySelector('[data-role="code-field"]');
+      const statusEl = overlay.querySelector('[data-role="status"]');
+      const sendBtn = overlay.querySelector('[data-role="send"]');
+      let stage = 'email';
+      sendBtn.onclick = async () => {
+        const email = emailEl.value.trim().toLowerCase();
+        if (!email || !email.includes('@')) { statusEl.textContent = isEn() ? '✗ Invalid email' : '✗ Невірний email'; return; }
+        if (stage === 'email') {
+          sendBtn.disabled = true;
+          statusEl.textContent = isEn() ? 'Sending…' : 'Надсилаємо…';
+          try {
+            await snAuth.post('/api/otp/request', { email, block: 'ideas-author' });
+            stage = 'code';
+            codeField.style.display = 'block';
+            sendBtn.textContent = isEn() ? 'Verify' : 'Перевірити';
+            statusEl.textContent = isEn() ? '✓ Code sent — check your email' : '✓ Код надіслано — перевір пошту';
+            sendBtn.disabled = false;
+            setTimeout(() => codeEl.focus(), 100);
+          } catch (e) { statusEl.textContent = '✗ ' + e.message; sendBtn.disabled = false; }
+        } else {
+          const code = codeEl.value.trim();
+          if (code.length !== 6) { statusEl.textContent = isEn() ? '✗ Code must be 6 digits' : '✗ Код = 6 цифр'; return; }
+          sendBtn.disabled = true;
+          statusEl.textContent = isEn() ? 'Verifying…' : 'Перевіряємо…';
+          try {
+            const j = await snAuth.post('/api/otp/verify', { email, code, block: 'ideas-author' });
+            snAuth.saveSession('ideas-author', {
+              email: j.email,
+              token: j.token,
+              exp: j.exp || (Math.floor(Date.now()/1000) + 30*86400),
+              isAdmin: j.isAdmin || false,
+            });
+            close();
+            renderIdeasAuthBanner();
+            loadList();
+          } catch (e) { statusEl.textContent = '✗ ' + e.message; sendBtn.disabled = false; }
+        }
+      };
+      [emailEl, codeEl].forEach(el => el && el.addEventListener('keydown', e => { if (e.key === 'Enter') sendBtn.click(); }));
+      setTimeout(() => emailEl.focus(), 100);
+    }
+    // Initial render
+    renderIdeasAuthBanner();
 
     function authorPrefs() {
       try { return JSON.parse(localStorage.getItem('sneco-ideas-author') || '{}'); }
