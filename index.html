@@ -1993,7 +1993,7 @@ h3.block-title:first-of-type { margin-top: 0; }
 }
 </style>
   <!-- v2.78.35 (Богдан): Google Sign-In primary для HR/Prices/Maintenance OTP-gate -->
-  <script src="dashboard/auth-google.js"></script>
+  <script defer src="dashboard/auth-google.js"></script>
 </head>
 <body class="lang-uk">
 
@@ -11881,11 +11881,11 @@ h3.block-title:first-of-type { margin-top: 0; }
           const v = input.value.trim();
           if (!v || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
             msg.classList.add('is-error');
-            msg.textContent = isEn() ? 'Enter a valid email.' : 'Введіть правильний email.';
+            msg.textContent = t('Введіть правильний email.', 'Enter a valid email.', 'Zadajte platný email.');
             return;
           }
           submit.disabled = true;
-          submit.textContent = isEn() ? 'Sending...' : 'Надсилаємо...';
+          submit.textContent = t('Надсилаємо...', 'Sending...', 'Odosielame...');
           try {
             await snAuth.requestOtp(v, block);
             email = v;
@@ -11911,22 +11911,22 @@ h3.block-title:first-of-type { margin-top: 0; }
           const code = input.value.trim();
           if (!/^\d{6}$/.test(code)) {
             msg.classList.add('is-error');
-            msg.textContent = isEn() ? 'Code must be 6 digits.' : 'Код — 6 цифр.';
+            msg.textContent = t('Код — 6 цифр.', 'Code must be 6 digits.', 'Kód má 6 číslic.');
             return;
           }
           submit.disabled = true;
-          submit.textContent = isEn() ? 'Verifying...' : 'Перевіряємо...';
+          submit.textContent = t('Перевіряємо...', 'Verifying...', 'Overujeme...');
           try {
             const result = await snAuth.verifyOtp(email, code, block);
             snAuth.saveSession(block, { token: result.token, email: result.email, isAdmin: result.isAdmin, exp: result.exp });
             onSuccess(result);
           } catch (e) {
             msg.classList.add('is-error');
-            msg.textContent = isEn() ? 'Wrong or expired code.' : 'Невірний або застарілий код.';
+            msg.textContent = t('Невірний або застарілий код.', 'Wrong or expired code.', 'Nesprávny alebo expirovaný kód.');
             input.classList.add('is-error');
             setTimeout(() => input.classList.remove('is-error'), 1500);
             submit.disabled = false;
-            submit.innerHTML = isEn() ? 'Verify' : 'Підтвердити';
+            submit.innerHTML = t('Підтвердити', 'Verify', 'Potvrdiť');
           }
         }
       });
@@ -11935,6 +11935,15 @@ h3.block-title:first-of-type { margin-top: 0; }
     render();
   }
   function isEn() { return document.body.classList.contains('lang-en'); }
+  function isSk() { return document.body.classList.contains('lang-sk'); }
+  // t(uk, en, sk) — runtime translation helper.
+  // Returns SK if lang-sk and sk provided, else EN if lang-en, else UK (default).
+  // SK falls back to UK if sk argument missing/empty (transitional, per snEco brand-bible rule).
+  function t(uk, en, sk) {
+    if (isEn()) return en;
+    if (isSk()) return (sk != null && sk !== '') ? sk : uk;
+    return uk;
+  }
   function applyLang() {
     // Re-applies SK→UK fallback after dynamic HTML insertion.
     if (typeof applySkFallback === 'function') applySkFallback();
@@ -11949,7 +11958,7 @@ h3.block-title:first-of-type { margin-top: 0; }
       rootEl.querySelectorAll('[data-otp-email-display]').forEach(el => el.textContent = sess.email);
       rootEl.querySelectorAll('[data-otp-expires-display]').forEach(el => {
         const mins = Math.max(0, Math.floor((sess.exp * 1000 - Date.now()) / 60000));
-        el.textContent = (isEn() ? 'expires in ' : 'до завершення ') + mins + ' min';
+        el.textContent = t('до завершення ', 'expires in ', 'do skončenia ') + mins + ' min';
       });
     }
   }
@@ -11995,21 +12004,37 @@ h3.block-title:first-of-type { margin-top: 0; }
       const data = await snAuth.adminGet(sess.token);
       const blocks = data.blocks || {};
       // v2.54: розширено для всіх існуючих + auto-fallback для майбутніх dashboard'ів
+      // v2.78.46: blockMeta тепер ПОВНИЙ (icons + descriptions для ВСІХ блоків з SUPPORTED_BLOCKS)
       const blockMeta = {
-        hr: { uk: 'HR', en: 'HR', sk: 'HR', icon: '👥' },
-        prices: { uk: 'Прайс-листи (Sales playbook)', en: 'Price lists (Sales playbook)', sk: 'Cenníky (Sales playbook)', icon: '💰' },
-        'dashboard': { uk: 'Sales Analytics (dashboard)', en: 'Sales Analytics (dashboard)', sk: 'Sales Analytics (dashboard)', icon: '📊' },
-        'inventory-dashboard': { uk: 'Inventory Dashboard — склад та закупки', en: 'Inventory Dashboard — stock & purchases', sk: 'Inventory Dashboard — sklad a nákup', icon: '📦' },
-        'production-dashboard': { uk: 'Production Dashboard — виробництво', en: 'Production Dashboard — production', sk: 'Production Dashboard — výroba', icon: '🏭' },
+        hr:                       { uk: 'HR',                                       en: 'HR',                                  sk: 'HR',                                        icon: '👥' },
+        prices:                   { uk: 'Прайс-листи (Sales playbook)',             en: 'Price lists (Sales playbook)',        sk: 'Cenníky (Sales playbook)',                  icon: '💰' },
+        dashboard:                { uk: 'Sales Analytics dashboard',                en: 'Sales Analytics dashboard',           sk: 'Sales Analytics dashboard',                 icon: '📊' },
+        'inventory-dashboard':    { uk: 'Inventory Dashboard — склад та закупки',   en: 'Inventory Dashboard — stock & purchases', sk: 'Inventory Dashboard — sklad a nákup',   icon: '📦' },
+        'production-dashboard':   { uk: 'Production Dashboard — виробництво',       en: 'Production Dashboard — production',   sk: 'Production Dashboard — výroba',             icon: '🏭' },
+        'customer-dashboard':     { uk: 'Customer 360 — клієнт-360',                en: 'Customer 360',                        sk: 'Customer 360',                              icon: '👥' },
+        'finance-dashboard':      { uk: 'Finance Dashboard — фінанси',              en: 'Finance Dashboard',                   sk: 'Finance Dashboard — financie',              icon: '💰' },
+        'procurement-dashboard':  { uk: 'Procurement Dashboard — постачання',       en: 'Procurement Dashboard — supply',      sk: 'Procurement Dashboard — zásobovanie',       icon: '🛒' },
+        'ideas-author':           { uk: 'Ideas — пропозиції команди',               en: 'Ideas — team proposals',              sk: 'Ideas — návrhy tímu',                       icon: '💡' },
       };
-      // Loop по всіх blocks з API (не лише hardcoded) — щоб майбутні auto-з'являлись.
-      // Виключаємо 'admin' (це сам себе керує) і 'production' (legacy "Виробничі цикли", не плутати з production-dashboard).
-      const HIDE_BLOCKS = new Set(['admin', 'production']);
+      // Auto-icons для майбутніх блоків — по keyword у name
+      const guessIcon = (b) => {
+        if (b.includes('payroll') || b.includes('hr'))           return '👥';
+        if (b.includes('finance') || b.includes('cash'))         return '💰';
+        if (b.includes('production') || b.includes('factory'))   return '🏭';
+        if (b.includes('inventory') || b.includes('stock'))      return '📦';
+        if (b.includes('sales') || b.includes('customer'))       return '📈';
+        if (b.includes('procurement') || b.includes('supply'))   return '🛒';
+        if (b.includes('idea') || b.includes('feedback'))        return '💡';
+        if (b.includes('marketing') || b.includes('content'))    return '📢';
+        if (b.includes('export') || b.includes('international')) return '🌍';
+        return '📊';
+      };
+      // Loop по всіх blocks з API + з SUPPORTED_BLOCKS frontend знає
+      const HIDE_BLOCKS = new Set(['admin', 'production']);  // 'production' = legacy
       const allBlocks = Object.keys(blocks).filter(b => !HIDE_BLOCKS.has(b));
-      // Default fallback для блоків без явної meta (наприклад payroll-dashboard, finance-dashboard у майбутньому)
       const defaultMeta = (b) => {
         const nice = b.replace(/-dashboard$/, '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-        return { uk: nice + ' Dashboard', en: nice + ' Dashboard', sk: nice + ' Dashboard', icon: '📈' };
+        return { uk: nice + ' Dashboard', en: nice + ' Dashboard', sk: nice + ' Dashboard', icon: guessIcon(b) };
       };
       let html = '';
       for (const block of allBlocks) {
@@ -12039,24 +12064,24 @@ h3.block-title:first-of-type { margin-top: 0; }
         addBtn.addEventListener('click', async () => {
           const newEmail = input.value.trim().toLowerCase();
           if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
-            msgEl.textContent = isEn() ? 'Enter a valid email.' : 'Введіть правильний email.';
+            msgEl.textContent = t('Введіть правильний email.', 'Enter a valid email.', 'Zadajte platný email.');
             msgEl.style.color = '#dc2626';
             return;
           }
           const current = blocks[block] || [];
           if (current.includes(newEmail)) {
-            msgEl.textContent = isEn() ? 'Already in list.' : 'Вже є у списку.';
+            msgEl.textContent = t('Вже є у списку.', 'Already in list.', 'Už je v zozname.');
             msgEl.style.color = '#7a5a00';
             return;
           }
           const updated = [...current, newEmail];
           try {
             await snAuth.adminUpdate(sess.token, block, updated);
-            msgEl.textContent = isEn() ? '✓ Added.' : '✓ Додано.';
+            msgEl.textContent = t('✓ Додано.', '✓ Added.', '✓ Pridané.');
             msgEl.style.color = '#2d6a00';
             renderAdminUi(sess); // refresh
           } catch (e) {
-            msgEl.textContent = (isEn() ? 'Error: ' : 'Помилка: ') + e.message;
+            msgEl.textContent = t('Помилка: ', 'Error: ', 'Chyba: ') + e.message;
             msgEl.style.color = '#dc2626';
           }
         });
@@ -12066,11 +12091,11 @@ h3.block-title:first-of-type { margin-top: 0; }
             const updated = (blocks[block] || []).filter(x => x !== emailToRemove);
             try {
               await snAuth.adminUpdate(sess.token, block, updated);
-              msgEl.textContent = isEn() ? '✓ Removed.' : '✓ Видалено.';
+              msgEl.textContent = t('✓ Видалено.', '✓ Removed.', '✓ Vymazané.');
               msgEl.style.color = '#2d6a00';
               renderAdminUi(sess);
             } catch (e) {
-              msgEl.textContent = (isEn() ? 'Error: ' : 'Помилка: ') + e.message;
+              msgEl.textContent = t('Помилка: ', 'Error: ', 'Chyba: ') + e.message;
               msgEl.style.color = '#dc2626';
             }
           });
@@ -12113,7 +12138,7 @@ h3.block-title:first-of-type { margin-top: 0; }
         // Logged out — show Google + OTP buttons
         actions.innerHTML = `
           <div id="ideas-google-slot" style="min-width:200px"></div>
-          <button id="ideas-otp-btn" style="padding:9px 16px;background:#1E1E1E;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:inherit">📧 ${isEn() ? 'Email OTP' : 'Email-код'}</button>
+          <button id="ideas-otp-btn" style="padding:9px 16px;background:#1E1E1E;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:inherit">📧 ${t('Email-код', 'Email OTP', 'Email kód')}</button>
         `;
         // Mount Google Sign-In
         if (window.SnecoAuth?.signInWithGoogle) {
@@ -12146,7 +12171,7 @@ h3.block-title:first-of-type { margin-top: 0; }
       overlay.innerHTML = `
         <div class="idea-modal" style="max-width:420px">
           <div class="idea-modal-header">
-            <h3>📧 ${isEn() ? 'Email login' : 'Вхід через email'}</h3>
+            <h3>📧 ${t('Вхід через email', 'Email login', 'Prihlásenie cez email')}</h3>
             <button class="idea-modal-close" data-role="close">×</button>
           </div>
           <div class="idea-modal-body">
@@ -12155,14 +12180,14 @@ h3.block-title:first-of-type { margin-top: 0; }
               <input type="email" data-role="email" placeholder="you@sneco.ua" autocomplete="email">
             </div>
             <div class="idea-modal-field" data-role="code-field" style="display:none">
-              <label>${isEn() ? 'Code from email' : 'Код з листа'}</label>
+              <label>${t('Код з листа', 'Code from email', 'Kód z emailu')}</label>
               <input type="text" data-role="code" maxlength="6" placeholder="123456" inputmode="numeric" style="letter-spacing:4px;font-size:18px;text-align:center">
             </div>
             <div style="font-size:11px;color:#888;margin-top:8px" data-role="status"></div>
           </div>
           <div class="idea-modal-footer">
-            <button class="ghost" data-role="cancel">${isEn() ? 'Cancel' : 'Скасувати'}</button>
-            <button class="primary" data-role="send">${isEn() ? 'Send code' : 'Надіслати код'}</button>
+            <button class="ghost" data-role="cancel">${t('Скасувати', 'Cancel', 'Zrušiť')}</button>
+            <button class="primary" data-role="send">${t('Надіслати код', 'Send code', 'Poslať kód')}</button>
           </div>
         </div>`;
       document.body.appendChild(overlay);
@@ -12178,24 +12203,24 @@ h3.block-title:first-of-type { margin-top: 0; }
       let stage = 'email';
       sendBtn.onclick = async () => {
         const email = emailEl.value.trim().toLowerCase();
-        if (!email || !email.includes('@')) { statusEl.textContent = isEn() ? '✗ Invalid email' : '✗ Невірний email'; return; }
+        if (!email || !email.includes('@')) { statusEl.textContent = t('✗ Невірний email', '✗ Invalid email', '✗ Neplatný email'); return; }
         if (stage === 'email') {
           sendBtn.disabled = true;
-          statusEl.textContent = isEn() ? 'Sending…' : 'Надсилаємо…';
+          statusEl.textContent = t('Надсилаємо…', 'Sending…', 'Odosielame…');
           try {
             await snAuth.post('/api/otp/request', { email, block: 'ideas-author' });
             stage = 'code';
             codeField.style.display = 'block';
-            sendBtn.textContent = isEn() ? 'Verify' : 'Перевірити';
-            statusEl.textContent = isEn() ? '✓ Code sent — check your email' : '✓ Код надіслано — перевір пошту';
+            sendBtn.textContent = t('Перевірити', 'Verify', 'Overiť');
+            statusEl.textContent = t('✓ Код надіслано — перевір пошту', '✓ Code sent — check your email', '✓ Kód odoslaný — skontrolujte email');
             sendBtn.disabled = false;
             setTimeout(() => codeEl.focus(), 100);
           } catch (e) { statusEl.textContent = '✗ ' + e.message; sendBtn.disabled = false; }
         } else {
           const code = codeEl.value.trim();
-          if (code.length !== 6) { statusEl.textContent = isEn() ? '✗ Code must be 6 digits' : '✗ Код = 6 цифр'; return; }
+          if (code.length !== 6) { statusEl.textContent = t('✗ Код = 6 цифр', '✗ Code must be 6 digits', '✗ Kód má 6 číslic'); return; }
           sendBtn.disabled = true;
-          statusEl.textContent = isEn() ? 'Verifying…' : 'Перевіряємо…';
+          statusEl.textContent = t('Перевіряємо…', 'Verifying…', 'Overujeme…');
           try {
             const j = await snAuth.post('/api/otp/verify', { email, code, block: 'ideas-author' });
             snAuth.saveSession('ideas-author', {
@@ -12230,8 +12255,8 @@ h3.block-title:first-of-type { margin-top: 0; }
       const today = new Date(); today.setHours(0,0,0,0);
       const ddy = new Date(today); ddy.setDate(ddy.getDate() - 1);
       const dt = new Date(d); dt.setHours(0,0,0,0);
-      if (dt.getTime() === today.getTime()) return (isEn() ? 'today ' : 'сьогодні ') + d.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' });
-      if (dt.getTime() === ddy.getTime()) return (isEn() ? 'yesterday ' : 'вчора ') + d.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' });
+      if (dt.getTime() === today.getTime()) return t('сьогодні ', 'today ', 'dnes ') + d.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' });
+      if (dt.getTime() === ddy.getTime()) return t('вчора ', 'yesterday ', 'včera ') + d.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' });
       return d.toLocaleDateString(undefined, { day:'numeric', month:'short' }) + ' ' + d.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' });
     }
     function fmtSize(b) {
@@ -12253,33 +12278,33 @@ h3.block-title:first-of-type { margin-top: 0; }
       overlay.innerHTML = `
         <div class="idea-modal">
           <div class="idea-modal-header">
-            <h3>💡 ${isEn() ? 'Draft solution for' : 'Драфт рішення для'}: ${escapeHtml2(idea.title)}</h3>
+            <h3>💡 ${t('Драфт рішення для', 'Draft solution for', 'Návrh riešenia pre')}: ${escapeHtml2(idea.title)}</h3>
             <button class="idea-modal-close" data-role="close">×</button>
           </div>
           <div class="idea-modal-body">
             <div class="idea-modal-field">
-              <label>📂 ${isEn() ? 'Brand Bible section' : 'Розділ Brand Bible'}</label>
+              <label>📂 ${t('Розділ Brand Bible', 'Brand Bible section', 'Sekcia Brand Bible')}</label>
               <select data-role="section">${sectionsOpts}</select>
             </div>
             <div class="idea-modal-field">
-              <label>${isEn() ? 'Solution title (short)' : 'Назва рішення (коротко)'}</label>
+              <label>${t('Назва рішення (коротко)', 'Solution title (short)', 'Názov riešenia (krátko)')}</label>
               <input type="text" data-role="title" maxlength="200" value="${escapeHtml2(proposal.title || '')}">
             </div>
             <div class="idea-modal-field">
-              <label>${isEn() ? 'Description (what we do)' : 'Опис (що ми робимо)'}</label>
+              <label>${t('Опис (що ми робимо)', 'Description (what we do)', 'Popis (čo robíme)')}</label>
               <textarea data-role="body" maxlength="4000" style="min-height:140px">${escapeHtml2(proposal.body || '')}</textarea>
             </div>
             <div class="idea-modal-field">
-              <label>📌 ${isEn() ? 'Example / how it would look' : 'Приклад / як виглядатиме'}</label>
+              <label>📌 ${t('Приклад / як виглядатиме', 'Example / how it would look', 'Príklad / ako to bude vyzerať')}</label>
               <textarea data-role="example" maxlength="4000" style="min-height:100px">${escapeHtml2(proposal.example || '')}</textarea>
             </div>
-            <div style="font-size:11px;color:#888;padding:8px 0">${proposal.ai_generated ? '🤖 ' + (isEn() ? 'AI-generated draft — review and edit before sending.' : 'Draft згенеровано AI — переглянь і відредагуй перед відправкою.') : ''}</div>
+            <div style="font-size:11px;color:#888;padding:8px 0">${proposal.ai_generated ? '🤖 ' + t('Draft згенеровано AI — переглянь і відредагуй перед відправкою.', 'AI-generated draft — review and edit before sending.', 'Návrh vygenerovaný AI — pred odoslaním skontrolujte a upravte.') : ''}</div>
           </div>
           <div class="idea-modal-footer">
             <span class="ai-loading" data-role="status"></span>
-            <button class="ghost" data-role="cancel">${isEn() ? 'Cancel' : 'Скасувати'}</button>
-            <button class="primary" data-role="save">💾 ${isEn() ? 'Save draft' : 'Зберегти draft'}</button>
-            <button class="send" data-role="send">📨 ${isEn() ? 'Send to author' : 'Відправити автору'}</button>
+            <button class="ghost" data-role="cancel">${t('Скасувати', 'Cancel', 'Zrušiť')}</button>
+            <button class="primary" data-role="save">💾 ${t('Зберегти draft', 'Save draft', 'Uložiť návrh')}</button>
+            <button class="send" data-role="send">📨 ${t('Відправити автору', 'Send to author', 'Poslať autorovi')}</button>
           </div>
         </div>`;
       document.body.appendChild(overlay);
@@ -12313,27 +12338,27 @@ h3.block-title:first-of-type { margin-top: 0; }
 
       overlay.querySelector('[data-role="save"]').addEventListener('click', async () => {
         const f = getFields();
-        if (!f.title || f.title.length < 3) { setStatus(isEn() ? 'Title too short' : 'Назва закоротка', true); return; }
-        setStatus(isEn() ? 'Saving…' : 'Зберігаємо…', false);
+        if (!f.title || f.title.length < 3) { setStatus(t('Назва закоротка', 'Title too short', 'Názov je príliš krátky'), true); return; }
+        setStatus(t('Зберігаємо…', 'Saving…', 'Ukladáme…'), false);
         try {
           await snAuth.post('/api/ideas/save-proposal', f, { token: tk });
-          setStatus(isEn() ? '✓ Saved' : '✓ Збережено', false);
+          setStatus(t('✓ Збережено', '✓ Saved', '✓ Uložené'), false);
           setTimeout(() => closeModal(false, true), 600);
         } catch (e) { setStatus('⚠ ' + e.message, true); }
       });
 
       overlay.querySelector('[data-role="send"]').addEventListener('click', async () => {
         const f = getFields();
-        if (!f.title || f.title.length < 3) { setStatus(isEn() ? 'Title too short' : 'Назва закоротка', true); return; }
-        if (!f.body || f.body.length < 10) { setStatus(isEn() ? 'Description too short' : 'Опис закороткий', true); return; }
-        if (!confirm(isEn() ? 'Send this proposal to the idea author by email?' : 'Відправити цю пропозицію автору ідеї поштою?')) return;
-        setStatus(isEn() ? 'Saving + sending…' : 'Зберігаємо + відправляємо…', false);
+        if (!f.title || f.title.length < 3) { setStatus(t('Назва закоротка', 'Title too short', 'Názov je príliš krátky'), true); return; }
+        if (!f.body || f.body.length < 10) { setStatus(t('Опис закороткий', 'Description too short', 'Popis je príliš krátky'), true); return; }
+        if (!confirm(t('Відправити цю пропозицію автору ідеї поштою?', 'Send this proposal to the idea author by email?', 'Poslať tento návrh autorovi nápadu emailom?'))) return;
+        setStatus(t('Зберігаємо + відправляємо…', 'Saving + sending…', 'Ukladáme + odosielame…'), false);
         try {
           // Save first (creates new draft if no proposal_id)
           const saveResp = await snAuth.post('/api/ideas/save-proposal', f, { token: tk });
           const pid = saveResp.proposal_id || proposal.id;
           await snAuth.post('/api/ideas/send-proposal', { idea_id: idea.id, proposal_id: pid }, { token: tk });
-          setStatus(isEn() ? '✓ Sent!' : '✓ Відправлено!', false);
+          setStatus(t('✓ Відправлено!', '✓ Sent!', '✓ Odoslané!'), false);
           setTimeout(() => closeModal(true, true), 800);
         } catch (e) { setStatus('⚠ ' + e.message, true); }
       });
@@ -12364,13 +12389,13 @@ h3.block-title:first-of-type { margin-top: 0; }
     }
     function renderList() {
       const items = cachedIdeas;
-      counterEl.textContent = items.length + ' ' + (isEn() ? 'idea(s)' : 'пропозиц.');
+      counterEl.textContent = items.length + ' ' + t('пропозиц.', 'idea(s)', 'návrh.');
       if (items.length === 0) {
-        listEl.innerHTML = '<div class="ideas-empty">' + (isEn() ? 'No ideas yet — be the first.' : 'Поки нічого — будь першим.') + '</div>';
+        listEl.innerHTML = '<div class="ideas-empty">' + t('Поки нічого — будь першим.', 'No ideas yet — be the first.', 'Zatiaľ nič — buďte prvý.') + '</div>';
         return;
       }
       // v2.78.39: workflow badges + status-aware coloring (UK + EN + SK)
-      const lang = (typeof getLang === 'function') ? getLang() : (isEn() ? 'en' : 'uk');
+      const lang = (typeof getLang === 'function') ? getLang() : (isEn() ? 'en' : isSk() ? 'sk' : 'uk');
       const wfLabel = (s) => {
         const map = {
           open:              { uk: 'Відкрита',       en: 'Open',              sk: 'Otvorená' },
@@ -12417,7 +12442,7 @@ h3.block-title:first-of-type { margin-top: 0; }
       }
       card.classList.add('is-expanded');
       const bodyEl = card.querySelector('[data-role="body"]');
-      bodyEl.innerHTML = '<div style="padding:14px 0;font-size:12px;color:var(--text-muted)">' + (isEn() ? 'Loading…' : 'Завантажуємо…') + '</div>';
+      bodyEl.innerHTML = '<div style="padding:14px 0;font-size:12px;color:var(--text-muted)">' + t('Завантажуємо…', 'Loading…', 'Načítava sa…') + '</div>';
       try {
         // v2.78.39: use /api/ideas/full if user is logged in (workflow); fallback to public /api/ideas/get otherwise
         const adminSess = snAuth.sessionFor('admin');
@@ -12476,7 +12501,7 @@ h3.block-title:first-of-type { margin-top: 0; }
           ${(c.attachments || []).length ? '<div class="idea-comment-attachments">' + c.attachments.map(attachmentLink).join('') + '</div>' : ''}
         </div>`).join('');
       const closedInfo = (wf === 'done')
-        ? '<div class="idea-closed-info">✓ ' + (isEn() ? 'Closed by ' : 'Закрито: ') + escapeHtml2(idea.closed_by || idea.status_changed_by || '') + ' · ' + fmtTime(idea.closed_at || idea.status_changed_at) + '</div>'
+        ? '<div class="idea-closed-info">✓ ' + t('Закрито: ', 'Closed by ', 'Uzavreté: ') + escapeHtml2(idea.closed_by || idea.status_changed_by || '') + ' · ' + fmtTime(idea.closed_at || idea.status_changed_at) + '</div>'
         : '';
       // v2.78.39: Proposal block (public — visible to all logged-in users)
       const sectionLabelFn = (sid) => (sections.find(s => s.id === sid)?.label) || sid || 'Інше';
@@ -12484,24 +12509,24 @@ h3.block-title:first-of-type { margin-top: 0; }
       if (activeProposal) {
         const pClass = activeProposal.status === 'approved' ? ' is-approved' : (activeProposal.status === 'changes_requested' ? ' is-changes' : '');
         const statusLabel = activeProposal.status === 'approved'
-          ? '✅ ' + (isEn() ? 'Approved by author' : 'Погоджено автором')
+          ? '✅ ' + t('Погоджено автором', 'Approved by author', 'Schválené autorom')
           : activeProposal.status === 'changes_requested'
-          ? '💬 ' + (isEn() ? 'Author requested changes' : 'Автор просить зміни')
-          : '⏳ ' + (isEn() ? 'Awaiting author response' : 'Очікує реакції автора');
+          ? '💬 ' + t('Автор просить зміни', 'Author requested changes', 'Autor žiada zmeny')
+          : '⏳ ' + t('Очікує реакції автора', 'Awaiting author response', 'Čaká na reakciu autora');
         proposalHtml = `
           <div class="idea-proposal-block${pClass}">
-            <div class="idea-proposal-label">💡 ${isEn() ? 'Proposed solution' : 'Запропоноване рішення'} · v${activeProposal.version}</div>
+            <div class="idea-proposal-label">💡 ${t('Запропоноване рішення', 'Proposed solution', 'Navrhované riešenie')} · v${activeProposal.version}</div>
             <div class="idea-proposal-title">${escapeHtml2(activeProposal.title || '')}</div>
-            <div class="idea-proposal-section">📂 ${isEn() ? 'Brand Bible section' : 'Розділ Brand Bible'}: <b>${escapeHtml2(sectionLabelFn(activeProposal.section))}</b></div>
+            <div class="idea-proposal-section">📂 ${t('Розділ Brand Bible', 'Brand Bible section', 'Sekcia Brand Bible')}: <b>${escapeHtml2(sectionLabelFn(activeProposal.section))}</b></div>
             ${activeProposal.body ? `<div class="idea-proposal-body">${escapeHtml2(activeProposal.body)}</div>` : ''}
             ${activeProposal.example ? `
-              <div class="idea-proposal-example-label">📌 ${isEn() ? 'Example' : 'Приклад'}</div>
+              <div class="idea-proposal-example-label">📌 ${t('Приклад', 'Example', 'Príklad')}</div>
               <div class="idea-proposal-example">${escapeHtml2(activeProposal.example)}</div>` : ''}
             <div class="idea-proposal-meta">${statusLabel} · ${escapeHtml2(activeProposal.drafted_by || '')} · ${fmtTime(activeProposal.sent_at || activeProposal.drafted_at)}${activeProposal.ai_generated ? ' · 🤖 AI draft' : ''}</div>
             ${canRespond && activeProposal.status === 'sent' ? `
               <div class="idea-author-response">
-                <button class="approve-btn" data-role="approve">✅ ${isEn() ? 'Approve' : 'Погодити рішення'}</button>
-                <button class="changes-btn" data-role="request-changes">💬 ${isEn() ? 'Request changes' : 'Запросити зміни'}</button>
+                <button class="approve-btn" data-role="approve">✅ ${t('Погодити рішення', 'Approve', 'Schváliť')}</button>
+                <button class="changes-btn" data-role="request-changes">💬 ${t('Запросити зміни', 'Request changes', 'Požiadať o zmeny')}</button>
               </div>` : ''}
           </div>`;
       }
@@ -12511,19 +12536,19 @@ h3.block-title:first-of-type { margin-top: 0; }
         const btns = [];
         if (wf === 'open' || wf === 'changes_requested') {
           // v2.78.45: Прибрано AI кнопки — admin сам пише proposal у modal
-          btns.push(`<button class="is-primary" data-role="write-proposal">💡 ${isEn() ? 'Write proposal' : 'Написати рішення'}</button>`);
+          btns.push(`<button class="is-primary" data-role="write-proposal">💡 ${t('Написати рішення', 'Write proposal', 'Napísať návrh')}</button>`);
         }
         if (draftProposal) {
-          btns.push(`<button data-role="edit-draft" data-pid="${escapeHtml2(draftProposal.id)}">✏ ${isEn() ? 'Edit draft' : 'Редагувати draft'} (v${draftProposal.version})</button>`);
+          btns.push(`<button data-role="edit-draft" data-pid="${escapeHtml2(draftProposal.id)}">✏ ${t('Редагувати draft', 'Edit draft', 'Upraviť návrh')} (v${draftProposal.version})</button>`);
         }
         if (wf === 'approved') {
-          btns.push(`<button class="is-primary" data-role="transition" data-status="in_progress">🚀 ${isEn() ? 'Start (in progress)' : 'В роботу'}</button>`);
+          btns.push(`<button class="is-primary" data-role="transition" data-status="in_progress">🚀 ${t('В роботу', 'Start (in progress)', 'Spustiť (v procese)')}</button>`);
         }
         if (wf === 'in_progress' || wf === 'approved') {
-          btns.push(`<button data-role="transition" data-status="done">✓ ${isEn() ? 'Mark as done' : 'Зроблено'}</button>`);
+          btns.push(`<button data-role="transition" data-status="done">✓ ${t('Зроблено', 'Mark as done', 'Hotovo')}</button>`);
         }
         if (wf === 'done') {
-          btns.push(`<button data-role="transition" data-status="open">↺ ${isEn() ? 'Reopen' : 'Повернути в роботу'}</button>`);
+          btns.push(`<button data-role="transition" data-status="open">↺ ${t('Повернути в роботу', 'Reopen', 'Znova otvoriť')}</button>`);
         }
         if (btns.length) {
           adminActionsHtml = `<div class="idea-admin-actions">${btns.join('')}</div>`;
@@ -12531,7 +12556,7 @@ h3.block-title:first-of-type { margin-top: 0; }
       }
       // Audit log (collapsed by default)
       const auditHtml = auditLog.length ? `
-        <div class="idea-audit-toggle" data-role="audit-toggle">📜 ${isEn() ? 'Show history' : 'Показати історію'} (${auditLog.length})</div>
+        <div class="idea-audit-toggle" data-role="audit-toggle">📜 ${t('Показати історію', 'Show history', 'Zobraziť históriu')} (${auditLog.length})</div>
         <div class="idea-audit-log" data-role="audit-log" style="display:none">
           ${auditLog.map(a => `<div class="idea-audit-row"><span class="audit-time">${fmtTime(a.created_at)}</span> · <b>${escapeHtml2(a.actor_email)}</b> · ${escapeHtml2(a.event)}${a.from_value ? ' · ' + escapeHtml2(a.from_value) + '→' + escapeHtml2(a.to_value || '') : ''}</div>`).join('')}
         </div>` : '';
@@ -12547,23 +12572,23 @@ h3.block-title:first-of-type { margin-top: 0; }
         ${auditHtml}
         ${commentsHtml ? '<div class="idea-comments">' + commentsHtml + '</div>' : ''}
         <div class="idea-comment-form" style="margin-top:14px">
-          <div class="ideas-form-row"><textarea data-role="comment-body" maxlength="10000" placeholder="${isEn() ? 'Add comment / new info' : 'Додати коментар / нову інформацію'}"></textarea></div>
+          <div class="ideas-form-row"><textarea data-role="comment-body" maxlength="10000" placeholder="${t('Додати коментар / нову інформацію', 'Add comment / new info', 'Pridať komentár / nové info')}"></textarea></div>
           ${activeSess && activeSess.email
             ? `<div class="ideas-form-row" style="font-size:11.5px;color:var(--text-muted);padding:4px 2px">
-                ${isEn() ? 'Posting as' : 'Коментар від'}: <strong style="color:var(--text)">${escapeHtml2(activeSess.email)}</strong>
+                ${t('Коментар від', 'Posting as', 'Komentár od')}: <strong style="color:var(--text)">${escapeHtml2(activeSess.email)}</strong>
               </div>`
             : `<div class="ideas-form-grid">
-                <input type="text" data-role="comment-name" maxlength="80" placeholder="${isEn() ? "Your name" : "Ваше ім'я"}">
+                <input type="text" data-role="comment-name" maxlength="80" placeholder="${t("Ваше ім'я", "Your name", "Vaše meno")}">
                 <input type="email" data-role="comment-email" maxlength="200" placeholder="Email">
               </div>`}
           <div class="ideas-form-row">
             <div class="ideas-attach-zone" data-role="comment-attach-zone">
-              <label class="idea-action-btn" style="cursor:pointer">📎 ${isEn() ? "Attach file" : "Файл"}<input type="file" multiple style="display:none" data-role="comment-files"></label>
+              <label class="idea-action-btn" style="cursor:pointer">📎 ${t("Файл", "Attach file", "Súbor")}<input type="file" multiple style="display:none" data-role="comment-files"></label>
               <span data-role="comment-attach-list"></span>
             </div>
           </div>
           <div class="ideas-form-actions">
-            <button class="primary" data-role="comment-submit">${isEn() ? 'Submit' : 'Додати'}</button>
+            <button class="primary" data-role="comment-submit">${t('Додати', 'Submit', 'Pridať')}</button>
             <span class="otp-msg" data-role="comment-msg" style="margin:0"></span>
           </div>
         </div>
@@ -12583,7 +12608,7 @@ h3.block-title:first-of-type { margin-top: 0; }
       // Wire admin
       const closeBtn = bodyEl.querySelector('[data-role="close"]');
       if (closeBtn) closeBtn.addEventListener('click', async () => {
-        if (!confirm(isEn() ? 'Mark as done?' : 'Позначити як зроблено?')) return;
+        if (!confirm(t('Позначити як зроблено?', 'Mark as done?', 'Označiť ako hotové?'))) return;
         try {
           await snAuth.post('/api/ideas/close', { idea_id: idea.id }, { token: adminSess.token });
           await loadList();
@@ -12644,7 +12669,7 @@ h3.block-title:first-of-type { margin-top: 0; }
       // Approve / request changes (author)
       const approveBtn = bodyEl.querySelector('[data-role="approve"]');
       if (approveBtn) approveBtn.addEventListener('click', async () => {
-        if (!confirm(isEn() ? 'Approve this solution? You can still comment further afterwards.' : 'Погодити це рішення? Ви все ще зможете додати коментарі пізніше.')) return;
+        if (!confirm(t('Погодити це рішення? Ви все ще зможете додати коментарі пізніше.', 'Approve this solution? You can still comment further afterwards.', 'Schváliť toto riešenie? Komentovať môžete aj naďalej.'))) return;
         try {
           await snAuth.post('/api/ideas/respond', { idea_id: idea.id, action: 'approve' }, { token: ideaToken });
           await toggleCard(card); await toggleCard(card);
@@ -12653,7 +12678,7 @@ h3.block-title:first-of-type { margin-top: 0; }
       });
       const changesBtn = bodyEl.querySelector('[data-role="request-changes"]');
       if (changesBtn) changesBtn.addEventListener('click', async () => {
-        const note = prompt(isEn() ? 'What changes would you like?' : 'Які зміни ви хочете запропонувати?');
+        const note = prompt(t('Які зміни ви хочете запропонувати?', 'What changes would you like?', 'Aké zmeny by ste chceli navrhnúť?'));
         if (!note || note.trim().length < 5) return;
         try {
           await snAuth.post('/api/ideas/respond', { idea_id: idea.id, action: 'request_changes', note: note.trim() }, { token: ideaToken });
@@ -12665,7 +12690,7 @@ h3.block-title:first-of-type { margin-top: 0; }
       bodyEl.querySelectorAll('[data-role="transition"]').forEach(btn => {
         btn.addEventListener('click', async () => {
           const target = btn.dataset.status;
-          if (target === 'done' && !confirm(isEn() ? 'Mark as done? Author will be notified.' : 'Позначити як зроблено? Автор отримає лист.')) return;
+          if (target === 'done' && !confirm(t('Позначити як зроблено? Автор отримає лист.', 'Mark as done? Author will be notified.', 'Označiť ako hotové? Autor dostane email.'))) return;
           try {
             await snAuth.post('/api/ideas/transition', { idea_id: idea.id, status: target }, { token: ideaToken });
             await toggleCard(card); await toggleCard(card);
@@ -12717,10 +12742,10 @@ h3.block-title:first-of-type { margin-top: 0; }
         } else {
           name = (bodyEl.querySelector('[data-role="comment-name"]')?.value || '').trim();
           email = (bodyEl.querySelector('[data-role="comment-email"]')?.value || '').trim();
-          if (!name || !email) { msgEl.classList.add('is-error'); msgEl.textContent = isEn() ? 'Name and email required' : 'Ім\'я та email обов\'язкові'; return; }
+          if (!name || !email) { msgEl.classList.add('is-error'); msgEl.textContent = t('Ім\'я та email обов\'язкові', 'Name and email required', 'Meno a email sú povinné'); return; }
         }
-        if (!text && commentAttachments.length === 0) { msgEl.classList.add('is-error'); msgEl.textContent = isEn() ? 'Add text or file' : 'Додайте текст або файл'; return; }
-        if (commentAttachments.some(a => a._uploading)) { msgEl.classList.add('is-error'); msgEl.textContent = isEn() ? 'Wait for upload' : 'Зачекайте завантаження'; return; }
+        if (!text && commentAttachments.length === 0) { msgEl.classList.add('is-error'); msgEl.textContent = t('Додайте текст або файл', 'Add text or file', 'Pridajte text alebo súbor'); return; }
+        if (commentAttachments.some(a => a._uploading)) { msgEl.classList.add('is-error'); msgEl.textContent = t('Зачекайте завантаження', 'Wait for upload', 'Počkajte na nahrávanie'); return; }
         try {
           await snAuth.post('/api/ideas/comment', {
             idea_id: idea.id, body: text, author_name: name, author_email: email,
@@ -12821,10 +12846,10 @@ h3.block-title:first-of-type { margin-top: 0; }
       } else {
         name = (formEl.querySelector('[data-role="name"]')?.value || '').trim();
         email = (formEl.querySelector('[data-role="email"]')?.value || '').trim();
-        if (!name || !email) { msgEl.classList.add('is-error'); msgEl.textContent = isEn() ? 'Name and email required' : 'Ім\'я та email обов\'язкові'; return; }
+        if (!name || !email) { msgEl.classList.add('is-error'); msgEl.textContent = t('Ім\'я та email обов\'язкові', 'Name and email required', 'Meno a email sú povinné'); return; }
       }
-      if (title.length < 4) { msgEl.classList.add('is-error'); msgEl.textContent = isEn() ? 'Title too short' : 'Назва коротка'; return; }
-      if (pendingAttachments.some(a => a._uploading)) { msgEl.classList.add('is-error'); msgEl.textContent = isEn() ? 'Wait for upload' : 'Зачекайте'; return; }
+      if (title.length < 4) { msgEl.classList.add('is-error'); msgEl.textContent = t('Назва коротка', 'Title too short', 'Názov je príliš krátky'); return; }
+      if (pendingAttachments.some(a => a._uploading)) { msgEl.classList.add('is-error'); msgEl.textContent = t('Зачекайте', 'Wait for upload', 'Počkajte'); return; }
       try {
         await snAuth.post('/api/ideas/create', {
           title, body, author_name: name, author_email: email,
