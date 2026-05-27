@@ -12542,10 +12542,14 @@ h3.block-title:first-of-type { margin-top: 0; }
         ${commentsHtml ? '<div class="idea-comments">' + commentsHtml + '</div>' : ''}
         <div class="idea-comment-form" style="margin-top:14px">
           <div class="ideas-form-row"><textarea data-role="comment-body" maxlength="10000" placeholder="${isEn() ? 'Add comment / new info' : 'Додати коментар / нову інформацію'}"></textarea></div>
-          <div class="ideas-form-grid">
-            <input type="text" data-role="comment-name" maxlength="80" placeholder="${isEn() ? "Your name" : "Ваше ім'я"}">
-            <input type="email" data-role="comment-email" maxlength="200" placeholder="Email">
-          </div>
+          ${activeSess && activeSess.email
+            ? `<div class="ideas-form-row" style="font-size:11.5px;color:var(--text-muted);padding:4px 2px">
+                ${isEn() ? 'Posting as' : 'Коментар від'}: <strong style="color:var(--text)">${escapeHtml2(activeSess.email)}</strong>
+              </div>`
+            : `<div class="ideas-form-grid">
+                <input type="text" data-role="comment-name" maxlength="80" placeholder="${isEn() ? "Your name" : "Ваше ім'я"}">
+                <input type="email" data-role="comment-email" maxlength="200" placeholder="Email">
+              </div>`}
           <div class="ideas-form-row">
             <div class="ideas-attach-zone" data-role="comment-attach-zone">
               <label class="idea-action-btn" style="cursor:pointer">📎 ${isEn() ? "Attach file" : "Файл"}<input type="file" multiple style="display:none" data-role="comment-files"></label>
@@ -12558,10 +12562,18 @@ h3.block-title:first-of-type { margin-top: 0; }
           </div>
         </div>
       `;
-      // Hydrate author from prefs
-      const prefs = authorPrefs();
-      bodyEl.querySelector('[data-role="comment-name"]').value = prefs.name || '';
-      bodyEl.querySelector('[data-role="comment-email"]').value = prefs.email || '';
+      // v2.78.42: Hydrate author from session if logged in, else from prefs
+      if (activeSess && activeSess.email) {
+        // logged in — поля прибрані, але _activeAuthor для submit handler
+        bodyEl._activeAuthorEmail = activeSess.email;
+        bodyEl._activeAuthorName = activeSess.name || activeSess.email.split('@')[0];
+      } else {
+        const prefs = authorPrefs();
+        const nameEl = bodyEl.querySelector('[data-role="comment-name"]');
+        const emailEl = bodyEl.querySelector('[data-role="comment-email"]');
+        if (nameEl) nameEl.value = prefs.name || '';
+        if (emailEl) emailEl.value = prefs.email || '';
+      }
       // Wire admin
       const closeBtn = bodyEl.querySelector('[data-role="close"]');
       if (closeBtn) closeBtn.addEventListener('click', async () => {
@@ -12680,14 +12692,21 @@ h3.block-title:first-of-type { margin-top: 0; }
         }
         commentFiles.value = '';
       });
-      // Submit comment
+      // Submit comment — v2.78.42: session-aware (logged-in users skip name/email)
       bodyEl.querySelector('[data-role="comment-submit"]').addEventListener('click', async () => {
         const text = bodyEl.querySelector('[data-role="comment-body"]').value.trim();
-        const name = bodyEl.querySelector('[data-role="comment-name"]').value.trim();
-        const email = bodyEl.querySelector('[data-role="comment-email"]').value.trim();
         const msgEl = bodyEl.querySelector('[data-role="comment-msg"]');
         msgEl.className = 'otp-msg';
-        if (!name || !email) { msgEl.classList.add('is-error'); msgEl.textContent = isEn() ? 'Name and email required' : 'Ім\'я та email обов\'язкові'; return; }
+        let name, email;
+        if (bodyEl._activeAuthorEmail) {
+          // Залогінений — беремо з сесії
+          email = bodyEl._activeAuthorEmail;
+          name = bodyEl._activeAuthorName || email.split('@')[0];
+        } else {
+          name = (bodyEl.querySelector('[data-role="comment-name"]')?.value || '').trim();
+          email = (bodyEl.querySelector('[data-role="comment-email"]')?.value || '').trim();
+          if (!name || !email) { msgEl.classList.add('is-error'); msgEl.textContent = isEn() ? 'Name and email required' : 'Ім\'я та email обов\'язкові'; return; }
+        }
         if (!text && commentAttachments.length === 0) { msgEl.classList.add('is-error'); msgEl.textContent = isEn() ? 'Add text or file' : 'Додайте текст або файл'; return; }
         if (commentAttachments.some(a => a._uploading)) { msgEl.classList.add('is-error'); msgEl.textContent = isEn() ? 'Wait for upload' : 'Зачекайте завантаження'; return; }
         try {
@@ -12695,7 +12714,7 @@ h3.block-title:first-of-type { margin-top: 0; }
             idea_id: idea.id, body: text, author_name: name, author_email: email,
             attachments: commentAttachments.map(({_uploading, ...rest}) => rest),
           });
-          saveAuthor(name, email);
+          if (!bodyEl._activeAuthorEmail) saveAuthor(name, email);
           await loadList();
           // Re-expand the same card
           setTimeout(() => {
