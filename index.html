@@ -11797,25 +11797,26 @@ h3.block-title:first-of-type { margin-top: 0; }
       if (!r.ok) throw new Error(data.error || ('HTTP ' + r.status));
       return data;
     },
-    // v2.78.39: Return any valid (non-expired) session — used by Ideas workflow
-    // so authors can respond without being admins.
+    // v2.78.39+v2.78.41 (fix): Return any valid (non-expired) session — used by Ideas workflow.
+    // Без кешу _fallback (інакше stale між викликами).
     anySession() {
       try {
         const now = Date.now() / 1000;
+        let firstValid = null;
         for (let i = 0; i < sessionStorage.length; i++) {
           const k = sessionStorage.key(i);
           if (!k || !k.startsWith(SS_PREFIX)) continue;
           try {
             const s = JSON.parse(sessionStorage.getItem(k) || '{}');
             if (s.token && s.email && (!s.exp || s.exp > now)) {
-              // Prefer admin session if available
+              // Prefer admin session — return immediately
               if (s.isAdmin) return s;
-              // Save first valid as fallback
-              if (!this._fallback) this._fallback = s;
+              // Save first valid as fallback (no cross-call cache)
+              if (!firstValid) firstValid = s;
             }
           } catch (e) {}
         }
-        return this._fallback || null;
+        return firstValid;
       } catch (e) { return null; }
     },
     requestOtp(email, block) { return this.post('/api/otp/request', { email, block }); },
@@ -12090,34 +12091,20 @@ h3.block-title:first-of-type { margin-top: 0; }
     let cachedIdeas = [];
     let pendingAttachments = [];   // for new-idea form
 
-    // v2.78.40: Login banner — Google Sign-In + OTP entry для ideas workflow
+    // v2.78.40+v2.78.41: Login banner — ховаємо повністю якщо вже є валідна сесія
     function renderIdeasAuthBanner() {
       const banner = document.getElementById('ideas-auth-banner');
       const actions = document.getElementById('ideas-auth-actions');
       if (!banner || !actions) return;
-      const sess = snAuth.anySession ? snAuth.anySession() : (snAuth.sessionFor('admin') || snAuth.sessionFor('ideas') || snAuth.sessionFor('dashboard'));
+      const sess = snAuth.anySession ? snAuth.anySession() : (snAuth.sessionFor('admin') || snAuth.sessionFor('ideas-author') || snAuth.sessionFor('dashboard'));
       if (sess && sess.email) {
-        // Logged in — show user info + sign-out
-        banner.style.background = 'linear-gradient(180deg,#e6f4d8 0%,#d4ecc0 100%)';
-        banner.style.borderColor = 'rgba(150,193,31,.5)';
-        banner.style.borderLeftColor = '#96C11F';
-        banner.querySelector('div').innerHTML = `
-          <strong style="color:#1E1E1E">✅ ${sess.isAdmin ? (isEn() ? 'Logged in as admin' : 'Залогінений як адмін') : (isEn() ? 'Logged in' : 'Залогінений')}</strong><br>
-          <span style="color:#557a00;font-family:ui-monospace,Menlo,monospace">${escapeHtml2(sess.email)}</span>
-          ${sess.isAdmin ? ' · <span style="color:#996600;font-weight:600">' + (isEn() ? 'You can propose solutions' : 'Можеш пропонувати рішення') + '</span>' : ''}
-        `;
-        actions.innerHTML = `<button id="ideas-signout-btn" style="padding:8px 14px;background:#fff;border:1px solid #d4ecc0;color:#557a00;border-radius:6px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:inherit">🔒 ${isEn() ? 'Sign out' : 'Вийти'}</button>`;
-        document.getElementById('ideas-signout-btn').onclick = () => {
-          // Clear all sessions
-          try {
-            const ks = [];
-            for (let i = 0; i < sessionStorage.length; i++) { const k = sessionStorage.key(i); if (k && k.startsWith('snauth:')) ks.push(k); }
-            ks.forEach(k => sessionStorage.removeItem(k));
-          } catch(e){}
-          renderIdeasAuthBanner();
-          loadList(); // re-render with logged-out state
-        };
-      } else {
+        // Уже залогінений у будь-якому block — banner непотрібен.
+        banner.style.display = 'none';
+        return;
+      }
+      // Не залогінений — показати banner з кнопками
+      banner.style.display = '';
+      {
         // Logged out — show Google + OTP buttons
         actions.innerHTML = `
           <div id="ideas-google-slot" style="min-width:200px"></div>
@@ -12364,6 +12351,8 @@ h3.block-title:first-of-type { margin-top: 0; }
         const data = await snAuth.post('/api/ideas/list', { status: currentFilter });
         cachedIdeas = data.items || [];
         renderList();
+        // v2.78.41: re-check session state кожен раз — щоб banner коректно ховався/показувався
+        renderIdeasAuthBanner();
       } catch (e) {
         listEl.innerHTML = '<div class="ideas-empty" style="color:#dc2626">⚠ ' + escapeHtml2(e.message) + '</div>';
       }
