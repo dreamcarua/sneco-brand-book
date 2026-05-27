@@ -396,6 +396,33 @@ body.dash-locked{overflow:hidden}
   </div>
 </div>
 
+<!-- v2.78.39 fix CR-2: stale-data warning banner — показуємо якщо generated > 24h тому -->
+<div id="stale-data-banner" style="display:none;background:linear-gradient(180deg,#fff3d6 0%,#ffeaa6 100%);border-bottom:2px solid #cc9700;padding:10px 24px;color:#7a5a00;font-size:13px;font-weight:600;text-align:center;font-family:'Inter',system-ui,sans-serif">
+  ⚠ Дані застаріли · згенеровано <span id="stale-data-date">—</span> · для актуальних метрик дивись <a href="../customer-360/customer-360.html" style="color:#996600;text-decoration:underline">Customer 360</a> або <a href="../finance/finance.html" style="color:#996600;text-decoration:underline">Finance</a> (вони тягнуть з D1 live)
+</div>
+<script>
+  // v2.78.39: check if "generated" in inline D is older than 24h → show banner
+  (function(){
+    try {
+      const m = document.documentElement.outerHTML.match(/"generated":\s*"([^"]+)"/);
+      if (!m) return;
+      const dateStr = m[1];  // format: DD.MM.YYYY HH:mm
+      const parts = dateStr.match(/(\d{2})\.(\d{2})\.(\d{4})\s+(\d{2}):(\d{2})/);
+      if (!parts) return;
+      const dt = new Date(+parts[3], +parts[2]-1, +parts[1], +parts[4], +parts[5]);
+      const ageH = (Date.now() - dt.getTime()) / 3600000;
+      if (ageH > 24) {
+        const b = document.getElementById('stale-data-banner');
+        const d = document.getElementById('stale-data-date');
+        if (b && d) {
+          d.textContent = dateStr + ' (' + Math.round(ageH/24) + ' днів тому)';
+          b.style.display = 'block';
+        }
+      }
+    } catch(e) {}
+  })();
+</script>
+
 <!-- TAB NAV -->
 <div class="tabnav">
   <button class="tab-btn" style="display:none" id="tabbtn-1" onclick="showTab(1)"><span class="tab-icon">📊</span>Огляд</button>
