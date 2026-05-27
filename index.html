@@ -11155,7 +11155,13 @@ h3.block-title:first-of-type { margin-top: 0; }
 
   // hash routing on load
   const initial = location.hash.replace('#','');
-  if (initial && document.getElementById('sec-' + initial)) show(initial, false);
+  if (initial && document.getElementById('sec-' + initial)) {
+    show(initial, false);
+  } else if (initial.startsWith('idea-')) {
+    // v2.78.37 (Богдан): #idea-XXX від daily digest email → activate ideas section + auto-scroll
+    show('ideas', false);
+    // Save target для loadList .then() — scroll з там
+  }
 
   // keyboard arrows
   document.addEventListener('keydown', e => {
@@ -12207,7 +12213,27 @@ h3.block-title:first-of-type { margin-top: 0; }
     });
 
     // Initial load
-    loadList();
+    loadList().then(() => {
+      // v2.78.37 (Богдан): auto-scroll до конкретної idea якщо URL hash = #idea-{id}
+      // Викликається з daily digest email clickable links
+      const hash = window.location.hash || '';
+      const m = hash.match(/^#idea-([a-zA-Z0-9_-]+)$/);
+      if (m) {
+        const targetId = m[1];
+        setTimeout(() => {
+          const card = listEl.querySelector('[data-id="' + targetId + '"]');
+          if (card) {
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (!card.classList.contains('is-expanded') && typeof toggleCard === 'function') {
+              toggleCard(card);
+            }
+            card.style.transition = 'box-shadow .3s';
+            card.style.boxShadow = '0 0 0 3px #FEBF27, 0 4px 14px rgba(0,0,0,.08)';
+            setTimeout(() => { card.style.boxShadow = ''; }, 2500);
+          }
+        }, 300);
+      }
+    });
   }
 
   // === ORG CHART INTERACTIVE (v2.9) ===
