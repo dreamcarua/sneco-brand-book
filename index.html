@@ -1901,6 +1901,8 @@ h3.block-title:first-of-type { margin-top: 0; }
   a { color: inherit; }
 }
 </style>
+  <!-- v2.78.35 (Богдан): Google Sign-In primary для HR/Prices/Maintenance OTP-gate -->
+  <script src="dashboard/auth-google.js"></script>
 </head>
 <body class="lang-uk">
 
@@ -11643,9 +11645,11 @@ h3.block-title:first-of-type { margin-top: 0; }
     function html() {
       if (stage === 'email') {
         return `
-          <div class="otp-icon">📧</div>
-          <div class="otp-title"><span data-lang="uk">Введіть email</span><span data-lang="en">Enter email</span><span data-lang="sk">Zadajte email</span></div>
-          <div class="otp-desc"><span data-lang="uk">Якщо ваш email у списку доступу — на нього надійде 6-значний код. Сесія діє 1 годину.</span><span data-lang="en">If your email is whitelisted, you'll receive a 6-digit code. Session lasts 1 hour.</span><span data-lang="sk">Ak je váš email v zozname prístupu — bude vám zaslaný 6-miestny kód. Relácia trvá 1 hodinu.</span></div>
+          <div class="otp-icon">🔐</div>
+          <div class="otp-title"><span data-lang="uk">Авторизація</span><span data-lang="en">Sign in</span><span data-lang="sk">Prihlásenie</span></div>
+          <div class="otp-desc"><span data-lang="uk">Швидко через Google (рекомендовано) або email-код. Сесія — 30 днів.</span><span data-lang="en">Sign in with Google (recommended) or email code. Session lasts 30 days.</span><span data-lang="sk">Prihláste sa cez Google alebo email-kód. Relácia trvá 30 dní.</span></div>
+          <div data-role="google-btn" style="display:flex;justify-content:center;margin:14px 0 8px"></div>
+          <div style="font-size:11px;color:#777;text-align:center;margin:8px 0 4px"><span data-lang="uk">— або email-код —</span><span data-lang="en">— or email code —</span><span data-lang="sk">— alebo email-kód —</span></div>
           <input type="email" class="otp-input" data-role="email" placeholder="you@company.com" autocomplete="email">
           <button class="otp-btn" data-role="submit"><span data-lang="uk">Надіслати код</span><span data-lang="en">Send code</span><span data-lang="sk">Odoslať kód</span></button>
           <div class="otp-msg" data-role="msg"></div>`;
@@ -11667,6 +11671,14 @@ h3.block-title:first-of-type { margin-top: 0; }
       const msg = mountEl.querySelector('[data-role="msg"]');
       const back = mountEl.querySelector('[data-role="back"]');
       const input = mountEl.querySelector(stage === 'email' ? '[data-role="email"]' : '[data-role="code"]');
+      // v2.78.35 (Богдан): Google Sign-In у email stage — primary метод
+      const gBtnContainer = mountEl.querySelector('[data-role="google-btn"]');
+      if (gBtnContainer && window.SnecoAuth && stage === 'email') {
+        window.SnecoAuth.signInWithGoogle(block, gBtnContainer,
+          (j) => onSuccess && onSuccess(j.token, j.email, j.exp),
+          (errMsg) => { msg.className = 'otp-msg otp-error'; msg.textContent = errMsg; }
+        );
+      }
       input.focus();
       input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submit.click(); } });
       submit.addEventListener('click', async () => {
