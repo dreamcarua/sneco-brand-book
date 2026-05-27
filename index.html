@@ -2210,7 +2210,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Bible v2.63 · 2026
+    Brand Bible v2.78.39 · 2026
   </div>
 </nav>
 
@@ -2224,7 +2224,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
     <span data-lang="sk">Jedna ingrediencia. <span class="qr-ns-accent">Žiadne kompromisy.</span> Syrový snack 21. storočia.</span>
   </div>
-  <div class="qr-meta">v2.63 · 2026</div>
+  <div class="qr-meta">v2.78.39 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -9479,6 +9479,63 @@ h3.block-title:first-of-type { margin-top: 0; }
   <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span><span data-lang="sk">História verzií</span></h3>
 
   <div class="changelog-entry">
+    <span class="changelog-version">v2.78.39</span><span class="changelog-date">27.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>💡 Ideas Resolution Workflow.</strong> Повний pipeline для будь-якої ідеї: <code>open → proposed → approved / changes_requested → in_progress → done</code>. AI-generated draft рішення (секція Brand Bible + назва + опис + приклад), редагування у модалці, відправка автору, public proposal block у Brand Bible (всі видять, всі коментують), author response buttons (✅ Погодити / 💬 Запросити зміни), audit log усіх змін. 3 нові D1 таблиці: <code>idea_proposals</code>, <code>idea_comments</code>, <code>idea_audit_log</code>. 7 нових Worker endpoints (<code>/api/ideas/draft-proposal</code> · <code>save-proposal</code> · <code>send-proposal</code> · <code>respond</code> · <code>transition</code> · <code>full</code> · <code>sections</code>). 3 brand email templates (proposal sent / author responded / implementation done) з CTA в Brand Bible. Daily digest тепер показує "⏳ Очікують реакції автора", "✅ Погоджено", "🚀 В роботі" — окремими секціями зверху + повний "📋 УСІ ВІДКРИТІ" список з активними лінками <code>#idea-{id}</code>.</li>
+      <li data-lang="en"><strong>💡 Ideas Resolution Workflow.</strong> Full pipeline for any team idea: open→proposed→approved/changes→in_progress→done. AI-drafted solutions, edit modal, email to author, public proposal block, response buttons, audit log. 3 new D1 tables, 7 Worker endpoints, 3 branded email templates. Daily digest now includes workflow snapshot sections.</li>
+      <li data-lang="sk"><strong>💡 Workflow rezolúcie nápadov.</strong> Plný pipeline pre nápad od tímu: AI draft riešenia, e-mail autorovi, public proposal block s tlačidlami Schváliť / Požiadať o zmeny, audit log.</li>
+      <li data-lang="uk"><strong>🔧 Critical fixes у Customer 360 (v2.78.36 → v2.78.39):</strong> <code>copySummary</code> тепер combined-aware (mrsnack.ua, Сільпо тощо) → справжній LTV у clipboard; <code>__metrics.aov</code> додано → Peer comparison у Health Trend працює; refresh badge тепер скидає warning стиль; AR aging buckets очищено; keyboard <code>n</code> → <code>openCrmModal()</code>; Google Sign-In exp fallback 30 днів; Cross-sell period default 365.</li>
+      <li data-lang="en"><strong>🔧 Customer 360 critical fixes:</strong> combined-aware copySummary, aov in metrics, refresh badge reset, AR buckets cleanup, n→openCrmModal, Google exp fallback, CS default 365.</li>
+      <li data-lang="sk"><strong>🔧 Customer 360 — kritické opravy</strong> (combined-aware copy, AOV peer comparison, badge reset).</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry">
+    <span class="changelog-version">v2.78.37</span><span class="changelog-date">26.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>📧 Daily Ideas Digest email щодня 08:00 Київ.</strong> Cron Worker з Workers AI (llama-3.1-8b) класифікує ідеї HIGH/MEDIUM/LOW, дає ТОП-3 рекомендації "що робити сьогодні", відправляє branded email на vg@sneco.ua з картками-лінками <code>#idea-{id}</code> у Brand Bible. Hash-routing auto-scroll + highlight target idea card.</li>
+      <li data-lang="en"><strong>📧 Daily Ideas Digest email at 08:00 Kyiv.</strong> Cron + Workers AI classifies ideas HIGH/MED/LOW, top-3 recs, branded email with deep-link cards to Brand Bible.</li>
+      <li data-lang="sk"><strong>📧 Denný digest nápadov — 08:00 Kyjev.</strong> AI klasifikácia, top-3 odporúčania, branded e-mail.</li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry">
+    <span class="changelog-version">v2.78.35</span><span class="changelog-date">25.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>🔐 Google OAuth (primary) + OTP (fallback) + JWT 30 днів.</strong> Усі 5 дашбордів + HR/Prices/Maintenance — Google Sign-In primary метод. Shared <code>auth-google.js</code> хелпер. Worker endpoints <code>/api/auth/google</code> + <code>/api/auth/config</code>. Refresh tokens на 30 днів — мінімум перезаходів.</li>
+      <li data-lang="en"><strong>🔐 Google OAuth primary + OTP fallback + JWT 30d.</strong> All dashboards + HR/Prices/Maintenance use Google Sign-In primary. Shared helper.</li>
+      <li data-lang="sk"><strong>🔐 Google OAuth + OTP fallback + JWT 30 dní.</strong></li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry">
+    <span class="changelog-version">v2.78.0</span><span class="changelog-date">22.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>👥 Customer 360 Overview Redesign + KAM tooling.</strong> Portfolio Health KPIs (5 cards), Concentration alert, Trend chart 12 міс, TOP-5 action items inline, Movers (4 таблиці — ріст/падіння у % і ₴), New/Lost, Segment Heatmap 3×3 (VIP/Mid/SMB × Good/Warn/Bad) з drill-down, Quick-filter chips. Per-customer: Health Trend sparklines + 6 anomaly alerts, AR aging buckets (31-60/61-90/90+), Cross-sell matrix з period toggle, Timeline хронологія (60 подій), Decision-makers parsing, CRM-лог (D1 + MoySklad sync), Forecast next order, LTV estimate, Excel export всього клієнта. Combined customers (5 груп: mrsnack.ua, Сільпо, Тісто та Хміль, Море Пива, Бар Сидерія) через <code>matchCounterparty()</code> global helper з кешем memberIds/memberNames.</li>
+      <li data-lang="en"><strong>👥 Customer 360 Overview Redesign + KAM toolkit.</strong> 5 KPI cards, movers tables, segment heatmap with drill-down, Health Trend sparklines + anomaly alerts, AR aging buckets, Cross-sell matrix, Timeline, Decision-makers, CRM log (D1+MoySklad), forecast, Excel export, combined-customer logic.</li>
+      <li data-lang="sk"><strong>👥 Customer 360 Overview Redesign + KAM tooling.</strong></li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry">
+    <span class="changelog-version">v2.77.0</span><span class="changelog-date">19.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>🛒 Procurement Dashboard (Pylyp's PR #1)</strong> — окремий дашборд для постачання (block <code>procurement-dashboard</code>), schema, sync.py з ThreadPoolExecutor, Worker entities. + Finance fix: expense_item тепер працює через <code>fetch_lookup_map</code> + <code>_resolve_href</code> (MoySklad ігнорує expand для transactional, треба окремий call). Customer 360 v2.77.4 — Movers TOP-20 sliding 30d.</li>
+      <li data-lang="en"><strong>🛒 Procurement Dashboard (Pylyp's PR #1) + Finance expense_item fix.</strong></li>
+      <li data-lang="sk"><strong>🛒 Procurement Dashboard + Finance fix.</strong></li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry">
+    <span class="changelog-version">v2.76.0</span><span class="changelog-date">18.05.2026</span>
+    <ul class="changelog-list">
+      <li data-lang="uk"><strong>🧭 Unified nav menu</strong> на 5 дашбордах (Customer 360 · Finance · Sales · Inventory · Production · Brand Bible). Finance тепер показує реальні категорії витрат замість 100% "(не вказано)". Worker raw_json гібрид — skip для heavy tables.</li>
+      <li data-lang="en"><strong>🧭 Unified nav menu</strong> across 5 dashboards + Finance expense categories fix + Worker raw_json optimization.</li>
+      <li data-lang="sk"><strong>🧭 Unified navigation + Finance fix.</strong></li>
+    </ul>
+  </div>
+
+  <div class="changelog-entry">
     <span class="changelog-version">v2.63</span><span class="changelog-date">17.05.2026</span>
     <ul class="changelog-list">
       <li data-lang="uk"><strong>💰 Finance Dashboard — новий standalone дашборд</strong> (block: <code>finance-dashboard</code>) для Пилипа, Богдана, Ярослава, Вадима. 8 hero KPI (виручка 30 днів з delta vs prev 30d, фактичні надходження з delta, відкриті/прострочені рахунки, DSO, прогноз ₴ на 30 днів, активні клієнти, avg рахунок). Cash flow chart (12 місяців: виручка vs надходження). AR aging — doughnut з 4 buckets (1-30 / 31-60 / 61-90 / 90+ днів) + детальна таблиця. <strong>ТОП-10 поточних дебіторів з готовими mailto/tel</strong> для миттєвого дзвінка/листа з нагадуванням. Очікувані надходження у наступні 30 днів. 4 auto-insights (critical &gt; 90d, DSO health, forecast, concentration TOP-1).</li>
@@ -11360,7 +11417,8 @@ h3.block-title:first-of-type { margin-top: 0; }
     // Sections — extract title and full text content
     document.querySelectorAll('section.section').forEach(sec => {
       const id = sec.id;
-      if (!id || id === 'sec-hr') return; // skip HR (locked) — but allow if user wants
+      // v2.78.39 fix M1: виключаємо sensitive locked секції з search index
+      if (!id || ['sec-hr', 'sec-production', 'sec-prices', 'sec-admin', 'sec-equipment'].includes(id)) return;
       const target = id.replace(/^sec-/, '');
 
       // Get title from section-title or section-eyebrow (combine all language texts)
@@ -12015,7 +12073,9 @@ h3.block-title:first-of-type { margin-top: 0; }
     const filterEl = document.getElementById('ideas-filter');
     const newBtn = document.getElementById('ideas-new-btn');
     const formEl = document.getElementById('ideas-form');
-    let currentFilter = 'open';
+    // v2.78.39 fix H3: якщо приходимо з email через #idea-{id} і ідея done — currentFilter='open' її приховає.
+    // Розв'язок: при наявності hash #idea-{id} стартуємо з 'all'.
+    let currentFilter = (location.hash || '').startsWith('#idea-') ? 'all' : 'open';
     let cachedIdeas = [];
     let pendingAttachments = [];   // for new-idea form
 
@@ -12170,15 +12230,19 @@ h3.block-title:first-of-type { margin-top: 0; }
         listEl.innerHTML = '<div class="ideas-empty">' + (isEn() ? 'No ideas yet — be the first.' : 'Поки нічого — будь першим.') + '</div>';
         return;
       }
-      // v2.78.39: workflow badges + status-aware coloring
-      const wfLabel = (s) => ({
-        open: isEn() ? 'Open' : 'Відкрита',
-        proposed: isEn() ? 'Proposed' : 'Рішення',
-        approved: isEn() ? 'Approved' : 'Погоджено',
-        changes_requested: isEn() ? 'Changes requested' : 'Просять зміни',
-        in_progress: isEn() ? 'In progress' : 'В роботі',
-        done: isEn() ? 'Done' : 'Готово',
-      }[s] || s);
+      // v2.78.39: workflow badges + status-aware coloring (UK + EN + SK)
+      const lang = (typeof getLang === 'function') ? getLang() : (isEn() ? 'en' : 'uk');
+      const wfLabel = (s) => {
+        const map = {
+          open:              { uk: 'Відкрита',       en: 'Open',              sk: 'Otvorená' },
+          proposed:          { uk: 'Рішення',        en: 'Proposed',          sk: 'Návrh' },
+          approved:          { uk: 'Погоджено',      en: 'Approved',          sk: 'Schválené' },
+          changes_requested: { uk: 'Просять зміни',  en: 'Changes requested', sk: 'Žiadané zmeny' },
+          in_progress:       { uk: 'В роботі',       en: 'In progress',       sk: 'V procese' },
+          done:              { uk: 'Готово',         en: 'Done',              sk: 'Hotovo' },
+        };
+        return (map[s] && (map[s][lang] || map[s].uk)) || s;
+      };
       listEl.innerHTML = items.map(it => {
         const wf = it.workflow_status || (it.status === 'done' ? 'done' : 'open');
         return `

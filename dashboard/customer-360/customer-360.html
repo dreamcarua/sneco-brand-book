@@ -505,7 +505,8 @@ body.dash-locked{overflow:hidden}
     if (window.SnecoAuth) {
       const gBtn = document.getElementById('google-signin-btn');
       window.SnecoAuth.signInWithGoogle(BLOCK, gBtn,
-        (j) => unlock(j.token, j.email, j.exp),
+        // v2.78.39 fix C5: fallback exp = now + 30d якщо Worker не повертає (JWT TTL 30 days)
+        (j) => unlock(j.token, j.email, j.exp || (Math.floor(Date.now()/1000) + 30*86400)),
         (errMsg) => {
           const msgEl = document.getElementById('auth-msg');
           if (msgEl) { msgEl.textContent = errMsg; msgEl.className = 'dashauth-msg is-error'; }
@@ -666,7 +667,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.78.36 · 🎨 Topbar fix: справжній SVG лого замість "sn" квадратика + nav breakpoint 1100→1280px + компактніші badges + adaptive hide на narrow widths · 🔐 Google OAuth + OTP fallback + JWT 30 діб · Health Trend · Оновлення: щодня 06:00
+  snEco Customer 360 v2.78.39 · 🔧 Critical fixes: copySummary combined-aware · aov у metrics → Peer comparison працює · refresh button skip reset · AR aging bucket cleanup · keyboard "n" → openCrmModal · Google Sign-In exp fallback · CS period default 365 · 🎨 Topbar + Google OAuth + JWT 30 діб · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -798,6 +799,8 @@ window.setCustGroupBy = function(g) {
 };
 
 // v2.78.30 (Богдан): Cross-sell period toggle (3m / 12m / lifetime)
+// v2.78.39 fix C3: explicit default 365 (12m) — інакше initial render всі chips inactive
+if (typeof window._csPeriodDays === 'undefined') window._csPeriodDays = 365;
 window.setCsPeriod = function(days) {
   window._csPeriodDays = days;   // null = lifetime, 90 = 3m, 365 = 12m
   if (typeof _currentCustKey !== 'undefined' && _currentCustKey) {
@@ -1567,10 +1570,12 @@ function computeCustomerMetrics(c, allDemands, allReturns){
   // First order date (для "new clients" по періоду)
   const firstOrder = sorted[0].ms_moment;
 
+  // v2.78.39 fix C2: aov потрібен у Health Trend Peer comparison
+  const aov = sorted.length ? totalShipped / sorted.length : 0;
   return {
     totalShipped, ordersCount: sorted.length, avgCadence, daysSinceLast, lastOrder,
     overdueAR, returnRate, trend3m, monthRev, prevMonthRev, byMonth,
-    last30Rev, prev30Rev, firstOrder
+    last30Rev, prev30Rev, firstOrder, aov
   };
 }
 
@@ -3117,27 +3122,21 @@ function setupSearch(){
       }
     } else if (e.key === 'n' && _currentCustKey) {
       // 'n' для нової CRM-нотатки якщо клієнт відкритий
-      const btn = document.querySelector('[onclick*="openNewNote"], [onclick*="addCrmNote"]');
-      if (btn) { e.preventDefault(); btn.click(); }
+      // v2.78.39 fix H12: keyboard shortcut "n" — selector був застарілий від v2.74
+      if (typeof _currentCust !== 'undefined' && _currentCust && typeof window.openCrmModal === 'function') {
+        e.preventDefault();
+        window.openCrmModal();
+      }
     }
   });
 }
 
-// v2.68: бережемо HTML списків щоб можна було повернутися "← До списку"
-// v2.76.0: після Overview Redesign (v2.74.0) backup більше не потрібен —
-// просто re-render Overview (це і є "список клієнтів" з усіма movers / action items)
-let _pillsBackup = null;
-
+// v2.78.39 fix H2: _pillsBackup — dead code від v2.68. Прибрано.
 window.showPillsList = function(){
   // v2.78.33: вертаємось до списку — знімаємо compact mode щоб search знов з'явився
   document.querySelector('.selector-bar')?.classList.remove('compact');
-  // v2.76.0 FIX: showPillsList() — повертаємось до Overview (KPIs, movers, action items,
-  // heatmap). Раніше: відновлювали stale _pillsBackup + показували empty-hero. БАГ.
-  // Тепер просто renderOverview() — він і pills, і contentWrap правильно перепопулює.
   document.getElementById('custSearch').value = '';
   document.getElementById('searchResults')?.classList.remove('open');
-  // Скинути _pillsBackup щоб наступний вибір клієнта знов його записав
-  _pillsBackup = null;
   renderOverview();
   window.scrollTo({top: 0, behavior: 'smooth'});
 };
@@ -3156,9 +3155,6 @@ window.selectCustomer = function(name){
   // Рішення: при першому виборі — згортаємо список pills у компактну кнопку
   // "← До списку клієнтів". Selector-bar стає 80px → scroll працює нормально.
   const pillsEl = document.getElementById('quickPills');
-  if (pillsEl && !_pillsBackup) {
-    _pillsBackup = pillsEl.innerHTML;
-  }
   // v2.78.33: compact mode — search прихований через CSS клас, тільки back-button лівий
   document.querySelector('.selector-bar')?.classList.add('compact');
   pillsEl.innerHTML = `
@@ -3870,8 +3866,9 @@ function renderCustomerView(c){
     <!-- v2.78.31 (Богдан audit): AR AGING BUCKETS — стандартна 30/60/90/90+ розкладка -->
     ${(() => {
       if (overdueDemands.length === 0) return '';
-      const buckets = { '1-30': 0, '31-60': 0, '61-90': 0, '90+': 0 };
-      const cnt = { '1-30': 0, '31-60': 0, '61-90': 0, '90+': 0 };
+      // v2.78.39 fix H1: removed unused '1-30' bucket (cutoff правило = тільки >30 днів)
+      const buckets = { '31-60': 0, '61-90': 0, '90+': 0 };
+      const cnt = { '31-60': 0, '61-90': 0, '90+': 0 };
       overdueDemands.forEach(d => {
         const days = Math.floor((Date.now() - new Date(d.ms_moment).getTime()) / 86400000);
         const debt = ((d.sum_kop||0) - (d.payed_sum_kop||0)) / 100;
@@ -4780,7 +4777,10 @@ window.exportCustomerXLSX = function(custKey) {
 window.copySummary = function(name){
   const c = allCounterparties.find(x => x.name === name);
   if (!c) return;
-  const dems = allDemands.filter(d => d.agent === name);
+  // v2.78.39 fix C1: use matchCounterparty for combined customer support
+  const dems = window.matchCounterparty
+    ? allDemands.filter(d => window.matchCounterparty(d, c))
+    : allDemands.filter(d => d.agent === name);
   const ltv = dems.reduce((a,d) => a + (d.sum_kop||0)/100, 0);
   const lastOrder = dems.length ? dems.sort((a,b)=>(b.ms_moment||'').localeCompare(a.ms_moment||''))[0].ms_moment : null;
   const text = `Клієнт: ${c.name}
@@ -4840,6 +4840,10 @@ function startRefreshTicker(){
       txt += ' · ⚠ Sync застарів';
       el.style.background = 'rgba(254,191,39,.18)';
       el.style.color = '#FEBF27';
+    } else {
+      // v2.78.39 fix C4: reset inline styles коли sync ок (інакше badge назавжди жовтий)
+      el.style.background = '';
+      el.style.color = '';
     }
     el.textContent = txt;
   };
