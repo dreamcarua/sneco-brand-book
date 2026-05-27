@@ -1645,6 +1645,97 @@ h3.block-title:first-of-type { margin-top: 0; }
   background: var(--green);
 }
 .idea-status-dot.is-done { background: var(--text-muted); }
+/* v2.78.39: workflow status badges */
+.idea-wf-badge {
+  display: inline-block; padding: 2px 8px; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .4px; border-radius: 4px; margin-left: 8px;
+  vertical-align: middle; line-height: 1.4;
+}
+.idea-wf-badge.is-open { background: #f0f0f0; color: #666; }
+.idea-wf-badge.is-proposed { background: rgba(254,191,39,.20); color: #7a5a00; border: 1px solid rgba(254,191,39,.5); }
+.idea-wf-badge.is-approved { background: rgba(150,193,31,.18); color: #2d6a00; border: 1px solid rgba(150,193,31,.5); }
+.idea-wf-badge.is-changes_requested { background: rgba(255,140,0,.15); color: #a04500; border: 1px solid rgba(255,140,0,.5); }
+.idea-wf-badge.is-in_progress { background: rgba(123,82,217,.13); color: #5e3aa0; border: 1px solid rgba(123,82,217,.4); }
+.idea-wf-badge.is-done { background: rgba(150,193,31,.10); color: #557a00; border: 1px solid rgba(150,193,31,.3); }
+
+.idea-proposal-block {
+  margin: 14px 0; padding: 14px 16px; background: #fffbef; border: 1px solid rgba(254,191,39,.5);
+  border-left: 4px solid #FEBF27; border-radius: 6px;
+}
+.idea-proposal-block.is-approved { background: rgba(150,193,31,.06); border-color: rgba(150,193,31,.5); border-left-color: #96C11F; }
+.idea-proposal-block.is-changes { background: rgba(255,140,0,.05); border-color: rgba(255,140,0,.4); border-left-color: #ff8c00; }
+.idea-proposal-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #996600; margin-bottom: 6px; }
+.idea-proposal-title { font-size: 14.5px; font-weight: 700; color: #1E1E1E; margin: 0 0 6px; line-height: 1.35; }
+.idea-proposal-section { font-size: 11px; color: #996600; margin-bottom: 10px; }
+.idea-proposal-section b { color: #1E1E1E; }
+.idea-proposal-body { font-size: 13px; line-height: 1.6; color: #444; white-space: pre-wrap; word-break: break-word; margin-bottom: 10px; }
+.idea-proposal-example {
+  background: rgba(150,193,31,.08); border-left: 3px solid #96C11F; border-radius: 4px;
+  padding: 10px 12px; font-size: 12.5px; line-height: 1.55; color: #555; white-space: pre-wrap; word-break: break-word;
+}
+.idea-proposal-example-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #2d6a00; margin-bottom: 4px; }
+.idea-proposal-meta { font-size: 10.5px; color: #888; margin-top: 8px; }
+
+.idea-author-response {
+  display: flex; gap: 10px; margin-top: 12px; padding: 12px; background: #fff; border: 1px dashed var(--border); border-radius: 6px;
+}
+.idea-author-response button { padding: 8px 16px; font-size: 12.5px; font-weight: 700; border-radius: 6px; cursor: pointer; border: 1px solid; font-family: inherit; }
+.idea-author-response .approve-btn { background: #96C11F; color: #fff; border-color: #7a9c19; }
+.idea-author-response .approve-btn:hover { background: #7a9c19; }
+.idea-author-response .changes-btn { background: #fff; color: #a04500; border-color: #ff8c00; }
+.idea-author-response .changes-btn:hover { background: rgba(255,140,0,.10); }
+
+.idea-admin-actions { display: flex; gap: 8px; flex-wrap: wrap; padding: 10px 0 6px; border-top: 1px dashed var(--border); margin-top: 10px; }
+.idea-admin-actions button {
+  padding: 6px 12px; font-size: 11.5px; border: 1px solid var(--border); background: #fff;
+  border-radius: 5px; cursor: pointer; font-family: inherit; color: var(--text);
+}
+.idea-admin-actions button:hover { background: #1E1E1E; color: #fff; border-color: #1E1E1E; }
+.idea-admin-actions button.is-primary { background: #FEBF27; border-color: #cc9700; color: #1E1E1E; font-weight: 700; }
+.idea-admin-actions button.is-primary:hover { background: #cc9700; color: #fff; }
+
+.idea-audit-toggle { font-size: 11px; color: #888; cursor: pointer; user-select: none; padding: 6px 0; }
+.idea-audit-toggle:hover { color: #1E1E1E; }
+.idea-audit-log { margin-top: 8px; border-left: 2px solid #e6e6e6; padding-left: 12px; }
+.idea-audit-row { font-size: 11px; color: #666; padding: 4px 0; line-height: 1.4; }
+.idea-audit-row b { color: #1E1E1E; }
+.idea-audit-row .audit-time { color: #999; font-family: ui-monospace, Menlo, monospace; }
+
+/* Modal for proposal draft */
+.idea-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 9999;
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.idea-modal {
+  background: #fff; border-radius: 10px; max-width: 720px; width: 100%; max-height: 90vh;
+  overflow-y: auto; box-shadow: 0 12px 40px rgba(0,0,0,.3);
+}
+.idea-modal-header {
+  padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;
+}
+.idea-modal-header h3 { margin: 0; font-size: 16px; font-weight: 700; color: #1E1E1E; }
+.idea-modal-close { background: none; border: none; font-size: 22px; cursor: pointer; color: #888; line-height: 1; }
+.idea-modal-body { padding: 18px 22px; }
+.idea-modal-field { margin-bottom: 14px; }
+.idea-modal-field label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #888; margin-bottom: 5px; }
+.idea-modal-field input, .idea-modal-field select, .idea-modal-field textarea {
+  width: 100%; padding: 8px 10px; font-size: 13px; font-family: inherit;
+  border: 1px solid var(--border); border-radius: 5px; background: #fff; color: var(--text);
+  box-sizing: border-box;
+}
+.idea-modal-field textarea { min-height: 90px; resize: vertical; line-height: 1.55; }
+.idea-modal-footer {
+  padding: 14px 22px; border-top: 1px solid var(--border);
+  display: flex; gap: 10px; justify-content: flex-end; align-items: center; flex-wrap: wrap;
+}
+.idea-modal-footer .ai-loading { font-size: 12px; color: #7e57c2; margin-right: auto; }
+.idea-modal-footer button {
+  padding: 8px 16px; font-size: 12.5px; font-weight: 700; border-radius: 6px; cursor: pointer; border: 1px solid; font-family: inherit;
+}
+.idea-modal-footer button.ghost { background: #fff; color: #666; border-color: var(--border); }
+.idea-modal-footer button.primary { background: #FEBF27; color: #1E1E1E; border-color: #cc9700; }
+.idea-modal-footer button.send { background: #1E1E1E; color: #fff; border-color: #1E1E1E; }
+.idea-modal-footer button:disabled { opacity: .5; cursor: not-allowed; }
 .idea-main { flex: 1; min-width: 0; }
 .idea-title { font-size: 14px; font-weight: 700; line-height: 1.3; margin-bottom: 4px; }
 .idea-meta { font-size: 11px; color: var(--text-muted); display: flex; gap: 8px; flex-wrap: wrap; }
@@ -11637,6 +11728,27 @@ h3.block-title:first-of-type { margin-top: 0; }
       if (!r.ok) throw new Error(data.error || ('HTTP ' + r.status));
       return data;
     },
+    // v2.78.39: Return any valid (non-expired) session — used by Ideas workflow
+    // so authors can respond without being admins.
+    anySession() {
+      try {
+        const now = Date.now() / 1000;
+        for (let i = 0; i < sessionStorage.length; i++) {
+          const k = sessionStorage.key(i);
+          if (!k || !k.startsWith(SS_PREFIX)) continue;
+          try {
+            const s = JSON.parse(sessionStorage.getItem(k) || '{}');
+            if (s.token && s.email && (!s.exp || s.exp > now)) {
+              // Prefer admin session if available
+              if (s.isAdmin) return s;
+              // Save first valid as fallback
+              if (!this._fallback) this._fallback = s;
+            }
+          } catch (e) {}
+        }
+        return this._fallback || null;
+      } catch (e) { return null; }
+    },
     requestOtp(email, block) { return this.post('/api/otp/request', { email, block }); },
     verifyOtp(email, code, block) { return this.post('/api/otp/verify', { email, code, block }); },
     adminGet(token) { return this.post('/api/admin/whitelist/get', {}, { token }); },
@@ -11936,6 +12048,100 @@ h3.block-title:first-of-type { margin-top: 0; }
       return '<a class="idea-attachment" href="' + escapeHtml2(fileUrl(a.key)) + '" target="_blank" rel="noopener">📄 ' + escapeHtml2(a.name) + ' <span style="opacity:.6">(' + fmtSize(a.size) + ')</span></a>';
     }
 
+    // v2.78.39: Modal for proposal draft
+    function openProposalModal(idea, proposal, sections, onClose) {
+      const overlay = document.createElement('div');
+      overlay.className = 'idea-modal-overlay';
+      const sectionsOpts = sections.map(s => `<option value="${escapeHtml2(s.id)}"${s.id === (proposal.section || 'other') ? ' selected' : ''}>${escapeHtml2(s.label)}</option>`).join('');
+      overlay.innerHTML = `
+        <div class="idea-modal">
+          <div class="idea-modal-header">
+            <h3>💡 ${isEn() ? 'Draft solution for' : 'Драфт рішення для'}: ${escapeHtml2(idea.title)}</h3>
+            <button class="idea-modal-close" data-role="close">×</button>
+          </div>
+          <div class="idea-modal-body">
+            <div class="idea-modal-field">
+              <label>📂 ${isEn() ? 'Brand Bible section' : 'Розділ Brand Bible'}</label>
+              <select data-role="section">${sectionsOpts}</select>
+            </div>
+            <div class="idea-modal-field">
+              <label>${isEn() ? 'Solution title (short)' : 'Назва рішення (коротко)'}</label>
+              <input type="text" data-role="title" maxlength="200" value="${escapeHtml2(proposal.title || '')}">
+            </div>
+            <div class="idea-modal-field">
+              <label>${isEn() ? 'Description (what we do)' : 'Опис (що ми робимо)'}</label>
+              <textarea data-role="body" maxlength="4000" style="min-height:140px">${escapeHtml2(proposal.body || '')}</textarea>
+            </div>
+            <div class="idea-modal-field">
+              <label>📌 ${isEn() ? 'Example / how it would look' : 'Приклад / як виглядатиме'}</label>
+              <textarea data-role="example" maxlength="4000" style="min-height:100px">${escapeHtml2(proposal.example || '')}</textarea>
+            </div>
+            <div style="font-size:11px;color:#888;padding:8px 0">${proposal.ai_generated ? '🤖 ' + (isEn() ? 'AI-generated draft — review and edit before sending.' : 'Draft згенеровано AI — переглянь і відредагуй перед відправкою.') : ''}</div>
+          </div>
+          <div class="idea-modal-footer">
+            <span class="ai-loading" data-role="status"></span>
+            <button class="ghost" data-role="cancel">${isEn() ? 'Cancel' : 'Скасувати'}</button>
+            <button class="primary" data-role="save">💾 ${isEn() ? 'Save draft' : 'Зберегти draft'}</button>
+            <button class="send" data-role="send">📨 ${isEn() ? 'Send to author' : 'Відправити автору'}</button>
+          </div>
+        </div>`;
+      document.body.appendChild(overlay);
+
+      const closeModal = (sent, saved) => {
+        overlay.remove();
+        if (onClose) onClose(saved, sent);
+      };
+      overlay.querySelector('[data-role="close"]').addEventListener('click', () => closeModal(false, false));
+      overlay.querySelector('[data-role="cancel"]').addEventListener('click', () => closeModal(false, false));
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(false, false); });
+
+      const getFields = () => ({
+        idea_id: idea.id,
+        proposal_id: proposal.id,
+        section: overlay.querySelector('[data-role="section"]').value,
+        title: overlay.querySelector('[data-role="title"]').value.trim(),
+        body: overlay.querySelector('[data-role="body"]').value.trim(),
+        example: overlay.querySelector('[data-role="example"]').value.trim(),
+      });
+      const setStatus = (msg, isErr) => {
+        const el = overlay.querySelector('[data-role="status"]');
+        el.textContent = msg;
+        el.style.color = isErr ? '#dc2626' : '#7e57c2';
+      };
+
+      const adminSess = snAuth.sessionFor('admin');
+      const anySess = snAuth.anySession ? snAuth.anySession() : null;
+      const sess = (adminSess && adminSess.isAdmin) ? adminSess : (anySess || adminSess);
+      const tk = sess?.token;
+
+      overlay.querySelector('[data-role="save"]').addEventListener('click', async () => {
+        const f = getFields();
+        if (!f.title || f.title.length < 3) { setStatus(isEn() ? 'Title too short' : 'Назва закоротка', true); return; }
+        setStatus(isEn() ? 'Saving…' : 'Зберігаємо…', false);
+        try {
+          await snAuth.post('/api/ideas/save-proposal', f, { token: tk });
+          setStatus(isEn() ? '✓ Saved' : '✓ Збережено', false);
+          setTimeout(() => closeModal(false, true), 600);
+        } catch (e) { setStatus('⚠ ' + e.message, true); }
+      });
+
+      overlay.querySelector('[data-role="send"]').addEventListener('click', async () => {
+        const f = getFields();
+        if (!f.title || f.title.length < 3) { setStatus(isEn() ? 'Title too short' : 'Назва закоротка', true); return; }
+        if (!f.body || f.body.length < 10) { setStatus(isEn() ? 'Description too short' : 'Опис закороткий', true); return; }
+        if (!confirm(isEn() ? 'Send this proposal to the idea author by email?' : 'Відправити цю пропозицію автору ідеї поштою?')) return;
+        setStatus(isEn() ? 'Saving + sending…' : 'Зберігаємо + відправляємо…', false);
+        try {
+          // Save first (creates new draft if no proposal_id)
+          const saveResp = await snAuth.post('/api/ideas/save-proposal', f, { token: tk });
+          const pid = saveResp.proposal_id || proposal.id;
+          await snAuth.post('/api/ideas/send-proposal', { idea_id: idea.id, proposal_id: pid }, { token: tk });
+          setStatus(isEn() ? '✓ Sent!' : '✓ Відправлено!', false);
+          setTimeout(() => closeModal(true, true), 800);
+        } catch (e) { setStatus('⚠ ' + e.message, true); }
+      });
+    }
+
     async function uploadFile(file) {
       if (file.size > 10 * 1024 * 1024) throw new Error('File >10 MB');
       const r = await fetch(WORKER_URL + '/api/ideas/upload?filename=' + encodeURIComponent(file.name), {
@@ -11964,12 +12170,23 @@ h3.block-title:first-of-type { margin-top: 0; }
         listEl.innerHTML = '<div class="ideas-empty">' + (isEn() ? 'No ideas yet — be the first.' : 'Поки нічого — будь першим.') + '</div>';
         return;
       }
-      listEl.innerHTML = items.map(it => `
-        <div class="idea-card${it.status === 'done' ? ' is-done' : ''}" data-id="${escapeHtml2(it.id)}">
+      // v2.78.39: workflow badges + status-aware coloring
+      const wfLabel = (s) => ({
+        open: isEn() ? 'Open' : 'Відкрита',
+        proposed: isEn() ? 'Proposed' : 'Рішення',
+        approved: isEn() ? 'Approved' : 'Погоджено',
+        changes_requested: isEn() ? 'Changes requested' : 'Просять зміни',
+        in_progress: isEn() ? 'In progress' : 'В роботі',
+        done: isEn() ? 'Done' : 'Готово',
+      }[s] || s);
+      listEl.innerHTML = items.map(it => {
+        const wf = it.workflow_status || (it.status === 'done' ? 'done' : 'open');
+        return `
+        <div class="idea-card${wf === 'done' ? ' is-done' : ''}" data-id="${escapeHtml2(it.id)}" id="idea-${escapeHtml2(it.id)}">
           <div class="idea-card-header">
-            <div class="idea-status-dot${it.status === 'done' ? ' is-done' : ''}"></div>
+            <div class="idea-status-dot${wf === 'done' ? ' is-done' : ''}"></div>
             <div class="idea-main">
-              <div class="idea-title">${escapeHtml2(it.title)}</div>
+              <div class="idea-title">${escapeHtml2(it.title)}<span class="idea-wf-badge is-${wf}">${escapeHtml2(wfLabel(wf))}</span></div>
               <div class="idea-meta">
                 <span class="idea-meta-item">👤 ${escapeHtml2(it.author_name)}</span>
                 <span class="idea-meta-item">⏱ ${fmtTime(it.created_at)}</span>
@@ -11981,8 +12198,8 @@ h3.block-title:first-of-type { margin-top: 0; }
             <div class="idea-arrow">▸</div>
           </div>
           <div class="idea-card-body" data-role="body"></div>
-        </div>
-      `).join('');
+        </div>`;
+      }).join('');
       // Wire expand/collapse
       listEl.querySelectorAll('.idea-card').forEach(card => {
         const header = card.querySelector('.idea-card-header');
@@ -11999,18 +12216,52 @@ h3.block-title:first-of-type { margin-top: 0; }
       const bodyEl = card.querySelector('[data-role="body"]');
       bodyEl.innerHTML = '<div style="padding:14px 0;font-size:12px;color:var(--text-muted)">' + (isEn() ? 'Loading…' : 'Завантажуємо…') + '</div>';
       try {
-        const data = await snAuth.post('/api/ideas/get', { id: card.dataset.id });
+        // v2.78.39: use /api/ideas/full if user is logged in (workflow); fallback to public /api/ideas/get otherwise
+        const adminSess = snAuth.sessionFor('admin');
+        const anySess = snAuth.anySession ? snAuth.anySession() : null;
+        const sess = (adminSess && adminSess.isAdmin) ? adminSess : (anySess || adminSess);
+        const ideaToken = sess?.token;
+        let data;
+        if (ideaToken) {
+          data = await snAuth.post('/api/ideas/full', { idea_id: card.dataset.id }, { token: ideaToken });
+        } else {
+          data = await snAuth.post('/api/ideas/get', { id: card.dataset.id });
+        }
         renderCardBody(card, data);
       } catch (e) {
-        bodyEl.innerHTML = '<div style="padding:14px 0;color:#dc2626">⚠ ' + escapeHtml2(e.message) + '</div>';
+        // Fallback to public endpoint
+        try {
+          const data = await snAuth.post('/api/ideas/get', { id: card.dataset.id });
+          renderCardBody(card, data);
+        } catch (e2) {
+          bodyEl.innerHTML = '<div style="padding:14px 0;color:#dc2626">⚠ ' + escapeHtml2(e2.message) + '</div>';
+        }
       }
     }
 
     function renderCardBody(card, data) {
       const idea = data.idea;
-      const comments = data.comments || [];
+      // Merge legacy comments + new comments
+      const comments = [...(data.legacy_comments || data.comments || [])];
+      if (data.comments && data.legacy_comments) {
+        // new workflow returns both
+        comments.push(...data.comments);
+        comments.sort((a, b) => a.created_at - b.created_at);
+      }
+      const proposals = data.proposals || [];
+      const auditLog = data.audit || [];
+      const sections = data.sections || [];
       const adminSess = snAuth.sessionFor('admin');
-      const isAdmin = adminSess && adminSess.isAdmin;
+      const anySess = snAuth.anySession ? snAuth.anySession() : null;
+      const activeSess = (adminSess && adminSess.isAdmin) ? adminSess : (anySess || adminSess);
+      const isAdmin = activeSess && activeSess.isAdmin;
+      const ideaToken = activeSess?.token;
+      const wf = idea.workflow_status || (idea.status === 'done' ? 'done' : 'open');
+      const userEmail = (activeSess?.email || '').toLowerCase();
+      const canRespond = (idea.can_respond === true) || (userEmail && userEmail === (idea.author_email || '').toLowerCase());
+      // Active proposal = sent / approved / changes_requested (not draft)
+      const activeProposal = proposals.find(p => p.status === 'sent' || p.status === 'approved' || p.status === 'changes_requested');
+      const draftProposal = proposals.find(p => p.status === 'draft');
       const bodyEl = card.querySelector('[data-role="body"]');
       const attachmentsHtml = (idea.attachments || []).length
         ? '<div class="idea-attachments-list">' + idea.attachments.map(attachmentLink).join('') + '</div>'
@@ -12021,21 +12272,75 @@ h3.block-title:first-of-type { margin-top: 0; }
           ${c.body ? '<div class="idea-comment-body">' + escapeHtml2(c.body) + '</div>' : ''}
           ${(c.attachments || []).length ? '<div class="idea-comment-attachments">' + c.attachments.map(attachmentLink).join('') + '</div>' : ''}
         </div>`).join('');
-      const closedInfo = idea.status === 'done'
-        ? '<div class="idea-closed-info">✓ ' + (isEn() ? 'Closed by ' : 'Закрито: ') + escapeHtml2(idea.closed_by || '') + ' · ' + fmtTime(idea.closed_at) + '</div>'
+      const closedInfo = (wf === 'done')
+        ? '<div class="idea-closed-info">✓ ' + (isEn() ? 'Closed by ' : 'Закрито: ') + escapeHtml2(idea.closed_by || idea.status_changed_by || '') + ' · ' + fmtTime(idea.closed_at || idea.status_changed_at) + '</div>'
         : '';
-      const adminBtn = isAdmin
-        ? (idea.status === 'open'
-            ? '<button class="idea-action-btn is-primary" data-role="close">✓ ' + (isEn() ? 'Mark as done' : 'Зроблено') + '</button>'
-            : '<button class="idea-action-btn is-reopen">↺ ' + (isEn() ? 'Reopen' : 'Повернути в роботу') + '</button>')
-        : '';
+      // v2.78.39: Proposal block (public — visible to all logged-in users)
+      const sectionLabelFn = (sid) => (sections.find(s => s.id === sid)?.label) || sid || 'Інше';
+      let proposalHtml = '';
+      if (activeProposal) {
+        const pClass = activeProposal.status === 'approved' ? ' is-approved' : (activeProposal.status === 'changes_requested' ? ' is-changes' : '');
+        const statusLabel = activeProposal.status === 'approved'
+          ? '✅ ' + (isEn() ? 'Approved by author' : 'Погоджено автором')
+          : activeProposal.status === 'changes_requested'
+          ? '💬 ' + (isEn() ? 'Author requested changes' : 'Автор просить зміни')
+          : '⏳ ' + (isEn() ? 'Awaiting author response' : 'Очікує реакції автора');
+        proposalHtml = `
+          <div class="idea-proposal-block${pClass}">
+            <div class="idea-proposal-label">💡 ${isEn() ? 'Proposed solution' : 'Запропоноване рішення'} · v${activeProposal.version}</div>
+            <div class="idea-proposal-title">${escapeHtml2(activeProposal.title || '')}</div>
+            <div class="idea-proposal-section">📂 ${isEn() ? 'Brand Bible section' : 'Розділ Brand Bible'}: <b>${escapeHtml2(sectionLabelFn(activeProposal.section))}</b></div>
+            ${activeProposal.body ? `<div class="idea-proposal-body">${escapeHtml2(activeProposal.body)}</div>` : ''}
+            ${activeProposal.example ? `
+              <div class="idea-proposal-example-label">📌 ${isEn() ? 'Example' : 'Приклад'}</div>
+              <div class="idea-proposal-example">${escapeHtml2(activeProposal.example)}</div>` : ''}
+            <div class="idea-proposal-meta">${statusLabel} · ${escapeHtml2(activeProposal.drafted_by || '')} · ${fmtTime(activeProposal.sent_at || activeProposal.drafted_at)}${activeProposal.ai_generated ? ' · 🤖 AI draft' : ''}</div>
+            ${canRespond && activeProposal.status === 'sent' ? `
+              <div class="idea-author-response">
+                <button class="approve-btn" data-role="approve">✅ ${isEn() ? 'Approve' : 'Погодити рішення'}</button>
+                <button class="changes-btn" data-role="request-changes">💬 ${isEn() ? 'Request changes' : 'Запросити зміни'}</button>
+              </div>` : ''}
+          </div>`;
+      }
+      // Admin actions
+      let adminActionsHtml = '';
+      if (isAdmin) {
+        const btns = [];
+        if (wf === 'open' || wf === 'changes_requested') {
+          btns.push(`<button class="is-primary" data-role="draft-proposal">💡 ${isEn() ? 'Propose solution (AI draft)' : 'Запропонувати рішення (AI draft)'}</button>`);
+        }
+        if (draftProposal) {
+          btns.push(`<button data-role="edit-draft" data-pid="${escapeHtml2(draftProposal.id)}">✏ ${isEn() ? 'Edit draft' : 'Редагувати draft'} (v${draftProposal.version})</button>`);
+        }
+        if (wf === 'approved') {
+          btns.push(`<button class="is-primary" data-role="transition" data-status="in_progress">🚀 ${isEn() ? 'Start (in progress)' : 'В роботу'}</button>`);
+        }
+        if (wf === 'in_progress' || wf === 'approved') {
+          btns.push(`<button data-role="transition" data-status="done">✓ ${isEn() ? 'Mark as done' : 'Зроблено'}</button>`);
+        }
+        if (wf === 'done') {
+          btns.push(`<button data-role="transition" data-status="open">↺ ${isEn() ? 'Reopen' : 'Повернути в роботу'}</button>`);
+        }
+        if (btns.length) {
+          adminActionsHtml = `<div class="idea-admin-actions">${btns.join('')}</div>`;
+        }
+      }
+      // Audit log (collapsed by default)
+      const auditHtml = auditLog.length ? `
+        <div class="idea-audit-toggle" data-role="audit-toggle">📜 ${isEn() ? 'Show history' : 'Показати історію'} (${auditLog.length})</div>
+        <div class="idea-audit-log" data-role="audit-log" style="display:none">
+          ${auditLog.map(a => `<div class="idea-audit-row"><span class="audit-time">${fmtTime(a.created_at)}</span> · <b>${escapeHtml2(a.actor_email)}</b> · ${escapeHtml2(a.event)}${a.from_value ? ' · ' + escapeHtml2(a.from_value) + '→' + escapeHtml2(a.to_value || '') : ''}</div>`).join('')}
+        </div>` : '';
+
       bodyEl.innerHTML = `
         <div class="idea-full-text">${escapeHtml2(idea.body || '')}</div>
         ${attachmentsHtml}
+        ${proposalHtml}
+        ${adminActionsHtml}
         <div class="idea-actions">
-          ${adminBtn}
           ${closedInfo}
         </div>
+        ${auditHtml}
         ${commentsHtml ? '<div class="idea-comments">' + commentsHtml + '</div>' : ''}
         <div class="idea-comment-form" style="margin-top:14px">
           <div class="ideas-form-row"><textarea data-role="comment-body" maxlength="10000" placeholder="${isEn() ? 'Add comment / new info' : 'Додати коментар / нову інформацію'}"></textarea></div>
@@ -12074,6 +12379,77 @@ h3.block-title:first-of-type { margin-top: 0; }
           await snAuth.post('/api/ideas/reopen', { idea_id: idea.id }, { token: adminSess.token });
           await loadList();
         } catch (e) { alert('Error: ' + e.message); }
+      });
+
+      // v2.78.39: Workflow buttons
+      // Audit log toggle
+      const auditToggle = bodyEl.querySelector('[data-role="audit-toggle"]');
+      if (auditToggle) auditToggle.addEventListener('click', () => {
+        const log = bodyEl.querySelector('[data-role="audit-log"]');
+        log.style.display = log.style.display === 'none' ? 'block' : 'none';
+      });
+      // Draft proposal (admin)
+      const draftBtn = bodyEl.querySelector('[data-role="draft-proposal"]');
+      if (draftBtn) draftBtn.addEventListener('click', async () => {
+        draftBtn.disabled = true;
+        const origText = draftBtn.textContent;
+        draftBtn.textContent = '🤖 ' + (isEn() ? 'AI is drafting…' : 'AI генерує draft…');
+        try {
+          const resp = await snAuth.post('/api/ideas/draft-proposal', { idea_id: idea.id }, { token: ideaToken });
+          openProposalModal(idea, resp.proposal, sections, async (saved, send) => {
+            if (send) { await toggleCard(card); await toggleCard(card); } // refresh
+            else if (saved) { await toggleCard(card); await toggleCard(card); }
+            await loadList();
+          });
+        } catch (e) {
+          alert('Error: ' + e.message);
+        } finally {
+          draftBtn.disabled = false;
+          draftBtn.textContent = origText;
+        }
+      });
+      // Edit existing draft (admin)
+      const editDraftBtn = bodyEl.querySelector('[data-role="edit-draft"]');
+      if (editDraftBtn) editDraftBtn.addEventListener('click', async () => {
+        const pid = editDraftBtn.dataset.pid;
+        const prop = proposals.find(p => p.id === pid);
+        if (!prop) return;
+        openProposalModal(idea, prop, sections, async () => {
+          await toggleCard(card); await toggleCard(card);
+          await loadList();
+        });
+      });
+      // Approve / request changes (author)
+      const approveBtn = bodyEl.querySelector('[data-role="approve"]');
+      if (approveBtn) approveBtn.addEventListener('click', async () => {
+        if (!confirm(isEn() ? 'Approve this solution? You can still comment further afterwards.' : 'Погодити це рішення? Ви все ще зможете додати коментарі пізніше.')) return;
+        try {
+          await snAuth.post('/api/ideas/respond', { idea_id: idea.id, action: 'approve' }, { token: ideaToken });
+          await toggleCard(card); await toggleCard(card);
+          await loadList();
+        } catch (e) { alert('Error: ' + e.message); }
+      });
+      const changesBtn = bodyEl.querySelector('[data-role="request-changes"]');
+      if (changesBtn) changesBtn.addEventListener('click', async () => {
+        const note = prompt(isEn() ? 'What changes would you like?' : 'Які зміни ви хочете запропонувати?');
+        if (!note || note.trim().length < 5) return;
+        try {
+          await snAuth.post('/api/ideas/respond', { idea_id: idea.id, action: 'request_changes', note: note.trim() }, { token: ideaToken });
+          await toggleCard(card); await toggleCard(card);
+          await loadList();
+        } catch (e) { alert('Error: ' + e.message); }
+      });
+      // Admin transitions
+      bodyEl.querySelectorAll('[data-role="transition"]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const target = btn.dataset.status;
+          if (target === 'done' && !confirm(isEn() ? 'Mark as done? Author will be notified.' : 'Позначити як зроблено? Автор отримає лист.')) return;
+          try {
+            await snAuth.post('/api/ideas/transition', { idea_id: idea.id, status: target }, { token: ideaToken });
+            await toggleCard(card); await toggleCard(card);
+            await loadList();
+          } catch (e) { alert('Error: ' + e.message); }
+        });
       });
       // Wire comment file upload
       let commentAttachments = [];
