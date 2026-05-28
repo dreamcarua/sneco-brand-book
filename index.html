@@ -2277,7 +2277,7 @@ body.is-admin section.admin-only { display: block !important; }
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Bible v2.78.50 · 2026
+    Brand Bible v2.78.52 · 2026
   </div>
 </nav>
 
@@ -2291,7 +2291,7 @@ body.is-admin section.admin-only { display: block !important; }
     <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
     <span data-lang="sk">Jedna ingrediencia. <span class="qr-ns-accent">Žiadne kompromisy.</span> Syrový snack 21. storočia.</span>
   </div>
-  <div class="qr-meta">v2.78.50 · 2026</div>
+  <div class="qr-meta">v2.78.52 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -7273,311 +7273,404 @@ body.is-admin section.admin-only { display: block !important; }
 </section>
 
 <!-- ============================================================
-     ОНБОРДИНГ — як працюють всі системи snEco (v2.78.51)
-     ⚠ MAINTENANCE RULE: при додаванні нової фічі/системи —
-     ОБОВ'ЯЗКОВО оновити відповідну картку нижче!
+     ОНБОРДИНГ — інтерактивний гід для команди (v2.78.52)
+     ⚠ MAINTENANCE RULE: при додаванні фічі — оновити картку.
+     Technical архітектура — окремо у Maintenance секції.
      ============================================================ -->
 <section class="section" id="sec-onboarding" style="padding:56px 64px">
   <div class="section-eyebrow">🎓 <span data-lang="uk">Онбординг</span><span data-lang="en">Onboarding</span><span data-lang="sk">Onboarding</span></div>
   <h2 class="section-title">
-    <span data-lang="uk">Як працюють системи snEco</span>
-    <span data-lang="en">How snEco systems work</span>
-    <span data-lang="sk">Ako fungujú systémy snEco</span>
+    <span data-lang="uk">Як працювати з snEco — за 5 хвилин</span>
+    <span data-lang="en">Working with snEco — in 5 minutes</span>
+    <span data-lang="sk">Práca so snEco — za 5 minút</span>
   </h2>
   <div class="section-lead">
-    <span data-lang="uk">Гід по всіх інструментах команди snEco — навіщо існує кожна система, як використовувати, типові кейси. Якщо ти новий у команді — почни звідси. Якщо ти давно у snEco — повертайся коли треба згадати як щось працює.</span>
-    <span data-lang="en">Guide to all snEco team tools — why each system exists, how to use, typical cases. If you're new — start here.</span>
-    <span data-lang="sk">Sprievodca všetkými nástrojmi tímu snEco — prečo existuje každý systém, ako používať, typické prípady.</span>
+    <span data-lang="uk">Простий гід по інструментам, які допоможуть тобі у щоденній роботі. Без жаргонів. Обери свою роль — побачиш потрібне саме тобі.</span>
+    <span data-lang="en">Simple guide to the tools you'll use daily. No jargon. Pick your role — see what's relevant.</span>
+    <span data-lang="sk">Jednoduchý sprievodca nástrojmi. Bez žargónu. Vyber rolu — uvidíš čo potrebuješ.</span>
   </div>
 
-  <!-- v2.78.51: maintenance reminder banner -->
-  <div style="background:#fff3d6;border:1px solid rgba(254,191,39,.5);border-left:4px solid #FEBF27;border-radius:8px;padding:14px 18px;margin:24px 0 32px;color:#7a5a00;font-size:13px;line-height:1.55">
-    <strong>⚠ <span data-lang="uk">Це maintained розділ</span><span data-lang="en">Maintained section</span><span data-lang="sk">Spravovaná sekcia</span></strong> ·
-    <span data-lang="uk">при додаванні нової фічі/системи — оновлюй відповідну картку. Інакше команда не дізнається як це використовувати.</span>
-    <span data-lang="en">when adding a new feature/system — update the relevant card. Otherwise the team won't know how to use it.</span>
-    <span data-lang="sk">pri pridaní novej funkcie/systému — aktualizuj príslušnú kartu.</span>
+  <!-- ROLE TABS -->
+  <style>
+    .ob-role-tabs { display:flex; flex-wrap:wrap; gap:8px; margin:32px 0 24px; }
+    .ob-role-tab {
+      padding:14px 20px; background:var(--card); border:2px solid var(--border); border-radius:12px;
+      cursor:pointer; font-size:14px; font-weight:600; font-family:inherit; color:var(--text);
+      display:flex; align-items:center; gap:10px; transition:all .15s;
+    }
+    .ob-role-tab:hover { border-color:#FEBF27; transform:translateY(-2px); }
+    .ob-role-tab.active { background:#1E1E1E; color:#FEBF27; border-color:#1E1E1E; }
+    .ob-role-tab .icon { font-size:22px; }
+    .ob-content-panel { display:none; }
+    .ob-content-panel.active { display:block; animation:fadeIn .25s; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+    .ob-tool-card {
+      display:grid; grid-template-columns:60px 1fr auto; gap:18px; align-items:center;
+      padding:20px 22px; background:var(--card); border:1px solid var(--border);
+      border-radius:14px; margin:14px 0; transition:all .2s;
+    }
+    .ob-tool-card:hover { box-shadow:0 4px 16px rgba(0,0,0,.06); transform:translateY(-1px); }
+    .ob-tool-icon {
+      width:56px; height:56px; border-radius:12px; display:flex; align-items:center;
+      justify-content:center; font-size:28px;
+    }
+    .ob-tool-body { min-width:0; }
+    .ob-tool-title { font-size:17px; font-weight:800; margin:0 0 4px; color:var(--text); }
+    .ob-tool-desc { font-size:13px; color:var(--text-muted); line-height:1.5; }
+    .ob-tool-cta {
+      padding:10px 18px; background:#FEBF27; color:#1E1E1E; border-radius:8px;
+      font-size:13px; font-weight:700; text-decoration:none; white-space:nowrap;
+      transition:all .15s; display:inline-block;
+    }
+    .ob-tool-cta:hover { background:#1E1E1E; color:#FEBF27; }
+    .ob-tool-cta.secondary { background:transparent; border:1.5px solid var(--border); color:var(--text); }
+    .ob-tool-cta.secondary:hover { border-color:#1E1E1E; background:#1E1E1E; color:#fff; }
+
+    .ob-quick-start {
+      background:linear-gradient(135deg,#1E1E1E 0%,#2A2A2A 100%); color:#fff;
+      border-radius:14px; padding:28px 32px; margin:32px 0;
+    }
+    .ob-quick-start h3 { margin:0 0 16px; font-size:20px; font-weight:800; color:#FEBF27; }
+    .ob-quick-start ol { margin:0; padding-left:24px; font-size:14px; line-height:1.8; }
+    .ob-quick-start ol li { margin-bottom:6px; }
+    .ob-quick-start a { color:#FEBF27; text-decoration:underline; }
+
+    .ob-faq details {
+      background:var(--card); border:1px solid var(--border); border-radius:10px;
+      padding:14px 18px; margin:8px 0; cursor:pointer;
+    }
+    .ob-faq summary {
+      cursor:pointer; font-weight:600; font-size:14px; list-style:none;
+      display:flex; justify-content:space-between; align-items:center; color:var(--text);
+    }
+    .ob-faq summary::after { content:'+'; font-size:20px; color:#FEBF27; transition:transform .2s; }
+    .ob-faq details[open] summary::after { content:'−'; }
+    .ob-faq details > div { padding-top:12px; font-size:13px; line-height:1.6; color:var(--text-muted); }
+    .ob-faq details > div code { background:#fffbef; padding:2px 6px; border-radius:4px; font-size:12px; color:#996600; }
+
+    @media (max-width: 640px) {
+      .ob-tool-card { grid-template-columns:48px 1fr; }
+      .ob-tool-cta { grid-column:2; margin-top:8px; }
+      .ob-role-tab { font-size:12px; padding:10px 14px; }
+    }
+  </style>
+
+  <div class="ob-role-tabs" role="tablist">
+    <button class="ob-role-tab active" data-ob-role="all" type="button">
+      <span class="icon">👥</span><span data-lang="uk">Все</span><span data-lang="en">All</span><span data-lang="sk">Všetko</span>
+    </button>
+    <button class="ob-role-tab" data-ob-role="kam" type="button">
+      <span class="icon">🤝</span><span data-lang="uk">KAM / Sales</span><span data-lang="en">KAM / Sales</span><span data-lang="sk">KAM / Predaj</span>
+    </button>
+    <button class="ob-role-tab" data-ob-role="marketing" type="button">
+      <span class="icon">📣</span><span data-lang="uk">Маркетинг</span><span data-lang="en">Marketing</span><span data-lang="sk">Marketing</span>
+    </button>
+    <button class="ob-role-tab" data-ob-role="production" type="button">
+      <span class="icon">🏭</span><span data-lang="uk">Виробництво</span><span data-lang="en">Production</span><span data-lang="sk">Výroba</span>
+    </button>
+    <button class="ob-role-tab" data-ob-role="finance" type="button">
+      <span class="icon">💰</span><span data-lang="uk">Фінанси</span><span data-lang="en">Finance</span><span data-lang="sk">Financie</span>
+    </button>
+    <button class="ob-role-tab" data-ob-role="new" type="button">
+      <span class="icon">🆕</span><span data-lang="uk">Новачок</span><span data-lang="en">New member</span><span data-lang="sk">Nový člen</span>
+    </button>
   </div>
 
-  <!-- ─── 1. BRAND BIBLE ─── -->
-  <div class="onboarding-card" data-card="brand-bible" style="margin:32px 0;padding:24px;background:var(--card);border-radius:12px;border:1px solid var(--border)">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-      <div style="width:48px;height:48px;border-radius:10px;background:#1E1E1E;color:#FEBF27;display:flex;align-items:center;justify-content:center;font-size:24px">📖</div>
-      <div>
-        <h3 style="margin:0;font-size:18px;font-weight:800">Brand Bible</h3>
-        <div style="font-size:12px;color:var(--text-muted)">brand.sneco.ua · головна точка правди про бренд</div>
-      </div>
-    </div>
-    <div style="font-size:13px;line-height:1.6;color:var(--text)">
-      <p><strong>Концепція:</strong> Єдина live онлайн-біблія бренду snEco. 20+ секцій від маніфесту до операційних SOPs. Доступна публічно з 3 мовами (UA/EN/SK), окремі sensitive розділи (HR, Prices, Production SOPs) — через email-OTP або Google Sign-In gate.</p>
-      <p><strong>Навіщо:</strong> щоб маркетингу не доводилось дзвонити виробництву по ваги, sales не блукав у Slack за прайс-листами, нові партнери одразу бачили що ми за бренд. Tribal knowledge → документ.</p>
-      <p><strong>Як використовувати:</strong></p>
-      <ul style="margin:6px 0 6px 20px;padding:0">
-        <li><strong>Команда:</strong> кожен ранок прокинувся → що додалось у Brand Bible? Дивись footer changelog</li>
-        <li><strong>Sales:</strong> перед розмовою з партнером → дивись Sales секцію + Прайс-листи</li>
-        <li><strong>Маркетинг:</strong> Visual + Voice + Photo як референси</li>
-        <li><strong>Виробництво:</strong> Procurement SOPs + Production cycles</li>
-        <li><strong>Адміни (vg/fg):</strong> Maintenance UI — управління whitelist</li>
-      </ul>
-      <p><strong>Типові кейси:</strong></p>
-      <ol style="margin:6px 0 6px 20px;padding:0">
-        <li>Альона: "Мені треба прайс для нового партнера" → Sales секція → OTP → готово</li>
-        <li>Богдан: "Як ми пакуємо 28г на палеті?" → Packaging секція → Pack-out specs</li>
-        <li>Ярослав: "Який ШК у Cheddar 14г?" → Documents → SKU registry</li>
-        <li>vg: "Що команда пропонує цього тижня?" → Daily digest о 08:00 KYV у пошту</li>
+  <!-- QUICK START для новачка — показується тільки якщо role=new або all -->
+  <div class="ob-content-panel active" data-ob-panel="all,new">
+    <div class="ob-quick-start">
+      <h3>🚀 <span data-lang="uk">Швидкий старт за 3 хвилини</span><span data-lang="en">Quick start in 3 minutes</span><span data-lang="sk">Rýchly štart za 3 minúty</span></h3>
+      <ol>
+        <li data-lang="uk">Відкрий <a href="https://brand.sneco.ua/" target="_self">brand.sneco.ua</a> — це твій головний хаб</li>
+        <li data-lang="uk">Якщо щось закрите 🔐 — натисни <strong>Sign in with Google</strong> (твоя робоча пошта <code>@sneco.ua</code> має бути у whitelist)</li>
+        <li data-lang="uk">Маєш ідею як покращити процес? <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false;">Додай у "💡 Пропозиції"</a> — vg відповість за тиждень</li>
+        <li data-lang="uk">Що тобі знадобиться щодня — обери свою роль вгорі ↑</li>
+        <li data-lang="en">Open <a href="https://brand.sneco.ua/">brand.sneco.ua</a> — your main hub</li>
+        <li data-lang="en">If locked 🔐 — Sign in with Google (your <code>@sneco.ua</code> must be whitelisted)</li>
+        <li data-lang="en">Got an improvement idea? Add it to "💡 Ideas" — vg will respond within a week</li>
+        <li data-lang="en">For daily tools — pick your role above</li>
+        <li data-lang="sk">Otvor brand.sneco.ua · Pri 🔐 — Sign in s Google · Nápad — pridaj do Ideas · Vyber rolu hore</li>
       </ol>
     </div>
   </div>
 
-  <!-- ─── 2. IDEAS RESOLUTION WORKFLOW ─── -->
-  <div class="onboarding-card" data-card="ideas-workflow" style="margin:32px 0;padding:24px;background:var(--card);border-radius:12px;border:1px solid var(--border)">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-      <div style="width:48px;height:48px;border-radius:10px;background:#FEBF27;color:#1E1E1E;display:flex;align-items:center;justify-content:center;font-size:24px">💡</div>
-      <div>
-        <h3 style="margin:0;font-size:18px;font-weight:800">Ideas Resolution Workflow</h3>
-        <div style="font-size:12px;color:var(--text-muted)">brand.sneco.ua/#ideas · від ідеї до реалізації</div>
+  <!-- TOOL CARDS — кожна з data-ob-roles -->
+
+  <!-- IDEAS WORKFLOW — для всіх -->
+  <div class="ob-tool-card ob-content-panel active" data-ob-panel="all,kam,marketing,production,finance,new">
+    <div class="ob-tool-icon" style="background:rgba(254,191,39,.18);color:#996600">💡</div>
+    <div class="ob-tool-body">
+      <div class="ob-tool-title" data-lang-group>
+        <span data-lang="uk">Пропозиції — твоя ідея → готова система</span>
+        <span data-lang="en">Ideas — your idea → live system</span>
+        <span data-lang="sk">Návrhy — tvoj nápad → systém</span>
+      </div>
+      <div class="ob-tool-desc">
+        <span data-lang="uk">Бачиш проблему або маєш ідею? Додай тут — vg підготує рішення за тиждень, ти погодиш або зміниш, і ми реалізовуємо. <strong>Кейс:</strong> Альона запропонувала таблицю ваг упаковки → vg підготував → реалізовано у Packaging секції.</span>
+        <span data-lang="en">See a problem or have an idea? Add here — vg drafts solution in 1 week, you approve or refine, then we ship. <strong>Case:</strong> Альона proposed pack weights table → vg drafted → shipped to Packaging.</span>
       </div>
     </div>
-    <div style="font-size:13px;line-height:1.6;color:var(--text)">
-      <p><strong>Концепція:</strong> Будь-хто з команди може запропонувати ідею (нова секція, процес, SOP, sales-tool). Vadym готує draft рішення → автор натискає <strong>✅ Погодити</strong> або <strong>💬 Запросити зміни</strong> → ідея переходить у роботу і реалізується.</p>
-      <p><strong>Pipeline:</strong> <code>open → proposed → approved → in_progress → done</code></p>
-      <p><strong>Навіщо:</strong> щоб ідеї не губились у Slack-thread'ах. Щоб автор бачив що його ідея сприйнялась. Щоб команда мала transparency хто що пропонує і як це реалізується.</p>
-      <p><strong>Як використовувати — для авторів:</strong></p>
-      <ol style="margin:6px 0 6px 20px;padding:0">
-        <li>Відкрий <code>brand.sneco.ua/#ideas</code></li>
-        <li>"+ Нова пропозиція" → ім'я, email, опис → Додати</li>
-        <li>Чекай email "💡 Рішення: ..." від vg (зазвичай за тиждень)</li>
-        <li>Відкрий лист → "Відкрити в Brand Bible" → ✅ Погодити або 💬 Запросити зміни</li>
-        <li>Коли done — отримаєш лист "🎉 Реалізовано!" з лінком на конкретну секцію</li>
-      </ol>
-      <p><strong>Як використовувати — для admin (vg):</strong></p>
-      <ol style="margin:6px 0 6px 20px;padding:0">
-        <li>Щодня о 08:00 KYV — email з backlog (Очікують реакції / Погоджено / В роботі)</li>
-        <li>Відкрий ідею → "💡 Написати рішення" → modal з 4 полями</li>
-        <li>"📨 Відправити автору" → автоматично email + status update</li>
-        <li>Коли автор approve → email тобі + button "🚀 В роботу"</li>
-        <li>Реалізував → "✓ Зроблено" → автор отримує "🎉 Реалізовано"</li>
-      </ol>
-      <p><strong>Backend:</strong> 4 D1 таблиці (ideas, idea_proposals, idea_comments, idea_audit_log) + 7 Worker endpoints + 3 email templates. Кожна дія — у audit log.</p>
-    </div>
+    <a class="ob-tool-cta" href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false;"><span data-lang="uk">Спробувати</span><span data-lang="en">Try it</span><span data-lang="sk">Vyskúšať</span></a>
   </div>
 
-  <!-- ─── 3. CUSTOMER 360 ─── -->
-  <div class="onboarding-card" data-card="customer-360" style="margin:32px 0;padding:24px;background:var(--card);border-radius:12px;border:1px solid var(--border)">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-      <div style="width:48px;height:48px;border-radius:10px;background:#96C11F;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px">👥</div>
-      <div>
-        <h3 style="margin:0;font-size:18px;font-weight:800">Customer 360</h3>
-        <div style="font-size:12px;color:var(--text-muted)">brand.sneco.ua/dashboard/customer-360/ · KAM-инструмент</div>
+  <!-- CUSTOMER 360 — KAM / sales -->
+  <div class="ob-tool-card ob-content-panel active" data-ob-panel="all,kam">
+    <div class="ob-tool-icon" style="background:rgba(150,193,31,.18);color:#557a00">👥</div>
+    <div class="ob-tool-body">
+      <div class="ob-tool-title" data-lang-group>
+        <span data-lang="uk">Customer 360 — все про клієнта на одній сторінці</span>
+        <span data-lang="en">Customer 360 — everything about a client on one page</span>
+        <span data-lang="sk">Customer 360 — všetko o klientovi na jednej stránke</span>
+      </div>
+      <div class="ob-tool-desc">
+        <span data-lang="uk">Перед дзвінком до Сільпо натисни / → введи "сіль" → побачиш: всю історію замовлень, чи є борг, що зазвичай купують, чи варто пропонувати нове. <strong>Замість</strong>: відкривати MoySklad → робити 5 звітів → рахувати в Excel.</span>
+        <span data-lang="en">Before calling Silpo press / → type "sil" → see: full order history, debts, top SKUs, cross-sell opportunities. <strong>Instead of</strong>: opening MoySklad → running 5 reports.</span>
       </div>
     </div>
-    <div style="font-size:13px;line-height:1.6;color:var(--text)">
-      <p><strong>Концепція:</strong> Інтерактивний дашборд для KAM-команди (Ярослав, Валентина) і керівництва (vg, Богдан). Показує повний 360° кожного клієнта: revenue, AR, AOV, тренди, anomalies, cross-sell opportunities, timeline історія взаємодій.</p>
-      <p><strong>Навіщо:</strong> щоб KAM перед розмовою з клієнтом мав весь контекст за 30 секунд. Замість "відкрити MoySklad → витягти 5 звітів → порахувати в Excel" — один лінк.</p>
-      <p><strong>Як використовувати:</strong></p>
-      <ul style="margin:6px 0 6px 20px;padding:0">
-        <li><strong>Overview:</strong> 5 Portfolio Health KPIs · Concentration alert · 12-міс trend · Movers (хто росте/падає) · Heatmap VIP/Mid/SMB × Good/Warn/Bad</li>
-        <li><strong>Per-customer:</strong> search → клік → KPI cards · Health Trend sparklines · AR aging buckets · Cross-sell matrix · Timeline (60 подій) · Decision-makers · CRM-нотатки · Forecast next order · Excel export</li>
-        <li><strong>Keyboard:</strong> <kbd>/</kbd> search · <kbd>n</kbd> new CRM note · <kbd>Esc</kbd> close</li>
-      </ul>
-      <p><strong>Типові кейси:</strong></p>
-      <ol style="margin:6px 0 6px 20px;padding:0">
-        <li>Ярослав перед дзвінком до Сільпо: відкриває картку → бачить overdue AR 1.2M, останнє замовлення 3 тижні тому, тренд падає → дзвонить з reason для розмови</li>
-        <li>vg: ранкова перевірка → 5 customers з anomaly alert → drill-down → reach out до ризикових</li>
-        <li>Combined клієнти (mrsnack.ua, Сільпо як 5 ФОП): автоматично об'єднуються — bачимо консолідовану картину</li>
-      </ol>
-      <p><strong>Доступ:</strong> Google Sign-In або email-OTP. Whitelist через Maintenance UI у Brand Bible.</p>
-    </div>
+    <a class="ob-tool-cta" href="https://brand.sneco.ua/dashboard/customer-360/customer-360.html" target="_blank">Customer 360 →</a>
   </div>
 
-  <!-- ─── 4. FINANCE DASHBOARD ─── -->
-  <div class="onboarding-card" data-card="finance" style="margin:32px 0;padding:24px;background:var(--card);border-radius:12px;border:1px solid var(--border)">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-      <div style="width:48px;height:48px;border-radius:10px;background:#1B4332;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px">💰</div>
-      <div>
-        <h3 style="margin:0;font-size:18px;font-weight:800">Finance Dashboard</h3>
-        <div style="font-size:12px;color:var(--text-muted)">brand.sneco.ua/dashboard/finance/ · cash flow & AR</div>
+  <!-- FINANCE DASHBOARD — finance only -->
+  <div class="ob-tool-card ob-content-panel active" data-ob-panel="all,finance">
+    <div class="ob-tool-icon" style="background:rgba(27,67,50,.15);color:#1B4332">💰</div>
+    <div class="ob-tool-body">
+      <div class="ob-tool-title" data-lang-group>
+        <span data-lang="uk">Finance Dashboard — скільки грошей зараз і хто винний</span>
+        <span data-lang="en">Finance Dashboard — cash & who owes</span>
+        <span data-lang="sk">Finance Dashboard — peniaze a dlžníci</span>
+      </div>
+      <div class="ob-tool-desc">
+        <span data-lang="uk">Понеділок 09:00 → відкрив → побачив: загальну виручку місяця, AR aging (хто прострочив), ТОП-10 боржників з кнопкою <em>"📞 Подзвонити"</em>. <strong>Кейс:</strong> Пилип ранок → топ-3 боржника &gt;90 днів → пише з нагадуванням.</span>
+        <span data-lang="en">Monday 9 AM → open → see: month revenue, AR aging, TOP-10 debtors with "📞 Call" button. <strong>Case:</strong> Pylyp morning → top-3 overdue → sends reminders.</span>
       </div>
     </div>
-    <div style="font-size:13px;line-height:1.6;color:var(--text)">
-      <p><strong>Концепція:</strong> Фінансовий дашборд для CFO ролі (Пилип) і керівництва. Live з D1: cash flow 12 міс, AR aging (1-30 / 31-60 / 61-90 / 90+), TOP-10 дебіторів з mailto/tel, DSO, прогноз 30d, expense categories.</p>
-      <p><strong>Навіщо:</strong> щоб Пилип не вічно дзвонив бухгалтерії "скільки грошей зараз?". Один екран — повна картина.</p>
-      <p><strong>Кейси:</strong></p>
-      <ol style="margin:6px 0 6px 20px;padding:0">
-        <li>Понеділок 09:00 — Пилип дивиться: AR overdue >90 днів = 2.3M ₴ → klick mailto → пише топ-3 боржникам</li>
-        <li>Перед прийняттям рішення про закупку нової партії сиру → дивиться поточну ліквідність + прогноз 30d</li>
-        <li>Reviewing expense categories monthly — куди йдуть гроші, де можна оптимізувати</li>
-      </ol>
-      <p><strong>Доступ:</strong> Whitelist через Maintenance — Пилип, vg, Богдан, Ярослав.</p>
-    </div>
+    <a class="ob-tool-cta" href="https://brand.sneco.ua/dashboard/finance/finance.html" target="_blank">Finance →</a>
   </div>
 
-  <!-- ─── 5. INVENTORY + PRODUCTION DASHBOARDS ─── -->
-  <div class="onboarding-card" data-card="inventory-production" style="margin:32px 0;padding:24px;background:var(--card);border-radius:12px;border:1px solid var(--border)">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-      <div style="width:48px;height:48px;border-radius:10px;background:#5e3aa0;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px">📦</div>
-      <div>
-        <h3 style="margin:0;font-size:18px;font-weight:800">Inventory + Production Dashboards</h3>
-        <div style="font-size:12px;color:var(--text-muted)">brand.sneco.ua/dashboard/inventory/ + /production/ · stock, виробництво</div>
+  <!-- INVENTORY — для виробництва -->
+  <div class="ob-tool-card ob-content-panel active" data-ob-panel="all,production">
+    <div class="ob-tool-icon" style="background:rgba(94,58,160,.15);color:#5e3aa0">📦</div>
+    <div class="ob-tool-body">
+      <div class="ob-tool-title" data-lang-group>
+        <span data-lang="uk">Inventory — поточний stock та що треба замовити</span>
+        <span data-lang="en">Inventory — current stock & what to order</span>
+        <span data-lang="sk">Inventory — aktuálny sklad</span>
+      </div>
+      <div class="ob-tool-desc">
+        <span data-lang="uk">Перед PO на сир-сировину: відкрий → побачиш поточний stock + темп продажів за 30 днів → розрахуєш точну кількість для замовлення.</span>
+        <span data-lang="en">Before raw cheese PO: open → see current stock + 30-day sales tempo → calculate exact order quantity.</span>
       </div>
     </div>
-    <div style="font-size:13px;line-height:1.6;color:var(--text)">
-      <p><strong>Концепція:</strong> Дашборди для виробничої команди (Валерія, Богдан) і операційки. Inventory — складські залишки, динаміка приходу/витрат, top SKU, dead stock. Production — виробничі цикли, output по днях, OEE.</p>
-      <p><strong>Як оновлюються дані:</strong> щодня о ~06:30 KYV автоматично — GitHub Actions workflow тягне з D1 → будує `data.json` → пушить через SSH у Pages.</p>
-      <p><strong>Кейси:</strong></p>
-      <ol style="margin:6px 0 6px 20px;padding:0">
-        <li>Валерія перед PO на сир-сировину: відкриває Inventory → дивиться поточний stock + tempo продажів → розраховує замовлення</li>
-        <li>Богдан: тижневий monitoring — output по SKU vs plan, dead stock alerts</li>
-        <li>Ранкове рев'ю — є альортах якщо щось критичне (stock < safety buffer)</li>
-      </ol>
-      <p><strong>Stale data warning:</strong> якщо `data.json generated >24 год` — yellow banner з лінком на Customer 360 (live з D1).</p>
-    </div>
+    <a class="ob-tool-cta" href="https://brand.sneco.ua/dashboard/inventory/inventory.html" target="_blank">Inventory →</a>
   </div>
 
-  <!-- ─── 6. SALES ANALYTICS + PROCUREMENT ─── -->
-  <div class="onboarding-card" data-card="sales-procurement" style="margin:32px 0;padding:24px;background:var(--card);border-radius:12px;border:1px solid var(--border)">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-      <div style="width:48px;height:48px;border-radius:10px;background:#E84040;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px">📈</div>
-      <div>
-        <h3 style="margin:0;font-size:18px;font-weight:800">Sales Analytics + Procurement</h3>
-        <div style="font-size:12px;color:var(--text-muted)">brand.sneco.ua/dashboard/dashboard.html + /procurement/</div>
+  <!-- PRODUCTION — для виробництва -->
+  <div class="ob-tool-card ob-content-panel active" data-ob-panel="all,production">
+    <div class="ob-tool-icon" style="background:rgba(232,64,64,.13);color:#a00">🏭</div>
+    <div class="ob-tool-body">
+      <div class="ob-tool-title" data-lang-group>
+        <span data-lang="uk">Production — виробничі цикли та output</span>
+        <span data-lang="en">Production — cycles & output</span>
+        <span data-lang="sk">Production — výrobné cykly</span>
+      </div>
+      <div class="ob-tool-desc">
+        <span data-lang="uk">Тижневий monitoring: output per SKU vs plan, dead stock alerts, час на партію. <strong>Кейс:</strong> Богдан п'ятниця → ревʼю тижня → бачить що Cheddar 28г недовиробив 15% → коригує наступний тиждень.</span>
+        <span data-lang="en">Weekly monitoring: output per SKU vs plan, dead stock alerts, batch times.</span>
       </div>
     </div>
-    <div style="font-size:13px;line-height:1.6;color:var(--text)">
-      <p><strong>Sales Analytics:</strong> історія продажів, period filter (рік/квартал/місяць/custom), action items (revival list, AR overdue, funnel, concentration).</p>
-      <p><strong>Procurement:</strong> закупівлі (Pylyp's domain), історія постачання, top suppliers, lead-time analytics.</p>
-      <p><strong>Кейси:</strong></p>
-      <ol style="margin:6px 0 6px 20px;padding:0">
-        <li>Ярослав ранок: відкриває Sales → Action Items → 5 sleeping clients → виклики</li>
-        <li>Пилип: Procurement → дивиться cost trend постачальників → переговори по renegotiation</li>
-      </ol>
-    </div>
+    <a class="ob-tool-cta" href="https://brand.sneco.ua/dashboard/production/production.html" target="_blank">Production →</a>
   </div>
 
-  <!-- ─── 7. DAILY EMAIL AUTOMATION ─── -->
-  <div class="onboarding-card" data-card="daily-emails" style="margin:32px 0;padding:24px;background:var(--card);border-radius:12px;border:1px solid var(--border)">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-      <div style="width:48px;height:48px;border-radius:10px;background:#3B82F6;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px">📧</div>
-      <div>
-        <h3 style="margin:0;font-size:18px;font-weight:800">Daily Email Automation</h3>
-        <div style="font-size:12px;color:var(--text-muted)">3 листи щодня · vg@sneco.ua</div>
+  <!-- SALES ANALYTICS — KAM -->
+  <div class="ob-tool-card ob-content-panel active" data-ob-panel="all,kam">
+    <div class="ob-tool-icon" style="background:rgba(59,130,246,.13);color:#3B82F6">📈</div>
+    <div class="ob-tool-body">
+      <div class="ob-tool-title" data-lang-group>
+        <span data-lang="uk">Sales Analytics — продажі + action items на сьогодні</span>
+        <span data-lang="en">Sales Analytics — sales + today's action items</span>
+        <span data-lang="sk">Sales Analytics — predaj a denné úlohy</span>
+      </div>
+      <div class="ob-tool-desc">
+        <span data-lang="uk">Ранкова рутина: відкрив → Action Items tab → побачив 5 sleeping clients за тиждень → дзвонитимеш. + funnel orders→shipments→payments, concentration risk.</span>
+        <span data-lang="en">Morning routine: open → Action Items → see 5 sleeping clients → call them.</span>
       </div>
     </div>
-    <div style="font-size:13px;line-height:1.6;color:var(--text)">
-      <p><strong>Концепція:</strong> Замість ручного відкриття 5 дашбордів кожен ранок — vg отримує 3 цілеспрямованих email о 08:00-10:00 Київ.</p>
-      <table style="width:100%;border-collapse:collapse;margin:10px 0;font-size:12.5px">
-        <tr style="background:#f6f6f6">
-          <th style="padding:8px;text-align:left;border:1px solid var(--border)">Час Київ</th>
-          <th style="padding:8px;text-align:left;border:1px solid var(--border)">Email</th>
-          <th style="padding:8px;text-align:left;border:1px solid var(--border)">Що містить</th>
-        </tr>
-        <tr>
-          <td style="padding:8px;border:1px solid var(--border)">08:00</td>
-          <td style="padding:8px;border:1px solid var(--border)"><strong>📋 Brand Bible Daily Digest</strong></td>
-          <td style="padding:8px;border:1px solid var(--border)">N відкритих ідей + AI ТОП-3 рекомендації + workflow snapshot (Очікують / Погоджено / В роботі)</td>
-        </tr>
-        <tr>
-          <td style="padding:8px;border:1px solid var(--border)">09:00</td>
-          <td style="padding:8px;border:1px solid var(--border)"><strong>📊 Daily KAM Briefing</strong></td>
-          <td style="padding:8px;border:1px solid var(--border)">Дайджест продажів за вчора, action items, dormant clients, critical overdue AR</td>
-        </tr>
-        <tr>
-          <td style="padding:8px;border:1px solid var(--border)">10:00</td>
-          <td style="padding:8px;border:1px solid var(--border)"><strong>✅ System Health Audit</strong></td>
-          <td style="padding:8px;border:1px solid var(--border)">Звіт по всіх системах: workflows · D1 freshness · live URLs · data.json · ideas · audit log. ✅/⚠/❌ per check.</td>
-        </tr>
-      </table>
-      <p><strong>Якщо щось зламано</strong> — побачиш у System Health Audit одразу: який workflow failed, які URL down, що потребує уваги.</p>
-    </div>
+    <a class="ob-tool-cta" href="https://brand.sneco.ua/dashboard/dashboard.html" target="_blank">Sales →</a>
   </div>
 
-  <!-- ─── 8. DATA SYNC CHAIN ─── -->
-  <div class="onboarding-card" data-card="sync-chain" style="margin:32px 0;padding:24px;background:var(--card);border-radius:12px;border:1px solid var(--border)">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-      <div style="width:48px;height:48px;border-radius:10px;background:#7e57c2;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px">🔄</div>
-      <div>
-        <h3 style="margin:0;font-size:18px;font-weight:800">Data Sync Chain (MoySklad → Дашборди)</h3>
-        <div style="font-size:12px;color:var(--text-muted)">5 GitHub Actions workflows · автоматично щодня</div>
+  <!-- PRICE LISTS — sales/marketing -->
+  <div class="ob-tool-card ob-content-panel active" data-ob-panel="all,kam,marketing">
+    <div class="ob-tool-icon" style="background:rgba(254,191,39,.18);color:#996600">💰</div>
+    <div class="ob-tool-body">
+      <div class="ob-tool-title" data-lang-group>
+        <span data-lang="uk">Прайс-листи — актуальні ціни для партнерів</span>
+        <span data-lang="en">Price lists — current prices for partners</span>
+        <span data-lang="sk">Cenníky — aktuálne ceny</span>
+      </div>
+      <div class="ob-tool-desc">
+        <span data-lang="uk">Закриті password gate'ом. Усі 28 SKU з EAN-кодами, дистрибʼюторськими/оптовими/РРЦ цінами. <strong>Тільки</strong> для команди і затверджених партнерів.</span>
+        <span data-lang="en">Locked behind password gate. All 28 SKUs with EAN codes, distributor/wholesale/RRC prices.</span>
       </div>
     </div>
-    <div style="font-size:13px;line-height:1.6;color:var(--text)">
-      <p><strong>Концепція:</strong> Усі дашборди мають актуальні дані до 07:00 ранку без ручних дій.</p>
-      <pre style="background:#1E1E1E;color:#FEBF27;padding:14px;border-radius:8px;font-size:11.5px;overflow-x:auto;line-height:1.5">
-03:00 KYV  Procurement Sync     → MoySklad procurement → D1
-06:00 KYV  MoySklad Daily Sync  → demands/payments/etc → D1 (5-6 хв)
-~06:30 KYV Inventory Sync       → D1 → data.json → push у Pages
-                                 (auto через workflow_run after MoySklad)
-07:30 KYV  Inventory fallback   → cron на випадок якщо workflow_run miss
-08:00 KYV  Daily Ideas Digest   → Worker cron → email vg
-08:00 KYV  Sync Health Check    → audit + email
-09:00 KYV  Daily KAM Briefing   → AI summary + email
-10:00 KYV  System Audit V2      → comprehensive email</pre>
-      <p><strong>Якщо все ОК — нічого не робити.</strong> Якщо щось зламано — лист о 08:00 одразу скаже.</p>
-      <p><strong>Технічно:</strong></p>
-      <ul style="margin:6px 0 6px 20px;padding:0">
-        <li><strong>MoySklad</strong> → ETL Python script → <strong>Cloudflare D1</strong> (sneco-bible)</li>
-        <li><strong>D1</strong> → Cloudflare Worker (sneco-auth) → REST API</li>
-        <li><strong>API</strong> → Live дашборди (Customer 360, Finance) read live</li>
-        <li><strong>API</strong> → Daily build → <code>data.json</code> → GitHub Pages → Inventory/Production read</li>
-      </ul>
-    </div>
+    <a class="ob-tool-cta" href="#sec-prices" onclick="document.querySelector('[data-target=prices]')?.click();return false;"><span data-lang="uk">Sales секція</span><span data-lang="en">Sales section</span></a>
   </div>
 
-  <!-- ─── 9. AUTH / OTP / GOOGLE ─── -->
-  <div class="onboarding-card" data-card="auth" style="margin:32px 0;padding:24px;background:var(--card);border-radius:12px;border:1px solid var(--border)">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-      <div style="width:48px;height:48px;border-radius:10px;background:#cc9700;color:#1E1E1E;display:flex;align-items:center;justify-content:center;font-size:24px">🔐</div>
-      <div>
-        <h3 style="margin:0;font-size:18px;font-weight:800">Auth — Google + OTP + 30-day sessions</h3>
-        <div style="font-size:12px;color:var(--text-muted)">Cloudflare Worker auth, KV whitelist</div>
+  <!-- BRAND VOICE / PHOTO — для marketing -->
+  <div class="ob-tool-card ob-content-panel active" data-ob-panel="all,marketing">
+    <div class="ob-tool-icon" style="background:rgba(150,193,31,.18);color:#557a00">🎨</div>
+    <div class="ob-tool-body">
+      <div class="ob-tool-title" data-lang-group>
+        <span data-lang="uk">Бренд — voice, photo, packaging, claims</span>
+        <span data-lang="en">Brand — voice, photo, packaging, claims</span>
+        <span data-lang="sk">Bránd — hlas, foto, balenie, posolstvá</span>
+      </div>
+      <div class="ob-tool-desc">
+        <span data-lang="uk">Готуєш пост у Instagram, лист партнеру, нову етикетку? Дивись референси: тон голосу, photo style, packaging mockups, claims та слогани. Не вигадуй з нуля.</span>
+        <span data-lang="en">Preparing Instagram post, partner email, new label? Check references: tone of voice, photo style, packaging mockups, claims.</span>
       </div>
     </div>
-    <div style="font-size:13px;line-height:1.6;color:var(--text)">
-      <p><strong>Концепція:</strong> Двосторонній доступ до sensitive content. Sales price-lists, HR, дашборди — за whitelist. Brand Bible маніфест/команда/voice — public.</p>
-      <p><strong>Як логінитись (вибір):</strong></p>
-      <ol style="margin:6px 0 6px 20px;padding:0">
-        <li><strong>Google Sign-In</strong> (швидко) — якщо твій email у whitelist → один click</li>
-        <li><strong>Email-OTP</strong> (fallback) — вводиш email → 6-значний код на пошту → ввів → готово</li>
-      </ol>
-      <p><strong>Сесія 30 днів</strong> — не треба перелогінитись щодня. На іншому пристрої / після logout — новий login.</p>
-      <p><strong>Whitelist управління (admin):</strong> Brand Bible → Maintenance → Розподіл доступу → клік на потрібний блок → додати/видалити email. Через 30 сек активно.</p>
-    </div>
+    <a class="ob-tool-cta secondary" href="#sec-voice" onclick="document.querySelector('[data-target=voice]')?.click();return false;">Brand →</a>
   </div>
 
-  <!-- ─── 10. ADMIN MAINTENANCE TOOLS ─── -->
-  <div class="onboarding-card" data-card="maintenance" style="margin:32px 0;padding:24px;background:var(--card);border-radius:12px;border:1px solid var(--border)">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-      <div style="width:48px;height:48px;border-radius:10px;background:#1E1E1E;color:#96C11F;display:flex;align-items:center;justify-content:center;font-size:24px">🛠</div>
-      <div>
-        <h3 style="margin:0;font-size:18px;font-weight:800">Admin tools (Maintenance)</h3>
-        <div style="font-size:12px;color:var(--text-muted)">тільки для vg + fg</div>
+  <!-- DOCUMENTS — для всіх -->
+  <div class="ob-tool-card ob-content-panel active" data-ob-panel="all,kam,marketing,finance,new">
+    <div class="ob-tool-icon" style="background:rgba(138,138,138,.18);color:#555">📄</div>
+    <div class="ob-tool-body">
+      <div class="ob-tool-title" data-lang-group>
+        <span data-lang="uk">Документи — сертифікати, патенти, нагороди</span>
+        <span data-lang="en">Documents — certificates, patents, awards</span>
+        <span data-lang="sk">Dokumenty — certifikáty, patenty, ocenenia</span>
+      </div>
+      <div class="ob-tool-desc">
+        <span data-lang="uk">Партнер просить FSSC або HACCP? Sales lead запитує SIAL Grand Prix? Все тут — клік → PDF → forward у пошту. <strong>Не питай</strong> у Богдана/Левка кожен раз.</span>
+        <span data-lang="en">Partner asks for FSSC/HACCP? Sales lead asks about SIAL? All here — click → PDF → forward.</span>
       </div>
     </div>
-    <div style="font-size:13px;line-height:1.6;color:var(--text)">
-      <p><strong>Концепція:</strong> Один UI у Brand Bible для всіх адмін-дій. Не треба ходити у Cloudflare Dashboard, GitHub, MoySklad окремо.</p>
-      <p><strong>Що можна (Brand Bible → Maintenance):</strong></p>
-      <ul style="margin:6px 0 6px 20px;padding:0">
-        <li>Розподіл доступу — whitelist'и для всіх blocks (HR, Prices, Customer Dashboard, Finance, etc.)</li>
-        <li>Changelog ведення</li>
-        <li>Документація переходу (governance)</li>
-        <li>(майбутнє) Force-run sync workflows одним кліком</li>
-      </ul>
-      <p><strong>За кулісами:</strong> Cloudflare D1 + KV + R2, GitHub Actions, Resend email — все працює без ручних дій. Якщо хочеш заглянути:</p>
-      <ul style="margin:6px 0 6px 20px;padding:0">
-        <li>Cloudflare Dashboard → <code>sneco-auth</code> Worker</li>
-        <li>GitHub → <code>dreamcarua/snEco</code> (source code) + <code>dreamcarua/sneco-brand-book</code> (Pages)</li>
-        <li>Resend.com → email logs</li>
-      </ul>
-    </div>
+    <a class="ob-tool-cta secondary" href="#sec-documents" onclick="document.querySelector('[data-target=documents]')?.click();return false;"><span data-lang="uk">Документи</span><span data-lang="en">Documents</span></a>
   </div>
 
-  <!-- Footer — як підтримувати цей розділ -->
-  <div style="margin:48px 0 24px;padding:20px;background:#fff3d6;border-radius:10px;border-left:4px solid #FEBF27;font-size:13px;line-height:1.6;color:#7a5a00">
-    <strong>📝 <span data-lang="uk">Як підтримувати цей розділ актуальним</span><span data-lang="en">How to keep this section current</span><span data-lang="sk">Ako udržiavať túto sekciu aktuálnou</span></strong><br>
-    <span data-lang="uk">При додаванні нової фічі/системи — оновити відповідну картку <strong>тут</strong> або створити нову. Це не "nice-to-have" — це core документація для команди. Без оновлення нові люди не дізнаються як використовувати свіжі інструменти.</span>
-    <span data-lang="en">When adding a new feature/system — update the relevant card here or create a new one. This is core documentation, not nice-to-have.</span>
-    <span data-lang="sk">Pri pridaní novej funkcie/systému — aktualizuj príslušnú kartu tu.</span>
+  <!-- DAILY EMAIL — для vg -->
+  <div class="ob-tool-card ob-content-panel active" data-ob-panel="all,kam,finance">
+    <div class="ob-tool-icon" style="background:rgba(59,130,246,.13);color:#1d5fa6">📧</div>
+    <div class="ob-tool-body">
+      <div class="ob-tool-title" data-lang-group>
+        <span data-lang="uk">Щоденні емейли — система сама пише vg вранці</span>
+        <span data-lang="en">Daily emails — system writes vg every morning</span>
+        <span data-lang="sk">Denné e-maily — systém píše vg ráno</span>
+      </div>
+      <div class="ob-tool-desc">
+        <span data-lang="uk">Прокинувся, відкрив пошту — побачив: нові ідеї команди, action items на день, статус всіх систем. Не треба відкривати 5 дашбордів вранці.</span>
+        <span data-lang="en">Wake up, open mail — see: new team ideas, action items, system status. No need to open 5 dashboards.</span>
+      </div>
+    </div>
+    <a class="ob-tool-cta secondary" href="#sec-documents" onclick="document.querySelectorAll('.ob-faq details').forEach(d => d.open = true);document.querySelector('.ob-faq')?.scrollIntoView({behavior:'smooth'});return false;"><span data-lang="uk">FAQ нижче ↓</span><span data-lang="en">FAQ below ↓</span></a>
+  </div>
+
+  <!-- FAQ -->
+  <h3 style="margin:48px 0 16px;font-size:18px;font-weight:800">
+    <span data-lang="uk">❓ Часті запитання</span><span data-lang="en">❓ FAQ</span><span data-lang="sk">❓ Najčastejšie otázky</span>
+  </h3>
+  <div class="ob-faq">
+    <details>
+      <summary><span data-lang="uk">Як залогінитись у дашборд?</span><span data-lang="en">How do I log in?</span><span data-lang="sk">Ako sa prihlásim?</span></summary>
+      <div>
+        <span data-lang="uk">1. Натисни <strong>Sign in with Google</strong> — найшвидше. <br>2. Якщо Google не спрацював — введи свій <code>@sneco.ua</code> email → отримаєш 6-значний код на пошту → введи. <br>3. Не у whitelist? — напиши <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>, додамо за хвилину. <br>4. Сесія діє <strong>30 днів</strong> — не перелогінюватись щодня.</span>
+        <span data-lang="en">1. Click Sign in with Google — fastest. 2. Or enter your @sneco.ua email → 6-digit code → enter. 3. Not whitelisted? — email vg. 4. Session lasts 30 days.</span>
+      </div>
+    </details>
+    <details>
+      <summary><span data-lang="uk">Я бачу "У РОЗРОБЦІ" блоки — це що?</span><span data-lang="en">I see "IN DEVELOPMENT" blocks — what's that?</span></summary>
+      <div>
+        <span data-lang="uk">Це нові секції які ще чекають твого <strong>✅ Погодити</strong> у системі Пропозицій. Як тільки погодиш — vg реалізовує, і блок стає публічним.</span>
+        <span data-lang="en">New sections waiting for your ✅ Approve in Ideas. Once approved — vg ships, block becomes public.</span>
+      </div>
+    </details>
+    <details>
+      <summary><span data-lang="uk">Дані застаріли — що робити?</span><span data-lang="en">Data is stale — what to do?</span></summary>
+      <div>
+        <span data-lang="uk">Customer 360 і Finance — live з реальної БД, завжди свіжі. Inventory і Production оновлюються щодня о 06:30 Київ автоматично. Якщо бачиш ⚠ <strong>"Дані застаріли"</strong> banner — оновлення не відбулось, напиши vg.</span>
+        <span data-lang="en">Customer 360 + Finance — live. Inventory + Production refresh daily ~06:30 Kyiv automatically. If you see ⚠ "Stale data" banner — sync failed, email vg.</span>
+      </div>
+    </details>
+    <details>
+      <summary><span data-lang="uk">Я подав ідею, але не отримав відповіді</span><span data-lang="en">I submitted an idea but got no response</span></summary>
+      <div>
+        <span data-lang="uk">vg отримує дайджест ідей щодня о 08:00. Зазвичай відповідь приходить за тиждень. Якщо > 2 тижнів — напиши <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> з заголовком ідеї.</span>
+        <span data-lang="en">vg gets daily digest at 08:00. Reply usually within 1 week. If >2 weeks — email vg directly.</span>
+      </div>
+    </details>
+    <details>
+      <summary><span data-lang="uk">Що робити якщо дашборд не завантажується?</span><span data-lang="en">Dashboard won't load — what to do?</span></summary>
+      <div>
+        <span data-lang="uk">1. Перевір що ти залогінений (Google або OTP). <br>2. Hard reload: <kbd>Cmd+Shift+R</kbd> (Mac) або <kbd>Ctrl+Shift+R</kbd> (Win). <br>3. Спробуй у режимі incognito. <br>4. Якщо й це не допомагає — напиши vg з скріншотом.</span>
+        <span data-lang="en">1. Check you're logged in. 2. Hard reload Cmd+Shift+R / Ctrl+Shift+R. 3. Try incognito. 4. Email vg with screenshot.</span>
+      </div>
+    </details>
+    <details>
+      <summary><span data-lang="uk">Хто має доступ до Прайс-листів?</span><span data-lang="en">Who has access to Price lists?</span></summary>
+      <div>
+        <span data-lang="uk">Команда snEco (KAM, sales, маркетинг, керівництво) + затверджені партнери. Якщо тобі треба доступ — напиши vg, він додасть твою пошту у whitelist.</span>
+        <span data-lang="en">snEco team + approved partners. Need access? Email vg to whitelist.</span>
+      </div>
+    </details>
+    <details>
+      <summary><span data-lang="uk">Працює тільки англійською — як змінити мову?</span><span data-lang="en">Stuck in English — how to switch language?</span></summary>
+      <div>
+        <span data-lang="uk">Угорі правому куті — кнопки UA / EN / SK. Натисни → весь сайт перемкнеться.</span>
+        <span data-lang="en">Top right corner — UA / EN / SK buttons. Click to switch.</span>
+      </div>
+    </details>
+    <details>
+      <summary><span data-lang="uk">Як знайти конкретну інформацію швидко?</span><span data-lang="en">How do I find specific info fast?</span></summary>
+      <div>
+        <span data-lang="uk">Натисни <kbd>⌘K</kbd> (Mac) / <kbd>Ctrl+K</kbd> (Win) → пошук по всіх секціях Brand Bible. Або клік на 🔍 у sidebar зліва.</span>
+        <span data-lang="en">Press Cmd+K / Ctrl+K → search across all sections. Or click 🔍 in sidebar.</span>
+      </div>
+    </details>
+  </div>
+
+  <!-- CONTACT BLOCK -->
+  <div style="margin:48px 0 24px;padding:24px 28px;background:#fffbef;border:1px solid rgba(254,191,39,.4);border-radius:14px;display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+    <div style="font-size:32px">💬</div>
+    <div style="flex:1;min-width:260px">
+      <div style="font-size:15px;font-weight:700;color:#1E1E1E;margin-bottom:4px">
+        <span data-lang="uk">Не знайшов відповідь?</span>
+        <span data-lang="en">Can't find an answer?</span>
+        <span data-lang="sk">Nenašiel si odpoveď?</span>
+      </div>
+      <div style="font-size:13px;color:var(--text-muted)">
+        <span data-lang="uk">Напиши <a href="mailto:vg@sneco.ua" style="color:#996600;font-weight:600">vg@sneco.ua</a> або подай "✋ Питання" у системі <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false;" style="color:#996600;font-weight:600">Пропозицій</a> — додам відповідь у FAQ.</span>
+        <span data-lang="en">Email <a href="mailto:vg@sneco.ua" style="color:#996600;font-weight:600">vg@sneco.ua</a> or submit a question in <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false;" style="color:#996600;font-weight:600">Ideas</a>.</span>
+      </div>
+    </div>
   </div>
 </section>
+
+<script>
+  // v2.78.52: Role tabs filtering для онбордингу
+  (function(){
+    const tabs = document.querySelectorAll('.ob-role-tab');
+    const panels = document.querySelectorAll('.ob-content-panel');
+    function applyRole(role) {
+      tabs.forEach(t => t.classList.toggle('active', t.dataset.obRole === role));
+      panels.forEach(p => {
+        const roles = (p.dataset.obPanel || '').split(',').map(s => s.trim());
+        const visible = roles.includes(role) || (role === 'all' && roles.includes('all'));
+        p.classList.toggle('active', visible);
+      });
+      try { localStorage.setItem('sneco_ob_role', role); } catch(e){}
+    }
+    tabs.forEach(t => t.addEventListener('click', () => applyRole(t.dataset.obRole)));
+    // Restore last role
+    try {
+      const saved = localStorage.getItem('sneco_ob_role') || 'all';
+      applyRole(saved);
+    } catch(e) { applyRole('all'); }
+  })();
+</script>
+
+
 
 <!-- ============================================================
      DOCUMENTS & CERTIFICATES
@@ -10438,6 +10531,122 @@ body.is-admin section.admin-only { display: block !important; }
     <div class="check-item"><span class="check-icon check-warn">!</span><span data-lang="uk">Відповідність місцевим харчовим регуляціям (маркування, алергени)</span><span data-lang="en">Compliant with local food regulations (labeling, allergens)</span><span data-lang="sk">Súlad s miestnymi potravinárskymi reguláciami (označenie, alergény)</span></div>
     <div class="check-item"><span class="check-icon check-miss">✕</span><span data-lang="uk">Не змішуйте UA та EU юр-дані на одному носії</span><span data-lang="en">Never mix UA and EU legal details on the same asset</span><span data-lang="sk">Nemiešajte UA a EÚ právne údaje na jednom nosiči</span></div>
   </div>
+
+  <!-- v2.78.52: Технічна архітектура — для dev/admin -->
+  <h3 class="block-title" style="margin-top:48px">🏗 <span data-lang="uk">Технічна архітектура</span><span data-lang="en">Technical architecture</span><span data-lang="sk">Technická architektúra</span></h3>
+  <div class="section-lead" style="font-size:13px;color:var(--text-muted);margin-bottom:20px">
+    <span data-lang="uk">Для admin / dev. Як влаштовані всі snEco-системи "за кулісами". Якщо ти користувач — тобі це не потрібно (дивись <a href="#sec-onboarding" onclick="document.querySelector('[data-target=onboarding]')?.click();return false;">Онбординг</a>).</span>
+    <span data-lang="en">For admin/dev. How snEco systems work under the hood. As a user — you don't need this (see Onboarding).</span>
+    <span data-lang="sk">Pre admin/dev. Ako fungujú systémy snEco zákulisne.</span>
+  </div>
+
+  <details style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin:8px 0">
+    <summary style="cursor:pointer;font-weight:700;font-size:14px;color:var(--text)">🔄 <span data-lang="uk">Data sync chain (MoySklad → дашборди)</span><span data-lang="en">Data sync chain</span></summary>
+    <div style="padding-top:14px;font-size:12.5px;line-height:1.6;color:var(--text)">
+      <p><strong>5 GitHub Actions workflows автоматично щодня:</strong></p>
+      <pre style="background:#1E1E1E;color:#FEBF27;padding:14px;border-radius:8px;font-size:11.5px;overflow-x:auto;line-height:1.5">
+03:00 KYV  Procurement Sync     → MoySklad procurement → D1
+06:00 KYV  MoySklad Daily Sync  → demands/payments/etc → D1 (5-6 хв)
+~06:30 KYV Inventory Sync       → D1 → data.json → push у Pages
+                                 (auto через workflow_run after MoySklad)
+07:30 KYV  Inventory fallback   → cron на випадок якщо workflow_run miss
+08:00 KYV  Daily Ideas Digest   → Worker cron → email vg
+08:00 KYV  Sync Health Check    → audit + email
+09:00 KYV  Daily KAM Briefing   → AI summary + email
+10:00 KYV  System Audit V2      → comprehensive 41-check email</pre>
+      <p><strong>Pipeline:</strong> MoySklad API → Python ETL scripts → <code>Cloudflare D1</code> (sneco-bible) → <code>Cloudflare Worker</code> (sneco-auth) REST API → Live dashboards (read live з D1) / batch <code>data.json</code> для Inventory+Production.</p>
+      <p><strong>Repo:</strong> <code>dreamcarua/snEco</code> (source code, workflows) + <code>dreamcarua/sneco-brand-book</code> (GitHub Pages → brand.sneco.ua).</p>
+    </div>
+  </details>
+
+  <details style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin:8px 0">
+    <summary style="cursor:pointer;font-weight:700;font-size:14px;color:var(--text)">🔐 <span data-lang="uk">Auth: Google OAuth + OTP + JWT</span><span data-lang="en">Auth architecture</span></summary>
+    <div style="padding-top:14px;font-size:12.5px;line-height:1.6;color:var(--text)">
+      <p><strong>Worker endpoints:</strong> <code>/api/auth/google</code> · <code>/api/otp/request</code> · <code>/api/otp/verify</code> · <code>/api/session/verify</code></p>
+      <p><strong>Sessions:</strong> JWT з 30-day TTL, HS256, secret у Worker env. Зберігаються у <code>sessionStorage</code> per-block.</p>
+      <p><strong>Whitelist storage:</strong> <code>Cloudflare KV</code> namespace <code>OTP_KV</code>, key <code>wl:{block}</code>. Admin block hardcoded до <code>ADMIN_EMAILS</code> env var.</p>
+      <p><strong>Supported blocks (11):</strong> hr, prices, admin, production, dashboard, inventory-dashboard, production-dashboard, customer-dashboard, finance-dashboard, procurement-dashboard, ideas-author</p>
+    </div>
+  </details>
+
+  <details style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin:8px 0">
+    <summary style="cursor:pointer;font-weight:700;font-size:14px;color:var(--text)">💡 <span data-lang="uk">Ideas Resolution Workflow — D1 + Worker</span><span data-lang="en">Ideas backend</span></summary>
+    <div style="padding-top:14px;font-size:12.5px;line-height:1.6;color:var(--text)">
+      <p><strong>4 D1 таблиці:</strong> <code>ideas</code>, <code>idea_proposals</code> (versioned), <code>idea_comments</code>, <code>idea_audit_log</code></p>
+      <p><strong>7 Worker endpoints:</strong> sections · draft-proposal · save-proposal · send-proposal · respond · transition · full</p>
+      <p><strong>Pipeline:</strong> <code>open → proposed → approved / changes_requested → in_progress → done</code></p>
+      <p><strong>3 email templates через Resend</strong> (sender <code>noreply@sneco.ua</code>): proposal sent → author · author responded → admins · implementation done → author</p>
+      <p><strong>Auto-whitelist:</strong> <code>ideas-author</code> block — будь-хто хто подав ідею + admins, без manual whitelist editing.</p>
+      <p><strong>Admin batch endpoint:</strong> <code>/api/ideas/admin-batch-propose</code> з X-Sync-Key auth — для batch send proposals через script.</p>
+    </div>
+  </details>
+
+  <details style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin:8px 0">
+    <summary style="cursor:pointer;font-weight:700;font-size:14px;color:var(--text)">🚀 <span data-lang="uk">GitHub Pages deploy chain</span><span data-lang="en">Deploy chain</span></summary>
+    <div style="padding-top:14px;font-size:12.5px;line-height:1.6;color:var(--text)">
+      <p><strong>Script:</strong> <code>~/snEco/brand/publish-to-pages.sh "commit message"</code></p>
+      <p><strong>Flow:</strong> rsync <code>~/snEco/brand/</code> → <code>~/sneco-brand-book/</code> → <code>index.html</code> (з <code>!snEco_Brand_Guide.html</code>) → git commit + push → GitHub Pages rebuild ~1-2 хв.</p>
+      <p><strong>data.json sync:</strong> через GitHub Action workflow <code>inventory-sync.yml</code> з SSH Deploy Key (<code>BRAND_BOOK_DEPLOY_KEY</code> secret) — постійний, не залежить від моєї сесії.</p>
+    </div>
+  </details>
+
+  <details style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin:8px 0">
+    <summary style="cursor:pointer;font-weight:700;font-size:14px;color:var(--text)">📧 <span data-lang="uk">Daily emails — як налаштовано</span><span data-lang="en">Daily emails setup</span></summary>
+    <div style="padding-top:14px;font-size:12.5px;line-height:1.6;color:var(--text)">
+      <p><strong>3 листи щодня:</strong></p>
+      <ul style="margin:6px 0 6px 20px;padding:0">
+        <li><strong>08:00 KYV — Brand Bible Daily Digest.</strong> Cloudflare Worker cron <code>0 5 * * *</code> UTC у <code>wrangler.toml</code>. Workers AI (llama-3.1-8b) класифікує + Resend.</li>
+        <li><strong>09:00 KYV — Daily KAM Briefing.</strong> GitHub Action <code>daily-briefing.yml</code> cron <code>0 6 * * *</code>. Script <code>daily_briefing.py</code>.</li>
+        <li><strong>10:00 KYV — System Health Audit.</strong> GitHub Action <code>sync-health-check.yml</code> cron <code>0 7 * * *</code>. Script <code>sync_health_check.py</code> (41 check, branded HTML).</li>
+      </ul>
+      <p><strong>Resend sender:</strong> <code>noreply@sneco.ua</code> (domain verified). API key у Worker secrets + GitHub repo secrets.</p>
+    </div>
+  </details>
+
+  <details style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin:8px 0">
+    <summary style="cursor:pointer;font-weight:700;font-size:14px;color:var(--text)">⚠ <span data-lang="uk">Maintenance rule — sec-onboarding must update</span><span data-lang="en">Onboarding maintenance rule</span></summary>
+    <div style="padding-top:14px;font-size:12.5px;line-height:1.6;color:var(--text)">
+      <p><strong>Правило:</strong> при додаванні нової фічі/системи — ОБОВ'ЯЗКОВО оновити відповідну картку у <code>sec-onboarding</code>.</p>
+      <p><strong>Чому:</strong> без онбордингу команда не знає як використовувати новинки. Це core документація, не nice-to-have.</p>
+      <p><strong>Template нової картки:</strong></p>
+      <pre style="background:#f6f6f6;padding:10px;border-radius:6px;font-size:10.5px;overflow-x:auto">&lt;div class="ob-tool-card ob-content-panel active" data-ob-panel="all,{role}"&gt;
+  &lt;div class="ob-tool-icon" style="background:{bg};color:{fg}"&gt;{emoji}&lt;/div&gt;
+  &lt;div class="ob-tool-body"&gt;
+    &lt;div class="ob-tool-title"&gt;{Назва}&lt;/div&gt;
+    &lt;div class="ob-tool-desc"&gt;{Концепція + кейс}&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;a class="ob-tool-cta" href="{URL}"&gt;Спробувати&lt;/a&gt;
+&lt;/div&gt;</pre>
+      <p>Reference у CLAUDE.md → <em>"⚠ MAINTENANCE RULE — секція Онбординг"</em>.</p>
+    </div>
+  </details>
+
+  <details style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin:8px 0">
+    <summary style="cursor:pointer;font-weight:700;font-size:14px;color:var(--text)">📦 <span data-lang="uk">Cloudflare resources</span><span data-lang="en">Cloudflare resources</span></summary>
+    <div style="padding-top:14px;font-size:12.5px;line-height:1.6;color:var(--text)">
+      <p><strong>Account:</strong> <code>6a23c35130eb0a8197cdd0809c4a0695</code> (Workers Paid $5/міс)</p>
+      <p><strong>Worker:</strong> <code>sneco-auth</code> · <code>https://sneco-auth.vg-ab6.workers.dev</code></p>
+      <p><strong>D1:</strong> <code>sneco-bible</code> · UUID <code>aaa513f5-5a90-4b57-a73a-e907c640fd3a</code> · 21 tables · ~240 MB</p>
+      <p><strong>KV namespace:</strong> <code>365fd0b27fe74a73b09a860c09d8a66d</code> (whitelists, OTP codes)</p>
+      <p><strong>R2 bucket:</strong> <code>sneco-files</code> (uploads, idea attachments)</p>
+      <p><strong>Limits:</strong> 30s CPU per request · 10M requests/міс · можна heavy aggregation.</p>
+    </div>
+  </details>
+
+  <details style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin:8px 0">
+    <summary style="cursor:pointer;font-weight:700;font-size:14px;color:var(--text)">🔑 <span data-lang="uk">GitHub repo secrets (для GitHub Actions)</span><span data-lang="en">GitHub secrets</span></summary>
+    <div style="padding-top:14px;font-size:12.5px;line-height:1.6;color:var(--text)">
+      <ul style="margin:0 0 0 20px;padding:0">
+        <li><code>BRAND_BOOK_DEPLOY_KEY</code> — SSH ed25519, write до sneco-brand-book repo</li>
+        <li><code>WORKER_URL</code> — <code>https://sneco-auth.vg-ab6.workers.dev</code></li>
+        <li><code>SYNC_API_KEY</code> — auth для Worker /api/dashboard/* endpoints</li>
+        <li><code>MOYSKLAD_TOKEN</code> — для sync scripts</li>
+        <li><code>RESEND_API_KEY</code> — для daily-briefing / sync-health-check emails</li>
+        <li><code>BRIEFING_TO</code> — <code>vg@sneco.ua</code></li>
+      </ul>
+      <p>Setup інструкція: <code>~/snEco/BRAND_BOOK_TOKEN_SETUP.md</code></p>
+    </div>
+  </details>
 
   <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span><span data-lang="sk">História verzií</span></h3>
 
