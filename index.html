@@ -2277,7 +2277,7 @@ body.is-admin section.admin-only { display: block !important; }
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Bible v2.78.52 · 2026
+    Brand Bible v2.78.53 · 2026
   </div>
 </nav>
 
@@ -2291,7 +2291,7 @@ body.is-admin section.admin-only { display: block !important; }
     <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
     <span data-lang="sk">Jedna ingrediencia. <span class="qr-ns-accent">Žiadne kompromisy.</span> Syrový snack 21. storočia.</span>
   </div>
-  <div class="qr-meta">v2.78.52 · 2026</div>
+  <div class="qr-meta">v2.78.53 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -7273,9 +7273,8 @@ body.is-admin section.admin-only { display: block !important; }
 </section>
 
 <!-- ============================================================
-     ОНБОРДИНГ — інтерактивний гід для команди (v2.78.52)
+     ОНБОРДИНГ v3 (v2.78.53) — логіка розділів + дашборди в кінець
      ⚠ MAINTENANCE RULE: при додаванні фічі — оновити картку.
-     Technical архітектура — окремо у Maintenance секції.
      ============================================================ -->
 <section class="section" id="sec-onboarding" style="padding:56px 64px">
   <div class="section-eyebrow">🎓 <span data-lang="uk">Онбординг</span><span data-lang="en">Onboarding</span><span data-lang="sk">Onboarding</span></div>
@@ -7285,13 +7284,13 @@ body.is-admin section.admin-only { display: block !important; }
     <span data-lang="sk">Práca so snEco — za 5 minút</span>
   </h2>
   <div class="section-lead">
-    <span data-lang="uk">Простий гід по інструментам, які допоможуть тобі у щоденній роботі. Без жаргонів. Обери свою роль — побачиш потрібне саме тобі.</span>
-    <span data-lang="en">Simple guide to the tools you'll use daily. No jargon. Pick your role — see what's relevant.</span>
-    <span data-lang="sk">Jednoduchý sprievodca nástrojmi. Bez žargónu. Vyber rolu — uvidíš čo potrebuješ.</span>
+    <span data-lang="uk">Простий гід по інструментам snEco для команди. Обери свою роль — побачиш потрібне саме тобі. Якщо новачок — починай зверху і йди вниз.</span>
+    <span data-lang="en">Simple guide to snEco team tools. Pick your role above. If new — start from top, go down.</span>
+    <span data-lang="sk">Sprievodca nástrojmi snEco. Vyber rolu. Ak si nový — choď zhora dole.</span>
   </div>
 
-  <!-- ROLE TABS -->
   <style>
+    /* ────────── ROLE TABS ────────── */
     .ob-role-tabs { display:flex; flex-wrap:wrap; gap:8px; margin:32px 0 24px; }
     .ob-role-tab {
       padding:14px 20px; background:var(--card); border:2px solid var(--border); border-radius:12px;
@@ -7305,6 +7304,47 @@ body.is-admin section.admin-only { display: block !important; }
     .ob-content-panel.active { display:block; animation:fadeIn .25s; }
     @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
+    /* ────────── QUICK START ────────── */
+    .ob-quick-start {
+      background:linear-gradient(135deg,#1E1E1E 0%,#2A2A2A 100%); color:#fff;
+      border-radius:14px; padding:28px 32px; margin:32px 0;
+    }
+    .ob-quick-start h3 { margin:0 0 16px; font-size:20px; font-weight:800; color:#FEBF27; }
+    .ob-quick-start ol { margin:0; padding-left:24px; font-size:14px; line-height:1.8; }
+    .ob-quick-start ol li { margin-bottom:6px; }
+    .ob-quick-start a { color:#FEBF27; text-decoration:underline; }
+
+    /* ────────── SECTION INTRO (нова — пояснення груп) ────────── */
+    .ob-chapter {
+      margin:48px 0 16px;
+      padding:14px 18px;
+      background:linear-gradient(90deg,#FEBF27 0%,transparent 100%);
+      border-radius:8px;
+    }
+    .ob-chapter h3 {
+      margin:0; font-size:22px; font-weight:800; color:#1E1E1E; letter-spacing:-.02em;
+    }
+    .ob-chapter p { margin:6px 0 0; font-size:13.5px; color:#7a5a00; line-height:1.55; }
+
+    /* ────────── BRAND BIBLE GROUPS GRID ────────── */
+    .ob-bb-groups {
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr));
+      gap:14px; margin:20px 0 32px;
+    }
+    .ob-bb-group {
+      background:var(--card); border:1px solid var(--border); border-radius:12px;
+      padding:18px 20px; transition:all .15s;
+    }
+    .ob-bb-group:hover { box-shadow:0 4px 12px rgba(0,0,0,.05); transform:translateY(-1px); }
+    .ob-bb-group .lbl {
+      font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.6px;
+      color:var(--text-muted); margin-bottom:8px;
+    }
+    .ob-bb-group h4 { margin:0 0 8px; font-size:16px; font-weight:800; }
+    .ob-bb-group p { margin:0 0 10px; font-size:12.5px; line-height:1.5; color:var(--text-muted); }
+    .ob-bb-group ul { margin:0; padding-left:18px; font-size:12px; color:var(--text); line-height:1.7; }
+
+    /* ────────── TOOL CARDS (existing) ────────── */
     .ob-tool-card {
       display:grid; grid-template-columns:60px 1fr auto; gap:18px; align-items:center;
       padding:20px 22px; background:var(--card); border:1px solid var(--border);
@@ -7327,15 +7367,44 @@ body.is-admin section.admin-only { display: block !important; }
     .ob-tool-cta.secondary { background:transparent; border:1.5px solid var(--border); color:var(--text); }
     .ob-tool-cta.secondary:hover { border-color:#1E1E1E; background:#1E1E1E; color:#fff; }
 
-    .ob-quick-start {
-      background:linear-gradient(135deg,#1E1E1E 0%,#2A2A2A 100%); color:#fff;
-      border-radius:14px; padding:28px 32px; margin:32px 0;
+    /* ────────── SECTION DETAIL CARDS ────────── */
+    .ob-sec-card {
+      background:var(--card); border:1px solid var(--border); border-radius:12px;
+      padding:18px 22px; margin:10px 0;
     }
-    .ob-quick-start h3 { margin:0 0 16px; font-size:20px; font-weight:800; color:#FEBF27; }
-    .ob-quick-start ol { margin:0; padding-left:24px; font-size:14px; line-height:1.8; }
-    .ob-quick-start ol li { margin-bottom:6px; }
-    .ob-quick-start a { color:#FEBF27; text-decoration:underline; }
+    .ob-sec-card .head {
+      display:flex; align-items:center; gap:12px; margin-bottom:10px;
+    }
+    .ob-sec-card .head .ic {
+      width:38px; height:38px; border-radius:10px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:18px; background:rgba(254,191,39,.15); color:#996600; flex-shrink:0;
+    }
+    .ob-sec-card .head h4 { margin:0; font-size:15px; font-weight:800; flex:1; }
+    .ob-sec-card .head a {
+      font-size:12px; color:#996600; text-decoration:none; font-weight:600; white-space:nowrap;
+    }
+    .ob-sec-card .head a:hover { color:#1E1E1E; text-decoration:underline; }
+    .ob-sec-card .what {
+      font-size:12.5px; color:var(--text); line-height:1.55; margin-bottom:8px;
+    }
+    .ob-sec-card .why {
+      font-size:12px; color:var(--text-muted); line-height:1.5;
+      padding:8px 12px; background:rgba(150,193,31,.08); border-left:3px solid var(--g);
+      border-radius:4px; margin-top:6px;
+    }
+    .ob-sec-card .why strong { color:#557a00; }
 
+    /* ────────── DASHBOARDS GRID — у кінці ────────── */
+    .ob-dash-banner {
+      background:linear-gradient(135deg,#5e3aa0 0%,#7e57c2 100%); color:#fff;
+      border-radius:14px; padding:28px 32px; margin:48px 0 20px;
+      text-align:center;
+    }
+    .ob-dash-banner h3 { margin:0 0 8px; font-size:22px; font-weight:800; }
+    .ob-dash-banner p { margin:0; font-size:14px; line-height:1.55; opacity:.9; }
+
+    /* ────────── FAQ ────────── */
     .ob-faq details {
       background:var(--card); border:1px solid var(--border); border-radius:10px;
       padding:14px 18px; margin:8px 0; cursor:pointer;
@@ -7356,299 +7425,593 @@ body.is-admin section.admin-only { display: block !important; }
     }
   </style>
 
+  <!-- ROLE TABS -->
   <div class="ob-role-tabs" role="tablist">
-    <button class="ob-role-tab active" data-ob-role="all" type="button">
-      <span class="icon">👥</span><span data-lang="uk">Все</span><span data-lang="en">All</span><span data-lang="sk">Všetko</span>
-    </button>
-    <button class="ob-role-tab" data-ob-role="kam" type="button">
-      <span class="icon">🤝</span><span data-lang="uk">KAM / Sales</span><span data-lang="en">KAM / Sales</span><span data-lang="sk">KAM / Predaj</span>
-    </button>
-    <button class="ob-role-tab" data-ob-role="marketing" type="button">
-      <span class="icon">📣</span><span data-lang="uk">Маркетинг</span><span data-lang="en">Marketing</span><span data-lang="sk">Marketing</span>
-    </button>
-    <button class="ob-role-tab" data-ob-role="production" type="button">
-      <span class="icon">🏭</span><span data-lang="uk">Виробництво</span><span data-lang="en">Production</span><span data-lang="sk">Výroba</span>
-    </button>
-    <button class="ob-role-tab" data-ob-role="finance" type="button">
-      <span class="icon">💰</span><span data-lang="uk">Фінанси</span><span data-lang="en">Finance</span><span data-lang="sk">Financie</span>
-    </button>
-    <button class="ob-role-tab" data-ob-role="new" type="button">
-      <span class="icon">🆕</span><span data-lang="uk">Новачок</span><span data-lang="en">New member</span><span data-lang="sk">Nový člen</span>
-    </button>
+    <button class="ob-role-tab active" data-ob-role="all" type="button"><span class="icon">👥</span><span data-lang="uk">Все</span><span data-lang="en">All</span><span data-lang="sk">Všetko</span></button>
+    <button class="ob-role-tab" data-ob-role="new" type="button"><span class="icon">🆕</span><span data-lang="uk">Новачок</span><span data-lang="en">New</span><span data-lang="sk">Nový</span></button>
+    <button class="ob-role-tab" data-ob-role="kam" type="button"><span class="icon">🤝</span><span data-lang="uk">KAM / Sales</span><span data-lang="en">KAM/Sales</span><span data-lang="sk">KAM</span></button>
+    <button class="ob-role-tab" data-ob-role="marketing" type="button"><span class="icon">📣</span><span data-lang="uk">Маркетинг</span><span data-lang="en">Marketing</span><span data-lang="sk">Marketing</span></button>
+    <button class="ob-role-tab" data-ob-role="production" type="button"><span class="icon">🏭</span><span data-lang="uk">Виробництво</span><span data-lang="en">Production</span><span data-lang="sk">Výroba</span></button>
+    <button class="ob-role-tab" data-ob-role="finance" type="button"><span class="icon">💰</span><span data-lang="uk">Фінанси</span><span data-lang="en">Finance</span><span data-lang="sk">Financie</span></button>
   </div>
 
-  <!-- QUICK START для новачка — показується тільки якщо role=new або all -->
+  <!-- QUICK START -->
   <div class="ob-content-panel active" data-ob-panel="all,new">
     <div class="ob-quick-start">
-      <h3>🚀 <span data-lang="uk">Швидкий старт за 3 хвилини</span><span data-lang="en">Quick start in 3 minutes</span><span data-lang="sk">Rýchly štart za 3 minúty</span></h3>
+      <h3>🚀 <span data-lang="uk">Швидкий старт за 3 хвилини</span><span data-lang="en">Quick start in 3 min</span><span data-lang="sk">Rýchly štart</span></h3>
       <ol>
-        <li data-lang="uk">Відкрий <a href="https://brand.sneco.ua/" target="_self">brand.sneco.ua</a> — це твій головний хаб</li>
+        <li data-lang="uk">Відкрий <a href="https://brand.sneco.ua/">brand.sneco.ua</a> — це твій головний хаб</li>
         <li data-lang="uk">Якщо щось закрите 🔐 — натисни <strong>Sign in with Google</strong> (твоя робоча пошта <code>@sneco.ua</code> має бути у whitelist)</li>
         <li data-lang="uk">Маєш ідею як покращити процес? <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false;">Додай у "💡 Пропозиції"</a> — vg відповість за тиждень</li>
-        <li data-lang="uk">Що тобі знадобиться щодня — обери свою роль вгорі ↑</li>
-        <li data-lang="en">Open <a href="https://brand.sneco.ua/">brand.sneco.ua</a> — your main hub</li>
-        <li data-lang="en">If locked 🔐 — Sign in with Google (your <code>@sneco.ua</code> must be whitelisted)</li>
-        <li data-lang="en">Got an improvement idea? Add it to "💡 Ideas" — vg will respond within a week</li>
-        <li data-lang="en">For daily tools — pick your role above</li>
-        <li data-lang="sk">Otvor brand.sneco.ua · Pri 🔐 — Sign in s Google · Nápad — pridaj do Ideas · Vyber rolu hore</li>
+        <li data-lang="uk">Прочитай нижче як влаштована Brand Bible — це фундамент усього</li>
+        <li data-lang="uk">Потім подивись свою роль вгорі ↑ — побачиш потрібні дашборди</li>
       </ol>
     </div>
   </div>
 
-  <!-- TOOL CARDS — кожна з data-ob-roles -->
-
-  <!-- IDEAS WORKFLOW — для всіх -->
-  <div class="ob-tool-card ob-content-panel active" data-ob-panel="all,kam,marketing,production,finance,new">
-    <div class="ob-tool-icon" style="background:rgba(254,191,39,.18);color:#996600">💡</div>
-    <div class="ob-tool-body">
-      <div class="ob-tool-title" data-lang-group>
-        <span data-lang="uk">Пропозиції — твоя ідея → готова система</span>
-        <span data-lang="en">Ideas — your idea → live system</span>
-        <span data-lang="sk">Návrhy — tvoj nápad → systém</span>
-      </div>
-      <div class="ob-tool-desc">
-        <span data-lang="uk">Бачиш проблему або маєш ідею? Додай тут — vg підготує рішення за тиждень, ти погодиш або зміниш, і ми реалізовуємо. <strong>Кейс:</strong> Альона запропонувала таблицю ваг упаковки → vg підготував → реалізовано у Packaging секції.</span>
-        <span data-lang="en">See a problem or have an idea? Add here — vg drafts solution in 1 week, you approve or refine, then we ship. <strong>Case:</strong> Альона proposed pack weights table → vg drafted → shipped to Packaging.</span>
-      </div>
-    </div>
-    <a class="ob-tool-cta" href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false;"><span data-lang="uk">Спробувати</span><span data-lang="en">Try it</span><span data-lang="sk">Vyskúšať</span></a>
+  <!-- ═══════════════════════════════════════════════════════════
+       РОЗДІЛ 1. ЯК ВЛАШТОВАНА BRAND BIBLE — структура книги
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="ob-chapter ob-content-panel active" data-ob-panel="all,new,kam,marketing,production,finance">
+    <h3>📖 <span data-lang="uk">1. Як влаштована Brand Bible</span><span data-lang="en">1. How Brand Bible is structured</span></h3>
+    <p data-lang="uk">Brand Bible — центральне місце правди про snEco. Це live онлайн-документ з 5 групами секцій. Кожна група — окрема функція. Знай де що шукати — не питай команду.</p>
+    <p data-lang="en">Brand Bible — central source of truth for snEco. Live online doc with 5 section groups. Know where to look, don't ask the team.</p>
   </div>
 
-  <!-- CUSTOMER 360 — KAM / sales -->
-  <div class="ob-tool-card ob-content-panel active" data-ob-panel="all,kam">
-    <div class="ob-tool-icon" style="background:rgba(150,193,31,.18);color:#557a00">👥</div>
-    <div class="ob-tool-body">
-      <div class="ob-tool-title" data-lang-group>
-        <span data-lang="uk">Customer 360 — все про клієнта на одній сторінці</span>
-        <span data-lang="en">Customer 360 — everything about a client on one page</span>
-        <span data-lang="sk">Customer 360 — všetko o klientovi na jednej stránke</span>
-      </div>
-      <div class="ob-tool-desc">
-        <span data-lang="uk">Перед дзвінком до Сільпо натисни / → введи "сіль" → побачиш: всю історію замовлень, чи є борг, що зазвичай купують, чи варто пропонувати нове. <strong>Замість</strong>: відкривати MoySklad → робити 5 звітів → рахувати в Excel.</span>
-        <span data-lang="en">Before calling Silpo press / → type "sil" → see: full order history, debts, top SKUs, cross-sell opportunities. <strong>Instead of</strong>: opening MoySklad → running 5 reports.</span>
-      </div>
+  <div class="ob-bb-groups ob-content-panel active" data-ob-panel="all,new,kam,marketing,production,finance">
+    <div class="ob-bb-group">
+      <div class="lbl"><span data-lang="uk">Група 1</span><span data-lang="en">Group 1</span></div>
+      <h4>📜 <span data-lang="uk">Вступ</span><span data-lang="en">Introduction</span></h4>
+      <p data-lang="uk">Хто ми, для чого існуємо, як виникли. Це <em>чому</em> — основа стратегії.</p>
+      <p data-lang="en">Who we are, why we exist. The <em>"why"</em>.</p>
+      <ul>
+        <li data-lang="uk">Маніфест — north star</li>
+        <li data-lang="uk">Про бренд — архітектура</li>
+        <li data-lang="uk">Команда — хто за що</li>
+        <li data-lang="uk">Історія & VacWave</li>
+        <li data-lang="uk">Меседжі & слогани</li>
+        <li data-lang="en">Manifesto</li>
+        <li data-lang="en">About brand</li>
+        <li data-lang="en">Team & org</li>
+        <li data-lang="en">History & VacWave</li>
+      </ul>
     </div>
-    <a class="ob-tool-cta" href="https://brand.sneco.ua/dashboard/customer-360/customer-360.html" target="_blank">Customer 360 →</a>
+
+    <div class="ob-bb-group">
+      <div class="lbl"><span data-lang="uk">Група 2</span></div>
+      <h4>🎨 <span data-lang="uk">Ідентичність</span><span data-lang="en">Identity</span></h4>
+      <p data-lang="uk">Як snEco виглядає і звучить. Це <em>обличчя</em> — використовується в усіх комунікаціях.</p>
+      <p data-lang="en">How snEco looks and sounds. Used in all communications.</p>
+      <ul>
+        <li data-lang="uk">Візуальна (лого, кольори, шрифти)</li>
+        <li data-lang="uk">Голос — як ми пишемо/говоримо</li>
+        <li data-lang="uk">Фотографія — стиль референсів</li>
+        <li data-lang="en">Visual (logo, colors, fonts)</li>
+        <li data-lang="en">Voice — how we write</li>
+        <li data-lang="en">Photography style</li>
+      </ul>
+    </div>
+
+    <div class="ob-bb-group">
+      <div class="lbl"><span data-lang="uk">Група 3</span></div>
+      <h4>🚀 <span data-lang="uk">Застосування</span><span data-lang="en">Application</span></h4>
+      <p data-lang="uk">Готові інструменти для кожного каналу. Це <em>як</em> — практичні правила.</p>
+      <p data-lang="en">Ready tools per channel. The <em>"how"</em>.</p>
+      <ul>
+        <li data-lang="uk">Digital — сайт, соцмережі</li>
+        <li data-lang="uk">Упаковка & друк</li>
+        <li data-lang="uk">Міжнародна (EU/US)</li>
+        <li data-lang="uk">PR & кризові</li>
+        <li data-lang="uk">Sales — прайси, sales kit</li>
+        <li data-lang="uk">Legal — договори</li>
+        <li data-lang="uk">Точки контакту</li>
+        <li data-lang="en">Digital · Packaging · International · PR · Sales · Legal · Touchpoints</li>
+      </ul>
+    </div>
+
+    <div class="ob-bb-group">
+      <div class="lbl"><span data-lang="uk">Група 4</span></div>
+      <h4>📚 <span data-lang="uk">Сервіс</span><span data-lang="en">Reference</span></h4>
+      <p data-lang="uk">Документи, гіди, історія версій. Це <em>support</em> — куди ходити по факти.</p>
+      <p data-lang="en">Docs, guides, version history.</p>
+      <ul>
+        <li data-lang="uk">🎓 Онбординг (це тут)</li>
+        <li data-lang="uk">Документи — сертифікати, патенти</li>
+        <li data-lang="uk">ЗМІ про нас — публікації</li>
+        <li data-lang="uk">Maintenance — admin tools</li>
+        <li data-lang="en">Onboarding (you're here)</li>
+        <li data-lang="en">Documents</li>
+        <li data-lang="en">Press coverage</li>
+      </ul>
+    </div>
+
+    <div class="ob-bb-group">
+      <div class="lbl"><span data-lang="uk">Група 5</span></div>
+      <h4>💡 <span data-lang="uk">Колаборація</span><span data-lang="en">Collaboration</span></h4>
+      <p data-lang="uk">Місце де команда впливає на продукт. Це <em>зворотний зв'язок</em>.</p>
+      <p data-lang="en">Where the team shapes the product.</p>
+      <ul>
+        <li data-lang="uk">💡 Пропозиції — твої ідеї</li>
+        <li data-lang="uk">(майбутнє) Voting, comments</li>
+        <li data-lang="en">💡 Ideas — your suggestions</li>
+      </ul>
+    </div>
   </div>
 
-  <!-- FINANCE DASHBOARD — finance only -->
-  <div class="ob-tool-card ob-content-panel active" data-ob-panel="all,finance">
-    <div class="ob-tool-icon" style="background:rgba(27,67,50,.15);color:#1B4332">💰</div>
-    <div class="ob-tool-body">
-      <div class="ob-tool-title" data-lang-group>
-        <span data-lang="uk">Finance Dashboard — скільки грошей зараз і хто винний</span>
-        <span data-lang="en">Finance Dashboard — cash & who owes</span>
-        <span data-lang="sk">Finance Dashboard — peniaze a dlžníci</span>
-      </div>
-      <div class="ob-tool-desc">
-        <span data-lang="uk">Понеділок 09:00 → відкрив → побачив: загальну виручку місяця, AR aging (хто прострочив), ТОП-10 боржників з кнопкою <em>"📞 Подзвонити"</em>. <strong>Кейс:</strong> Пилип ранок → топ-3 боржника &gt;90 днів → пише з нагадуванням.</span>
-        <span data-lang="en">Monday 9 AM → open → see: month revenue, AR aging, TOP-10 debtors with "📞 Call" button. <strong>Case:</strong> Pylyp morning → top-3 overdue → sends reminders.</span>
-      </div>
-    </div>
-    <a class="ob-tool-cta" href="https://brand.sneco.ua/dashboard/finance/finance.html" target="_blank">Finance →</a>
+  <!-- ═══════════════════════════════════════════════════════════
+       РОЗДІЛ 2. ДЕТАЛЬНО ПО СЕКЦІЯХ — навіщо кожна
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="ob-chapter ob-content-panel active" data-ob-panel="all,new,kam,marketing,production,finance">
+    <h3>🔍 <span data-lang="uk">2. Що у кожній секції — логіка і кейси</span><span data-lang="en">2. What's in each section — logic + use cases</span></h3>
+    <p data-lang="uk">Кожна секція має конкретну роль. Якщо знаєш — швидко знаходиш потрібне.</p>
   </div>
 
-  <!-- INVENTORY — для виробництва -->
-  <div class="ob-tool-card ob-content-panel active" data-ob-panel="all,production">
-    <div class="ob-tool-icon" style="background:rgba(94,58,160,.15);color:#5e3aa0">📦</div>
-    <div class="ob-tool-body">
-      <div class="ob-tool-title" data-lang-group>
-        <span data-lang="uk">Inventory — поточний stock та що треба замовити</span>
-        <span data-lang="en">Inventory — current stock & what to order</span>
-        <span data-lang="sk">Inventory — aktuálny sklad</span>
+  <!-- INTRODUCTION SECTIONS -->
+  <div class="ob-content-panel active" data-ob-panel="all,new,marketing">
+    <div class="ob-sec-card">
+      <div class="head"><div class="ic">⭐</div><h4 data-lang-group><span data-lang="uk">Маніфест</span><span data-lang="en">Manifesto</span></h4><a href="#sec-manifesto" onclick="document.querySelector('[data-target=manifesto]')?.click();return false;">→ Відкрити</a></div>
+      <div class="what" data-lang-group>
+        <span data-lang="uk"><strong>Що це:</strong> філософія бренду одним документом — north star "Один інгредієнт. Жодних компромісів. Сирний снек XXI ст."</span>
+        <span data-lang="en"><strong>What:</strong> brand philosophy in one doc — north star "One ingredient. No compromises."</span>
       </div>
-      <div class="ob-tool-desc">
-        <span data-lang="uk">Перед PO на сир-сировину: відкрий → побачиш поточний stock + темп продажів за 30 днів → розрахуєш точну кількість для замовлення.</span>
-        <span data-lang="en">Before raw cheese PO: open → see current stock + 30-day sales tempo → calculate exact order quantity.</span>
-      </div>
-    </div>
-    <a class="ob-tool-cta" href="https://brand.sneco.ua/dashboard/inventory/inventory.html" target="_blank">Inventory →</a>
-  </div>
-
-  <!-- PRODUCTION — для виробництва -->
-  <div class="ob-tool-card ob-content-panel active" data-ob-panel="all,production">
-    <div class="ob-tool-icon" style="background:rgba(232,64,64,.13);color:#a00">🏭</div>
-    <div class="ob-tool-body">
-      <div class="ob-tool-title" data-lang-group>
-        <span data-lang="uk">Production — виробничі цикли та output</span>
-        <span data-lang="en">Production — cycles & output</span>
-        <span data-lang="sk">Production — výrobné cykly</span>
-      </div>
-      <div class="ob-tool-desc">
-        <span data-lang="uk">Тижневий monitoring: output per SKU vs plan, dead stock alerts, час на партію. <strong>Кейс:</strong> Богдан п'ятниця → ревʼю тижня → бачить що Cheddar 28г недовиробив 15% → коригує наступний тиждень.</span>
-        <span data-lang="en">Weekly monitoring: output per SKU vs plan, dead stock alerts, batch times.</span>
+      <div class="why" data-lang-group>
+        <span data-lang="uk"><strong>Навіщо:</strong> щоб ВСІ рішення (від нового SKU до email-підпису) звірятися з єдиним напрямком. Якщо щось суперечить маніфесту — НЕ робимо.</span>
+        <span data-lang="en"><strong>Why:</strong> all decisions verified against single direction.</span>
       </div>
     </div>
-    <a class="ob-tool-cta" href="https://brand.sneco.ua/dashboard/production/production.html" target="_blank">Production →</a>
-  </div>
 
-  <!-- SALES ANALYTICS — KAM -->
-  <div class="ob-tool-card ob-content-panel active" data-ob-panel="all,kam">
-    <div class="ob-tool-icon" style="background:rgba(59,130,246,.13);color:#3B82F6">📈</div>
-    <div class="ob-tool-body">
-      <div class="ob-tool-title" data-lang-group>
-        <span data-lang="uk">Sales Analytics — продажі + action items на сьогодні</span>
-        <span data-lang="en">Sales Analytics — sales + today's action items</span>
-        <span data-lang="sk">Sales Analytics — predaj a denné úlohy</span>
+    <div class="ob-sec-card">
+      <div class="head"><div class="ic">🧬</div><h4 data-lang-group><span data-lang="uk">Про бренд</span><span data-lang="en">About brand</span></h4><a href="#sec-intro" onclick="document.querySelector('[data-target=intro]')?.click();return false;">→ Відкрити</a></div>
+      <div class="what" data-lang-group>
+        <span data-lang="uk"><strong>Що це:</strong> архітектура бренду — позиціонування, target audience, унікальна цінність, конкурентний контекст.</span>
+        <span data-lang="en"><strong>What:</strong> brand architecture — positioning, audience, USP, competitive context.</span>
       </div>
-      <div class="ob-tool-desc">
-        <span data-lang="uk">Ранкова рутина: відкрив → Action Items tab → побачив 5 sleeping clients за тиждень → дзвонитимеш. + funnel orders→shipments→payments, concentration risk.</span>
-        <span data-lang="en">Morning routine: open → Action Items → see 5 sleeping clients → call them.</span>
+      <div class="why" data-lang-group>
+        <span data-lang="uk"><strong>Навіщо:</strong> sales перед першою розмовою з партнером → 5 хв читає → знає як подавати snEco. Маркетинг перед новою кампанією → перевіряє чи в стилі.</span>
+        <span data-lang="en"><strong>Why:</strong> sales before first partner call — 5 min read = knows how to pitch.</span>
       </div>
     </div>
-    <a class="ob-tool-cta" href="https://brand.sneco.ua/dashboard/dashboard.html" target="_blank">Sales →</a>
-  </div>
 
-  <!-- PRICE LISTS — sales/marketing -->
-  <div class="ob-tool-card ob-content-panel active" data-ob-panel="all,kam,marketing">
-    <div class="ob-tool-icon" style="background:rgba(254,191,39,.18);color:#996600">💰</div>
-    <div class="ob-tool-body">
-      <div class="ob-tool-title" data-lang-group>
-        <span data-lang="uk">Прайс-листи — актуальні ціни для партнерів</span>
-        <span data-lang="en">Price lists — current prices for partners</span>
-        <span data-lang="sk">Cenníky — aktuálne ceny</span>
+    <div class="ob-sec-card">
+      <div class="head"><div class="ic">👥</div><h4 data-lang-group><span data-lang="uk">Команда &amp; орг-структура</span><span data-lang="en">Team &amp; org</span></h4><a href="#sec-team" onclick="document.querySelector('[data-target=team]')?.click();return false;">→ Відкрити</a></div>
+      <div class="what" data-lang-group>
+        <span data-lang="uk"><strong>Що це:</strong> інтерактивна org-chart — хто за що відповідає у snEco UA + Sneco SK. Click на людину → роль + контакти.</span>
+        <span data-lang="en"><strong>What:</strong> interactive org chart — who owns what. Click person → role + contacts.</span>
       </div>
-      <div class="ob-tool-desc">
-        <span data-lang="uk">Закриті password gate'ом. Усі 28 SKU з EAN-кодами, дистрибʼюторськими/оптовими/РРЦ цінами. <strong>Тільки</strong> для команди і затверджених партнерів.</span>
-        <span data-lang="en">Locked behind password gate. All 28 SKUs with EAN codes, distributor/wholesale/RRC prices.</span>
+      <div class="why" data-lang-group>
+        <span data-lang="uk"><strong>Навіщо:</strong> новачок не знає до кого з яким питанням. Орг-чарт відповідає за 10 секунд: фінанси → Пилип, KAM → Ярослав/Валентина, експорт → Ірина.</span>
+        <span data-lang="en"><strong>Why:</strong> who to ask for what — answers in 10 sec.</span>
       </div>
     </div>
-    <a class="ob-tool-cta" href="#sec-prices" onclick="document.querySelector('[data-target=prices]')?.click();return false;"><span data-lang="uk">Sales секція</span><span data-lang="en">Sales section</span></a>
-  </div>
 
-  <!-- BRAND VOICE / PHOTO — для marketing -->
-  <div class="ob-tool-card ob-content-panel active" data-ob-panel="all,marketing">
-    <div class="ob-tool-icon" style="background:rgba(150,193,31,.18);color:#557a00">🎨</div>
-    <div class="ob-tool-body">
-      <div class="ob-tool-title" data-lang-group>
-        <span data-lang="uk">Бренд — voice, photo, packaging, claims</span>
-        <span data-lang="en">Brand — voice, photo, packaging, claims</span>
-        <span data-lang="sk">Bránd — hlas, foto, balenie, posolstvá</span>
+    <div class="ob-sec-card">
+      <div class="head"><div class="ic">🔬</div><h4 data-lang-group><span data-lang="uk">Історія &amp; VacWave</span><span data-lang="en">History &amp; VacWave</span></h4><a href="#sec-story" onclick="document.querySelector('[data-target=story]')?.click();return false;">→ Відкрити</a></div>
+      <div class="what" data-lang-group>
+        <span data-lang="uk"><strong>Що це:</strong> історія snEco (2018 → 2026 · 25× зростання) + опис VacWave Bio Nutrition (запатентована, Patent UA №139035, 36-38°C, НЕ NASA).</span>
+        <span data-lang="en"><strong>What:</strong> snEco history + VacWave Bio Nutrition technology description.</span>
       </div>
-      <div class="ob-tool-desc">
-        <span data-lang="uk">Готуєш пост у Instagram, лист партнеру, нову етикетку? Дивись референси: тон голосу, photo style, packaging mockups, claims та слогани. Не вигадуй з нуля.</span>
-        <span data-lang="en">Preparing Instagram post, partner email, new label? Check references: tone of voice, photo style, packaging mockups, claims.</span>
+      <div class="why" data-lang-group>
+        <span data-lang="uk"><strong>Навіщо:</strong> прес/інвестори/нові партнери питають "чим ви унікальні?" — тут ТОЧНА термінологія. <strong>Запам'ятай:</strong> ми НЕ кажемо "NASA technology" — це наша власна патентована.</span>
+        <span data-lang="en"><strong>Why:</strong> press/investors/partners ask "what's unique?" — exact terminology here.</span>
       </div>
     </div>
-    <a class="ob-tool-cta secondary" href="#sec-voice" onclick="document.querySelector('[data-target=voice]')?.click();return false;">Brand →</a>
-  </div>
 
-  <!-- DOCUMENTS — для всіх -->
-  <div class="ob-tool-card ob-content-panel active" data-ob-panel="all,kam,marketing,finance,new">
-    <div class="ob-tool-icon" style="background:rgba(138,138,138,.18);color:#555">📄</div>
-    <div class="ob-tool-body">
-      <div class="ob-tool-title" data-lang-group>
-        <span data-lang="uk">Документи — сертифікати, патенти, нагороди</span>
-        <span data-lang="en">Documents — certificates, patents, awards</span>
-        <span data-lang="sk">Dokumenty — certifikáty, patenty, ocenenia</span>
+    <div class="ob-sec-card">
+      <div class="head"><div class="ic">💬</div><h4 data-lang-group><span data-lang="uk">Меседжі &amp; слогани</span><span data-lang="en">Claims &amp; slogans</span></h4><a href="#sec-claims" onclick="document.querySelector('[data-target=claims]')?.click();return false;">→ Відкрити</a></div>
+      <div class="what" data-lang-group>
+        <span data-lang="uk"><strong>Що це:</strong> готові фрази-claims (high protein, 0 цукру, 100% натуральний сир) + перевірені слогани для headlines.</span>
+        <span data-lang="en"><strong>What:</strong> ready claims + tested slogans for headlines.</span>
       </div>
-      <div class="ob-tool-desc">
-        <span data-lang="uk">Партнер просить FSSC або HACCP? Sales lead запитує SIAL Grand Prix? Все тут — клік → PDF → forward у пошту. <strong>Не питай</strong> у Богдана/Левка кожен раз.</span>
-        <span data-lang="en">Partner asks for FSSC/HACCP? Sales lead asks about SIAL? All here — click → PDF → forward.</span>
+      <div class="why" data-lang-group>
+        <span data-lang="uk"><strong>Навіщо:</strong> маркетинг не вигадує з нуля — копіює перевірені claims, які <strong>юридично безпечні</strong> (всі підтверджені lab-tests + сертифікатами).</span>
+        <span data-lang="en"><strong>Why:</strong> marketing copies legally safe claims (lab-tested).</span>
       </div>
     </div>
-    <a class="ob-tool-cta secondary" href="#sec-documents" onclick="document.querySelector('[data-target=documents]')?.click();return false;"><span data-lang="uk">Документи</span><span data-lang="en">Documents</span></a>
   </div>
 
-  <!-- DAILY EMAIL — для vg -->
-  <div class="ob-tool-card ob-content-panel active" data-ob-panel="all,kam,finance">
-    <div class="ob-tool-icon" style="background:rgba(59,130,246,.13);color:#1d5fa6">📧</div>
-    <div class="ob-tool-body">
-      <div class="ob-tool-title" data-lang-group>
-        <span data-lang="uk">Щоденні емейли — система сама пише vg вранці</span>
-        <span data-lang="en">Daily emails — system writes vg every morning</span>
-        <span data-lang="sk">Denné e-maily — systém píše vg ráno</span>
+  <!-- IDENTITY SECTIONS -->
+  <div class="ob-content-panel active" data-ob-panel="all,marketing">
+    <div class="ob-sec-card">
+      <div class="head"><div class="ic">🎨</div><h4 data-lang-group><span data-lang="uk">Візуальна система</span><span data-lang="en">Visual system</span></h4><a href="#sec-visual" onclick="document.querySelector('[data-target=visual]')?.click();return false;">→ Відкрити</a></div>
+      <div class="what" data-lang-group>
+        <span data-lang="uk"><strong>Що це:</strong> логотипи (4 варіанти × 3 формати: SVG/PNG/AI) + палітра (#FEBF27 жовтий, #96C11F зелений, #1E1E1E чорний) + шрифти (Qanelas Soft + HighVoltage Rough).</span>
+        <span data-lang="en"><strong>What:</strong> logos + colors + fonts.</span>
       </div>
-      <div class="ob-tool-desc">
-        <span data-lang="uk">Прокинувся, відкрив пошту — побачив: нові ідеї команди, action items на день, статус всіх систем. Не треба відкривати 5 дашбордів вранці.</span>
-        <span data-lang="en">Wake up, open mail — see: new team ideas, action items, system status. No need to open 5 dashboards.</span>
+      <div class="why" data-lang-group>
+        <span data-lang="uk"><strong>Навіщо:</strong> дизайнер робить новий банер → завантажує logo SVG → бере точний HEX-код → не "приблизно жовтий", а наш фірмовий. Consistency на 100%.</span>
+        <span data-lang="en"><strong>Why:</strong> designer downloads exact assets, not "approximately yellow".</span>
       </div>
     </div>
-    <a class="ob-tool-cta secondary" href="#sec-documents" onclick="document.querySelectorAll('.ob-faq details').forEach(d => d.open = true);document.querySelector('.ob-faq')?.scrollIntoView({behavior:'smooth'});return false;"><span data-lang="uk">FAQ нижче ↓</span><span data-lang="en">FAQ below ↓</span></a>
+
+    <div class="ob-sec-card">
+      <div class="head"><div class="ic">🗣</div><h4 data-lang-group><span data-lang="uk">Голос бренду</span><span data-lang="en">Voice</span></h4><a href="#sec-voice" onclick="document.querySelector('[data-target=voice]')?.click();return false;">→ Відкрити</a></div>
+      <div class="what" data-lang-group>
+        <span data-lang="uk"><strong>Що це:</strong> tone-of-voice правила — як ми пишемо текст. Do/Don't приклади. Різні tone для UA (тепліше, гумор) vs EU (стриманіше, premium).</span>
+        <span data-lang="en"><strong>What:</strong> tone of voice — how we write. Do/Don't. Different for UA vs EU.</span>
+      </div>
+      <div class="why" data-lang-group>
+        <span data-lang="uk"><strong>Навіщо:</strong> щоб Альона пише Instagram-пост, Ірина — лист німецькому партнеру, Ярослав — sales-deck. <strong>Усі звучать як один бренд</strong>, а не 5 різних людей.</span>
+        <span data-lang="en"><strong>Why:</strong> Альона's Instagram + Ірина's German email + Ярослав's sales deck — sound like one brand.</span>
+      </div>
+    </div>
+
+    <div class="ob-sec-card">
+      <div class="head"><div class="ic">📸</div><h4 data-lang-group><span data-lang="uk">Фотографія</span><span data-lang="en">Photography</span></h4><a href="#sec-photo" onclick="document.querySelector('[data-target=photo]')?.click();return false;">→ Відкрити</a></div>
+      <div class="what" data-lang-group>
+        <span data-lang="uk"><strong>Що це:</strong> photo style guide — освітлення, композиція, реквізит, фон. Approved photos для повторного використання + правила для нових сесій.</span>
+        <span data-lang="en"><strong>What:</strong> photo style guide — lighting, composition, props, backgrounds.</span>
+      </div>
+      <div class="why" data-lang-group>
+        <span data-lang="uk"><strong>Навіщо:</strong> новий фотограф розуміє за 5 хв як знімати snEco — не як коричнева крекер на дерев'яному столі, а як <strong>premium snack у мінімалістичному стилі</strong>.</span>
+        <span data-lang="en"><strong>Why:</strong> new photographer understands in 5 min how to shoot snEco — premium, minimalist.</span>
+      </div>
+    </div>
   </div>
 
-  <!-- FAQ -->
+  <!-- APPLICATION SECTIONS -->
+  <div class="ob-content-panel active" data-ob-panel="all,kam,marketing">
+    <div class="ob-sec-card">
+      <div class="head"><div class="ic">💰</div><h4 data-lang-group><span data-lang="uk">Sales — прайси і playbook</span><span data-lang="en">Sales — prices &amp; playbook</span></h4><a href="#sec-prices" onclick="document.querySelector('[data-target=prices]')?.click();return false;">→ Відкрити (🔐 password)</a></div>
+      <div class="what" data-lang-group>
+        <span data-lang="uk"><strong>Що це:</strong> повний прайс-лист 28 SKU (28г/14г/20г/500г) з 3 рівнями цін (дистриб'ютор/опт/РРЦ), EAN-кодами, термінами зберігання. 🔐 Password-gated.</span>
+        <span data-lang="en"><strong>What:</strong> 28 SKU price list with 3 price levels + EAN codes. 🔐 Password-gated.</span>
+      </div>
+      <div class="why" data-lang-group>
+        <span data-lang="uk"><strong>Навіщо:</strong> Ярослав/Валентина у магазині з потенційним партнером → відкрив телефон → показав live прайс → одразу робить пропозицію. Без Excel-файлу що "застарів 2 місяці".</span>
+        <span data-lang="en"><strong>Why:</strong> KAM with partner — opens phone, shows live price, makes offer instantly.</span>
+      </div>
+    </div>
+
+    <div class="ob-sec-card">
+      <div class="head"><div class="ic">📦</div><h4 data-lang-group><span data-lang="uk">Упаковка &amp; друк</span><span data-lang="en">Packaging &amp; print</span></h4><a href="#sec-packaging" onclick="document.querySelector('[data-target=packaging]')?.click();return false;">→ Відкрити</a></div>
+      <div class="what" data-lang-group>
+        <span data-lang="uk"><strong>Що це:</strong> каталог 11 SKU 90×160 мм з mockups + .ai файли + друкарські PDF. Правила для нових SKU. Стандарти багатомовності.</span>
+        <span data-lang="en"><strong>What:</strong> 11 SKU packaging catalog with mockups + .ai files + print PDFs.</span>
+      </div>
+      <div class="why" data-lang-group>
+        <span data-lang="uk"><strong>Навіщо:</strong> запуск нового смаку (наприклад "Космічний 28г") → дизайнер бере існуючий шаблон → замінює тільки 2-3 елементи → у виробництво за тиждень замість 3 тижнів.</span>
+        <span data-lang="en"><strong>Why:</strong> new SKU launch — designer reuses template, ships in 1 week not 3.</span>
+      </div>
+    </div>
+
+    <div class="ob-sec-card">
+      <div class="head"><div class="ic">🌍</div><h4 data-lang-group><span data-lang="uk">Міжнародна комунікація</span><span data-lang="en">International</span></h4><a href="#sec-international" onclick="document.querySelector('[data-target=international]')?.click();return false;">→ Відкрити</a></div>
+      <div class="what" data-lang-group>
+        <span data-lang="uk"><strong>Що це:</strong> правила для EU/UK/US — Made in EU vs Made in Ukraine рамки, мовні версії пакування, регуляторні відмінності.</span>
+        <span data-lang="en"><strong>What:</strong> EU/UK/US rules — labeling, regulations, language versions.</span>
+      </div>
+      <div class="why" data-lang-group>
+        <span data-lang="uk"><strong>Навіщо:</strong> Ірина у переговорах з Lidl DE — точно знає що ми Sneco SK з NL/PL сировиною = "Made in EU" valid. НЕ змішує з UA даними. Compliance 100%.</span>
+        <span data-lang="en"><strong>Why:</strong> Ірина with Lidl DE — knows compliance details, no mistakes.</span>
+      </div>
+    </div>
+
+    <div class="ob-sec-card">
+      <div class="head"><div class="ic">📰</div><h4 data-lang-group><span data-lang="uk">PR &amp; кризові комунікації</span><span data-lang="en">PR &amp; crisis</span></h4><a href="#sec-pr" onclick="document.querySelector('[data-target=pr]')?.click();return false;">→ Відкрити</a></div>
+      <div class="what" data-lang-group>
+        <span data-lang="uk"><strong>Що це:</strong> готові відповіді на типові запитання журналістів + crisis playbook (якщо щось пішло не так — recall, claim, репутаційна загроза).</span>
+        <span data-lang="en"><strong>What:</strong> press FAQ + crisis playbook (recall, claims, reputation threats).</span>
+      </div>
+      <div class="why" data-lang-group>
+        <span data-lang="uk"><strong>Навіщо:</strong> о 18:00 п'ятниці журналіст пише: "у вашому продукті знайшли X" — Альона НЕ панікує, відкриває crisis playbook → діє за template → 30 хв до відповіді замість 3 діб.</span>
+        <span data-lang="en"><strong>Why:</strong> 6PM Friday journalist message — Альона opens playbook, responds in 30 min.</span>
+      </div>
+    </div>
+
+    <div class="ob-sec-card">
+      <div class="head"><div class="ic">⚖</div><h4 data-lang-group><span data-lang="uk">Legal — реквізити і шаблони</span><span data-lang="en">Legal</span></h4><a href="#sec-legal" onclick="document.querySelector('[data-target=legal]')?.click();return false;">→ Відкрити</a></div>
+      <div class="what" data-lang-group>
+        <span data-lang="uk"><strong>Що це:</strong> юр. реквізити ТОВ «Прайм Снек» і Sneco SK s.r.o. + шаблони NDA, договорів поставки, дистрибʼюторських угод.</span>
+        <span data-lang="en"><strong>What:</strong> legal entities + NDA, supply contract, distributor agreement templates.</span>
+      </div>
+      <div class="why" data-lang-group>
+        <span data-lang="uk"><strong>Навіщо:</strong> sales підписує NDA з потенційним партнером → не йде до юриста за 200 USD → бере шаблон → подає на підпис → угода за день.</span>
+        <span data-lang="en"><strong>Why:</strong> sales signs NDA without lawyer — takes template, ships in 1 day.</span>
+      </div>
+    </div>
+
+    <div class="ob-sec-card">
+      <div class="head"><div class="ic">📍</div><h4 data-lang-group><span data-lang="uk">Точки контакту</span><span data-lang="en">Touchpoints</span></h4><a href="#sec-touchpoints" onclick="document.querySelector('[data-target=touchpoints]')?.click();return false;">→ Відкрити</a></div>
+      <div class="what" data-lang-group>
+        <span data-lang="uk"><strong>Що це:</strong> мапа всіх touchpoints snEco з customer — ритейл-полиця, Instagram, viktorina, e-commerce, виставки, HoReCa.</span>
+        <span data-lang="en"><strong>What:</strong> map of all snEco customer touchpoints.</span>
+      </div>
+      <div class="why" data-lang-group>
+        <span data-lang="uk"><strong>Навіщо:</strong> зрозуміти customer journey — де ми зустрічаємо клієнта, що він бачить, як це впливає на лояльність. Допомагає планувати маркетингові кампанії.</span>
+        <span data-lang="en"><strong>Why:</strong> understand customer journey — plan campaigns better.</span>
+      </div>
+    </div>
+
+    <div class="ob-sec-card">
+      <div class="head"><div class="ic">💻</div><h4 data-lang-group><span data-lang="uk">Digital</span><span data-lang="en">Digital</span></h4><a href="#sec-digital" onclick="document.querySelector('[data-target=digital]')?.click();return false;">→ Відкрити</a></div>
+      <div class="what" data-lang-group>
+        <span data-lang="uk"><strong>Що це:</strong> правила для сайту (sneco.ua), соцмереж (Instagram, Facebook, TikTok), email-маркетингу. Структура постів, hashtag strategy.</span>
+        <span data-lang="en"><strong>What:</strong> rules for site, socials, email — post structure, hashtag strategy.</span>
+      </div>
+      <div class="why" data-lang-group>
+        <span data-lang="uk"><strong>Навіщо:</strong> SMM-менеджер не вигадує "як писати про snEco на TikTok" — є чіткі правила, які працюють і збільшують engagement.</span>
+        <span data-lang="en"><strong>Why:</strong> SMM has clear rules that drive engagement.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- REFERENCE SECTIONS -->
+  <div class="ob-content-panel active" data-ob-panel="all,kam,marketing,production,finance,new">
+    <div class="ob-sec-card">
+      <div class="head"><div class="ic">📄</div><h4 data-lang-group><span data-lang="uk">Документи — сертифікати, патенти</span><span data-lang="en">Documents</span></h4><a href="#sec-documents" onclick="document.querySelector('[data-target=documents]')?.click();return false;">→ Відкрити</a></div>
+      <div class="what" data-lang-group>
+        <span data-lang="uk"><strong>Що це:</strong> FSSC 22000, ISO 22000, HACCP, IFS Food v8, FDA USA, Patent UA №139035, ТМ UA/SK/CZ/PL, нагороди (SIAL Grand Prix 2024). Кожне — клікабельний PDF.</span>
+        <span data-lang="en"><strong>What:</strong> all certs/patents/TMs/awards — clickable PDFs.</span>
+      </div>
+      <div class="why" data-lang-group>
+        <span data-lang="uk"><strong>Навіщо:</strong> партнер просить "покажіть FSSC" → клік → надсилаєш PDF. Sales не дзвонить до Богдана/Левка кожен раз — все централізовано.</span>
+        <span data-lang="en"><strong>Why:</strong> partner asks for FSSC — click, send. No bothering team.</span>
+      </div>
+    </div>
+
+    <div class="ob-sec-card">
+      <div class="head"><div class="ic">📰</div><h4 data-lang-group><span data-lang="uk">ЗМІ про нас</span><span data-lang="en">Press coverage</span></h4><a href="#sec-press-coverage" onclick="document.querySelector('[data-target=press-coverage]')?.click();return false;">→ Відкрити</a></div>
+      <div class="what" data-lang-group>
+        <span data-lang="uk"><strong>Що це:</strong> 26+ публікацій про snEco у Forbes, Vogue, AIN.ua, Економічна Правда, Mind, тощо. Згруповано по темах (SIAL · Tech · Export · Resilience · Sustainability).</span>
+        <span data-lang="en"><strong>What:</strong> 26+ press articles, grouped by topic.</span>
+      </div>
+      <div class="why" data-lang-group>
+        <span data-lang="uk"><strong>Навіщо:</strong> sales-pitch потенційному партнеру — додаєш топ-5 публікацій → партнер бачить що snEco має credibility у медіа. Це робить переговори простішими.</span>
+        <span data-lang="en"><strong>Why:</strong> sales pitch — add top-5 articles → partner sees credibility.</span>
+      </div>
+    </div>
+
+    <div class="ob-sec-card">
+      <div class="head"><div class="ic">🛠</div><h4 data-lang-group><span data-lang="uk">Maintenance — admin tools</span><span data-lang="en">Maintenance</span></h4><a href="#sec-maintenance" onclick="document.querySelector('[data-target=maintenance]')?.click();return false;">→ Відкрити (🔐 admin)</a></div>
+      <div class="what" data-lang-group>
+        <span data-lang="uk"><strong>Що це:</strong> для admin'ів (vg/fg) — управління whitelist'ами доступу до захищених розділів, compliance чеклист, технічна архітектура.</span>
+        <span data-lang="en"><strong>What:</strong> for admins — whitelist management, compliance checklist, tech architecture.</span>
+      </div>
+      <div class="why" data-lang-group>
+        <span data-lang="uk"><strong>Навіщо:</strong> новий партнер хоче доступ до прайсів → vg відкриває → додає email → 30 секунд → партнер має доступ. Без коду, без розробників.</span>
+        <span data-lang="en"><strong>Why:</strong> new partner wants prices — vg adds email in 30 sec, no devs needed.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- COLLABORATION -->
+  <div class="ob-content-panel active" data-ob-panel="all,new,kam,marketing,production,finance">
+    <div class="ob-sec-card" style="background:#fff9e5;border-color:rgba(254,191,39,.4)">
+      <div class="head"><div class="ic" style="background:#FEBF27;color:#1E1E1E">💡</div><h4 data-lang-group><span data-lang="uk">Пропозиції — твоя ідея → готова система</span><span data-lang="en">Ideas — your idea → live system</span></h4><a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false;">→ Відкрити</a></div>
+      <div class="what" data-lang-group>
+        <span data-lang="uk"><strong>Що це:</strong> щоб ти міг впливати на snEco — пропонуй що завгодно: нова секція Brand Bible, новий SOP, sales-tool, маркетингова ідея. Workflow: <code>open → vg готує рішення → погоджуєш → ми реалізовуємо → готово</code>.</span>
+        <span data-lang="en"><strong>What:</strong> propose anything — new section, SOP, sales tool, idea. Workflow open → vg drafts → you approve → ship.</span>
+      </div>
+      <div class="why" data-lang-group>
+        <span data-lang="uk"><strong>Навіщо:</strong> щоб ідеї не губились у Slack-thread'ах. Щоб кожен у команді бачив що його думка важлива. Реальний кейс: Альона запропонувала "таблицю ваг упаковки" → vg готує draft → реалізовується у Packaging секції.</span>
+        <span data-lang="en"><strong>Why:</strong> ideas don't get lost in Slack. Real case: Альона proposed pack weights table → vg drafts → ships to Packaging.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       РОЗДІЛ 3. АВТОМАТИЗАЦІЇ — як система працює без тебе
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="ob-chapter ob-content-panel active" data-ob-panel="all,new,kam,finance">
+    <h3>⚙ <span data-lang="uk">3. Автоматизації — що працює без тебе</span><span data-lang="en">3. Automations — what works without you</span></h3>
+    <p data-lang="uk">snEco має ряд процесів які запускаються самі. Тобі тільки треба знати ЩО приходить і КОЛИ.</p>
+    <p data-lang="en">snEco has automated processes. You just need to know WHAT arrives and WHEN.</p>
+  </div>
+
+  <div class="ob-content-panel active" data-ob-panel="all,new,kam,finance">
+    <div class="ob-tool-card">
+      <div class="ob-tool-icon" style="background:rgba(59,130,246,.13);color:#1d5fa6">📧</div>
+      <div class="ob-tool-body">
+        <div class="ob-tool-title" data-lang-group>
+          <span data-lang="uk">3 щоденних емейли (08:00 / 09:00 / 10:00 KYV)</span>
+          <span data-lang="en">3 daily emails (8/9/10 AM KYV)</span>
+        </div>
+        <div class="ob-tool-desc" data-lang-group>
+          <span data-lang="uk"><strong>08:00 — Brand Bible Daily Digest:</strong> нові ідеї команди + AI рекомендації що робити сьогодні · <strong>09:00 — Daily KAM Briefing:</strong> sleeping clients, AR overdue, action items · <strong>10:00 — System Health Audit:</strong> 41-check звіт по всіх системах. <em>Якщо щось зламано — побачиш одразу.</em></span>
+          <span data-lang="en"><strong>8AM Ideas Digest · 9AM KAM Briefing · 10AM Health Audit.</strong> If anything broken — see immediately.</span>
+        </div>
+      </div>
+      <a class="ob-tool-cta secondary" href="#sec-maintenance" onclick="document.querySelector('[data-target=maintenance]')?.click();return false;"><span data-lang="uk">Деталі</span><span data-lang="en">Details</span></a>
+    </div>
+
+    <div class="ob-tool-card">
+      <div class="ob-tool-icon" style="background:rgba(126,87,194,.13);color:#5e3aa0">🔄</div>
+      <div class="ob-tool-body">
+        <div class="ob-tool-title" data-lang-group>
+          <span data-lang="uk">Sync chain — дані оновлюються щодня 03:00-07:00 KYV</span>
+          <span data-lang="en">Sync chain — data refreshes daily 3-7 AM KYV</span>
+        </div>
+        <div class="ob-tool-desc" data-lang-group>
+          <span data-lang="uk">MoySklad → D1 → дашборди. <strong>До 08:00</strong> усі дані свіжі. Procurement (03:00) · MoySklad (06:00) · Inventory data.json (~06:30) · все автоматично через GitHub Actions.</span>
+          <span data-lang="en">MoySklad → D1 → dashboards. By 8AM all data fresh. Automated via GitHub Actions.</span>
+        </div>
+      </div>
+      <a class="ob-tool-cta secondary" href="#sec-maintenance" onclick="document.querySelector('[data-target=maintenance]')?.click();return false;"><span data-lang="uk">Tech у Maintenance</span><span data-lang="en">Tech</span></a>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       РОЗДІЛ 4. ДАШБОРДИ — advanced tools (у кінець!)
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="ob-dash-banner ob-content-panel active" data-ob-panel="all,kam,production,finance">
+    <h3>📊 <span data-lang="uk">4. Дашборди — твої щоденні інструменти</span><span data-lang="en">4. Dashboards — your daily tools</span></h3>
+    <p data-lang="uk">5 окремих дашбордів для конкретних ролей. Це live дані з MoySklad → D1 → візуалізація. Купа графіків, фільтрів, drill-down. Усе оновлюється автоматично щодня.</p>
+    <p data-lang="en">5 dedicated dashboards. Live data from MoySklad. Charts, filters, drill-downs. Auto-refresh daily.</p>
+  </div>
+
+  <!-- Customer 360 -->
+  <div class="ob-content-panel active" data-ob-panel="all,kam">
+    <div class="ob-tool-card">
+      <div class="ob-tool-icon" style="background:rgba(150,193,31,.18);color:#557a00">👥</div>
+      <div class="ob-tool-body">
+        <div class="ob-tool-title" data-lang-group>
+          <span data-lang="uk">Customer 360 — все про клієнта на одній сторінці</span>
+          <span data-lang="en">Customer 360 — full client view</span>
+        </div>
+        <div class="ob-tool-desc" data-lang-group>
+          <span data-lang="uk">Search клієнта → KPIs (LTV, AR, AOV) · Health Trend · 12-міс revenue · AR aging buckets · Cross-sell · Timeline 60 подій · CRM notes · Forecast next order · Excel export. <strong>Keyboard:</strong> <kbd>/</kbd> search · <kbd>n</kbd> note · <kbd>Esc</kbd> close.</span>
+          <span data-lang="en">Search → KPIs, Health Trend, AR aging, Cross-sell, Timeline, CRM, Forecast, Excel export. Keyboard / n Esc.</span>
+        </div>
+      </div>
+      <a class="ob-tool-cta" href="https://brand.sneco.ua/dashboard/customer-360/customer-360.html" target="_blank">Customer 360 →</a>
+    </div>
+  </div>
+
+  <!-- Finance -->
+  <div class="ob-content-panel active" data-ob-panel="all,finance">
+    <div class="ob-tool-card">
+      <div class="ob-tool-icon" style="background:rgba(27,67,50,.15);color:#1B4332">💰</div>
+      <div class="ob-tool-body">
+        <div class="ob-tool-title" data-lang-group>
+          <span data-lang="uk">Finance Dashboard — гроші &amp; борги</span>
+          <span data-lang="en">Finance Dashboard — cash &amp; debts</span>
+        </div>
+        <div class="ob-tool-desc" data-lang-group>
+          <span data-lang="uk">Cash flow 12 міс · AR aging (1-30 / 31-60 / 61-90 / 90+) · TOP-10 боржників з кнопкою <em>📞 Подзвонити</em> · DSO · 30-day forecast · expense categories. Понеділок 09:00 — Пилип знає чи є борг &gt;90 днів.</span>
+          <span data-lang="en">Cash flow 12mo · AR aging · TOP-10 debtors with call buttons · DSO · 30-day forecast.</span>
+        </div>
+      </div>
+      <a class="ob-tool-cta" href="https://brand.sneco.ua/dashboard/finance/finance.html" target="_blank">Finance →</a>
+    </div>
+  </div>
+
+  <!-- Inventory -->
+  <div class="ob-content-panel active" data-ob-panel="all,production">
+    <div class="ob-tool-card">
+      <div class="ob-tool-icon" style="background:rgba(94,58,160,.15);color:#5e3aa0">📦</div>
+      <div class="ob-tool-body">
+        <div class="ob-tool-title" data-lang-group>
+          <span data-lang="uk">Inventory Dashboard — склад &amp; закупки</span>
+          <span data-lang="en">Inventory — stock &amp; purchases</span>
+        </div>
+        <div class="ob-tool-desc" data-lang-group>
+          <span data-lang="uk">Поточний stock per SKU · темп продажів 30d · dead stock alerts · supplier analytics · safety buffer. Валерія перед PO дивиться → точна кількість сиру для замовлення.</span>
+          <span data-lang="en">Current stock · 30d sales tempo · dead stock alerts · safety buffer.</span>
+        </div>
+      </div>
+      <a class="ob-tool-cta" href="https://brand.sneco.ua/dashboard/inventory/inventory.html" target="_blank">Inventory →</a>
+    </div>
+  </div>
+
+  <!-- Production -->
+  <div class="ob-content-panel active" data-ob-panel="all,production">
+    <div class="ob-tool-card">
+      <div class="ob-tool-icon" style="background:rgba(232,64,64,.13);color:#a00">🏭</div>
+      <div class="ob-tool-body">
+        <div class="ob-tool-title" data-lang-group>
+          <span data-lang="uk">Production Dashboard — виробничі цикли</span>
+          <span data-lang="en">Production — manufacturing cycles</span>
+        </div>
+        <div class="ob-tool-desc" data-lang-group>
+          <span data-lang="uk">Output per SKU vs plan · технологічні карти · partis tracking · raw material usage · efficiency per shift. Богдан п'ятниця → ревʼю тижня → бачить недоробку Cheddar 28г → коригує.</span>
+          <span data-lang="en">Output vs plan · tech cards · efficiency · weekly review.</span>
+        </div>
+      </div>
+      <a class="ob-tool-cta" href="https://brand.sneco.ua/dashboard/production/production.html" target="_blank">Production →</a>
+    </div>
+  </div>
+
+  <!-- Sales Analytics -->
+  <div class="ob-content-panel active" data-ob-panel="all,kam">
+    <div class="ob-tool-card">
+      <div class="ob-tool-icon" style="background:rgba(59,130,246,.13);color:#3B82F6">📈</div>
+      <div class="ob-tool-body">
+        <div class="ob-tool-title" data-lang-group>
+          <span data-lang="uk">Sales Analytics — продажі &amp; action items</span>
+          <span data-lang="en">Sales Analytics — sales &amp; daily actions</span>
+        </div>
+        <div class="ob-tool-desc" data-lang-group>
+          <span data-lang="uk">Period selector (рік/квартал/місяць) · revival list (sleeping clients) · funnel orders→shipments→payments · concentration risk (Pareto). Ярослав ранок → 5 sleeping → виклики.</span>
+          <span data-lang="en">Period filters · revival list · funnel · concentration risk.</span>
+        </div>
+      </div>
+      <a class="ob-tool-cta" href="https://brand.sneco.ua/dashboard/dashboard.html" target="_blank">Sales →</a>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       FAQ
+       ═══════════════════════════════════════════════════════════ -->
   <h3 style="margin:48px 0 16px;font-size:18px;font-weight:800">
-    <span data-lang="uk">❓ Часті запитання</span><span data-lang="en">❓ FAQ</span><span data-lang="sk">❓ Najčastejšie otázky</span>
+    <span data-lang="uk">❓ Часті запитання</span><span data-lang="en">❓ FAQ</span><span data-lang="sk">❓ Najčastejšie</span>
   </h3>
   <div class="ob-faq">
     <details>
-      <summary><span data-lang="uk">Як залогінитись у дашборд?</span><span data-lang="en">How do I log in?</span><span data-lang="sk">Ako sa prihlásim?</span></summary>
+      <summary><span data-lang="uk">Як залогінитись у дашборд?</span><span data-lang="en">How to log in?</span></summary>
       <div>
-        <span data-lang="uk">1. Натисни <strong>Sign in with Google</strong> — найшвидше. <br>2. Якщо Google не спрацював — введи свій <code>@sneco.ua</code> email → отримаєш 6-значний код на пошту → введи. <br>3. Не у whitelist? — напиши <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>, додамо за хвилину. <br>4. Сесія діє <strong>30 днів</strong> — не перелогінюватись щодня.</span>
-        <span data-lang="en">1. Click Sign in with Google — fastest. 2. Or enter your @sneco.ua email → 6-digit code → enter. 3. Not whitelisted? — email vg. 4. Session lasts 30 days.</span>
+        <span data-lang="uk">1. Натисни <strong>Sign in with Google</strong> — найшвидше. <br>2. Або введи свій <code>@sneco.ua</code> email → отримаєш 6-значний код. <br>3. Не у whitelist? — пиши <a href="mailto:vg@sneco.ua">vg@sneco.ua</a>. <br>4. Сесія — <strong>30 днів</strong>, не треба перелогінюватись щодня.</span>
+        <span data-lang="en">1. Sign in with Google. 2. Or email-OTP. 3. Not whitelisted — email vg. 4. Session 30 days.</span>
       </div>
     </details>
     <details>
-      <summary><span data-lang="uk">Я бачу "У РОЗРОБЦІ" блоки — це що?</span><span data-lang="en">I see "IN DEVELOPMENT" blocks — what's that?</span></summary>
+      <summary><span data-lang="uk">Я подав ідею, але не отримав відповіді</span><span data-lang="en">Submitted idea, no response</span></summary>
       <div>
-        <span data-lang="uk">Це нові секції які ще чекають твого <strong>✅ Погодити</strong> у системі Пропозицій. Як тільки погодиш — vg реалізовує, і блок стає публічним.</span>
-        <span data-lang="en">New sections waiting for your ✅ Approve in Ideas. Once approved — vg ships, block becomes public.</span>
+        <span data-lang="uk">vg отримує digest щодня о 08:00 KYV. Зазвичай відповідь приходить за тиждень. Якщо &gt;2 тижнів — пиши <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> з заголовком ідеї.</span>
+        <span data-lang="en">vg gets digest daily 8AM. Response usually 1 week. If &gt;2 weeks — email vg.</span>
       </div>
     </details>
     <details>
-      <summary><span data-lang="uk">Дані застаріли — що робити?</span><span data-lang="en">Data is stale — what to do?</span></summary>
+      <summary><span data-lang="uk">Дані застаріли — що робити?</span><span data-lang="en">Data stale — what to do?</span></summary>
       <div>
-        <span data-lang="uk">Customer 360 і Finance — live з реальної БД, завжди свіжі. Inventory і Production оновлюються щодня о 06:30 Київ автоматично. Якщо бачиш ⚠ <strong>"Дані застаріли"</strong> banner — оновлення не відбулось, напиши vg.</span>
-        <span data-lang="en">Customer 360 + Finance — live. Inventory + Production refresh daily ~06:30 Kyiv automatically. If you see ⚠ "Stale data" banner — sync failed, email vg.</span>
+        <span data-lang="uk">Customer 360 і Finance — live, завжди свіжі. Inventory/Production — щодня о 06:30 KYV. Якщо ⚠ "Дані застаріли" banner — sync failed, пиши vg.</span>
+        <span data-lang="en">Customer 360 + Finance — live. Inventory+Production refresh 6:30 AM. Stale banner — email vg.</span>
       </div>
     </details>
     <details>
-      <summary><span data-lang="uk">Я подав ідею, але не отримав відповіді</span><span data-lang="en">I submitted an idea but got no response</span></summary>
+      <summary><span data-lang="uk">Як швидко знайти інформацію?</span><span data-lang="en">How to find info fast?</span></summary>
       <div>
-        <span data-lang="uk">vg отримує дайджест ідей щодня о 08:00. Зазвичай відповідь приходить за тиждень. Якщо > 2 тижнів — напиши <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> з заголовком ідеї.</span>
-        <span data-lang="en">vg gets daily digest at 08:00. Reply usually within 1 week. If >2 weeks — email vg directly.</span>
+        <span data-lang="uk">Натисни <kbd>⌘K</kbd> (Mac) або <kbd>Ctrl+K</kbd> (Win) — глобальний пошук по всіх секціях Brand Bible. Або 🔍 у sidebar зліва.</span>
+        <span data-lang="en">Press Cmd+K / Ctrl+K — global search. Or 🔍 in sidebar.</span>
       </div>
     </details>
     <details>
-      <summary><span data-lang="uk">Що робити якщо дашборд не завантажується?</span><span data-lang="en">Dashboard won't load — what to do?</span></summary>
+      <summary><span data-lang="uk">Я бачу "🟡 У РОЗРОБЦІ" блоки — що це?</span><span data-lang="en">What are "🟡 IN DEVELOPMENT" blocks?</span></summary>
       <div>
-        <span data-lang="uk">1. Перевір що ти залогінений (Google або OTP). <br>2. Hard reload: <kbd>Cmd+Shift+R</kbd> (Mac) або <kbd>Ctrl+Shift+R</kbd> (Win). <br>3. Спробуй у режимі incognito. <br>4. Якщо й це не допомагає — напиши vg з скріншотом.</span>
-        <span data-lang="en">1. Check you're logged in. 2. Hard reload Cmd+Shift+R / Ctrl+Shift+R. 3. Try incognito. 4. Email vg with screenshot.</span>
+        <span data-lang="uk">Це нові секції які чекають твого <strong>✅ Погодити</strong> у системі Ideas. Як тільки погодиш — блок стає публічним.</span>
+        <span data-lang="en">New sections waiting for your ✅ Approve in Ideas. Once approved — block becomes public.</span>
       </div>
     </details>
     <details>
-      <summary><span data-lang="uk">Хто має доступ до Прайс-листів?</span><span data-lang="en">Who has access to Price lists?</span></summary>
+      <summary><span data-lang="uk">Хто має доступ до прайс-листів?</span><span data-lang="en">Who has price list access?</span></summary>
       <div>
-        <span data-lang="uk">Команда snEco (KAM, sales, маркетинг, керівництво) + затверджені партнери. Якщо тобі треба доступ — напиши vg, він додасть твою пошту у whitelist.</span>
-        <span data-lang="en">snEco team + approved partners. Need access? Email vg to whitelist.</span>
+        <span data-lang="uk">Команда snEco (KAM, sales, маркетинг, керівництво) + затверджені партнери. Потрібен доступ? — пиши vg, додасть у whitelist.</span>
+        <span data-lang="en">snEco team + approved partners. Need access — email vg.</span>
       </div>
     </details>
     <details>
-      <summary><span data-lang="uk">Працює тільки англійською — як змінити мову?</span><span data-lang="en">Stuck in English — how to switch language?</span></summary>
+      <summary><span data-lang="uk">Як змінити мову інтерфейсу?</span><span data-lang="en">How to switch language?</span></summary>
       <div>
-        <span data-lang="uk">Угорі правому куті — кнопки UA / EN / SK. Натисни → весь сайт перемкнеться.</span>
-        <span data-lang="en">Top right corner — UA / EN / SK buttons. Click to switch.</span>
+        <span data-lang="uk">Угорі правому куті — кнопки UA / EN / SK. Клік → весь сайт перемикнеться.</span>
+        <span data-lang="en">Top right — UA / EN / SK buttons.</span>
       </div>
     </details>
     <details>
-      <summary><span data-lang="uk">Як знайти конкретну інформацію швидко?</span><span data-lang="en">How do I find specific info fast?</span></summary>
+      <summary><span data-lang="uk">Дашборд не завантажується</span><span data-lang="en">Dashboard won't load</span></summary>
       <div>
-        <span data-lang="uk">Натисни <kbd>⌘K</kbd> (Mac) / <kbd>Ctrl+K</kbd> (Win) → пошук по всіх секціях Brand Bible. Або клік на 🔍 у sidebar зліва.</span>
-        <span data-lang="en">Press Cmd+K / Ctrl+K → search across all sections. Or click 🔍 in sidebar.</span>
+        <span data-lang="uk">1. Перевір що залогінений. <br>2. Hard reload: <kbd>Cmd+Shift+R</kbd> / <kbd>Ctrl+Shift+R</kbd>. <br>3. Спробуй incognito. <br>4. Якщо ні — пиши vg з скріншотом.</span>
+        <span data-lang="en">1. Check login. 2. Hard reload. 3. Try incognito. 4. Email vg + screenshot.</span>
       </div>
     </details>
   </div>
 
-  <!-- CONTACT BLOCK -->
+  <!-- CONTACT -->
   <div style="margin:48px 0 24px;padding:24px 28px;background:#fffbef;border:1px solid rgba(254,191,39,.4);border-radius:14px;display:flex;gap:18px;align-items:center;flex-wrap:wrap">
     <div style="font-size:32px">💬</div>
     <div style="flex:1;min-width:260px">
       <div style="font-size:15px;font-weight:700;color:#1E1E1E;margin-bottom:4px">
         <span data-lang="uk">Не знайшов відповідь?</span>
         <span data-lang="en">Can't find an answer?</span>
-        <span data-lang="sk">Nenašiel si odpoveď?</span>
       </div>
       <div style="font-size:13px;color:var(--text-muted)">
-        <span data-lang="uk">Напиши <a href="mailto:vg@sneco.ua" style="color:#996600;font-weight:600">vg@sneco.ua</a> або подай "✋ Питання" у системі <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false;" style="color:#996600;font-weight:600">Пропозицій</a> — додам відповідь у FAQ.</span>
-        <span data-lang="en">Email <a href="mailto:vg@sneco.ua" style="color:#996600;font-weight:600">vg@sneco.ua</a> or submit a question in <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false;" style="color:#996600;font-weight:600">Ideas</a>.</span>
+        <span data-lang="uk">Пиши <a href="mailto:vg@sneco.ua" style="color:#996600;font-weight:600">vg@sneco.ua</a> або подай у <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false;" style="color:#996600;font-weight:600">Пропозиції</a> — додамо у FAQ.</span>
+        <span data-lang="en">Email vg or submit in Ideas — we'll add to FAQ.</span>
       </div>
     </div>
   </div>
 </section>
 
 <script>
-  // v2.78.52: Role tabs filtering для онбордингу
+  // v2.78.53: Role tabs filtering
   (function(){
     const tabs = document.querySelectorAll('.ob-role-tab');
     const panels = document.querySelectorAll('.ob-content-panel');
@@ -7662,11 +8025,7 @@ body.is-admin section.admin-only { display: block !important; }
       try { localStorage.setItem('sneco_ob_role', role); } catch(e){}
     }
     tabs.forEach(t => t.addEventListener('click', () => applyRole(t.dataset.obRole)));
-    // Restore last role
-    try {
-      const saved = localStorage.getItem('sneco_ob_role') || 'all';
-      applyRole(saved);
-    } catch(e) { applyRole('all'); }
+    try { applyRole(localStorage.getItem('sneco_ob_role') || 'all'); } catch(e) { applyRole('all'); }
   })();
 </script>
 
