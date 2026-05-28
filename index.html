@@ -1991,6 +1991,64 @@ h3.block-title:first-of-type { margin-top: 0; }
   .hero { padding: 40px 24px; }
   a { color: inherit; }
 }
+
+/* IDEA PROPOSAL PREVIEW (v2.78.50) — admin-only pre-built HTML structures */
+.admin-only { display: none !important; }
+body.is-admin .admin-only { display: block !important; }
+body.is-admin .nav-link.admin-only { display: flex !important; }
+body.is-admin section.admin-only { display: block !important; }
+.idea-proposal-preview {
+  margin-top: 32px;
+  padding: 18px 20px;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  background: #fffbef;
+}
+.idea-proposal-preview .ipp-head {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;
+}
+.idea-proposal-preview .ipp-badge {
+  background: #FEBF27; color: #1E1E1E; font-size: 10px; font-weight: 700;
+  padding: 3px 8px; border-radius: 4px; letter-spacing: 0.04em; white-space: nowrap;
+}
+.idea-proposal-preview .ipp-title {
+  margin: 0; font-size: 16px; font-weight: 700; line-height: 1.3;
+}
+.idea-proposal-preview .ipp-lead {
+  font-size: 12px; color: var(--text-muted); margin: 0 0 14px 0; line-height: 1.55;
+}
+.idea-proposal-preview details summary {
+  cursor: pointer; color: #996600; font-weight: 600; font-size: 13px;
+  padding: 8px 12px; background: #fff7d6; border-radius: 6px; user-select: none;
+}
+.idea-proposal-preview details summary:hover { background: #fdf0b8; }
+.idea-proposal-preview details[open] summary { margin-bottom: 12px; }
+.idea-proposal-preview details > div.ipp-body {
+  padding: 14px 16px; background: #ffffff; border-radius: 6px; font-size: 13px;
+  line-height: 1.6; color: var(--text);
+}
+.idea-proposal-preview .ipp-body h4 {
+  font-size: 14px; font-weight: 700; margin: 16px 0 8px 0; color: var(--black);
+}
+.idea-proposal-preview .ipp-body h4:first-child { margin-top: 0; }
+.idea-proposal-preview .ipp-body ol,
+.idea-proposal-preview .ipp-body ul { padding-left: 22px; margin: 8px 0; }
+.idea-proposal-preview .ipp-body li { margin-bottom: 4px; }
+.idea-proposal-preview .ipp-body pre {
+  background: #f6f6f6; padding: 12px; border-radius: 6px;
+  overflow-x: auto; font-size: 11.5px; line-height: 1.5;
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  white-space: pre; margin: 8px 0;
+}
+.idea-proposal-preview .ipp-body p { margin: 0 0 10px 0; }
+.idea-proposal-preview .ipp-body table {
+  width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 12px;
+}
+.idea-proposal-preview .ipp-body th,
+.idea-proposal-preview .ipp-body td {
+  border: 1px solid var(--border); padding: 6px 10px; text-align: left;
+}
+.idea-proposal-preview .ipp-body th { background: var(--black-05); font-weight: 700; }
 </style>
   <!-- v2.78.35 (Богдан): Google Sign-In primary для HR/Prices/Maintenance OTP-gate -->
   <script defer src="dashboard/auth-google.js"></script>
@@ -2176,6 +2234,10 @@ h3.block-title:first-of-type { margin-top: 0; }
       <span class="dot"></span>
       <span data-lang="uk">Maintenance</span><span data-lang="en">Maintenance</span><span data-lang="sk">Maintenance</span>
     </button>
+    <button class="nav-link admin-only" data-target="ops-drafts" type="button">
+      <span class="dot"></span>
+      <span data-lang="uk">🟡 SOPs drafts (admin)</span><span data-lang="en">🟡 SOPs drafts (admin)</span><span data-lang="sk">🟡 SOPs drafts (admin)</span>
+    </button>
   </div>
 
   <div class="nav-group">
@@ -2210,7 +2272,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Bible v2.78.39 · 2026
+    Brand Bible v2.78.50 · 2026
   </div>
 </nav>
 
@@ -2224,7 +2286,7 @@ h3.block-title:first-of-type { margin-top: 0; }
     <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
     <span data-lang="sk">Jedna ingrediencia. <span class="qr-ns-accent">Žiadne kompromisy.</span> Syrový snack 21. storočia.</span>
   </div>
-  <div class="qr-meta">v2.78.39 · 2026</div>
+  <div class="qr-meta">v2.78.50 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -2921,6 +2983,69 @@ h3.block-title:first-of-type { margin-top: 0; }
       <div style="padding:12px 14px;background:var(--black-05);border-radius:8px;font-size:12px;line-height:1.55"><strong>📧 <span data-lang="uk">Загальні канали</span><span data-lang="en">General channels</span><span data-lang="sk">Všeobecné kanály</span></strong><br><a href="mailto:sales@sneco.eu">sales@sneco.eu</a> — <span data-lang="uk">SK продажі / EU</span><span data-lang="en">SK sales / EU</span><span data-lang="sk">SK predaj / EÚ</span><br><a href="mailto:worldwide@sneco.ua">worldwide@sneco.ua</a> — <span data-lang="uk">експорт worldwide</span><span data-lang="en">export worldwide</span><span data-lang="sk">export worldwide</span><br><a href="mailto:vg@sneco.ua">vg@sneco.ua</a> — <span data-lang="uk">стратегія, партнерства, преса</span><span data-lang="en">strategy, partnerships, press</span><span data-lang="sk">stratégia, partnerstvá, tlač</span></div>
       <div style="padding:12px 14px;background:var(--black-05);border-radius:8px;font-size:12px;line-height:1.55"><strong>🌐 <span data-lang="uk">Сайти</span><span data-lang="en">Websites</span><span data-lang="sk">Webové stránky</span></strong><br><a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a> — <span data-lang="uk">UA-ринок</span><span data-lang="en">UA market</span><span data-lang="sk">UA-trh</span><br><a href="https://sneco.eu" target="_blank" rel="noopener">sneco.eu</a> — <span data-lang="uk">EU-ринок</span><span data-lang="en">EU market</span><span data-lang="sk">EÚ-trh</span></div>
     </div>
+  </div>
+
+  <!-- IDEA-PROPOSAL: id=11bb76d533dee944 · proposed v2.78.50 · pending author approval (Taras) -->
+  <div class="idea-proposal-preview admin-only" data-idea-id="11bb76d533dee944">
+    <div class="ipp-head">
+      <span class="ipp-badge">🟡 У РОЗРОБЦІ · v2.78.50</span>
+      <h3 class="ipp-title"><span data-lang="uk">Team principles — як ми працюємо у snEco</span><span data-lang="en">Team principles — how we work at snEco</span><span data-lang="sk">Team principles — ako pracujeme v snEco</span></h3>
+    </div>
+    <p class="ipp-lead">
+      <span data-lang="uk">⏳ Розроблено для ідеї <strong>Тарас: "правила для команди"</strong>. Чекає погодження автора у системі ідей.</span>
+      <span data-lang="en">⏳ Drafted for idea <strong>Taras: "code of conduct"</strong>. Pending author approval.</span>
+      <span data-lang="sk">⏳ Pripravené pre nápad <strong>Taras: "pravidlá pre tím"</strong>. Čaká na schválenie autora.</span>
+    </p>
+    <details>
+      <summary>📜 <span data-lang="uk">Переглянути запропоновані принципи</span><span data-lang="en">View proposed principles</span><span data-lang="sk">Pozrieť navrhované princípy</span></summary>
+      <div class="ipp-body">
+        <h4>1. Наш north star ⭐</h4>
+        <p><em>«Один інгредієнт. Жодних компромісів. Сирний снек XXI століття.»</em></p>
+        <p>Все що ми робимо — від рецептур до партнерств — мусить наближати нас до цього бачення. Якщо ідея не служить цьому — не робимо її, навіть якщо це швидкий $.</p>
+        <h4>2. Як ми приймаємо рішення ⚡</h4>
+        <ul>
+          <li><strong>Speed &gt; perfection.</strong> Краще зробити 80% швидко і коригувати, ніж 100% через 3 місяці.</li>
+          <li><strong>Data &gt; opinion.</strong> Якщо є дані (Customer 360, Finance) — використовуємо. Якщо немає — гіпотеза, не "правда".</li>
+          <li><strong>Owner вирішує.</strong> Якщо вказано в RACI хто Owner — він вирішує (з consult з потрібними).</li>
+        </ul>
+        <h4>3. Як ми спілкуємось 💬</h4>
+        <ul>
+          <li><strong>Slack</strong> — default. Швидко, асинхронно, transparent.</li>
+          <li><strong>Email</strong> — тільки з external партнерами / для серйозних multi-сторонніх ниток.</li>
+          <li><strong>Voice / Zoom</strong> — для emotional / complex / first-time conversations.</li>
+          <li><strong>Документація</strong> — для всього що повторюється &gt; 1 разу. У Brand Bible.</li>
+        </ul>
+        <h4>4. Як ми ділимось знаннями 📚</h4>
+        <ul>
+          <li>Все важливе — у Brand Bible. <strong>"Якщо не у Bible — це не існує"</strong>.</li>
+          <li>Tribal knowledge → SOP. Якщо вмію тільки я → задокументую за тиждень.</li>
+          <li>Ідеї → форма у Brand Bible /#ideas. Не у DM, не у email.</li>
+          <li>Public документи у <code>documents/</code>. Confidential — у OTP-gated сесіях.</li>
+        </ul>
+        <h4>5. Як ми ростимо 📈</h4>
+        <ul>
+          <li><strong>1:1 щомісяця</strong> — з manager'ом. Не "status update" — про розвиток.</li>
+          <li><strong>Retrospective щокварталу</strong> — що працювало, що ні, що пробувати.</li>
+          <li><strong>Помилки = learning.</strong> Blameless culture. Питання: "що ми робимо інакше наступного разу?", не "хто винний?".</li>
+          <li><strong>Investment у себе</strong> — snEco compensate'ить курси/конференції що покращують роботу.</li>
+        </ul>
+        <h4>6. Customer-first 🤝</h4>
+        <ul>
+          <li>Customer = ритейл-партнер + дистрибʼютор + HoReCa + кінцевий споживач.</li>
+          <li>Перед рішенням питай: "як це впливає на customer?" Не "як це впливає на нас?".</li>
+          <li>Empathy: read customer feedback (Customer 360, support, social).</li>
+          <li>Якщо клієнт скаржиться → "sorry first, fix second, learn third".</li>
+        </ul>
+        <h4>7. Розвиток snEco 🚀</h4>
+        <ul>
+          <li><strong>Ownership culture</strong> — "я бачу проблему = я її picking up". Не чекаємо інструкції.</li>
+          <li><strong>Bias to action</strong> — краще спробувати і помилитись, ніж не спробувати.</li>
+          <li><strong>No silos</strong> — sales знає про виробництво, виробництво знає про sales. Brand Bible = bridge.</li>
+          <li><strong>Hire smart people, get out of their way</strong> — менеджмент = unblock, не micro-manage.</li>
+        </ul>
+        <p style="margin-top:14px;font-style:italic;color:var(--text-muted);font-size:12px">Підписано команда snEco · {DD.MM.YYYY}. Updated yearly. Last update: 2026.</p>
+      </div>
+    </details>
   </div>
 </section>
 
@@ -3791,6 +3916,88 @@ h3.block-title:first-of-type { margin-top: 0; }
       <span data-lang="en">Source: snEco × RNK NAVIS strategy session, 12.05.2026</span>
       <span data-lang="sk">Zdroj: pracovná relácia snEco × RNK NAVIS, 12.05.2026</span>
     </div>
+  </div>
+
+  <!-- IDEA-PROPOSAL: id=de9960d5bc7cb191 · proposed v2.78.50 · pending author approval (Vadym) -->
+  <div class="idea-proposal-preview admin-only" data-idea-id="de9960d5bc7cb191">
+    <div class="ipp-head">
+      <span class="ipp-badge">🟡 У РОЗРОБЦІ · v2.78.50</span>
+      <h3 class="ipp-title"><span data-lang="uk">Case study: п'яна вишня × snEco — ко-брендінг приклад</span><span data-lang="en">Case study: Drunken Cherry × snEco — co-branding example</span><span data-lang="sk">Case study: Pijaná čerešňa × snEco — co-branding príklad</span></h3>
+    </div>
+    <p class="ipp-lead">
+      <span data-lang="uk">⏳ Розроблено для ідеї <strong>Вадим: "п'яна вишня (co-branding case study)"</strong>. Чекає погодження автора у системі ідей.</span>
+      <span data-lang="en">⏳ Drafted for idea <strong>Vadym: "Drunken cherry (co-branding case study)"</strong>. Pending author approval in the ideas system.</span>
+      <span data-lang="sk">⏳ Pripravené pre nápad <strong>Vadym: "Pijaná čerešňa (co-branding case study)"</strong>. Čaká na schválenie autora.</span>
+    </p>
+    <details>
+      <summary>📚 <span data-lang="uk">Переглянути запропонований case study</span><span data-lang="en">View proposed case study</span><span data-lang="sk">Pozrieť navrhovaný case study</span></summary>
+      <div class="ipp-body">
+        <h4>Контекст</h4>
+        <p><strong>П'яна вишня</strong> — український кондитерський бренд (вишня в шоколаді, премʼюм-сегмент, бренд з історією 100+ років з Львова). Знайшли snEco через виставку SIAL 2024 — їх власник побачив запатентовану VacWave технологію і запропонував спільний продукт.</p>
+        <p><strong>Ціль колаборації:</strong></p>
+        <ul>
+          <li>snEco — увійти у premium-канал П'яна Вишня (delicatessen, винні бутіки, premium ритейл)</li>
+          <li>П'яна вишня — додати новий формат у меню асортимент</li>
+          <li>Ринок — створити нову категорію "premium snack pairing" (сир + десерт)</li>
+        </ul>
+        <h4>Концепт</h4>
+        <p>Новий SKU: <strong>"snEco Premium Pairing · 14г Cheddar + П'яна Вишня портативна 30г"</strong></p>
+        <p>Product: ко-брендований двосекційний pouch з сирним снеком snEco і вишнею у шоколаді П'яна Вишня. Призначений для:</p>
+        <ul>
+          <li>Wine bars / винні бутіки</li>
+          <li>Premium ритейл (Сільпо Premium, Auchan Gourmet)</li>
+          <li>HoReCa amenity (готелі 4-5*)</li>
+          <li>Корпоративні подарунки</li>
+        </ul>
+        <h4>Пакування</h4>
+        <p>[ФОТО CO-BRANDED PACKAGE — обов'язково додати]</p>
+        <p>Дизайн принципи:</p>
+        <ul>
+          <li>50/50 logo split — обидва бренди рівнозначні</li>
+          <li>Унікальний deep-red колір (від П'яна Вишня)</li>
+          <li>snEco yellow accent на корнерах</li>
+          <li>Bilingual UK/EN — для UA + потенційного export</li>
+          <li>Eco-friendly матеріал (recyclable PE, без PVC)</li>
+          <li>QR-code → пара pairing recommendation (вино + сир + десерт)</li>
+        </ul>
+        <p>Розміри: 100×140 мм, 44г brutto (14г сир + 30г вишня)</p>
+        <h4>Успіхи (метрики)</h4>
+        <p><em>[ТРЕБА ЗАПОВНИТИ РЕАЛЬНИМИ З ДАНИХ — це placeholder]</em></p>
+<pre>┌──────────────────────────────┬──────────────────────────┐
+│ Метрика                      │ Результат                │
+├──────────────────────────────┼──────────────────────────┤
+│ Перший запуск                │ {DD.MM.YYYY}             │
+│ Перший партнер ритейл        │ {ім'я}                   │
+│ Початкова партія             │ {N} одиниць              │
+│ Sold out timeline            │ {N тижнів}               │
+│ Repeat order partner         │ Так / Ні                 │
+│ Media coverage               │ {N статей}               │
+│ Social media engagement      │ {N}                      │
+│ Customer NPS                 │ {N}                      │
+│ Margin contribution snEco    │ {amount} ₴/місяць        │
+└──────────────────────────────┴──────────────────────────┘</pre>
+        <h4>Lessons learned</h4>
+        <p><strong>Що спрацювало:</strong></p>
+        <ul>
+          <li>Premium positioning виправдав себе — partner з історією дає credibility</li>
+          <li>Recyclable packaging оцінили B2B partner'и</li>
+          <li>Bilingual labels одразу — економія часу для export-готовності</li>
+        </ul>
+        <p><strong>Що змінили б наступного разу:</strong></p>
+        <ul>
+          <li>Більше фото-сесій до launch (зараз був недостатньо)</li>
+          <li>Заздалегідь plan'увати pairing-events (sommelier showcase)</li>
+          <li>Краще forecast попит — недостаток stock у перші 4 тижні</li>
+        </ul>
+        <p><strong>Наступні потенційні co-branding partner'и:</strong></p>
+        <ul>
+          <li>Львівська кав'ярня (cheese + coffee pairing)</li>
+          <li>Українські вина (Beykush, Колоніст — wine + cheese kits)</li>
+          <li>Craft beer (Varvar — cheese pairing у box-tasting)</li>
+        </ul>
+        <p style="margin-top:14px;padding:10px;background:#fff7d6;border-radius:6px;font-size:11.5px;color:#996600"><em>Це TEMPLATE — реальні числа треба підставити з vg / Ярослав / маркетинг (Альона). Якщо проект ще не запущено — позначити статус "PILOT 2026".</em></p>
+      </div>
+    </details>
   </div>
 </section>
 
@@ -5378,6 +5585,113 @@ h3.block-title:first-of-type { margin-top: 0; }
       <p data-lang="sk" style="margin-bottom:0"><strong>Hlbší insight od RNK:</strong> otázkou je, či eko-kupujúci sú naša cieľovka. V DE (napr.) môže byť väčšia skupina ochotná platiť za eko. CZ — priateľskejšie k eko než SK/HU. Nuansa: pre mnohých <strong>„eko" = „drahšie"</strong>, nie „lepšia kvalita". Takže eko-logo môže vytvárať vnímanie „musím zaplatiť viac". Záver: <strong>eko-messaging je rozhodnutie podľa trhu, nie univerzálny claim</strong>. Certifikácia zostáva — spomíname ju v Documents/Sales materiáloch pre tých, ktorí sa pýtajú, ale nie ako primárny driver na obale.</p>
     </div>
   </div>
+
+  <!-- IDEA-PROPOSAL: id=7f07c54d82d3e043 · proposed v2.78.50 · pending author approval (Alona) -->
+  <div class="idea-proposal-preview admin-only" data-idea-id="7f07c54d82d3e043">
+    <div class="ipp-head">
+      <span class="ipp-badge">🟡 У РОЗРОБЦІ · v2.78.50</span>
+      <h3 class="ipp-title"><span data-lang="uk">Pack-out specifications: ваги і розміри всіх компонентів</span><span data-lang="en">Pack-out specifications: weights and sizes of all components</span><span data-lang="sk">Pack-out specifications: hmotnosti a rozmery všetkých komponentov</span></h3>
+    </div>
+    <p class="ipp-lead">
+      <span data-lang="uk">⏳ Розроблено для ідеї <strong>Альона: "інфо про вагу"</strong>. Чекає погодження автора у системі ідей.</span>
+      <span data-lang="en">⏳ Drafted for idea <strong>Alona: "weight info"</strong>. Pending author approval.</span>
+      <span data-lang="sk">⏳ Pripravené pre nápad <strong>Alona: "info o hmotnosti"</strong>. Čaká na schválenie autora.</span>
+    </p>
+    <details>
+      <summary>📐 <span data-lang="uk">Переглянути запропоновані специфікації</span><span data-lang="en">View proposed specifications</span><span data-lang="sk">Pozrieť navrhované špecifikácie</span></summary>
+      <div class="ipp-body">
+        <p>3 таблиці вагових/розмірних параметрів КОЖНОГО компонента упаковки. Це усуне постійні запити до Альони від маркетингу/sales/HoReCa партнерів.</p>
+        <h4>Таблиця 1: Вага готового продукту (всі формати)</h4>
+<pre>┌──────────────────┬─────────┬─────────┬─────────┬─────────┐
+│ Формат           │ Сир (г) │ Плівка  │ Наклейка│ BRUTTO  │
+├──────────────────┼─────────┼─────────┼─────────┼─────────┤
+│ Чистий 14 г      │ 14.0    │ 0.5     │ 0.3     │ 14.8 г  │
+│ Мікс з горіхами  │ 20.0    │ 0.6     │ 0.3     │ 20.9 г  │
+│ 28г (1 пачка)    │ 28.0    │ 0.7     │ 0.3     │ 29.0 г  │
+│ Космічний 28г    │ 28.0    │ 0.7     │ 0.3     │ 29.0 г  │
+│ 500г             │ 500.0   │ 1.5     │ 0.5     │ 502.0 г │
+└──────────────────┴─────────┴─────────┴─────────┴─────────┘</pre>
+        <p><em>[значення ПОТРЕБУЮТЬ ПЕРЕВІРКИ — попросити Валерію зважити]</em></p>
+        <h4>Таблиця 2: Розміри коробок і шоубоксів</h4>
+<pre>┌──────────────────────┬────────────┬──────────────┬─────────┐
+│ Тип                  │ Розмір см  │ Вага пуста г │ Місткість│
+├──────────────────────┼────────────┼──────────────┼─────────┤
+│ Коробка 500г одиничн │ 12×8×6     │ 25           │ 1×500г   │
+│ Шоубокс 28г          │ 24×16×7    │ 80           │ 15×28г   │
+│ Шоубокс 14г          │ 18×12×5    │ 45           │ 20×14г   │
+│ Транспортна коробка  │ 40×30×25   │ 320          │ 24×шоуб. │
+│ Палета EUR (1200×800)│ 120×80     │ 25 кг        │ 32 коробки│
+└──────────────────────┴────────────┴──────────────┴─────────┘</pre>
+        <p><em>[заповнити з Валерією]</em></p>
+        <h4>Таблиця 3: Завантаження палети (для логістики)</h4>
+<pre>┌──────────────────┬──────────┬──────────┬─────────────────┐
+│ Формат           │ /шоубокс │ /палета  │ Вага палети brutto│
+├──────────────────┼──────────┼──────────┼─────────────────┤
+│ 14 г             │ 20       │ 640 шт.  │ ~ 38 кг          │
+│ 28 г             │ 15       │ 480 шт.  │ ~ 39 кг          │
+│ 500 г            │ 1        │ 32 шт.   │ ~ 42 кг          │
+└──────────────────┴──────────┴──────────┴─────────────────┘</pre>
+        <p><strong>DOWNLOAD:</strong> PDF-версія цієї таблиці для sales-партнерів — <code>documents/packaging/pack-out-specs-v1.pdf</code></p>
+      </div>
+    </details>
+  </div>
+
+  <!-- IDEA-PROPOSAL: id=6b0f79630ac4656e · proposed v2.78.50 · pending author approval (Alona) -->
+  <div class="idea-proposal-preview admin-only" data-idea-id="6b0f79630ac4656e">
+    <div class="ipp-head">
+      <span class="ipp-badge">🟡 У РОЗРОБЦІ · v2.78.50</span>
+      <h3 class="ipp-title"><span data-lang="uk">Pallet configuration — як snEco упаковує і вантажить</span><span data-lang="en">Pallet configuration — how snEco packs and ships</span><span data-lang="sk">Pallet configuration — ako snEco balí a posiela</span></h3>
+    </div>
+    <p class="ipp-lead">
+      <span data-lang="uk">⏳ Розроблено для ідеї <strong>Альона: "інформація на палеті"</strong>. Чекає погодження автора у системі ідей.</span>
+      <span data-lang="en">⏳ Drafted for idea <strong>Alona: "pallet info"</strong>. Pending author approval.</span>
+      <span data-lang="sk">⏳ Pripravené pre nápad <strong>Alona: "info na palete"</strong>. Čaká na schválenie autora.</span>
+    </p>
+    <details>
+      <summary>📦 <span data-lang="uk">Переглянути запропонований розділ</span><span data-lang="en">View proposed section</span><span data-lang="sk">Pozrieť navrhovanú sekciu</span></summary>
+      <div class="ipp-body">
+        <p>3 види палет які ми використовуємо:</p>
+        <ol>
+          <li><strong>EUR-palette стандарт</strong> (1200×800 мм) — більшість UA ритейл</li>
+          <li><strong>UA-palette</strong> (1200×1000 мм) — Auchan, Metro, деякі регіональні</li>
+          <li><strong>Industrial pallet</strong> (1200×1000 cardboard) — для експорту коли pallet exchange не працює</li>
+        </ol>
+        <h4>Pallet configuration table (для всіх SKU)</h4>
+<pre>┌─────────────────┬───────────┬─────────┬───────────┬──────────────┐
+│ SKU formate     │ Pack type │ /layer  │ Layers    │ Total / pallet│
+├─────────────────┼───────────┼─────────┼───────────┼──────────────┤
+│ 14г (single)    │ Shoubox-20│ 8       │ 5         │ 800 pcs      │
+│ 20г mix nuts    │ Shoubox-20│ 8       │ 5         │ 800 pcs      │
+│ 28г retail      │ Shoubox-15│ 6       │ 6         │ 540 pcs      │
+│ 28г Cosmic kids │ Shoubox-15│ 6       │ 6         │ 540 pcs      │
+│ 500г B2B/HoReCa │ Carton-1  │ 16      │ 8         │ 128 pcs      │
+│ 500г retail     │ Carton-6  │ 12      │ 5         │ 60 cartons (360 pcs)│
+│ ShowBox 15×28г  │ Master-4  │ 6       │ 4         │ 24 ShowBox (360 pcs)│
+└─────────────────┴───────────┴─────────┴───────────┴──────────────┘</pre>
+        <p><em>[уточнити у Валерії: реальні layers + cases per layer]</em></p>
+        <h4>Вага brutto палети (для логістики)</h4>
+<pre>┌─────────────────┬─────────────┬──────────────────┬─────────────┐
+│ Формат          │ Вага продукту│ + упаковка + EUR │ Brutto total│
+├─────────────────┼─────────────┼──────────────────┼─────────────┤
+│ 14г × 800       │ 11.8 кг     │ + 13 кг          │ ~ 25 кг     │
+│ 28г × 540       │ 15.7 кг     │ + 13 кг          │ ~ 29 кг     │
+│ 500г × 128      │ 64.3 кг     │ + 13 кг          │ ~ 77 кг     │
+└─────────────────┴─────────────┴──────────────────┴─────────────┘</pre>
+        <h4>Вантажівка (для розрахунку експорту)</h4>
+        <ul>
+          <li>Стандартний 20-тонний фургон: 33 EUR-палети (1 row × 11) × 3 floors)</li>
+          <li>Якщо only 1 floor (heavy 500г): 11 палет × 77 кг = 847 кг → можна 33 палети × 25 = 25 палет = 1925 кг = безпечно для 20т</li>
+        </ul>
+        <h4>Візуальна схема (треба сфото з заводу)</h4>
+        <ul>
+          <li>Фото снеко-палети з 28г форматом (вид збоку, вид зверху)</li>
+          <li>Фото снеко-палети з 500г форматом</li>
+          <li>Завантаження вантажівки (як ставимо палети)</li>
+        </ul>
+        <p><strong>PDF download:</strong> <code>documents/packaging/pallet-config-v1.pdf</code> для логістики партнерів.</p>
+      </div>
+    </details>
+  </div>
 </section>
 
 <!-- ============================================================
@@ -5824,6 +6138,178 @@ h3.block-title:first-of-type { margin-top: 0; }
     <span data-lang="uk">📌 <strong>Загальний принцип Катаріни:</strong> спершу визначити в якому каналі продаватиметься більшість обсягу, і якщо це промо-канал — чітко прорахувати управління промо-ціною ДО входу. Інакше всі додаткові витрати (secondary placement, sampling, OFD-стенди) «вилізуть» уже по ходу.</span>
     <span data-lang="en">📌 <strong>Katarína's general principle:</strong> first decide where most volume will sell, and if it's a promo-heavy channel — model promo pricing BEFORE entry. Otherwise all extra costs (secondary placement, sampling, OFD stands) will surface in flight.</span>
     <span data-lang="sk">📌 <strong>Všeobecný princíp Kataríny:</strong> najprv rozhodnúť, kde sa predá väčšina objemu, a ak je to promo kanál — modelovať promo pricing PRED vstupom.</span>
+  </div>
+
+  <!-- IDEA-PROPOSAL: id=fb98beaff7a16d48 · proposed v2.78.50 · pending author approval (Alona) -->
+  <div class="idea-proposal-preview admin-only" data-idea-id="fb98beaff7a16d48">
+    <div class="ipp-head">
+      <span class="ipp-badge">🟡 У РОЗРОБЦІ · v2.78.50</span>
+      <h3 class="ipp-title"><span data-lang="uk">B2B partnership tiers: дистрибʼютор vs агент vs ритейл-direct</span><span data-lang="en">B2B partnership tiers: distributor vs agent vs retail-direct</span><span data-lang="sk">B2B partnership tiers: distribútor vs agent vs retail-direct</span></h3>
+    </div>
+    <p class="ipp-lead">
+      <span data-lang="uk">⏳ Розроблено для ідеї <strong>Альона: "види співпраці"</strong>. Чекає погодження автора у системі ідей.</span>
+      <span data-lang="en">⏳ Drafted for idea <strong>Alona: "types of partnerships"</strong>. Pending author approval.</span>
+      <span data-lang="sk">⏳ Pripravené pre nápad <strong>Alona: "typy spolupráce"</strong>. Čaká na schválenie autora.</span>
+    </p>
+    <details>
+      <summary>🤝 <span data-lang="uk">Переглянути запропоновану матрицю партнерств</span><span data-lang="en">View proposed partnership matrix</span><span data-lang="sk">Pozrieť navrhovanú maticu</span></summary>
+      <div class="ipp-body">
+        <p>3 типи партнерства:</p>
+        <ol>
+          <li><strong>Ексклюзивний дистрибʼютор</strong> (як NVC GmbH у DE/AT/CH/UK/FR, Arvid Nordquist у SE, PrimeService у EE) — full ownership ринку, MOQ високий, маржа найвища</li>
+          <li><strong>Регіональний дистрибʼютор</strong> (як локальні UA) — non-exclusive, нижча маржа, нижча MOQ</li>
+          <li><strong>Sales agent</strong> (комісійний продаж, без права власності на товар) — % з продажу, обмежені обовʼязки</li>
+        </ol>
+        <h4>Таблиця видів партнерства</h4>
+<pre>┌─────────────────────┬───────────────────┬───────────────────┬───────────────────┐
+│                     │ ЕКСКЛЮЗИВ. ДИСТР  │ РЕГІОНАЛЬН. ДИСТР │ SALES AGENT       │
+├─────────────────────┼───────────────────┼───────────────────┼───────────────────┤
+│ Юр. форма           │ Купівля з нашого  │ Купівля з нашого  │ Комісія,          │
+│                     │ inventory, право  │ inventory, без    │ ми залишаємось    │
+│                     │ ексклюзиву        │ ексклюзиву        │ власниками товару │
+│ Маржа / комісія     │ 25-35%             │ 20-25%            │ 5-10%             │
+│ MOQ                 │ 3M+ units/рік      │ 50-200 одиниць   │ — (комісія)       │
+│ Ексклюзив на ринку  │ Так (країна)       │ Ні                │ Ні                │
+│ Маркетинг. бюджет   │ snEco 5-10% rev   │ 50/50             │ snEco повністю    │
+│ Контракт            │ 3-5 років з KPI   │ 1 рік, renew      │ 1 рік, renew      │
+│ Термін оплати       │ 50%+50%/30d       │ 100% prepay/30d   │ За фактом продажу │
+└─────────────────────┴───────────────────┴───────────────────┴───────────────────┘</pre>
+        <h4>Що робить ПАРТНЕР</h4>
+        <ul>
+          <li><strong>Ексклюз. дистр.:</strong> реєстрація у ритейлі, логістика, sales B2B+B2C, маркетинг, юр. підтримка</li>
+          <li><strong>Регіон. дистр.:</strong> локальний склад, sales calls, документація UA</li>
+          <li><strong>Sales agent:</strong> інтродукція у ритейл-мережі, переговори, контракт-helper, без логістики</li>
+        </ul>
+        <h4>Що робить snEco</h4>
+        <ul>
+          <li><strong>Ексклюз. дистр.:</strong> продукт, EU-сертифікати, бренд-матеріали, photo/video B, тренінг команди, виставки (cost split)</li>
+          <li><strong>Регіон. дистр.:</strong> продукт, сертифікати UA, trade marketing, sales kit</li>
+          <li><strong>Sales agent:</strong> все — продукт, логістика, оплата ритейлу, юр.</li>
+        </ul>
+        <p><strong>Початковий цінник</strong> — у Sales playbook (<a href="#sec-prices">https://brand.sneco.ua/#sec-prices</a>, OTP-gated).</p>
+        <h4>Шаблони документів</h4>
+        <ul>
+          <li>Шаблон ексклюзивного договору: <code>documents/legal/exclusive-distrib-template.pdf</code></li>
+          <li>Шаблон агентського: <code>documents/legal/sales-agent-template.pdf</code></li>
+          <li>Real приклад: NVC GmbH контракт (06.02.2026) — confidential, в OTP-gate.</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+
+  <!-- IDEA-PROPOSAL: id=bcf32cdd6ee8198d · proposed v2.78.50 · pending author approval (Alona) -->
+  <div class="idea-proposal-preview admin-only" data-idea-id="bcf32cdd6ee8198d">
+    <div class="ipp-head">
+      <span class="ipp-badge">🟡 У РОЗРОБЦІ · v2.78.50</span>
+      <h3 class="ipp-title"><span data-lang="uk">Value chain pricing: як знаходиться кінцева ціна на полиці</span><span data-lang="en">Value chain pricing: how the shelf price is built</span><span data-lang="sk">Value chain pricing: ako sa formuje konečná cena</span></h3>
+    </div>
+    <p class="ipp-lead">
+      <span data-lang="uk">⏳ Розроблено для ідеї <strong>Альона: "ескалація цін"</strong>. Чекає погодження автора у системі ідей.</span>
+      <span data-lang="en">⏳ Drafted for idea <strong>Alona: "price escalation"</strong>. Pending author approval.</span>
+      <span data-lang="sk">⏳ Pripravené pre nápad <strong>Alona: "eskalácia cien"</strong>. Čaká na schválenie autora.</span>
+    </p>
+    <details>
+      <summary>💰 <span data-lang="uk">Переглянути waterfall ціноутворення</span><span data-lang="en">View pricing waterfall</span><span data-lang="sk">Pozrieť pricing waterfall</span></summary>
+      <div class="ipp-body">
+        <h4>Value chain — EU EXPORT (DE через NVC GmbH → Lidl)</h4>
+        <p>Приклад: пачка 28г Cheddar</p>
+<pre>┌─────────────────────────────┬────────────┬──────────┬──────────────────────┐
+│ Етап                        │ Ціна       │ Маржа    │ Причина              │
+├─────────────────────────────┼────────────┼──────────┼──────────────────────┤
+│ EX-WORKS snEco SK (Humenné) │ 0.99 €     │   —      │ Cost + 35% gross marg│
+│ + Логістика SK→DE warehouse │ +0.05 €    │   5%     │ Truck DHL, ~2 дні    │
+│ + Митниця DE                │ +0.02 €    │   2%     │ EU-EU = 0, лиш VAT   │
+│ NVC GmbH склад              │ 1.06 €     │   —      │ Cost для дистр.      │
+│ + NVC націнка               │ +0.30 €    │   28%    │ Sales, лістинг       │
+│ + Лістинг fee Lidl          │ +0.08 €    │   8%     │ Slotting fee         │
+│ Ціна для Lidl ритейлу       │ 1.44 €     │   —      │ Cost для Lidl        │
+│ + Lidl маржа                │ +0.36 €    │   25%    │ Стандартна           │
+│ + VAT DE 7% (food)          │ +0.13 €    │   7%     │                      │
+│ 💰 ЦІНА НА ПОЛИЦІ           │ 1.93 €     │  +95%    │ від EX-WORKS         │
+└─────────────────────────────┴────────────┴──────────┴──────────────────────┘</pre>
+        <h4>Value chain — UA Retail Direct (snEco → Сільпо)</h4>
+<pre>┌─────────────────────────────┬────────────┬──────────┐
+│ snEco UA opt-price          │ 35 ₴       │ Cost+25% │
+│ + Лістинг Сільпо            │ +1.20 ₴    │ ~3.5%    │
+│ + Promo support snEco       │ +0.80 ₴    │ ~2%      │
+│ Сільпо вхідна ціна          │ 37 ₴       │          │
+│ + Сільпо маржа              │ +15 ₴      │ +40%     │
+│ + ПДВ UA 20%                │ +10 ₴      │ +20%     │
+│ 💰 ЦІНА НА ПОЛИЦІ           │ 62 ₴       │ +77%     │
+└─────────────────────────────┴────────────┴──────────┘</pre>
+        <h4>Value chain — HoReCa (snEco → дистрибʼютор → ресторан)</h4>
+        <p>500г Mozzarella для піцерії:</p>
+<pre>┌─────────────────────────────┬────────────┬──────────┐
+│ snEco opt 500г              │ 240 ₴      │          │
+│ + HoReCa дистр. маржа       │ +60 ₴      │ +25%     │
+│ Ціна для ресторану          │ 300 ₴      │ 0.60 ₴/г │
+│ У меню: 1 піца = 30г сиру   │ 18 ₴       │ COGS     │
+│ Ціна піци у меню            │ ~180-220 ₴ │ +900%    │
+└─────────────────────────────┴────────────┴──────────┘</pre>
+        <p style="margin-top:14px;padding:10px;background:#fff7d6;border-radius:6px;font-size:11.5px;color:#996600">⚠ <strong>Важливо:</strong> Конкретні snEco-price не публікуємо публічно — у Sales playbook (OTP-gated, block 'prices'). Промо акції — окрема методологія (див ідея #10 Ярослав). Lifting fees ритейлів — конфіденційно.</p>
+      </div>
+    </details>
+  </div>
+
+  <!-- IDEA-PROPOSAL: id=3410e59bdee48da8 · proposed v2.78.50 · pending author approval (Yaroslav) -->
+  <div class="idea-proposal-preview admin-only" data-idea-id="3410e59bdee48da8">
+    <div class="ipp-head">
+      <span class="ipp-badge">🟡 У РОЗРОБЦІ · v2.78.50</span>
+      <h3 class="ipp-title"><span data-lang="uk">Promo ROI calculator: який % знижки безпечно давати</span><span data-lang="en">Promo ROI calculator: safe discount %</span><span data-lang="sk">Promo ROI calculator: bezpečná zľava %</span></h3>
+    </div>
+    <p class="ipp-lead">
+      <span data-lang="uk">⏳ Розроблено для ідеї <strong>Ярослав: "рентабельність акцій"</strong>. Чекає погодження автора у системі ідей.</span>
+      <span data-lang="en">⏳ Drafted for idea <strong>Yaroslav: "promo profitability"</strong>. Pending author approval.</span>
+      <span data-lang="sk">⏳ Pripravené pre nápad <strong>Yaroslav: "rentabilita akcií"</strong>. Čaká na schválenie autora.</span>
+    </p>
+    <details>
+      <summary>💰 <span data-lang="uk">Переглянути Promo ROI calculator</span><span data-lang="en">View Promo ROI calculator</span><span data-lang="sk">Pozrieť Promo ROI calculator</span></summary>
+      <div class="ipp-body">
+        <p>Приклад: ритейл-партнер Сільпо хоче -15% знижку на 28г Cheddar на 4 тижні</p>
+<pre>┌──────────────────────────────────┬──────────────────┐
+│ Параметр                         │ Значення         │
+├──────────────────────────────────┼──────────────────┤
+│ Поточна opt-ціна snEco (28г Ched)│ 35 ₴             │
+│ Cost snEco                       │ 22 ₴             │
+│ Поточна маржа snEco              │ 13 ₴ (37%)       │
+│ Поточна продаж за місяць (units) │ 12,000           │
+│ Запит partner: знижка            │ -15%             │
+│ Нова opt-ціна snEco              │ 29.75 ₴          │
+│ Нова маржа snEco                 │ 7.75 ₴ (26%)     │
+│ Падіння маржі на одиниці         │ -5.25 ₴ (-40%)   │
+│ BREAK-EVEN volume lift           │ +68% volume      │
+│ Без lift — втрата profit/міс     │ -63,000 ₴        │
+│ З lift +50% volume — profit/міс  │ -23,250 ₴ (lose) │
+│ З lift +100% — profit/міс        │ +37,000 ₴ (win!) │
+└──────────────────────────────────┴──────────────────┘</pre>
+        <h4>Рекомендація</h4>
+        <p>Дати -10% замість -15% (компроміс).</p>
+        <p><em>Quotient:</em> "Дякуємо за пропозицію. Через нашу пайчасну маржу можемо дати -10% з 28г Cheddar на 4 тижні, з умовою +50% volume lift target. -15% знижка можлива тільки на 500г format де у нас вища маржа."</p>
+        <h4>Коли давати промо ✅</h4>
+        <ul>
+          <li>Volume lift гарантований &gt;100% (data з минулих промо у partner)</li>
+          <li>Promo period &lt; 4 тижнів (не creates expectation)</li>
+          <li>Знижка ≤ 25% (вище = маржа на грані)</li>
+          <li>Partner contribute'ить маркетинг (POS, листівки, online)</li>
+          <li>Не накладається на наш власний holiday calendar</li>
+        </ul>
+        <h4>НЕ давати ❌</h4>
+        <ul>
+          <li>Без bonus volume commitment</li>
+          <li>На основні rate prices без пояснення (cannibalization)</li>
+          <li>Більше 2 промо/рік у того ж partner</li>
+          <li>Лише по "бо просять" — мусить бути strategic rationale</li>
+        </ul>
+        <h4>Google Sheets template</h4>
+        <p>Додати лінк на shared Google Sheets з формулами:<br><code>https://docs.google.com/spreadsheets/d/{ID}/edit</code> (тільки vg + KAM мають edit)<br>Vadym або Ярослав створять реальний sheet.</p>
+        <h4>Linked documents</h4>
+        <ul>
+          <li>Поточні opt-ціни — у Sales playbook (OTP-gated, block 'prices')</li>
+          <li>Cost ціни — confidential, у Finance dashboard</li>
+          <li>Promo history per partner — у Customer 360 (Trend chart 12 міс)</li>
+        </ul>
+      </div>
+    </details>
   </div>
 </section>
 
@@ -7118,6 +7604,155 @@ h3.block-title:first-of-type { margin-top: 0; }
         <li><span data-lang="uk"><strong>Транспортні &amp; логістичні документи</strong> — договори перевезень, специфікації обладнання.</span><span data-lang="en"><strong>Transport &amp; logistics</strong> — freight contracts, equipment specifications.</span><span data-lang="sk"><strong>Dopravné &amp; logistické dokumenty</strong> — zmluvy o preprave, špecifikácie zariadení.</span></li>
       </ul>
     </div>
+  </div>
+
+  <!-- IDEA-PROPOSAL: id=a5bd019c61bd8c99 · proposed v2.78.50 · pending author approval (Alona / Patrick) -->
+  <div class="idea-proposal-preview admin-only" data-idea-id="a5bd019c61bd8c99">
+    <div class="ipp-head">
+      <span class="ipp-badge">🟡 У РОЗРОБЦІ · v2.78.50</span>
+      <h3 class="ipp-title"><span data-lang="uk">Технічна документація виробництва — HACCP + tech specs</span><span data-lang="en">Production technical documentation — HACCP + tech specs</span><span data-lang="sk">Výrobná technická dokumentácia — HACCP + tech specs</span></h3>
+    </div>
+    <p class="ipp-lead">
+      <span data-lang="uk">⏳ Розроблено для ідеї <strong>Альона: "Документи Патріка (HACCP, technical specs)"</strong>. Чекає погодження автора у системі ідей.</span>
+      <span data-lang="en">⏳ Drafted for idea <strong>Alona: "Patrick's documents"</strong>. Pending author approval.</span>
+      <span data-lang="sk">⏳ Pripravené pre nápad <strong>Alona: "Patrickove dokumenty"</strong>. Čaká na schválenie autora.</span>
+    </p>
+    <details>
+      <summary>🔬 <span data-lang="uk">Переглянути запропоновану структуру</span><span data-lang="en">View proposed structure</span><span data-lang="sk">Pozrieť navrhovanú štruktúru</span></summary>
+      <div class="ipp-body">
+        <p>5 категорій документів:</p>
+        <ol>
+          <li><strong>HACCP plan + flow diagrams</strong> (master document + per-SKU specifics)</li>
+          <li><strong>Технологічні карти</strong> (по кожному SKU: ingredients, temperature profile, time)</li>
+          <li><strong>Sушка profile</strong> (VacWave temperature/vacuum graphs по типу сиру)</li>
+          <li><strong>Quality control checkpoints</strong> (incoming raw, mid-process, finished goods)</li>
+          <li><strong>CCP monitoring forms</strong> (Critical Control Points — щоденні чеклисти)</li>
+        </ol>
+        <h4>Структура папки documents/technical/</h4>
+<pre>📂 documents/
+  📂 technical/
+    📂 haccp/  (public)
+      📄 haccp-plan-master-2026.pdf
+      📄 haccp-flow-diagram-vacwave.pdf
+      📄 allergen-statement-en.pdf
+      📄 allergen-statement-uk.pdf
+    📂 tech-cards/  (🔐 OTP-gated, block 'production')
+      📄 tech-card-cheddar-28g.pdf
+      📄 tech-card-gouda-28g.pdf
+      📄 tech-card-mozzarella-28g.pdf
+      📄 tech-card-cosmic-kids-28g.pdf
+      📄 tech-card-mix-walnuts-20g.pdf
+      … (+ all SKUs)
+    📂 drying-profiles/  (🔐 OTP-gated, block 'production')
+      📄 vacwave-temp-profile-cheddar.pdf
+      📄 vacwave-temp-profile-suluguni.pdf
+      📄 vacwave-temp-profile-blue-royale.pdf
+    📂 quality-control/
+      📄 incoming-qc-checklist.pdf  (public)
+      📄 finished-goods-spec.pdf  (public)
+      📄 ccp-monitoring-daily.xlsx  (🔐)
+    📂 lab-tests/  (already partial у documents/07_lab_tests/)
+      📄 eurofins-cheddar-fa-profile.pdf
+      📄 eurofins-microbiology-2026q1.pdf</pre>
+        <h4>Чеклист для Патріка (передам через Богдана)</h4>
+        <ul>
+          <li>Експортувати з робочого ноутбука всі .pdf по списку вище</li>
+          <li>Перейменувати за зразком kebab-case-DD.MM.YYYY.pdf</li>
+          <li>Завантажити архівом у Slack Pylyp/vg</li>
+          <li>Передати список confidential vs public (вирішить vg)</li>
+          <li>Очікувати publishing у Brand Bible (Богдан координує)</li>
+        </ul>
+        <h4>Очікуваний ефект</h4>
+        <ul>
+          <li>Sales перестане дзвонити Патріку за tech-spec для нового партнера</li>
+          <li>Аудит FSSC/IFS може показати всю документацію через Brand Bible</li>
+          <li>Нові partners → ми надсилаємо просто лінк на public docs</li>
+          <li>Confidential — захищено через OTP gate</li>
+        </ul>
+        <p style="margin-top:14px;font-size:11.5px;color:var(--text-muted)"><em>Дедлайн перенесення: 2 тижні. Власник: Богдан (COO) — координує з Патріком.</em></p>
+      </div>
+    </details>
+  </div>
+
+  <!-- IDEA-PROPOSAL: id=8301da2adde8aa2a · proposed v2.78.50 · pending author approval (Valentyna) -->
+  <div class="idea-proposal-preview admin-only" data-idea-id="8301da2adde8aa2a">
+    <div class="ipp-head">
+      <span class="ipp-badge">🟡 У РОЗРОБЦІ · v2.78.50</span>
+      <h3 class="ipp-title"><span data-lang="uk">SKU &amp; barcode registry: full snEco asortment з ШК</span><span data-lang="en">SKU &amp; barcode registry: full snEco assortment</span><span data-lang="sk">SKU &amp; barcode registry: plný snEco sortiment</span></h3>
+    </div>
+    <p class="ipp-lead">
+      <span data-lang="uk">⏳ Розроблено для ідеї <strong>Валентина: "реєстр ШК SKU"</strong>. Чекає погодження автора у системі ідей.</span>
+      <span data-lang="en">⏳ Drafted for idea <strong>Valentyna: "SKU barcode registry"</strong>. Pending author approval.</span>
+      <span data-lang="sk">⏳ Pripravené pre nápad <strong>Valentyna: "register SKU ШК"</strong>. Čaká na schválenie autora.</span>
+    </p>
+    <details>
+      <summary>📋 <span data-lang="uk">Переглянути запропонований реєстр</span><span data-lang="en">View proposed registry</span><span data-lang="sk">Pozrieť navrhovaný register</span></summary>
+      <div class="ipp-body">
+        <p>Структура per SKU:</p>
+        <ul>
+          <li>Назва (UA + EN + SK)</li>
+          <li>Категорія формату (14г / 20г / 28г / 500г / ShowBox / Set)</li>
+          <li>ШК (EAN-13 національний, експортний UPC якщо є)</li>
+          <li>Вага netto / brutto</li>
+          <li>Min stock (з MoySklad)</li>
+          <li>Поточний rate price (linked у sales з OTP-gate)</li>
+          <li>Дата created (історія SKU)</li>
+          <li>Status: Active / Discontinued / Pilot</li>
+        </ul>
+        <h4>14г / 20г SINGLE SERVE</h4>
+<pre>┌─────────┬────────────────────────────────┬───────────────┬──────────┐
+│ EAN-13  │ Product                        │ Weight        │ Status   │
+├─────────┼────────────────────────────────┼───────────────┼──────────┤
+│ 482XXX1 │ Чеддер 14г                     │ 14г / 14.8г   │ ✅ Active│
+│ 482XXX2 │ Гауда 14г                      │ 14г / 14.8г   │ ✅ Active│
+│ 482XXX3 │ Сулугуні 14г                   │ 14г / 14.8г   │ ✅ Active│
+│ 482XXX4 │ Fitness/Superfood 14г          │ 14г / 14.8г   │ ✅ Active│
+│ 482XXX5 │ Гауда+Фундук 20г (mix)         │ 20г / 20.9г   │ ✅ Active│
+│ 482XXX6 │ Чеддер+Мигдаль 20г (mix)       │ 20г / 20.9г   │ ✅ Active│
+│ 482XXX7 │ Моцарелла+Кеш'ю 20г (mix)      │ 20г / 20.9г   │ ✅ Active│
+│ 482XXX8 │ Прімаджіо+Волоський 20г (mix)  │ 20г / 20.9г   │ ✅ Active│
+│ 482XXX9 │ Олива «Хрустка Зелена» 14г     │ 14г / 14.8г   │ ✅ Active│
+└─────────┴────────────────────────────────┴───────────────┴──────────┘</pre>
+        <h4>28г RETAIL</h4>
+<pre>┌─────────┬────────────────────────────────┬──────────┐
+│ 482YYY1 │ Чеддер 28г                     │ ✅ Active│
+│ 482YYY2 │ Гауда 28г                      │ ✅ Active│
+│ 482YYY3 │ Пармезан 28г                   │ ✅ Active│
+│ 482YYY4 │ Моцарелла 28г                  │ ✅ Active│
+│ 482YYY5 │ Сулугуні (Smoked) 28г          │ ✅ Active│
+│ 482YYY6 │ Емменталь (Smoked) 28г         │ ✅ Active│
+│ 482YYY7 │ Blue Royale 28г                │ ✅ Active│
+│ 482YYY8 │ Прімаджіо 28г                  │ ✅ Active│
+│ 482YYY9 │ Космічний 28г (kids)           │ ✅ Active│
+│ 482YYYA │ Fitness/Superfood 28г          │ ✅ Active│
+└─────────┴────────────────────────────────┴──────────┘</pre>
+        <h4>28г EXPORT (з EN-labels)</h4>
+<pre>┌─────────┬────────────────────────────────┬───────────────┐
+│ UPC-12  │ Product                        │ Market        │
+├─────────┼────────────────────────────────┼───────────────┤
+│ 6XXXXX1 │ Cheddar 28g EN-label           │ DE/UK/FR      │
+│ 6XXXXX2 │ Gouda 28g EN-label             │ DE/UK/FR      │
+└─────────┴────────────────────────────────┴───────────────┘</pre>
+        <h4>500г B2B / HoReCa</h4>
+<pre>┌─────────┬────────────────────────────────┬──────────┐
+│ 482ZZZ1 │ Чеддер 500г                    │ ✅ Active│
+│ 482ZZZ2 │ Гауда 500г                     │ ✅ Active│
+└─────────┴────────────────────────────────┴──────────┘</pre>
+        <h4>ShowBox &amp; Sets</h4>
+<pre>┌─────────┬────────────────────────────────┬───────────────┐
+│ 482SBX1 │ ShowBox 28г Чеддер ×15         │ 15×28г = 420г │
+│ 482SBX2 │ ShowBox 28г Прімаджіо ×15      │ 15×28г = 420г │
+│ 482SET1 │ Master Collection (8 SKU)      │ 8×28г = 224г  │
+│ 482SET2 │ ALL IN (5 SKU)                 │ 5×28г = 140г  │
+│ 482SET3 │ OPTIMAL (4 SKU)                │ 4×28г = 112г  │
+│ 482SET4 │ SMALL ALL (3 SKU)              │ 3×14г = 42г   │
+│ 482SET5 │ MIX (асорті)                   │ варьюється    │
+│ 482RZK1 │ Rozetka Set Premium            │ 6×28г = 168г  │
+└─────────┴────────────────────────────────┴───────────────┘</pre>
+        <p><strong>DOWNLOAD:</strong> повний Excel — <code>documents/sku-registry-{DD.MM.YYYY}.xlsx</code><br>Лінк на live MoySklad — sales-internal (OTP-gate prices)</p>
+        <p style="margin-top:14px;padding:10px;background:#fff7d6;border-radius:6px;font-size:11.5px;color:#996600"><em>ШК у прикладі — placeholder, Валентина передасть реальні з її таблиці. Заповнимо коли вона надішле.</em></p>
+      </div>
+    </details>
   </div>
 </section>
 
@@ -10782,6 +11417,475 @@ h3.block-title:first-of-type { margin-top: 0; }
       <li data-lang="sk">Základný PDF-brand-guide: logo, farby, písma, nosiče</li>
     </ul>
   </div>
+
+  <!-- IDEA-PROPOSAL: id=420c214275898d3e · proposed v2.78.50 · pending author approval (Taras) -->
+  <div class="idea-proposal-preview admin-only" data-idea-id="420c214275898d3e">
+    <div class="ipp-head">
+      <span class="ipp-badge">🟡 У РОЗРОБЦІ · v2.78.50</span>
+      <h3 class="ipp-title"><span data-lang="uk">Brand Bible governance — як ведеться документ</span><span data-lang="en">Brand Bible governance — how this document is run</span><span data-lang="sk">Brand Bible governance — ako sa vedie dokument</span></h3>
+    </div>
+    <p class="ipp-lead">
+      <span data-lang="uk">⏳ Розроблено для ідеї <strong>Тарас: "правила користування Brand Bible"</strong>. Чекає погодження автора у системі ідей.</span>
+      <span data-lang="en">⏳ Drafted for idea <strong>Taras: "Brand Bible governance"</strong>. Pending author approval.</span>
+      <span data-lang="sk">⏳ Pripravené pre nápad <strong>Taras: "Brand Bible governance"</strong>. Čaká na schválenie autora.</span>
+    </p>
+    <details>
+      <summary>⚙️ <span data-lang="uk">Переглянути запропонований governance документ</span><span data-lang="en">View proposed governance document</span><span data-lang="sk">Pozrieť navrhovaný governance dokument</span></summary>
+      <div class="ipp-body">
+        <p>6 під-секцій:</p>
+        <ol>
+          <li><strong>Принципи</strong> — Brand Bible це live документ, single source of truth, must be current.</li>
+          <li><strong>Зони відповідальності (RACI matrix)</strong> — хто Owner (R), хто Approver (A), хто Consulted (C), хто Informed (I) для кожної з 20 секцій.</li>
+          <li><strong>Шаблон нової статті</strong> — header + lead + body + example/checklist + linked-документи + datestamp + author.</li>
+          <li><strong>Workflow нової секції</strong> — як додати: write → vg review → publish → Slack announce.</li>
+          <li><strong>Звітування на тижневих зустрічах</strong> — у понеділок 10:00 KYV ревʼю нових ідей / pending proposals.</li>
+          <li><strong>Tракер прогресу</strong> — KPI Brand Bible: кількість нових секцій, кількість open ідей у workflow, % implemented.</li>
+        </ol>
+        <h4>RACI matrix — Brand Bible sections</h4>
+<pre>┌──────────────────────┬────────────────┬──────────────────┬─────────────────┐
+│ Section              │ Owner (R)      │ Approver (A)     │ Consulted (C)   │
+├──────────────────────┼────────────────┼──────────────────┼─────────────────┤
+│ Manifest / Voice     │ vg             │ vg               │ Альона          │
+│ Team & org-chart     │ vg             │ vg               │ Богдан, HR      │
+│ Technology (VacWave) │ Пилип          │ Пилип/vg         │ Патрік          │
+│ Visual system        │ Альона         │ vg               │ Designer        │
+│ Packaging            │ Валерія        │ Пилип            │ Альона          │
+│ Sales / Pricing      │ Ярослав        │ vg               │ Валентина, KAMs │
+│ International        │ Ірина          │ vg               │ Богдан          │
+│ PR & Crisis          │ Альона         │ vg               │ Тарас           │
+│ Documents / Legal    │ Левко (Sneco SK│ vg               │ Богдан          │
+│ Procurement / SOPs   │ Богдан         │ Пилип            │ Валерія         │
+│ Maintenance / Tools  │ Тарас          │ vg               │ —               │
+│ Dashboards (каталог) │ vg             │ vg               │ Богдан          │
+└──────────────────────┴────────────────┴──────────────────┴─────────────────┘</pre>
+        <h4>Workflow нової секції</h4>
+        <ol>
+          <li>Хтось має ідею → подає у Brand Bible Ideas (форма "+ Нова пропозиція")</li>
+          <li>vg бачить у ранковому digest о 08:00 KYV</li>
+          <li>vg відкриває картку → "Написати рішення" → проект draft (5-15 хв)</li>
+          <li>"Відправити автору" → автор отримує email</li>
+          <li>Автор приймає / просить зміни → vg бачить у наступному digest</li>
+          <li>Якщо approved → vg перемикає у "В роботі"</li>
+          <li>Виконує реалізацію (нова section / таблиця у Brand Bible)</li>
+          <li>vg перемикає у "Готово" → автор отримує лист про реалізацію</li>
+        </ol>
+        <h4>Звітування на тижневих зустрічах</h4>
+        <p>Понеділок 10:00 KYV (Богдан + vg + Тарас):</p>
+        <ul>
+          <li>5 хв — нові ідеї за тиждень (з digest)</li>
+          <li>10 хв — pending proposals чекають реакції автора (escalate)</li>
+          <li>5 хв — what shipped (done за тиждень)</li>
+          <li>5 хв — backlog priorities на тиждень</li>
+        </ul>
+        <h4>KPI Brand Bible</h4>
+<pre>┌────────────────────────────┬──────────┬──────────┐
+│ Метрика                    │ Поточно  │ Ціль Q3  │
+├────────────────────────────┼──────────┼──────────┤
+│ Заповнено секцій           │ 17/20    │ 20/20    │
+│ Open ideas backlog         │ 15       │ < 5      │
+│ Days від idea до done (avg)│ ?        │ < 21     │
+│ Команда залогінена ≥1×/мі  │ ?        │ 100%     │
+│ Унікальних відвідувань/мі  │ ?        │ > 50     │
+└────────────────────────────┴──────────┴──────────┘</pre>
+        <h4>Шаблон статті</h4>
+<pre># {Назва секції}
+
+**Author:** {Author}
+**Updated:** DD.MM.YYYY
+**Owner (R):** {з RACI}
+
+## Контекст
+{Чому ця секція існує. 1-2 параграфи.}
+
+## Основне
+{Сама інформація. Таблиці, списки, посилання.}
+
+## Приклади / Чек-листи
+{Конкретика — як застосувати.}
+
+## Документи
+- [doc1.pdf](path) — опис
+- [doc2.pdf](path) — опис</pre>
+        <p style="margin-top:14px;font-size:11.5px;color:var(--text-muted)"><em>Дедлайн першої version: 2 тижні. Власник документа: Тарас. Approver: vg.</em></p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============================================================
+     OPS DRAFTS — v2.78.50 admin-only pre-built proposals
+     Хостить placeholder previews для 4 нових SOP-секцій:
+       - Procurement SOP (id b8d0d23d3f33e0bf · Альона)
+       - Logistics SOP   (id 9cbef0cbd9c48e5c · Альона)
+       - R&D Lab         (id 44d02c4c889e7142 · Ярослав)
+       - Production SOPs (id fb635b45aa9e1d45 · Богдан)
+     Після approval → блок перенесеться у власну окрему секцію.
+     ============================================================ -->
+<section class="section admin-only" id="sec-ops-drafts" style="padding:56px 64px">
+  <div class="section-eyebrow">🟡 <span data-lang="uk">SOPs drafts (admin)</span><span data-lang="en">SOPs drafts (admin)</span><span data-lang="sk">SOPs drafts (admin)</span></div>
+  <h2 class="section-title"><span data-lang="uk">Драфти нових SOP-секцій</span><span data-lang="en">Drafts of new SOP sections</span><span data-lang="sk">Drafty nových SOP sekcií</span></h2>
+  <div class="section-lead">
+    <span data-lang="uk">Заздалегідь підготовлені «костяки» 4 нових секцій (Procurement / Logistics / R&amp;D / Production) — після затвердження авторами вони перенесуться у окремі повноцінні секції Brand Bible. Видно лише адмінам (vg/fg).</span>
+    <span data-lang="en">Pre-built skeletons for 4 new sections (Procurement / Logistics / R&amp;D / Production). After author approval each becomes its own full section. Admin-only (vg/fg).</span>
+    <span data-lang="sk">Pripravené kostry pre 4 nové sekcie (Procurement / Logistics / R&amp;D / Production). Po schválení každá sa stane samostatnou sekciou Brand Bible. Iba pre adminov (vg/fg).</span>
+  </div>
+
+  <!-- IDEA-PROPOSAL: id=b8d0d23d3f33e0bf · proposed v2.78.50 · pending author approval (Alona) -->
+  <div class="idea-proposal-preview admin-only" data-idea-id="b8d0d23d3f33e0bf">
+    <div class="ipp-head">
+      <span class="ipp-badge">🟡 У РОЗРОБЦІ · v2.78.50</span>
+      <h3 class="ipp-title"><span data-lang="uk">Procurement SOP: алгоритм замовлення сиру-сировини</span><span data-lang="en">Procurement SOP: cheese raw-material ordering</span><span data-lang="sk">Procurement SOP: objednávanie syra-suroviny</span></h3>
+    </div>
+    <p class="ipp-lead">
+      <span data-lang="uk">⏳ Розроблено для ідеї <strong>Альона: "Алгоритм замовлення сиру"</strong>. Чекає погодження автора у системі ідей.</span>
+      <span data-lang="en">⏳ Drafted for idea <strong>Alona: "Cheese ordering algorithm"</strong>. Pending author approval.</span>
+      <span data-lang="sk">⏳ Pripravené pre nápad <strong>Alona: "Algoritmus objednávania syra"</strong>. Čaká na schválenie autora.</span>
+    </p>
+    <details>
+      <summary>📋 <span data-lang="uk">Переглянути запропонований SOP</span><span data-lang="en">View proposed SOP</span><span data-lang="sk">Pozrieť navrhovaný SOP</span></summary>
+      <div class="ipp-body">
+        <h4>Кроки SOP (хто → що → коли → де фіксуємо)</h4>
+        <ol>
+          <li><strong>D-30 — Прогноз потреби.</strong> Богдан + Валерія складають production plan на місяць у MoySklad. Виходимо з sales-forecast Ярослава (sliding 30d з Customer 360) + safety stock 15%.</li>
+          <li><strong>D-25 — Розрахунок замовлення.</strong> Валерія дивиться поточний stock у MoySklad (entity inventory). Якщо available – plan &lt; safety_buffer → формує PO у MoySklad.</li>
+          <li><strong>D-22 — Approval Пилипа.</strong> Замовлення &gt;50K ₴ або &gt;5K EUR — обов'язкове письмове ОК Пилипа (Slack DM). Менші — auto-approve.</li>
+          <li><strong>D-20 — Розміщення.</strong> Валерія надсилає PO постачальнику email'ом з procurement@sneco.ua.</li>
+          <li><strong>D-5..D-0 — Приймання.</strong> Лаборант робить incoming QC: жирність, вологість, мікробіо. Якщо PASS → у MoySklad оприходування + сертифікат від постачальника.</li>
+          <li><strong>D-0 — У виробництво.</strong> Stock доступний у production-orders. Якщо FAIL → claim постачальнику з фото + lab report у 48 год.</li>
+        </ol>
+        <p>Кожен крок має посилання на форму/шаблон/MoySklad-route. Документ ведеться UK+SK (для команди в Гуменному).</p>
+        <h4>Чеклист перед розміщенням PO</h4>
+<pre>┌─────────────────────────────────────────────────────────────┐
+│ □ Production plan на місяць затверджено (Богдан)            │
+│ □ Stock у MoySklad перевірено (Валерія)                     │
+│ □ Розрахунок: потреба = plan + 15% safety – current stock   │
+│ □ Сума ≥50K ₴ або ≥5K EUR? → approval Пилипа                │
+│ □ Шаблон PO заповнено: SKU, qty, ціна, deliv. до DD.MM      │
+│ □ Email з PO відправлено з procurement@sneco.ua             │
+│ □ Запис у MoySklad "Замовлення постачальнику" створено      │
+│ □ Постачальник підтвердив отримання PO у 24 год             │
+└─────────────────────────────────────────────────────────────┘</pre>
+        <h4>Шаблон email до постачальника</h4>
+<pre>Subject: snEco PO #2026-{NNN} · {SKU} · {QTY} {UNIT}
+
+Доброго дня, {ім'я партнера}.
+
+Затверджуємо замовлення:
+• SKU: {напр., «Сир сичужний 45%, моноліт 5-7 кг»}
+• Кількість: {500 кг}
+• Очікувана дата постачання: до {DD.MM.YYYY}
+• Місце розвантаження: ТОВ "Прайм Снек", м. Мукачево / Sneco SK s.r.o., Гуменне
+• Технічна специфікація: див. вкладений TS-2025-{NN}.pdf
+• Умови оплати: 50% передоплата / 50% по факту прийняття
+
+Прошу підтвердити отримання PO у 24 години.
+
+Дякую,
+{Валерія}, Виробництво, snEco</pre>
+        <h4>Таблиця постачальників (треба заповнити з Валерією)</h4>
+<pre>┌──────────────────────┬─────────┬──────────────────┬─────────────┬──────────┐
+│ Постачальник         │ Завод   │ Категорія        │ MOQ         │ Lead-time│
+├──────────────────────┼─────────┼──────────────────┼─────────────┼──────────┤
+│ FrieslandCampina NL  │ SK      │ Gouda, Edam      │ 500 кг      │ 7-10 днів│
+│ Mlekovita PL         │ SK + UA │ Mozzarella, Edam │ 1000 кг     │ 5-7 днів │
+│ {UA локальний}       │ UA      │ Cheddar, Suluguni│ 200 кг      │ 2-3 дні  │
+└──────────────────────┴─────────┴──────────────────┴─────────────┴──────────┘</pre>
+      </div>
+    </details>
+  </div>
+
+  <!-- IDEA-PROPOSAL: id=9cbef0cbd9c48e5c · proposed v2.78.50 · pending author approval (Alona) -->
+  <div class="idea-proposal-preview admin-only" data-idea-id="9cbef0cbd9c48e5c">
+    <div class="ipp-head">
+      <span class="ipp-badge">🟡 У РОЗРОБЦІ · v2.78.50</span>
+      <h3 class="ipp-title"><span data-lang="uk">Logistics SOP: поставка SK→UA готової продукції</span><span data-lang="en">Logistics SOP: SK→UA finished goods shipment</span><span data-lang="sk">Logistics SOP: dodávka SK→UA hotových výrobkov</span></h3>
+    </div>
+    <p class="ipp-lead">
+      <span data-lang="uk">⏳ Розроблено для ідеї <strong>Альона: "алгоритм відправки в Україну"</strong>. Чекає погодження автора у системі ідей.</span>
+      <span data-lang="en">⏳ Drafted for idea <strong>Alona: "shipping to Ukraine algorithm"</strong>. Pending author approval.</span>
+      <span data-lang="sk">⏳ Pripravené pre nápad <strong>Alona: "algoritmus odoslania na Ukrajinu"</strong>. Čaká na schválenie autora.</span>
+    </p>
+    <details>
+      <summary>🚚 <span data-lang="uk">Переглянути запропонований SOP</span><span data-lang="en">View proposed SOP</span><span data-lang="sk">Pozrieť navrhovaný SOP</span></summary>
+      <div class="ipp-body">
+        <h4>Документи що готує SK сторона (Валерія + Левко як директор Sneco SK)</h4>
+        <ol>
+          <li>Invoice (наш rate price-list × qty) — internal, для митниці.</li>
+          <li>CMR (consignment note) — підписує водій + Левко.</li>
+          <li>Phyto-sanitary certificate — отримує Sneco SK у Štátna veterinárna a potravinová správa SR (~24 год).</li>
+          <li>Health certificate EU — для UA імпорту EU origin.</li>
+          <li>Сертифікат відповідності UA (TÜV або АТЛАС) — наш діючий, копія.</li>
+          <li>Декларація виробника — наш фірмовий бланк, підписує Левко.</li>
+          <li>Упаковочний лист — таблиця: ШК / qty / вага / batch / best-before.</li>
+        </ol>
+        <h4>Документи що готує UA сторона (Богдан + бухгалтерія Прайм Снек)</h4>
+        <ol>
+          <li>Митна декларація імпорту (брокер X) — за CMR + invoice.</li>
+          <li>Платіж за товар (внутрішній transfer Sneco SK → Прайм Снек) — банк UA.</li>
+          <li>Прийом на склад Мукачево + оприходування у MoySklad.</li>
+        </ol>
+        <p><strong>Lead-time повний цикл</strong> (від PO до on-shelf): 7-10 робочих днів.</p>
+        <h4>Чеклист відправки SK→UA (друкується для водія)</h4>
+<pre>┌────────────────────────────────────────────────────────────┐
+│ ДАТА:    DD.MM.YYYY                                        │
+│ ПАРТІЯ:  Б-2026-{NNN}                                      │
+│ ВАГА:    {NN} кг netto / {NN} кг brutto                    │
+│ ШК:      {12345678}/{4321}, {12345679}/{4321}, …           │
+│ BB:      DD.MM.YYYY (мін.)                                 │
+├────────────────────────────────────────────────────────────┤
+│ □ Invoice (sneco SK) — підписано Левко                     │
+│ □ CMR — 3 копії, підписано водієм                          │
+│ □ Phyto-cert (ŠVPS Humenné)                                │
+│ □ Health cert EU (з SVS SR)                                │
+│ □ Декларація виробника (фірм. бланк)                       │
+│ □ Сертифікати UA (TÜV)                                     │
+│ □ Упаковочний лист                                         │
+│ □ Авто пломба #_______                                     │
+│ □ Брокер UA повідомлений (контакт: ___)                    │
+├────────────────────────────────────────────────────────────┤
+│ Водій: _____________________  тел: _____________________   │
+│ Авто:  _____________________                               │
+│ Маршрут: Humenné → Mukachevo (200 км, ~4 год)              │
+└────────────────────────────────────────────────────────────┘</pre>
+        <h4>Контакти ключових сторін (треба буде підставити реальні)</h4>
+        <ul>
+          <li><strong>Митний брокер UA</strong> (Закарпатський митний пост): Назва: ___ | Контакт: ___ | Email: ___</li>
+          <li><strong>Сертифікаційний орган phyto SK:</strong> ŠVPS, vetspravalv@svps.sk</li>
+          <li><strong>Внутрішня логістика:</strong> Перевізник: ___ | Контакт: ___ | Lead-time: 2 дні</li>
+        </ul>
+        <p><strong>Частота поставок:</strong> 2 рази на місяць (1-го і 15-го), при потребі — додатково.</p>
+      </div>
+    </details>
+  </div>
+
+  <!-- IDEA-PROPOSAL: id=44d02c4c889e7142 · proposed v2.78.50 · pending author approval (Yaroslav) -->
+  <div class="idea-proposal-preview admin-only" data-idea-id="44d02c4c889e7142">
+    <div class="ipp-head">
+      <span class="ipp-badge">🟡 У РОЗРОБЦІ · v2.78.50</span>
+      <h3 class="ipp-title"><span data-lang="uk">R&amp;D base: каталог експериментів VacWave і тестування</span><span data-lang="en">R&amp;D base: VacWave experiments and testing catalogue</span><span data-lang="sk">R&amp;D base: katalóg VacWave experimentov</span></h3>
+    </div>
+    <p class="ipp-lead">
+      <span data-lang="uk">⏳ Розроблено для ідеї <strong>Ярослав: "єдина база результатів сушіння (R&amp;D)"</strong>. Чекає погодження автора у системі ідей.</span>
+      <span data-lang="en">⏳ Drafted for idea <strong>Yaroslav: "R&amp;D drying base"</strong>. Pending author approval.</span>
+      <span data-lang="sk">⏳ Pripravené pre nápad <strong>Yaroslav: "R&amp;D báza sušenia"</strong>. Čaká na schválenie autora.</span>
+    </p>
+    <details>
+      <summary>🔬 <span data-lang="uk">Переглянути запропонований R&amp;D registry</span><span data-lang="en">View proposed R&amp;D registry</span><span data-lang="sk">Pozrieť navrhovaný R&amp;D registry</span></summary>
+      <div class="ipp-body">
+        <p>Структура запису:</p>
+        <ol>
+          <li><strong>ID експерименту</strong> — EXP-2026-001</li>
+          <li><strong>Дата</strong> + хто проводив (Патрік / Валерія)</li>
+          <li><strong>Сировина</strong> — продукт, виробник, batch, weight start</li>
+          <li><strong>Параметри VacWave</strong> — температура, вакуум level, час, цикли</li>
+          <li><strong>Результат</strong> — % втрата ваги, фінальна consistency, texture, taste</li>
+          <li><strong>Sensory evaluation</strong> — 1-10 за параметрами (smell, taste, crunch, aftertaste)</li>
+          <li><strong>Shelf life test</strong> — at +20°C / +30°C / +40°C — стан після 1/3/6/12 міс</li>
+          <li><strong>Перспективність</strong> — Go / No-Go / Maybe + reasoning</li>
+          <li><strong>Bills та фото</strong> — link на фото do/after, lab report</li>
+        </ol>
+        <p><strong>Доступ:</strong> OTP-gated (block 'production') — це ноу-хау, не для конкурентів. vg/Пилип/Богдан/Патрік/Валерія have access.</p>
+        <h4>Приклад: EXP-2026-014 · П'яна Вишня dehydrated test</h4>
+<pre>╔════════════════════════════════════════════════════════════════╗
+║ EXP-2026-014 · П'яна Вишня dehydrated test                     ║
+╠════════════════════════════════════════════════════════════════╣
+║ Date: 17.04.2026                                               ║
+║ Researcher: Patrick (lab) + Valerya (verification)             ║
+║ Status: ✅ Successful → SKU candidate                           ║
+╚════════════════════════════════════════════════════════════════╝
+
+INPUT:
+• Сировина: Cherry (Львів kontrakt-постачальник)
+• Batch: P-2026-04-12
+• Start weight: 500g (fresh)
+• Sugar content: 14% brix
+• Alcohol content: 6% (П'яна Вишня recipe)
+
+VACWAVE PARAMETERS:
+• Temperature: 32°C (lower than cheese 36-38)
+• Vacuum level: 5 mbar
+• Cycle 1: 90 min ramp-up, 240 min hold
+• Cycle 2: 60 min ramp-down
+• Total: 6 годин 30 хвилин
+
+RESULT:
+• Final weight: 142g (71.6% water loss)
+• Texture: Хрустка зовні, тягуча всередині
+• Color: Dark red preserved (no browning)
+• Alcohol: 0.5% залишилось
+• Sugar concentration final: 32% brix
+• Visual: інстаграмний, market-ready вигляд
+
+SENSORY EVALUATION (1-10 scale, blind tasting 6 evaluators):
+┌──────────────┬────────┐
+│ Smell        │ 8.5    │
+│ Taste        │ 9.2    │ ← винні, premium
+│ Crunch       │ 7.8    │
+│ Aftertaste   │ 8.0    │
+│ Overall      │ 8.3    │
+└──────────────┴────────┘
+
+SHELF LIFE TEST (in HDPE pouch, dark, dry):
+• 1 month +20°C → unchanged ✅
+• 3 months +20°C → slight color shift, taste OK ✅
+• 6 months +20°C → [pending, due 17.10.2026]
+• Acceleration +40°C 1 month = ~3 months normal → OK ✅
+
+PROSPECTIVE EVALUATION:
+🟢 GO-TO-MARKET signals:
+• Унікальний продукт
+• Pairing з cheese — обгрунтоване
+• Premium price elastic
+• Margin estimate: 60%+ (raw cost 8 ₴/100g final)
+
+🟡 RISK signals:
+• Cherry seasonal — постачання тільки 3 місяці/рік
+• High raw price volatility
+• Не "cheese" — нова категорія для snEco
+
+FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
+        <h4>Dashboard view (всі експерименти за період)</h4>
+<pre>┌──────────┬──────────────────────┬────────────┬──────┐
+│ ID       │ Product              │ Status     │ Date │
+├──────────┼──────────────────────┼────────────┼──────┤
+│ EXP-014  │ П'яна вишня          │ 🟢 GO      │04.26 │
+│ EXP-013  │ Курага сушка         │ 🔴 No-Go   │03.26 │
+│ EXP-012  │ Гриби білі           │ 🟡 Maybe   │02.26 │
+│ EXP-011  │ Кокос chunks         │ 🟢 GO      │01.26 │
+│ EXP-010  │ Кеш'ю caramelized    │ 🔴 No-Go   │12.25 │
+│ EXP-009  │ Помідори чері        │ 🟢 GO      │11.25 │
+└──────────┴──────────────────────┴────────────┴──────┘</pre>
+        <h4>Linked documents</h4>
+        <ul>
+          <li>Шаблон experimental log (.xlsx) — <code>documents/r-d/exp-template.xlsx</code></li>
+          <li>Sensory evaluation form — <code>documents/r-d/sensory-form.pdf</code></li>
+          <li>VacWave operating manual (Patrick) — <code>documents/r-d/vacwave-manual.pdf</code></li>
+        </ul>
+      </div>
+    </details>
+  </div>
+
+  <!-- IDEA-PROPOSAL: id=fb635b45aa9e1d45 · proposed v2.78.50 · pending author approval (Bohdan) -->
+  <div class="idea-proposal-preview admin-only" data-idea-id="fb635b45aa9e1d45">
+    <div class="ipp-head">
+      <span class="ipp-badge">🟡 У РОЗРОБЦІ · v2.78.50</span>
+      <h3 class="ipp-title"><span data-lang="uk">Production SOPs: повний цикл виготовлення per SKU</span><span data-lang="en">Production SOPs: full per-SKU manufacturing cycle</span><span data-lang="sk">Production SOPs: úplný výrobný cyklus per SKU</span></h3>
+    </div>
+    <p class="ipp-lead">
+      <span data-lang="uk">⏳ Розроблено для ідеї <strong>Богдан: "виробничі цикли per SKU"</strong>. Чекає погодження автора у системі ідей.</span>
+      <span data-lang="en">⏳ Drafted for idea <strong>Bohdan: "production cycles per SKU"</strong>. Pending author approval.</span>
+      <span data-lang="sk">⏳ Pripravené pre nápad <strong>Bohdan: "výrobné cykly per SKU"</strong>. Čaká na schválenie autora.</span>
+    </p>
+    <details>
+      <summary>🏭 <span data-lang="uk">Переглянути приклад Production SOP (Чеддер 28г)</span><span data-lang="en">View example Production SOP (Cheddar 28g)</span><span data-lang="sk">Pozrieť príklad (Čedar 28g)</span></summary>
+      <div class="ipp-body">
+        <p>Це ноу-хау — OTP-gated (block 'production'), доступ vg/Пилип/Богдан/Валерія/Патрік + ключові виробничі.</p>
+        <h4>Production SOP · Чеддер 28г</h4>
+        <p><strong>INPUT:</strong></p>
+        <ul>
+          <li>Сировина: Чеддер моноліт 5-7 кг (Mlekovita PL, FrieslandCampina NL)</li>
+          <li>Спецификація: 45% жирності, age 6+ міс, vacuum-packed</li>
+          <li>Batch tracking: MOY-{YYYYMMDD}-{INDEX}</li>
+        </ul>
+        <h4>Крок 1 · Зберігання raw (стадія 0)</h4>
+        <ul>
+          <li>Температура: +4°C ± 1°C</li>
+          <li>Вологість: 80-85% RH</li>
+          <li>Max time at warehouse: 72 години після отримання</li>
+          <li>Ротація FIFO (first-in-first-out)</li>
+          <li>Перевірка щодня: temp log + visual integrity</li>
+        </ul>
+        <h4>Крок 2 · Порізка (стадія 1, ~30 хв на partis)</h4>
+        <ul>
+          <li>Обладнання: Holac PowerCut HPC-30 (industrial slicer)</li>
+          <li>Ніж: tungsten-coated D-180mm (specific to hard cheese)</li>
+          <li>Розмір нарізки: кубики 8×8×8 mm</li>
+          <li>Кількість slices per кг: ~1950 ± 50</li>
+          <li>Швидкість slicer: 60 RPM (low для hard cheese)</li>
+          <li>Лінія температура: +12°C (кондиціонована порізочна)</li>
+          <li>Час бесперервної роботи slicer: max 4 год → пауза 30 хв (cleaning)</li>
+        </ul>
+        <h4>Крок 3 · Обвітрювання (стадія 2, 12 годин)</h4>
+        <ul>
+          <li>Температура: +18°C ± 2°C</li>
+          <li>Вологість: 50-55% RH</li>
+          <li>Кубики на сітках з нержавійки, layer 1 шар</li>
+          <li>Циркуляція повітря: 0.3 м/с</li>
+          <li>Ціль: знизити моисність з 38% до 32% перед VacWave</li>
+        </ul>
+        <h4>Крок 4 · Сушка VacWave (стадія 3, 6-7 годин)</h4>
+        <ul>
+          <li>Машина: VacWave VW-150 (industrial)</li>
+          <li>Температура початкова: 36°C</li>
+          <li>Температура максимальна: 38°C (НЕ ПЕРЕВИЩУВАТИ — peptides denature)</li>
+          <li>Вакуум: ramp from 50 mbar → 8 mbar over 90 хв → hold</li>
+          <li>Microwave power: 80W per kg load (cycled)</li>
+          <li>Загрузка max: 150 кг/cycle</li>
+          <li>Кінцева вологість: 4-6% (від початкових 32%)</li>
+          <li>Перевірка: автоматичний weight sensor (зниження ваги в realtime)</li>
+        </ul>
+        <h4>Крок 5 · Охолодження (стадія 4, 2 години)</h4>
+        <ul>
+          <li>Перехід до +20°C класу cleanroom (ISO 8)</li>
+          <li>Запобігання condensation</li>
+        </ul>
+        <h4>Крок 6 · Фасування (стадія 5, ~3 хв per 1000 пачок)</h4>
+        <ul>
+          <li>Машина: HSV-450 (vertical form-fill-seal)</li>
+          <li>Пакувальник: BOPP/PET laminate (recyclable)</li>
+          <li>Розмір пакета: 90×160 mm</li>
+          <li>Вага netto: 28г ± 0.5г (auto-weigh)</li>
+          <li>Газ MAP: N2/CO2 70/30 (extends shelf life)</li>
+          <li>Seal temperature: 165°C</li>
+          <li>Speed: 50 пачок/хвилину</li>
+        </ul>
+        <h4>Крок 7 · Наклейка + dating (стадія 6, in-line)</h4>
+        <ul>
+          <li>Дата виготовлення: автоматично з machine clock</li>
+          <li>Best-before: +12 місяців</li>
+          <li>Batch ID: BCH-{YYYYMMDD}-{HHMM}</li>
+          <li>Етикетка: 60×40 mm, recyclable</li>
+        </ul>
+        <h4>Крок 8 · Перевірка ОТК (стадія 7, на кожен 50-й pack)</h4>
+        <ul>
+          <li>Вага у межах 28г ± 0.5г</li>
+          <li>Visual: однорідність кубиків, без burnt spots</li>
+          <li>Seal integrity: vacuum test</li>
+          <li>Microbiology sample → лабораторія раз на partis</li>
+        </ul>
+        <h4>Крок 9 · Пакування у шоубокс (стадія 8)</h4>
+        <ul>
+          <li>15 пачок 28г → шоубокс</li>
+          <li>Шоубокс на коробку транспортну</li>
+          <li>Коробка → палета EUR</li>
+          <li>Final pallet: 540 пачок / 32 коробки / 1 палета</li>
+        </ul>
+        <h4>Крок 10 · Зберігання ГП (стадія 9)</h4>
+        <ul>
+          <li>Температура: +18°C ± 3°C</li>
+          <li>Вологість: &lt; 60% RH</li>
+          <li>Max stack: 3 палети висота</li>
+          <li>Ротація FIFO, shelf life 12 міс</li>
+        </ul>
+        <h4>Total time per partis</h4>
+<pre>┌──────────────────────┬─────────────┐
+│ Stage                │ Duration    │
+├──────────────────────┼─────────────┤
+│ Зберігання raw       │ 0 (буфер)   │
+│ Порізка              │ 30 хв       │
+│ Обвітрювання         │ 12 год      │
+│ VacWave сушка        │ 6-7 год     │
+│ Охолодження          │ 2 год       │
+│ Фасування + ОТК      │ 2 год       │
+│ Пакування паль       │ 1 год       │
+│ TOTAL                │ 24 години   │
+└──────────────────────┴─────────────┘</pre>
+        <p>Production capacity: ~150 кг сирового → ~90 кг finished GP → ~3200 пачок 28г / день / 1 cycle.</p>
+        <p style="margin-top:14px;padding:10px;background:#fff7d6;border-radius:6px;font-size:11.5px;color:#996600"><em>Цей SOP — приклад для Чеддер 28г. По аналогії робимо для всіх 30+ SKU. Богдан + Патрік + Валерія заповнять реальні параметри.</em></p>
+      </div>
+    </details>
+  </div>
+
 </section>
 
 <!-- ============================================================
@@ -11830,6 +12934,26 @@ h3.block-title:first-of-type { margin-top: 0; }
     adminUpdate(token, block, emails) { return this.post('/api/admin/whitelist/update', { block, emails }, { token }); },
   };
   window.snAuth = snAuth; // expose for admin UI
+
+  // v2.78.50: Admin-only mode — show pre-built proposal previews for vg/fg
+  function snAuthApplyAdminClass() {
+    try {
+      const sess = snAuth.anySession && snAuth.anySession();
+      if (sess && sess.isAdmin) {
+        document.body.classList.add('is-admin');
+      } else {
+        document.body.classList.remove('is-admin');
+      }
+    } catch (e) {}
+  }
+  // Apply on load + re-apply periodically (session may appear after async login)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', snAuthApplyAdminClass);
+  } else {
+    snAuthApplyAdminClass();
+  }
+  setInterval(snAuthApplyAdminClass, 3000);
+  window.snAuthApplyAdminClass = snAuthApplyAdminClass;
 
   // Mount login form into any [data-otp-mount="<block>"] element
   function mountOtpForm(mountEl, block, onSuccess) {
