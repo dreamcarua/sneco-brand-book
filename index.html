@@ -2381,7 +2381,7 @@ body.is-admin section.admin-only { display: block !important; }
     </button>
     <button class="nav-link" data-target="production" type="button">
       <span class="dot"></span>
-      <span data-lang="uk">🏭 Виробничі цикли</span><span data-lang="en">🏭 Production Cycles</span><span data-lang="sk">🏭 Výrobné cykly</span>
+      <span data-lang="uk">🏭 Виробничі цикли та правила</span><span data-lang="en">🏭 Production Cycles &amp; Rules</span><span data-lang="sk">🏭 Výrobné cykly a pravidlá</span>
     </button>
     <!-- v2.78.57: split dashboards into 2 groups -->
     <button class="nav-link" data-target="dashboards-commercial" type="button">
@@ -12990,7 +12990,7 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
      ============================================================ -->
 <section class="section is-locked" id="sec-production" data-otp-block="production" style="padding:56px 64px">
   <div class="section-eyebrow">🔒 <span data-lang="uk">Конфіденційне · Виробництво</span><span data-lang="en">Confidential · Production</span><span data-lang="sk">Dôverné · Výroba</span></div>
-  <h2 class="section-title">🏭 <span data-lang="uk">Виробничі цикли — SOP per SKU</span><span data-lang="en">Production Cycles — SOP per SKU</span><span data-lang="sk">Výrobné cykly — SOP per SKU</span></h2>
+  <h2 class="section-title">🏭 <span data-lang="uk">Виробничі цикли та правила</span><span data-lang="en">Production Cycles &amp; Rules</span><span data-lang="sk">Výrobné cykly a pravidlá</span></h2>
 
   <!-- LOCKED STATE -->
   <div class="otp-locked">
@@ -13044,113 +13044,387 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
       </div>
     </div>
 
-    <!-- Per-stage detail framework -->
-    <h3 class="block-title">⚙️ <span data-lang="uk">Деталізація по дільницях (template)</span><span data-lang="en">Per-stage detail (template)</span><span data-lang="sk">Detail per stupeň (template)</span></h3>
-    <div class="grid-2">
-      <div class="card card-sm">
-        <div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--yellow);margin-bottom:8px">🔪 <span data-lang="uk">Порізка</span><span data-lang="en">Cutting</span><span data-lang="sk">Krájanie</span></div>
-        <ul style="font-size:12.5px;line-height:1.7;list-style:none;padding:0;margin:0;color:var(--text-muted)">
-          <li>• <span data-lang="uk">Тип ножа per вид сиру</span><span data-lang="en">Knife type per cheese variety</span><span data-lang="sk">Typ noža per druh syra</span></li>
-          <li>• <span data-lang="uk">Розмір фракцій (mm)</span><span data-lang="en">Fragment size (mm)</span><span data-lang="sk">Veľkosť frakcií (mm)</span></li>
-          <li>• <span data-lang="uk">Швидкість лінії</span><span data-lang="en">Line speed</span><span data-lang="sk">Rýchlosť linky</span></li>
-          <li>• <span data-lang="uk">Температура сировини при порізці</span><span data-lang="en">Raw-material temp during cutting</span><span data-lang="sk">Teplota suroviny pri krájaní</span></li>
-        </ul>
-      </div>
-      <div class="card card-sm">
-        <div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--yellow);margin-bottom:8px">🌬 <span data-lang="uk">Обвітрювання</span><span data-lang="en">Air-drying</span><span data-lang="sk">Vyvetrávanie</span></div>
-        <ul style="font-size:12.5px;line-height:1.7;list-style:none;padding:0;margin:0;color:var(--text-muted)">
-          <li>• <span data-lang="uk">Час обвітрювання per сорт (хв/год)</span><span data-lang="en">Air-drying time per variety (min/hr)</span><span data-lang="sk">Čas vyvetrávania per druh (min/hod)</span></li>
-          <li>• <span data-lang="uk">Температура приміщення</span><span data-lang="en">Room temperature</span><span data-lang="sk">Teplota miestnosti</span></li>
-          <li>• <span data-lang="uk">Вологість повітря</span><span data-lang="en">Air humidity</span><span data-lang="sk">Vlhkosť vzduchu</span></li>
-          <li>• <span data-lang="uk">Цільова втрата вологи %</span><span data-lang="en">Target moisture loss %</span><span data-lang="sk">Cieľová strata vlhkosti %</span></li>
-        </ul>
-      </div>
-      <div class="card card-sm">
-        <div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--yellow);margin-bottom:8px">📡 VacWave</div>
-        <ul style="font-size:12.5px;line-height:1.7;list-style:none;padding:0;margin:0;color:var(--text-muted)">
-          <li>• <span data-lang="uk">Завантаження барабана (kg)</span><span data-lang="en">Drum load (kg)</span><span data-lang="sk">Naplnenie bubna (kg)</span></li>
-          <li>• <span data-lang="uk">Кількість магнетронів</span><span data-lang="en">Magnetron count</span><span data-lang="sk">Počet magnetrónov</span></li>
-          <li>• <span data-lang="uk">Профіль потужності (W)</span><span data-lang="en">Power profile (W)</span><span data-lang="sk">Profil výkonu (W)</span></li>
-          <li>• <span data-lang="uk">Рівень вакууму (mbar)</span><span data-lang="en">Vacuum level (mbar)</span><span data-lang="sk">Úroveň vákua (mbar)</span></li>
-          <li>• <span data-lang="uk">Цикл температури (36–38°C cap)</span><span data-lang="en">Temperature cycle (36–38°C cap)</span><span data-lang="sk">Teplotný cyklus (36–38°C cap)</span></li>
-          <li>• <span data-lang="uk">Coolant trigger (°C)</span><span data-lang="en">Coolant trigger (°C)</span><span data-lang="sk">Coolant trigger (°C)</span></li>
-          <li>• <span data-lang="uk">Тривалість циклу (хв)</span><span data-lang="en">Cycle duration (min)</span><span data-lang="sk">Trvanie cyklu (min)</span></li>
-        </ul>
-      </div>
-      <div class="card card-sm">
-        <div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--yellow);margin-bottom:8px">📦 <span data-lang="uk">Фасування</span><span data-lang="en">Packaging</span><span data-lang="sk">Balenie</span></div>
-        <ul style="font-size:12.5px;line-height:1.7;list-style:none;padding:0;margin:0;color:var(--text-muted)">
-          <li>• <span data-lang="uk">Формат пачки (14г / 20г / 28г / 500г)</span><span data-lang="en">Pack format (14g / 20g / 28g / 500g)</span><span data-lang="sk">Formát obalu</span></li>
-          <li>• <span data-lang="uk">Газове середовище</span><span data-lang="en">Modified atmosphere</span><span data-lang="sk">Modifikovaná atmosféra</span></li>
-          <li>• <span data-lang="uk">Швидкість фасувальної лінії</span><span data-lang="en">Packaging line speed</span><span data-lang="sk">Rýchlosť baliacej linky</span></li>
-          <li>• <span data-lang="uk">QC bar / metal-detector / weight-check</span><span data-lang="en">QC bar / metal-detector / weight-check</span><span data-lang="sk">QC bar / metal-detector / weight-check</span></li>
-        </ul>
-      </div>
-      <div class="card card-sm">
-        <div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--yellow);margin-bottom:8px">📦 <span data-lang="uk">Зберігання</span><span data-lang="en">Storage</span><span data-lang="sk">Sklad</span></div>
-        <ul style="font-size:12.5px;line-height:1.7;list-style:none;padding:0;margin:0;color:var(--text-muted)">
-          <li>• <span data-lang="uk">Температурний режим (раб / гот.продукт)</span><span data-lang="en">Temperature regime (raw / FG)</span><span data-lang="sk">Teplotný režim (suro / HV)</span></li>
-          <li>• <span data-lang="uk">RH (humidity)</span><span data-lang="en">RH (humidity)</span><span data-lang="sk">RH (vlhkosť)</span></li>
-          <li>• <span data-lang="uk">Зонування паллет</span><span data-lang="en">Pallet zoning</span><span data-lang="sk">Zónovanie paliet</span></li>
-          <li>• <span data-lang="uk">FIFO / FEFO</span><span data-lang="en">FIFO / FEFO</span><span data-lang="sk">FIFO / FEFO</span></li>
-        </ul>
-      </div>
-      <div class="card card-sm">
-        <div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--yellow);margin-bottom:8px">🧼 <span data-lang="uk">Прибирання</span><span data-lang="en">Cleaning</span><span data-lang="sk">Čistenie</span></div>
-        <ul style="font-size:12.5px;line-height:1.7;list-style:none;padding:0;margin:0;color:var(--text-muted)">
-          <li>• <span data-lang="uk">Засоби (per поверхня)</span><span data-lang="en">Agents (per surface)</span><span data-lang="sk">Prostriedky (per povrch)</span></li>
-          <li>• <span data-lang="uk">Концентрації</span><span data-lang="en">Concentrations</span><span data-lang="sk">Koncentrácie</span></li>
-          <li>• <span data-lang="uk">Час експозиції</span><span data-lang="en">Contact time</span><span data-lang="sk">Čas expozície</span></li>
-          <li>• <span data-lang="uk">Періодичність (per зміна / тиждень)</span><span data-lang="en">Frequency (per shift / week)</span><span data-lang="sk">Frekvencia (per zmena / týždeň)</span></li>
-          <li>• <span data-lang="uk">Чек-лист валідації</span><span data-lang="en">Validation checklist</span><span data-lang="sk">Validačný checklist</span></li>
-        </ul>
-      </div>
+    <!-- v2.78.59: 6 SOP документів реальних — затверджені Гришин П.В. -->
+    <h3 class="block-title">📋 <span data-lang="uk">Затверджені SOP документи</span><span data-lang="en">Approved SOP documents</span><span data-lang="sk">Schválené SOP dokumenty</span></h3>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:18px;line-height:1.6">
+      <span data-lang="uk">6 офіційних документів виробничої політики. Затверджено Директором Гришин П.В. <strong>Усі — обов'язкові для виконання</strong>. Розширене резюме кожного — нижче. Повний оригінал — кнопкою «📥 Завантажити».</span>
+      <span data-lang="en">6 official production policy documents. Approved by Director P.V. Hryshyn. <strong>All mandatory</strong>. Summary below, full original via «📥 Download».</span>
+      <span data-lang="sk">6 oficiálnych výrobných dokumentov. Schválené Riaditeľom P.V. Hryshyn. <strong>Všetky povinné</strong>.</span>
     </div>
 
-    <!-- Per-SKU SOP status table -->
-    <h3 class="block-title">📋 <span data-lang="uk">SOP per SKU — статус наповнення</span><span data-lang="en">SOP per SKU — population status</span><span data-lang="sk">SOP per SKU — stav vyplnenia</span></h3>
-    <div class="card" style="padding:0">
-      <table class="spec-table" style="width:100%;font-size:12.5px">
-        <thead>
-          <tr>
-            <th>SKU</th>
-            <th><span data-lang="uk">Сировина</span><span data-lang="en">Raw material</span><span data-lang="sk">Surovina</span></th>
-            <th><span data-lang="uk">SOP документ</span><span data-lang="en">SOP doc</span><span data-lang="sk">SOP doc</span></th>
-            <th><span data-lang="uk">Час циклу (типовий)</span><span data-lang="en">Cycle time (typical)</span><span data-lang="sk">Čas cyklu (typický)</span></th>
-            <th><span data-lang="uk">Персонал</span><span data-lang="en">Staff</span><span data-lang="sk">Personál</span></th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td><strong>Cheddar</strong></td><td><span data-lang="uk">Чеддер блок</span><span data-lang="en">Cheddar block</span><span data-lang="sk">Cheddar blok</span></td><td>—</td><td>—</td><td>—</td><td>⏳ <span data-lang="uk">очікує</span><span data-lang="en">pending</span><span data-lang="sk">čaká</span></td></tr>
-          <tr><td><strong>Gouda</strong></td><td><span data-lang="uk">Гауда блок</span><span data-lang="en">Gouda block</span><span data-lang="sk">Gauda blok</span></td><td>—</td><td>—</td><td>—</td><td>⏳ <span data-lang="uk">очікує</span><span data-lang="en">pending</span><span data-lang="sk">čaká</span></td></tr>
-          <tr><td><strong>Parmesan / Primaggio</strong></td><td><span data-lang="uk">Парм./Прімаджіо</span><span data-lang="en">Parm./Primaggio</span><span data-lang="sk">Parm./Primaggio</span></td><td>—</td><td>—</td><td>—</td><td>⏳ <span data-lang="uk">очікує</span><span data-lang="en">pending</span><span data-lang="sk">čaká</span></td></tr>
-          <tr><td><strong>Mozzarella</strong></td><td>Mozz. block</td><td>—</td><td>—</td><td>—</td><td>⏳ <span data-lang="uk">очікує</span><span data-lang="en">pending</span><span data-lang="sk">čaká</span></td></tr>
-          <tr><td><strong>Smoked Suluguni</strong></td><td>Suluguni</td><td>—</td><td>—</td><td>—</td><td>⏳ <span data-lang="uk">очікує</span><span data-lang="en">pending</span><span data-lang="sk">čaká</span></td></tr>
-          <tr><td><strong>Smoked Emmental</strong></td><td>Emmental</td><td>—</td><td>—</td><td>—</td><td>⏳ <span data-lang="uk">очікує</span><span data-lang="en">pending</span><span data-lang="sk">čaká</span></td></tr>
-          <tr><td><strong>Blue Royale</strong></td><td><span data-lang="uk">Блакитний сир</span><span data-lang="en">Blue cheese</span><span data-lang="sk">Modrý syr</span></td><td>—</td><td>—</td><td>—</td><td>⏳ <span data-lang="uk">очікує</span><span data-lang="en">pending</span><span data-lang="sk">čaká</span></td></tr>
-          <tr><td><strong>Fitness 60%</strong></td><td><span data-lang="uk">Низькожирн. сир</span><span data-lang="en">Low-fat cheese</span><span data-lang="sk">Nízkotučný syr</span></td><td>—</td><td>—</td><td>—</td><td>⏳ <span data-lang="uk">очікує</span><span data-lang="en">pending</span><span data-lang="sk">čaká</span></td></tr>
-          <tr><td><strong>Cosmic (Kids)</strong></td><td><span data-lang="uk">Дитяча суміш</span><span data-lang="en">Kids blend</span><span data-lang="sk">Detská zmes</span></td><td>—</td><td>—</td><td>—</td><td>⏳ <span data-lang="uk">очікує</span><span data-lang="en">pending</span><span data-lang="sk">čaká</span></td></tr>
-          <tr><td><strong>Хрустка Зелена (оливки)</strong></td><td><span data-lang="uk">Оливки Halkidiki</span><span data-lang="en">Halkidiki olives</span><span data-lang="sk">Olivy Halkidiki</span></td><td>—</td><td>—</td><td>—</td><td>⏳ <span data-lang="uk">очікує</span><span data-lang="en">pending</span><span data-lang="sk">čaká</span></td></tr>
-          <tr><td><strong>Mixes 20г (5 SKU)</strong></td><td><span data-lang="uk">Сир + горіх</span><span data-lang="en">Cheese + nut</span><span data-lang="sk">Syr + orech</span></td><td>—</td><td>—</td><td>—</td><td>⏳ <span data-lang="uk">очікує</span><span data-lang="en">pending</span><span data-lang="sk">čaká</span></td></tr>
-        </tbody>
-      </table>
+    <style>
+      .sop-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden}
+      .sop-card summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:16px;padding:18px 22px;background:var(--card);transition:background .15s;user-select:none}
+      .sop-card summary::-webkit-details-marker{display:none}
+      .sop-card summary:hover{background:#fafaf5}
+      .sop-card[open] summary{background:#fffbef;border-bottom:1px solid var(--border)}
+      .sop-card .sop-num{font-size:24px;font-weight:900;color:var(--text-muted);min-width:48px;text-align:center;letter-spacing:-1px}
+      .sop-card[open] .sop-num{color:var(--yellow)}
+      .sop-card .sop-icon{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+      .sop-card .sop-body{flex:1;min-width:0}
+      .sop-card .sop-title{font-size:16px;font-weight:800;margin:0 0 3px;color:var(--text)}
+      .sop-card .sop-meta{font-size:11.5px;color:var(--text-muted)}
+      .sop-card .sop-arrow{font-size:14px;color:var(--text-muted);transition:transform .2s}
+      .sop-card[open] .sop-arrow{transform:rotate(90deg)}
+      .sop-card .sop-content{padding:20px 24px 24px;background:#fafaf5}
+      .sop-card .sop-content h5{font-size:13px;font-weight:800;margin:0 0 10px;color:var(--text);text-transform:uppercase;letter-spacing:.5px}
+      .sop-card .sop-content ul{margin:0 0 16px 18px;padding:0;font-size:13px;line-height:1.7;color:var(--text)}
+      .sop-card .sop-content ul li{margin-bottom:5px}
+      .sop-card .sop-download{display:inline-flex;align-items:center;gap:10px;padding:10px 18px;background:#1E1E1E;color:#FEBF27;text-decoration:none;font-weight:700;font-size:13px;border-radius:8px;margin-top:8px;transition:all .15s}
+      .sop-card .sop-download:hover{background:#FEBF27;color:#1E1E1E}
+      .sop-card .sop-approve{font-size:11px;color:var(--text-muted);margin-top:14px;font-style:italic}
+      @media (max-width:600px){.sop-card summary{padding:14px 16px;gap:10px}.sop-card .sop-num{min-width:32px;font-size:18px}.sop-card .sop-icon{width:38px;height:38px;font-size:18px}.sop-card .sop-content{padding:16px 18px}}
+    </style>
+
+    <!-- SOP 01: Спецодяг -->
+    <details class="sop-card">
+      <summary>
+        <span class="sop-num">01</span>
+        <div class="sop-icon" style="background:rgba(59,130,246,.15);color:#1d5fa6">👕</div>
+        <div class="sop-body">
+          <div class="sop-title" data-lang-group><span data-lang="uk">Поводження з санітарним одягом</span><span data-lang="en">Sanitary clothing handling</span><span data-lang="sk">Manipulácia so sanitárnym oblečením</span></div>
+          <div class="sop-meta" data-lang-group><span data-lang="uk">Як прати, де зберігати, коли вдягати/знімати · 1 сторінка · ✅ Затверджено</span><span data-lang="en">Washing, storage, when to wear/remove · 1 page · ✅ Approved</span></div>
+        </div>
+        <span class="sop-arrow">▸</span>
+      </summary>
+      <div class="sop-content" data-lang-group>
+        <h5 data-lang="uk">Ключові вимоги</h5>
+        <h5 data-lang="en">Key requirements</h5>
+        <ul>
+          <li data-lang="uk">Санодяг — чистий, повністю прикриває домашній одяг і волосся, добре застібається</li>
+          <li data-lang="uk">Прання на підприємстві, потім — пропрасувати (гине вегетативна мікрофлора)</li>
+          <li data-lang="uk">Зміна — за мірою забруднення, але не рідше <strong>1 разу на 2 дні</strong></li>
+          <li data-lang="uk">Зберігати в індивідуальних шафах, окремо від домашнього одягу</li>
+          <li data-lang="uk">Вдягати ПЕРЕД роботою (після миття рук); знімати ПЕРЕД виходом на територію або у туалет</li>
+          <li data-lang="uk">Шафи мити гарячою водою з миючими засобами + періодично дезінфікувати</li>
+          <li data-lang="en">Sanitary clothing — clean, fully covers home clothes and hair, fastens well</li>
+          <li data-lang="en">Wash on-site, then iron (kills vegetative microflora)</li>
+          <li data-lang="en">Change as needed, but not less than <strong>once every 2 days</strong></li>
+          <li data-lang="en">Store in individual lockers, separately from home clothes</li>
+          <li data-lang="en">Put on BEFORE work (after hand-wash); remove BEFORE leaving the facility or visiting toilet</li>
+        </ul>
+        <h5 data-lang="uk">⛔ Заборонено</h5>
+        <h5 data-lang="en">⛔ Prohibited</h5>
+        <ul>
+          <li data-lang="uk">Заколювати санодяг шпильками, голками</li>
+          <li data-lang="uk">Зберігати в кишенях предмети особистого туалету, сигарети, сторонні предмети</li>
+          <li data-lang="uk">Використовувати санодяг не за призначенням</li>
+          <li data-lang="en">Pinning sanitary clothing with pins, needles</li>
+          <li data-lang="en">Storing personal items, cigarettes, foreign objects in pockets</li>
+          <li data-lang="en">Using sanitary clothing for any other purpose</li>
+        </ul>
+        <a class="sop-download" href="documents/production/sops/sneco-sop-01-spetsodyag.docx" download>
+          📥 <span data-lang="uk">Завантажити повний документ (.docx)</span><span data-lang="en">Download full document (.docx)</span>
+        </a>
+        <div class="sop-approve" data-lang-group>
+          <span data-lang="uk">✅ Затверджено: Директор ТОВ «Прайм Снек» Гришин П.В.</span>
+          <span data-lang="en">✅ Approved: Director, Prime Snack LLC, P.V. Hryshyn</span>
+        </div>
+      </div>
+    </details>
+
+    <!-- SOP 02: Правила поведінки -->
+    <details class="sop-card">
+      <summary>
+        <span class="sop-num">02</span>
+        <div class="sop-icon" style="background:rgba(232,64,64,.12);color:#a00">📜</div>
+        <div class="sop-body">
+          <div class="sop-title" data-lang-group><span data-lang="uk">Правила поведінки на виробництві</span><span data-lang="en">Production behavior rules</span><span data-lang="sk">Pravidlá správania vo výrobe</span></div>
+          <div class="sop-meta" data-lang-group><span data-lang="uk">Медогляд · спецодяг · гігієна рук · відвідувачі · 2 сторінки · ✅ Затверджено</span><span data-lang="en">Medical check · clothing · hand hygiene · visitors · 2 pages · ✅ Approved</span></div>
+        </div>
+        <span class="sop-arrow">▸</span>
+      </summary>
+      <div class="sop-content" data-lang-group>
+        <h5 data-lang="uk">Базові вимоги до персоналу</h5>
+        <h5 data-lang="en">Basic staff requirements</h5>
+        <ul>
+          <li data-lang="uk"><strong>Медогляд</strong> — обов'язково перед вступом на роботу + первинне обстеження кожен день (шкіра, очі, вуха, ніс; журнал «Здоров'я»)</li>
+          <li data-lang="uk"><strong>Захисний спецодяг</strong> — включно з захистом волосся, вусів, бороди; чистка регулярна або одноразовий</li>
+          <li data-lang="uk">Каблучки — зняти або прикрити; ювелірні вироби — заборонені</li>
+          <li data-lang="uk">Руки — мити часто милом + дезінфікуючими засобами під проточною водою</li>
+          <li data-lang="uk">Нігті — чисті, обстрижені</li>
+          <li data-lang="uk">Рукавички — з матеріалів придатних для контакту з харчовою продукцією</li>
+          <li data-lang="en"><strong>Medical exam</strong> — mandatory before hiring + daily primary check (skin, eyes, ears, nose; «Health» log)</li>
+          <li data-lang="en"><strong>Protective clothing</strong> — including hair, mustache, beard cover</li>
+          <li data-lang="en">Rings — remove or cover; jewelry — prohibited</li>
+        </ul>
+        <h5 data-lang="uk">🚪 Вхід на виробництво</h5>
+        <h5 data-lang="en">🚪 Production entry</h5>
+        <ul>
+          <li data-lang="uk">Вимити руки → пройти через дезинфікуючий коврик → перевдягтися (верх + взуття) на чистий спецодяг → знову мити та дезінфікувати руки → вдягти гумові рукавички</li>
+          <li data-lang="en">Wash hands → step through disinfecting mat → change into clean clothing → wash+disinfect hands again → put on rubber gloves</li>
+        </ul>
+        <h5 data-lang="uk">🚫 Захворювання — НЕ допускати до роботи</h5>
+        <h5 data-lang="en">🚫 Diseases — NOT allowed to work</h5>
+        <ul>
+          <li data-lang="uk">Жовтяниця, діарея, блювота, гарячка, ангіна з підвищеною температурою</li>
+          <li data-lang="uk">Видимі інфіковані порушення шкіри (нариви, порізи, виразки)</li>
+          <li data-lang="uk">Виділення з вух, очей, носа</li>
+          <li data-lang="uk">Носії хвороб, що передаються через їжу</li>
+          <li data-lang="en">Jaundice, diarrhea, vomiting, fever, sore throat with fever</li>
+          <li data-lang="en">Visible infected skin lesions (abscesses, cuts, ulcers)</li>
+        </ul>
+        <h5 data-lang="uk">👥 Відвідувачі</h5>
+        <h5 data-lang="en">👥 Visitors</h5>
+        <ul>
+          <li data-lang="uk">Первинний огляд + анкетування (інфекційні захворювання); при ознаці — НЕ допускати</li>
+          <li data-lang="uk">Одноразовий халат + шапочка + бахіли; у зону відкритого продукту — додатково одноразові рукавички</li>
+          <li data-lang="en">Primary check + questionnaire; if symptoms — DO NOT admit. Disposable robe + cap + shoe covers; open-product zone — disposable gloves added</li>
+        </ul>
+        <a class="sop-download" href="documents/production/sops/sneco-sop-02-povedinka.docx" download>
+          📥 <span data-lang="uk">Завантажити повний документ (.docx)</span><span data-lang="en">Download full document (.docx)</span>
+        </a>
+        <div class="sop-approve" data-lang-group>
+          <span data-lang="uk">✅ Затверджено: Гришин П.В.</span><span data-lang="en">✅ Approved: P.V. Hryshyn</span>
+        </div>
+      </div>
+    </details>
+
+    <!-- SOP 03: Гігієна -->
+    <details class="sop-card">
+      <summary>
+        <span class="sop-num">03</span>
+        <div class="sop-icon" style="background:rgba(150,193,31,.18);color:#557a00">🧼</div>
+        <div class="sop-body">
+          <div class="sop-title" data-lang-group><span data-lang="uk">Основні правила гігієни</span><span data-lang="en">Basic hygiene rules</span><span data-lang="sk">Základné hygienické pravidlá</span></div>
+          <div class="sop-meta" data-lang-group><span data-lang="uk">Особиста чистота · повідомлення про захворювання · поведінка · 1 сторінка · ✅ Затверджено</span><span data-lang="en">Personal cleanliness · reporting illness · behavior · 1 page · ✅ Approved</span></div>
+        </div>
+        <span class="sop-arrow">▸</span>
+      </summary>
+      <div class="sop-content" data-lang-group>
+        <h5 data-lang="uk">Чек-лист гігієни кожного дня</h5>
+        <h5 data-lang="en">Daily hygiene checklist</h5>
+        <ul>
+          <li data-lang="uk">✅ Особиста чистота + чистий одяг</li>
+          <li data-lang="uk">✅ Руки — ретельно мити та сушити</li>
+          <li data-lang="uk">✅ Порізи/рани — закриті <strong>водостійкою пов'язкою помітного кольору</strong> (напр. синього)</li>
+          <li data-lang="uk">✅ Одноразові рукавиці — пам'ятай що вони забруднюються так само як руки</li>
+          <li data-lang="uk">✅ Прибирання — по мірі виконання завдань</li>
+          <li data-lang="en">✅ Personal cleanliness + clean clothes</li>
+          <li data-lang="en">✅ Hands — thoroughly washed and dried</li>
+          <li data-lang="en">✅ Cuts/wounds — covered with <strong>waterproof bandage of noticeable color</strong> (e.g. blue)</li>
+        </ul>
+        <h5 data-lang="uk">⚠️ Повідомлення керівника — обов'язково</h5>
+        <h5 data-lang="en">⚠️ Mandatory supervisor notification</h5>
+        <ul>
+          <li data-lang="uk">Проблеми зі шкірою, носом, горлом, шлунком, кишечником, інфікована рана — повідомити <strong>ПЕРЕД</strong> поводженням з продуктом (інакше — порушення закону)</li>
+          <li data-lang="uk">Після хвороби — повідомити при поверненні</li>
+          <li data-lang="uk">При візиті до лікаря — повідомити що працюєш з їжею</li>
+          <li data-lang="uk">Якщо хтось хворий вдома — теж повідомити керівника</li>
+          <li data-lang="en">Skin/nose/throat/stomach/intestine issues, infected wound — notify <strong>BEFORE</strong> handling food (otherwise — legal violation)</li>
+          <li data-lang="en">After illness — notify upon return</li>
+          <li data-lang="en">If someone is sick at home — notify supervisor</li>
+        </ul>
+        <h5 data-lang="uk">⛔ У приміщенні з продуктами</h5>
+        <h5 data-lang="en">⛔ In food handling area</h5>
+        <ul>
+          <li data-lang="uk">НЕ палити, НЕ їсти, НЕ пити</li>
+          <li data-lang="uk">НЕ чхати і НЕ кашляти над продуктами</li>
+          <li data-lang="uk">Уникати зайвого поводження з продуктами</li>
+          <li data-lang="uk">Помітив проблему → повідомити керівника</li>
+          <li data-lang="en">DO NOT smoke, eat, drink</li>
+          <li data-lang="en">DO NOT sneeze or cough over products</li>
+        </ul>
+        <a class="sop-download" href="documents/production/sops/sneco-sop-03-higiena.docx" download>
+          📥 <span data-lang="uk">Завантажити повний документ (.docx)</span><span data-lang="en">Download full document (.docx)</span>
+        </a>
+        <div class="sop-approve" data-lang-group>
+          <span data-lang="uk">✅ Затверджено: Директор ТОВ «Прайм Снек» Гришин П.В.</span>
+          <span data-lang="en">✅ Approved: Director, Prime Snack LLC, P.V. Hryshyn</span>
+        </div>
+      </div>
+    </details>
+
+    <!-- SOP 04: Скло і крихкий пластик -->
+    <details class="sop-card">
+      <summary>
+        <span class="sop-num">04</span>
+        <div class="sop-icon" style="background:rgba(254,191,39,.20);color:#996600">🥃</div>
+        <div class="sop-body">
+          <div class="sop-title" data-lang-group><span data-lang="uk">Контроль цілісності скла та крихкого пластику</span><span data-lang="en">Glass &amp; brittle plastic integrity control</span><span data-lang="sk">Kontrola integrity skla a krehkého plastu</span></div>
+          <div class="sop-meta" data-lang-group><span data-lang="uk">Інструктаж + протокол реагування + журнал · 1 сторінка · ✅ Затверджено</span><span data-lang="en">Instructions + response protocol + log · 1 page · ✅ Approved</span></div>
+        </div>
+        <span class="sop-arrow">▸</span>
+      </summary>
+      <div class="sop-content" data-lang-group>
+        <h5 data-lang="uk">Чому це критично</h5>
+        <h5 data-lang="en">Why it's critical</h5>
+        <ul>
+          <li data-lang="uk">Вироби зі скла і крихкого пластику = <strong>високий ризик забруднення</strong> харчової продукції при пошкодженні</li>
+          <li data-lang="uk">Крихкий пластик може руйнуватися <strong>подібно склу</strong></li>
+          <li data-lang="en">Glass + brittle plastic items = <strong>high contamination risk</strong> when damaged</li>
+        </ul>
+        <h5 data-lang="uk">📋 Правила</h5>
+        <h5 data-lang="en">📋 Rules</h5>
+        <ul>
+          <li data-lang="uk">Нове обладнання/інвентар/посуд — <strong>оглянути на цілісність</strong> ПЕРЕД встановленням</li>
+          <li data-lang="uk">Працівникам — <strong>заборонено приносити</strong> скло, крихкий пластик, кераміку у виробничу зону</li>
+          <li data-lang="en">New equipment — <strong>check integrity</strong> BEFORE installation</li>
+          <li data-lang="en">Workers — <strong>prohibited</strong> from bringing glass, brittle plastic, ceramic to production</li>
+        </ul>
+        <h5 data-lang="uk">🚨 Якщо виявлено пошкодження — алгоритм</h5>
+        <h5 data-lang="en">🚨 Damage response algorithm</h5>
+        <ul>
+          <li data-lang="uk">1. Працівник <strong>негайно повідомляє керівництво</strong></li>
+          <li data-lang="uk">2. Керівник оцінює загрозу забруднення сировини / напівфабрикатів / готової продукції</li>
+          <li data-lang="uk">3. Підозрілі партії — <strong>ідентифікуються → ізолюються → видаляються</strong> з зони виробництва</li>
+          <li data-lang="uk">4. Якщо немає реальної загрози — вичистити забруднену область, видалити відходи</li>
+          <li data-lang="uk">5. Прибирання — <strong>спеціально виділеним інвентарем</strong> (не звичайним!)</li>
+          <li data-lang="uk">6. Кожен інцидент — <strong>негайно у журнал пошкоджень</strong></li>
+          <li data-lang="en">1. Worker <strong>immediately notifies management</strong></li>
+          <li data-lang="en">2. Manager assesses contamination risk</li>
+          <li data-lang="en">3. Suspect batches — <strong>identify → isolate → remove</strong> from production</li>
+          <li data-lang="en">4. If no real threat — clean area, remove debris</li>
+          <li data-lang="en">5. Cleanup — <strong>dedicated tools only</strong> (not regular!)</li>
+          <li data-lang="en">6. Every incident — <strong>logged immediately</strong> in glass/plastic breakage log</li>
+        </ul>
+        <a class="sop-download" href="documents/production/sops/sneco-sop-04-sklo.docx" download>
+          📥 <span data-lang="uk">Завантажити повний документ (.docx)</span><span data-lang="en">Download full document (.docx)</span>
+        </a>
+      </div>
+    </details>
+
+    <!-- SOP 05: Технологія VacWave сушки -->
+    <details class="sop-card">
+      <summary>
+        <span class="sop-num">05</span>
+        <div class="sop-icon" style="background:rgba(126,87,194,.15);color:#5e3aa0">⚙️</div>
+        <div class="sop-body">
+          <div class="sop-title" data-lang-group><span data-lang="uk">Технологія приготування сушеного сиру (VacWave-обладнання)</span><span data-lang="en">Dried cheese production technology (VacWave)</span><span data-lang="sk">Technológia výroby sušeného syra (VacWave)</span></div>
+          <div class="sop-meta" data-lang-group><span data-lang="uk">Запуск обладнання · цикли роботи · реакція на несправності · 3 сторінки · ✅ Затверджено</span><span data-lang="en">Equipment startup · work cycles · troubleshooting · 3 pages · ✅ Approved</span></div>
+        </div>
+        <span class="sop-arrow">▸</span>
+      </summary>
+      <div class="sop-content" data-lang-group>
+        <h5 data-lang="uk">📋 Підготовка перед запуском</h5>
+        <h5 data-lang="en">📋 Pre-startup preparation</h5>
+        <ul>
+          <li data-lang="uk">Візуальний огляд приладів (комплектність + справність)</li>
+          <li data-lang="uk">Розставити підставки + діжки до станків</li>
+          <li data-lang="uk">Розфасувати сировину → засипати у діжки → загрузити у сушильні камери</li>
+          <li data-lang="uk">Ввімкнути вакуумний насос + систему охолодження (перевірити працездатність вузлів)</li>
+          <li data-lang="en">Visual inspection (completeness + serviceability)</li>
+          <li data-lang="en">Set up stands + tubs at machines · sort raw material · load drying chambers · turn on vacuum pump + cooling</li>
+        </ul>
+        <h5 data-lang="uk">▶️ Запуск (послідовно)</h5>
+        <h5 data-lang="en">▶️ Startup (sequential)</h5>
+        <ul>
+          <li data-lang="uk">1. «Пуск» — увімкнути живлення станка</li>
+          <li data-lang="uk">2. Закрити на затвор дверцята сушильних камер</li>
+          <li data-lang="uk">3. Вибрати кількість магнетронів для роботи (тумблер/кнопки)</li>
+          <li data-lang="uk">4. Налаштувати реле часу: «Прог» 3с → значення циклу → «Stt 1» → «t1 on» (час включення) → «t1 off» (5хв охолодження за замовч.) → «out»</li>
+          <li data-lang="uk">5. Увімкнути охолодження + вакуумний насос</li>
+          <li data-lang="uk">6. «Час» → перевірити створення тиску (манометри)</li>
+          <li data-lang="uk">7. При необхідному значенні від'ємного тиску → «Start»</li>
+          <li data-lang="en">1. «Start» — turn on machine power · 2. Close chamber doors · 3. Select magnetron count · 4. Configure time relay · 5. Enable cooling + vacuum · 6. Verify pressure · 7. «Start» at target vacuum</li>
+        </ul>
+        <h5 data-lang="uk">⏹ Завершення</h5>
+        <h5 data-lang="en">⏹ Finish</h5>
+        <ul>
+          <li data-lang="uk">Після зупинки таймера → процес завершений</li>
+          <li data-lang="uk">«Air» (або відтиснути «Vac») → відкрити дверцята</li>
+          <li data-lang="uk">Готову продукцію → на решітки → на стелажі під вентиляторами для охолодження → у бокси → фасувальний цех</li>
+          <li data-lang="uk">Вимкнути обладнання (червона кнопка) + вакуум + охолодження</li>
+          <li data-lang="uk">Очистити + вимити обладнання + прибирання виробничого приміщення</li>
+          <li data-lang="en">Timer stops → process complete · «Air» or release «Vac» → open doors · Move product to grids → racks under fans → boxes → packaging · Power off everything · Clean equipment + production area</li>
+        </ul>
+        <h5 data-lang="uk">🚨 Несправності — реакція</h5>
+        <h5 data-lang="en">🚨 Troubleshooting</h5>
+        <ul>
+          <li data-lang="uk"><strong>Магнетрон:</strong> згас світлодіодний індикатор → зупинити несправну камеру, обробку завершити в робочій</li>
+          <li data-lang="uk"><strong>Вакуумна система:</strong> аномалії на манометрах / відмова запуску насоса → перемкнути на <strong>резервний</strong> вакуумний насос</li>
+          <li data-lang="uk"><strong>Охолодження:</strong> температура рідини &gt;30°C або в камері &gt;50°C → <strong>зупинити сушку</strong> до усунення несправності</li>
+          <li data-lang="en"><strong>Magnetron:</strong> LED off → stop chamber, finish in working one</li>
+          <li data-lang="en"><strong>Vacuum:</strong> manometer issues / pump failure → switch to <strong>backup</strong> pump</li>
+          <li data-lang="en"><strong>Cooling:</strong> coolant &gt;30°C or chamber &gt;50°C → <strong>stop drying</strong> until fixed</li>
+        </ul>
+        <a class="sop-download" href="documents/production/sops/sneco-sop-05-tekhnologiya-sushky.docx" download>
+          📥 <span data-lang="uk">Завантажити повний документ (.docx)</span><span data-lang="en">Download full document (.docx)</span>
+        </a>
+      </div>
+    </details>
+
+    <!-- SOP 06: Тех.інструкція «сир сушений» -->
+    <details class="sop-card">
+      <summary>
+        <span class="sop-num">06</span>
+        <div class="sop-icon" style="background:rgba(96,193,191,.18);color:#1a7a78">🧀</div>
+        <div class="sop-body">
+          <div class="sop-title" data-lang-group><span data-lang="uk">Технологічна інструкція — «сир сушений»</span><span data-lang="en">Tech instruction — «dried cheese»</span><span data-lang="sk">Technologická inštrukcia — «sušený syr»</span></div>
+          <div class="sop-meta" data-lang-group><span data-lang="uk">Покроковий цикл: холодильник → порізка → нормалізація → сушка → фасування · 2 сторінки · ✅ Затверджено</span><span data-lang="en">Step-by-step: fridge → cutting → normalization → drying → packaging · 2 pages · ✅ Approved</span></div>
+        </div>
+        <span class="sop-arrow">▸</span>
+      </summary>
+      <div class="sop-content" data-lang-group>
+        <h5 data-lang="uk">📅 Етап 1 — Підготовка сиру</h5>
+        <h5 data-lang="en">📅 Stage 1 — Cheese prep</h5>
+        <ul>
+          <li data-lang="uk">З холодильної камери у приміщення порізки на <strong>16 годин ±2год</strong> для вирівнювання температури</li>
+          <li data-lang="uk">Виймати з упаковки → огляд на забруднення / цвіль → у чистий контейнер з кришкою</li>
+          <li data-lang="uk">Забруднений / запліснявілий сир — <strong>утилізувати</strong></li>
+          <li data-lang="en">Fridge → cutting room for <strong>16 hours ±2hr</strong> · Unpack → inspect → clean container · Contaminated cheese — <strong>discard</strong></li>
+        </ul>
+        <h5 data-lang="uk">🔪 Етап 2 — Дезінфекція + порізка</h5>
+        <h5 data-lang="en">🔪 Stage 2 — Sanitize + cut</h5>
+        <ul>
+          <li data-lang="uk">Стіл + дощечки + ножі: <strong>дезинфікуючий розчин → чиста вода → одноразові паперові серветки</strong></li>
+          <li data-lang="uk">Розмір кубиків: приблизно <strong>12×12×12 мм</strong></li>
+          <li data-lang="uk">Сулугуні: ріжеться на <strong>4 рівні частини</strong> (нормалізації температури не потребує)</li>
+          <li data-lang="en">Tables + boards + knives: <strong>disinfect → rinse → paper-towel dry</strong></li>
+          <li data-lang="en">Cube size: <strong>12×12×12 mm</strong> · Suluguni: <strong>4 equal pieces</strong> (no temp normalization needed)</li>
+        </ul>
+        <h5 data-lang="uk">📏 Етап 3 — Нормалізація температури</h5>
+        <h5 data-lang="en">📏 Stage 3 — Temp normalization</h5>
+        <ul>
+          <li data-lang="uk">Розкласти кубики на сітки → нормалізація до кімнатної (<strong>22-25°C</strong>, перевірка пірометром)</li>
+          <li data-lang="uk"><strong>Гауда / Чеддер / Пармезан</strong> — 2 кг на сітку</li>
+          <li data-lang="uk"><strong>Фітнес / Моцарелла</strong> — 2.2 кг на сітку</li>
+          <li data-lang="en">Spread on grids → normalize to room temp (<strong>22-25°C</strong>, pyrometer check)</li>
+          <li data-lang="en"><strong>Gouda / Cheddar / Parmesan</strong> — 2 kg per grid · <strong>Fitness / Mozzarella</strong> — 2.2 kg per grid</li>
+        </ul>
+        <h5 data-lang="uk">📡 Етап 4 — Сушка</h5>
+        <h5 data-lang="en">📡 Stage 4 — Drying</h5>
+        <ul>
+          <li data-lang="uk">Засипка в діжку — <strong>3 кг для всіх сирів</strong>, окрім сулугуні (4 кг)</li>
+          <li data-lang="uk">Зачинити + зафіксувати в камері → пульт керування → охолодження + вакуум → параметри (магнітроно-хвилини + тиск) per вид сиру див. лист «технології приготування»</li>
+          <li data-lang="en">Tub fill — <strong>3 kg all cheeses</strong>, except Suluguni (4 kg) · Close + lock chamber · Per-cheese params in «technology» sheet</li>
+        </ul>
+        <h5 data-lang="uk">⚖️ Етап 5 — Контроль готовності</h5>
+        <h5 data-lang="en">⚖️ Stage 5 — Final QC</h5>
+        <ul>
+          <li data-lang="uk"><strong>Органолептика:</strong> округла форма, без слідів підгару, колір відповідний до сорту</li>
+          <li data-lang="uk"><strong>Контроль ваги</strong> після сушки (± 50 г):</li>
+          <li data-lang="uk">— Фітнес, Пармезан, Гауда, Чеддер: <strong>1.6 кг</strong></li>
+          <li data-lang="uk">— Моцарелла: <strong>1.7 кг</strong></li>
+          <li data-lang="uk">— Сулугуні: <strong>1.5 кг</strong></li>
+          <li data-lang="uk">Якщо ваги більше норми → <strong>досушка</strong> (параметри у тій же таблиці)</li>
+          <li data-lang="en"><strong>Organoleptic:</strong> rounded, no burn marks, color matches variety · <strong>Weight control</strong> (±50g): Fitness/Parmesan/Gouda/Cheddar — 1.6 kg · Mozzarella — 1.7 kg · Suluguni — 1.5 kg</li>
+        </ul>
+        <h5 data-lang="uk">📦 Етап 6 — Фасування + склад</h5>
+        <h5 data-lang="en">📦 Stage 6 — Packaging + storage</h5>
+        <ul>
+          <li data-lang="uk">Готовий продукт → сітка (1 діжка / 1 сітка) → охолодження → промаркований контейнер per сорт сиру → у фасування</li>
+          <li data-lang="uk">Формати фасування: <strong>14г / 28г / 500г</strong> (за заявкою керівника робіт)</li>
+          <li data-lang="uk">Запаювання: <strong>на 2-4 мм вище лінії відриву</strong></li>
+          <li data-lang="uk">⚠️ <strong>Перевірка фасувальних ваг</strong> — ПЕРЕД роботою + <strong>кожні 2 години</strong> безперервної роботи</li>
+          <li data-lang="uk">Готовий продукт → склад зберігання</li>
+          <li data-lang="en">Pack formats: <strong>14g / 28g / 500g</strong> · Seal: 2-4mm above tear line · ⚠️ <strong>Scale verification</strong> BEFORE work + <strong>every 2 hours</strong> continuous</li>
+        </ul>
+        <a class="sop-download" href="documents/production/sops/sneco-sop-06-tekh-instrukcia-sushka.docx" download>
+          📥 <span data-lang="uk">Завантажити повний документ (.docx)</span><span data-lang="en">Download full document (.docx)</span>
+        </a>
+      </div>
+    </details>
+
+    <div style="margin-top:32px;padding:16px 20px;background:var(--yellow-soft);border-left:4px solid var(--yellow);border-radius:8px;font-size:13px;line-height:1.7">
+      <strong>📌 <span data-lang="uk">Як читати ці документи</span><span data-lang="en">How to read these documents</span></strong><br>
+      <span data-lang="uk">Кожен SOP — обов'язковий до виконання. Резюме вище — для швидкого ознайомлення. Перед роботою з новою партією / при онбордингу — <strong>обов'язково прочитати повний документ</strong> (кнопка «📥 Завантажити»). Будь-які питання щодо інтерпретації — до Богдана (COO) або Пилипа.</span>
+      <span data-lang="en">Each SOP is mandatory. Summaries above for quick orientation. Before new batch / during onboarding — <strong>must read full document</strong>. Questions — to Bohdan (COO) or Pylyp.</span>
     </div>
 
-    <div style="margin-top:24px;padding:16px 20px;background:var(--yellow-soft);border-left:4px solid var(--yellow);border-radius:8px;font-size:13px;line-height:1.7">
-      <strong>📝 <span data-lang="uk">Як заповнювати:</span><span data-lang="en">How to populate:</span><span data-lang="sk">Ako vyplniť:</span></strong>
-      <ol style="margin:8px 0 0 20px;padding:0;line-height:1.7">
-        <li><span data-lang="uk">Богдан / Валерія беруть один SKU за раз</span><span data-lang="en">Bohdan / Valeriia take one SKU at a time</span><span data-lang="sk">Bohdan / Valeriia berú jeden SKU naraz</span></li>
-        <li><span data-lang="uk">Заповнюють шаблон (6 етапів × параметри)</span><span data-lang="en">Fill in the template (6 stages × parameters)</span><span data-lang="sk">Vyplnia template (6 etáp × parametre)</span></li>
-        <li><span data-lang="uk">Залишають як XLSX/PDF в repo (або відправляють Вадиму на додавання)</span><span data-lang="en">Save as XLSX/PDF in repo (or send to Vadym to add)</span><span data-lang="sk">Uložia ako XLSX/PDF do repo (alebo pošlú Vadymovi na pridanie)</span></li>
-        <li><span data-lang="uk">Лінк додається у колонку «SOP документ», статус → ✅</span><span data-lang="en">Link is added to the "SOP doc" column, status → ✅</span><span data-lang="sk">Link sa pridá do stĺpca „SOP doc", stav → ✅</span></li>
-      </ol>
-    </div>
-
-    <div style="margin-top:24px;padding:14px 18px;background:var(--black-05);border-radius:8px;font-size:12px;color:var(--text-muted);line-height:1.55">
-      <span data-lang="uk">📌 Створено за пропозицією Богдана (Ideas #4, 12.05.2026). Цитата: <em>«загальна інформація по циклам виготовлення КОЖНОГО вида SKU... дорожня карта по загальному виробничому циклу в розрізі кожного виду виготовляємої продукції... Дана інформація має бути під паролями.»</em> Структура побудована на 6 етапах flow.</span>
-      <span data-lang="en">📌 Based on Bohdan's proposal (Ideas #4, 12.05.2026). Quote: <em>"general information on the production cycle of EACH type of SKU... a roadmap of the overall production cycle for each product variety... This information must be password-protected."</em> Structure based on the 6-stage flow.</span>
-      <span data-lang="sk">📌 Na základe Bohdanovho návrhu (Ideas #4, 12.05.2026). Citát: <em>„všeobecné informácie o výrobnom cykle KAŽDÉHO druhu SKU... cestovná mapa celkového výrobného cyklu pre každý druh výrobku... Táto informácia musí byť chránená heslom."</em> Štruktúra na 6 etapách toku.</span>
+    <div style="margin-top:18px;padding:14px 18px;background:var(--black-05);border-radius:8px;font-size:12px;color:var(--text-muted);line-height:1.55">
+      <span data-lang="uk">📚 Документи завантажено 28.05.2026. Власник: Богдан (COO). При оновленні — замінити файли у <code>brand/documents/production/sops/</code> + оновити резюме тут.</span>
+      <span data-lang="en">📚 Documents uploaded 2026-05-28. Owner: Bohdan (COO). When updating — replace files in <code>brand/documents/production/sops/</code> + update summaries here.</span>
     </div>
   </div>
 </section>
