@@ -1330,6 +1330,120 @@ h3.block-title:first-of-type { margin-top: 0; }
   .arch-entities { grid-template-columns: 1fr; }
 }
 
+/* ============================================================
+   MOBILE RESPONSIVE AUDIT (v2.78.56) — 375px iPhone fixes
+   - Sidebar overlay with backdrop on <=768px
+   - Compact topbar, language switcher, search
+   - Reduced section padding (32px 20px, then 28px 16px on <=480px)
+   - Hero title uses clamp() for fluid scaling
+   - Onboarding cards single-col on <=600px, ob-tool-card grid simplified
+   - Tables overflow-x:auto wrapping
+   - Pre code blocks scroll
+   - Touch targets >=44px (Apple HIG) for nav-link, role-tab
+   - Org chart departments single column on small
+   ============================================================ */
+@media (max-width: 768px) {
+  /* Burger shadow for visibility on light hero */
+  .burger { box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+  /* Sidebar slides in as overlay; backdrop dims main */
+  .sidebar { transform: translateX(-100%); transition: transform .25s ease; width: 280px; max-width: 86vw; box-shadow: 4px 0 16px rgba(0,0,0,0.18); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  body.mobile-nav-open { overflow: hidden; }
+  body.mobile-nav-open::before {
+    content: ''; position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+    z-index: 90; backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+    animation: fadeIn .2s ease;
+  }
+  /* Touch targets — nav-link min 44px */
+  .nav-link { padding: 12px 24px; min-height: 44px; font-size: 13.5px; }
+  /* Topbar shift: burger lives top-left, content reflows */
+  .quick-ref { padding: 14px 16px 10px 64px; flex-wrap: wrap; gap: 6px; min-height: 48px; }
+  .qr-mark { font-size: 13px; }
+  .qr-mark-sub { font-size: 10px; margin-left: 6px; }
+  .qr-northstar { font-size: 11.5px; flex-basis: 100%; order: 3; padding: 4px 0 0; text-align: left; }
+  .qr-meta { display: none; }
+}
+
+/* Phone breakpoint */
+@media (max-width: 600px) {
+  .section { padding: 32px 20px !important; }
+  .hero { padding: 40px 20px !important; }
+  .section-title { font-size: 26px; line-height: 1.2; }
+  .section-lead { font-size: 14px; margin-bottom: 28px; }
+  .hero-title { font-size: clamp(28px, 8.5vw, 44px) !important; line-height: 1.1 !important; letter-spacing: -0.4px !important; }
+  .hero-subtitle { font-size: 13.5px; }
+  /* Compact language floater */
+  .lang-floater { top: 10px; right: 10px; padding: 2px; }
+  .lang-floater .lang-btn { padding: 5px 8px; font-size: 10px; min-width: 28px; letter-spacing: 0.04em; }
+  /* Onboarding — single column + simpler grid */
+  .ob-tool-card { grid-template-columns: 44px 1fr !important; gap: 12px !important; padding: 14px 16px !important; }
+  .ob-tool-card .ob-tool-cta { grid-column: 1 / -1; margin-top: 6px; text-align: center; }
+  .ob-tool-icon { width: 44px !important; height: 44px !important; font-size: 22px !important; border-radius: 10px !important; }
+  .ob-tool-title { font-size: 15px !important; }
+  .ob-tool-desc { font-size: 12.5px !important; }
+  .ob-bb-groups { grid-template-columns: 1fr !important; gap: 12px !important; }
+  .ob-bb-group { padding: 14px 16px; }
+  .ob-quick-start { padding: 20px 18px !important; margin: 24px 0 !important; }
+  .ob-quick-start h3 { font-size: 17px; }
+  .ob-quick-start ol { font-size: 13px; padding-left: 20px; }
+  .ob-dash-banner { padding: 20px 18px !important; }
+  .ob-dash-banner h3 { font-size: 18px; }
+  .ob-chapter { padding: 12px 14px; margin: 32px 0 12px; }
+  .ob-chapter h3 { font-size: 18px; }
+  .ob-sec-card { padding: 14px 16px; }
+  .ob-sec-card .head h4 { font-size: 14px; }
+  .ob-sec-card .head a { font-size: 11px; }
+  /* Role tabs — compact, wrap */
+  .ob-role-tabs { gap: 6px; margin: 24px 0 18px; }
+  .ob-role-tab { font-size: 11.5px !important; padding: 10px 12px !important; gap: 6px !important; min-height: 40px; }
+  .ob-role-tab .icon { font-size: 16px !important; }
+  /* Tables — horizontal scroll inline (block-level overflow) */
+  .section table { display: block; overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch; }
+  /* Pre/code blocks */
+  pre { overflow-x: auto; max-width: 100%; font-size: 11.5px; padding: 10px 12px; }
+  /* Modal padding tighter */
+  .idea-modal-overlay { padding: 12px; }
+  .idea-modal { max-height: 92vh; }
+  .idea-modal-header, .idea-modal-body, .idea-modal-footer { padding-left: 16px; padding-right: 16px; }
+  /* Org chart fallback */
+  .org-tree { padding: 20px 12px; }
+  .org-row.row-departments { grid-template-columns: 1fr !important; min-width: 0 !important; }
+  /* Section padding overrides for sections with inline style="padding:56px 64px" */
+  .section[style*="padding:56px 64px"],
+  .section[style*="padding: 56px 64px"] { padding: 32px 20px !important; }
+  /* Manifesto: hero + body block have huge inline padding */
+  #sec-manifesto .hero[style*="padding:140px 64px"] { padding: 80px 18px !important; min-height: auto !important; }
+  #sec-manifesto > div[style*="padding:72px 64px"] { padding: 40px 18px !important; }
+}
+
+/* Extra-compact: iPhone SE / 375px */
+@media (max-width: 480px) {
+  .section { padding: 28px 16px !important; }
+  .hero { padding: 36px 16px !important; }
+  .quick-ref { padding: 14px 12px 10px 60px !important; }
+  .qr-mark { font-size: 12px; }
+  .qr-northstar { font-size: 11px; }
+  .section-title { font-size: 22px; }
+  .hero-title { font-size: clamp(24px, 9vw, 38px) !important; }
+  /* Hide floating search — use sidebar search via burger instead */
+  .search-floater { display: none !important; }
+  /* Smaller burger */
+  .burger { top: 12px; left: 12px; width: 36px; height: 36px; font-size: 18px; }
+  /* Onboarding role-tabs even more compact */
+  .ob-role-tab { font-size: 11px !important; padding: 8px 10px !important; }
+  .ob-role-tab .icon { font-size: 14px !important; }
+  /* Card padding reduce */
+  .card { padding: 16px; }
+  /* Idea cards */
+  .idea-card { padding: 12px; }
+  .idea-title { font-size: 13px; }
+  /* Manifesto hero title — smaller on tiny screens */
+  #sec-manifesto .hero-title { font-size: clamp(24px, 9vw, 40px) !important; }
+  #sec-manifesto .hero[style*="padding:140px 64px"] { padding: 60px 16px !important; }
+  #sec-manifesto > div[style*="padding:72px 64px"] { padding: 32px 16px !important; }
+}
+
 /* ORG CHART (TEAM section, v2.9) */
 .org-controls {
   display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
@@ -2277,7 +2391,7 @@ body.is-admin section.admin-only { display: block !important; }
     snEco / Prime Snack LLC<br>
     Sneco SK s.r.o.<br>
     <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" target="_blank" rel="noopener">sneco.ua</a><br><br>
-    Brand Bible v2.78.53 · 2026
+    Brand Bible v2.78.56 · 2026
   </div>
 </nav>
 
@@ -2291,7 +2405,7 @@ body.is-admin section.admin-only { display: block !important; }
     <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
     <span data-lang="sk">Jedna ingrediencia. <span class="qr-ns-accent">Žiadne kompromisy.</span> Syrový snack 21. storočia.</span>
   </div>
-  <div class="qr-meta">v2.78.53 · 2026</div>
+  <div class="qr-meta">v2.78.56 · 2026</div>
 </div>
 
 <!-- ============================================================
@@ -13377,10 +13491,34 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
   } catch (e) {}
   applySkFallback();
 
-  // burger
+  // burger (v2.78.56 — body backdrop + close-on-nav-click + close-on-backdrop)
   const burger = document.getElementById('burger');
   const sidebar = document.getElementById('sidebar');
-  if (burger) burger.addEventListener('click', () => sidebar.classList.toggle('open'));
+  function setMobileNav(open){
+    if (!sidebar) return;
+    sidebar.classList.toggle('open', open);
+    document.body.classList.toggle('mobile-nav-open', open);
+  }
+  if (burger) burger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    setMobileNav(!sidebar.classList.contains('open'));
+  });
+  // Close sidebar when a nav-link is tapped on mobile
+  document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.matchMedia('(max-width: 768px)').matches) setMobileNav(false);
+    });
+  });
+  // Tap on backdrop (anywhere outside sidebar while open) closes it
+  document.addEventListener('click', (e) => {
+    if (!sidebar || !sidebar.classList.contains('open')) return;
+    if (sidebar.contains(e.target) || (burger && burger.contains(e.target))) return;
+    setMobileNav(false);
+  });
+  // Esc closes mobile nav
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sidebar && sidebar.classList.contains('open')) setMobileNav(false);
+  });
 
   // === Predictive search (v2.34) ===
   const SEARCH_PLACEHOLDERS = {
