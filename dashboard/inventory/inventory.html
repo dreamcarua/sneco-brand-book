@@ -426,7 +426,6 @@ body.dash-locked{overflow:hidden}
 <!-- TAB NAV -->
 <div class="tabnav">
   <button class="tab-btn on" id="tabbtn-4" onclick="showTab(4)"><span class="tab-icon">📦</span>Склад та закупки</button>
-  <button class="tab-btn" style="display:none" id="tabbtn-5" onclick="showTab(5)"><span class="tab-icon">🏭</span>Виробництво</button>
 </div>
 
 <!-- FILTER BAR -->
@@ -630,59 +629,10 @@ body.dash-locked{overflow:hidden}
 
 </div><!-- /tab-4 -->
 
-<!-- ══════════ TAB 5: ВИРОБНИЦТВО ══════════ -->
-<div class="tab-content" id="tab-5">
-
-<!-- DRIED CHEESE KPIs -->
-<div class="sec">Виробництво сушеного сиру (кг)</div>
-<div class="g1" id="driedKpis"></div>
-
-<!-- MAIN CHART: dried cheese kg by month -->
-<div class="cc">
-  <div class="cc-head"><div><div class="cc-title">Обсяги виробництва сушеного сиру</div><div class="cc-sub">Приход (кг) за місяць — ключовий показник</div></div></div>
-  <div style="height:320px;position:relative"><canvas id="driedVolumeChart"></canvas></div>
-</div>
-
-<!-- MoM dynamics -->
-<div class="sec">Динаміка (місяць до місяця)</div>
-<div class="cc">
-  <div class="cc-head"><div><div class="cc-title">MoM зміна виробництва</div><div class="cc-sub">Приріст / падіння кг сушеного сиру, %</div></div></div>
-  <div style="height:260px;position:relative"><canvas id="driedMomChart"></canvas></div>
-</div>
-
-<!-- By product (stacked) -->
-<div class="sec">Розбивка по видах сиру</div>
-<div class="cc">
-  <div class="cc-head"><div><div class="cc-title">Виробництво по видах сушеного сиру</div><div class="cc-sub">Приход кг за місяць по кожному продукту</div></div></div>
-  <div style="height:320px;position:relative"><canvas id="driedByProductChart"></canvas></div>
-</div>
-
-<!-- Product totals table -->
-<div class="cc">
-  <div class="cc-sub" id="driedProductHeader" style="padding:8px 16px;color:var(--muted)">Загальне виробництво по продуктах</div>
-  <div style="overflow-x:auto"><table class="dt"><thead><tr><th>#</th><th>Продукт</th><th style="text-align:right">Всього, кг</th><th style="text-align:right">Частка</th></tr></thead><tbody id="driedProductBody"></tbody></table></div>
-</div>
-
-<!-- SUPPLY vs PRODUCTION operations -->
-<div class="sec">Закупки vs Виробництво (операції)</div>
-<div class="cc">
-  <div class="cc-head"><div><div class="cc-title">Кількість операцій</div><div class="cc-sub">Надходження від постачальників vs виробничі операції</div></div></div>
-  <div style="height:260px;position:relative"><canvas id="supplyVsProdChart"></canvas></div>
-</div>
-
-<!-- TECHCARDS -->
-<div class="sec">Технологічні карти в системі</div>
-<div class="cc">
-  <div class="cc-sub" id="techcardHeader" style="padding:8px 16px;color:var(--muted)">Список техкарт у системі</div>
-  <div style="overflow-x:auto"><table class="dt"><thead><tr><th>#</th><th>Назва техкарти</th></tr></thead><tbody id="techcardBody"></tbody></table></div>
-</div>
-
-</div><!-- /tab-5 -->
-
 </div><!-- /wrap -->
 
 <div class="footer">
-  snEco Inventory v1.3 (v2.78.40) · live data.json · МойСклад API → D1 → Pages · Оновлення: щодня 08:00 Київ
+  snEco Inventory v1.4 (v2.78.62) · live data.json · МойСклад API → D1 → Pages · Оновлення: щодня 08:00 Київ
 </div>
 
 <script>
@@ -879,12 +829,7 @@ function showTab(n){
   currentTab=n;
   // Rebuild charts for the newly shown tab (they need visible dimensions)
   setTimeout(()=>{
-    buildFilteredKpis();buildAlerts();buildPeriodCompare();buildSalesFocus();
-    if(n===1){buildAnnualTable();buildOverviewCurrentMonth();buildSparkline();buildOverviewTopClients();buildOverviewTopProducts();buildOverviewMetrics();buildOverviewStock();buildOverviewYoY();buildOverviewMargin();buildOverviewAR();}
-    if(n===2){buildMainChart();buildCashflow();buildQuarter();buildAnnual();buildReturns();buildAvgOrder();buildOrders();buildSeason();buildHist();}
-    if(n===3){buildTopClients();buildTopProducts();buildTopClientsMargin();buildTopProductsMargin();buildTopClientsAbsMargin();buildTopProductsAbsMargin();buildFunnel();buildGeoChart();buildChannelChart();buildCohort();buildSleeping();}
     if(n===4){buildStock();buildABC();buildStockHistory();buildSupplyChart();buildTurnover();buildRawMaterial();}
-    if(n===5){buildDriedKpis();buildDriedVolumeChart();buildDriedMomChart();buildDriedByProductChart();buildDriedProductTable();buildSupplyVsProd();buildTechcards();}
   },30);
 }
 

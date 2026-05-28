@@ -519,7 +519,7 @@ body.dash-locked{overflow:hidden}
 </div><!-- /wrap -->
 
 <div class="footer">
-  snEco Production v1.3 (v2.78.40) · live data.json · МойСклад API → D1 → Pages · Оновлення: щодня 08:00 Київ
+  snEco Production v1.4 (v2.78.62) · live data.json · МойСклад API → D1 → Pages · Оновлення: щодня 08:00 Київ
 </div>
 
 <script>
@@ -716,11 +716,6 @@ function showTab(n){
   currentTab=n;
   // Rebuild charts for the newly shown tab (they need visible dimensions)
   setTimeout(()=>{
-    buildFilteredKpis();buildAlerts();buildPeriodCompare();buildSalesFocus();
-    if(n===1){buildAnnualTable();buildOverviewCurrentMonth();buildSparkline();buildOverviewTopClients();buildOverviewTopProducts();buildOverviewMetrics();buildOverviewStock();buildOverviewYoY();buildOverviewMargin();buildOverviewAR();}
-    if(n===2){buildMainChart();buildCashflow();buildQuarter();buildAnnual();buildReturns();buildAvgOrder();buildOrders();buildSeason();buildHist();}
-    if(n===3){buildTopClients();buildTopProducts();buildTopClientsMargin();buildTopProductsMargin();buildTopClientsAbsMargin();buildTopProductsAbsMargin();buildFunnel();buildGeoChart();buildChannelChart();buildCohort();buildSleeping();}
-    if(n===4){buildStock();buildABC();buildStockHistory();buildSupplyChart();buildTurnover();buildRawMaterial();}
     if(n===5){buildDriedKpis();buildDriedVolumeChart();buildDriedMomChart();buildDriedByProductChart();buildDriedProductTable();buildSupplyVsProd();buildTechcards();}
   },30);
 }

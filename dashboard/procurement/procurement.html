@@ -322,7 +322,7 @@ body.dash-locked{overflow:hidden}
         if (!r.ok) {
           const j = await r.json().catch(()=>({}));
           if (j.error === 'not_in_whitelist') {
-            msg.innerHTML = `❌ Цього email немає у whitelist. <a href="mailto:vg@sneco.ua?subject=Finance%20Dashboard%20whitelist">✉ Запит до vg@sneco.ua</a>`;
+            msg.innerHTML = `❌ Цього email немає у whitelist. <a href="mailto:vg@sneco.ua?subject=Procurement%20Dashboard%20whitelist">✉ Запит до vg@sneco.ua</a>`;
           } else {
             msg.textContent = 'Помилка: ' + (j.error || r.status);
           }
@@ -384,18 +384,18 @@ body.dash-locked{overflow:hidden}
     <div class="logo">
       <img class="logo-img" src="../../logo/SNECO%20logo%20W.svg" alt="snEco">
       <div>
-        <div class="logo-text">snEco · Finance</div>
-        <div class="logo-sub">Рахунки · Гроші · Витрати по напрямах</div>
+        <div class="logo-text">snEco · Procurement</div>
+        <div class="logo-sub">Закупівлі · Постачальники · Витрати</div>
       </div>
     </div>
     <!-- v2.76.0 — Unified nav menu -->
     <nav class="nav-menu" id="navMenu">
       <a class="nav-link" href="../customer-360/customer-360.html">👥 Customer 360</a>
-      <a class="nav-link active" href="../finance/procurement.html">🛒 Finance</a>
+      <a class="nav-link" href="../finance/finance.html">💰 Finance</a>
       <a class="nav-link" href="../dashboard.html">📊 Sales</a>
       <a class="nav-link" href="../inventory/inventory.html">📦 Inventory</a>
       <a class="nav-link" href="../production/production.html">🏭 Production</a>
-      <a class="nav-link" href="../procurement/procurement.html">🛒 Procurement</a>
+      <a class="nav-link active" href="../procurement/procurement.html">🛒 Procurement</a>
       <a class="nav-link" href="../../">📘 Brand Bible</a>
     </nav>
   </div>
@@ -447,7 +447,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Procurement Dashboard v3.1.3 (v2.78.39) · expense_item ПРАЦЮЄ через href resolve + 60d chip + fetch retry · MoySklad → D1 → Worker · Cron щодня 06:00
+  snEco Procurement Dashboard v1.0 (v2.78.62) · scaffold від Finance template · MoySklad → D1 → Worker · Cron щодня 03:00
 </div>
 
 <script>
