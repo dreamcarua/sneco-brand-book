@@ -3,96 +3,248 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>snEco — Procurement Planning 2026 v2</title>
+<title>snEco — Procurement Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--y:#FEBF27;--g:#96C11F;--d:#1E1E1E;--bg:#F4F4EF;--card:#fff;--muted:#8a8a8a;--border:#E5E5DC;--red:#E84040;--blue:#3B82F6}
+:root{
+  --y:#FEBF27;--g:#96C11F;--d:#1E1E1E;--bg:#F4F4EF;--card:#fff;
+  --muted:#8a8a8a;--border:#E5E5DC;--red:#E84040;--blue:#3B82F6;
+  --orange:#F97316;--purple:#7209B7;
+  --yf:rgba(254,191,39,.13);--gf:rgba(150,193,31,.12);--rf:rgba(232,64,64,.10);
+}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--d);font-size:14px;min-height:100vh}
-.topbar{background:var(--d);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.3);color:#fff}
-.topbar .logo{display:flex;align-items:center;gap:10px}
-.topbar .logo-box{width:32px;height:32px;background:var(--y);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:var(--d);letter-spacing:-0.5px}
-.topbar .logo-text{font-size:15px;font-weight:700;letter-spacing:-.3px}
-.topbar .logo-sub{color:rgba(255,255,255,.4);font-size:11px;margin-top:1px}
+
+/* ─── TOPBAR ─── */
+.topbar{background:var(--d);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.3);gap:12px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-box{width:32px;height:32px;background:var(--y);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:var(--d);letter-spacing:-0.5px}
+.logo-img{height:24px;display:block;flex-shrink:0}
+@media(max-width:760px){.logo-text,.logo-sub{display:none}}
+@media(max-width:520px){.logo-img{height:20px}}
+.logo-text{color:#fff;font-size:15px;font-weight:700;letter-spacing:-.3px}
+.logo-sub{color:rgba(255,255,255,.4);font-size:11px;margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
+/* v2.76.0 — Unified nav menu across all dashboards */
 .nav-menu{display:flex;align-items:center;gap:2px;margin-left:18px;padding-left:18px;border-left:1px solid rgba(255,255,255,.12)}
 .nav-link{color:rgba(255,255,255,.65);text-decoration:none;font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:7px;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
 .nav-link:hover{background:rgba(255,255,255,.08);color:#fff}
 .nav-link.active{background:rgba(254,191,39,.18);color:#FEBF27}
-@media(max-width:1100px){.nav-menu{display:none}}
-.topbar-right{display:flex;align-items:center;gap:10px}
-.topbar .meta{font-size:11px;color:rgba(255,255,255,.5)}
+.nav-toggle{display:none;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:6px;margin-left:8px}
+@media(max-width:1280px){
+  .nav-menu{position:fixed;top:56px;left:0;right:0;background:#1E1E1E;flex-direction:column;align-items:stretch;padding:8px 16px;gap:0;margin:0;border-left:none;border-bottom:1px solid rgba(255,255,255,.1);transform:translateY(-110%);transition:transform .25s;z-index:180;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+  .nav-menu.open{transform:translateY(0)}
+  .nav-link{padding:11px 12px;border-radius:6px}
+  .nav-toggle{display:inline-block}
+}
+.badge{padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:600;white-space:nowrap}
+@media(max-width:900px){.badge{padding:2px 7px;font-size:10px}#lastBootBadge{display:none}}
+@media(max-width:520px){#lastUpdate{display:none}}
+.badge-green{background:rgba(150,193,31,.2);color:var(--g);border:1px solid rgba(150,193,31,.3)}
+.badge-gray{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1)}
 
-main{padding:20px 24px 60px;max-width:1320px;margin:0 auto}
-.period-bar{background:#fff;border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;position:sticky;top:56px;z-index:150;box-shadow:0 1px 0 rgba(0,0,0,.02)}
-.period-bar-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-.period-chips{display:flex;gap:4px;background:#F1F1EB;padding:3px;border-radius:9px;flex-wrap:wrap}
-.period-chip{padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;color:#555;cursor:pointer;border:none;background:transparent;transition:all .15s;white-space:nowrap;font-family:inherit}
-.period-chip:hover{background:rgba(254,191,39,.18);color:var(--d)}
-.period-chip.active{background:var(--d);color:#fff}
-.period-range-info{font-size:11px;color:var(--muted)}
-
-.section{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:22px}
-.section h2{font-size:13px;margin-bottom:14px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#444}
-.section .h2-sub{font-size:11px;color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0;margin-left:8px}
-table{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
-th,td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:right;white-space:nowrap}
-th:first-child,td:first-child{text-align:left;font-weight:500;max-width:340px;overflow:hidden;text-overflow:ellipsis}
-thead th{background:#fafaf6;font-weight:600;color:#555;font-size:11px;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid var(--border)}
-.bad{background:#fdecec !important;color:var(--red);font-weight:600}
-.warn{background:#fef9e9 !important;color:#c69510;font-weight:600}
-.ok{background:#f0f7e6 !important;color:var(--g);font-weight:600}
-.note{background:#fef9e9;border:1px solid #f1d883;border-left:4px solid var(--y);padding:12px 16px;border-radius:6px;font-size:12.5px;color:#7a5e10;margin:10px 0;line-height:1.55}
-.note strong{color:#5c4500}
-.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
-.loading-state{padding:60px 20px;text-align:center}
-.loading-state .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--y);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px}
-@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px}
-.kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden}
-.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--y)}
-.kpi.green::after{background:var(--g)}
-.kpi.red::after{background:var(--red)}
-.kpi.blue::after{background:var(--blue)}
-.kpi .label{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;font-weight:700}
-.kpi .value{font-size:22px;font-weight:800;color:var(--d)}
-.kpi .sub{font-size:10.5px;color:var(--muted);margin-top:3px}
-.muted{color:var(--muted)}
-
+/* ─── LAYOUT ─── */
+.wrap{padding:20px 24px;max-width:1400px;margin:0 auto}
+.empty-hero{padding:80px 20px;text-align:center;color:var(--muted)}
+.empty-hero .eh-icon{font-size:60px;margin-bottom:14px;opacity:.5}
+.empty-hero .eh-title{font-size:18px;font-weight:700;color:var(--d);margin-bottom:6px}
+.empty-hero .eh-sub{font-size:13px;line-height:1.5}
+.sec{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:24px 0 12px;display:flex;align-items:center;gap:8px}
+.sec::after{content:'';flex:1;height:1px;background:var(--border)}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media(max-width:900px){.g2{grid-template-columns:1fr}}
-.chart-h220{height:220px;position:relative}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media(max-width:960px){.g4{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}}
+@media(max-width:620px){.g4,.g3,.g2{grid-template-columns:1fr}.topbar{padding:0 12px;height:48px}.wrap{padding:12px 10px}}
 
-/* OTP-gate */
-#dashauth-overlay{position:fixed;inset:0;background:#1E1E1E;z-index:9999;display:flex;align-items:center;justify-content:center}
+/* ─── HERO HEADER ─── */
+.fin-header{background:linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%);color:#fff;border-radius:14px;padding:24px 28px;margin-bottom:20px;position:relative;overflow:hidden}
+.fin-header::after{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle, rgba(150,193,31,0.18) 0%, transparent 70%);pointer-events:none}
+.fin-title{font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;line-height:1.2}
+.fin-sub{font-size:13px;color:rgba(255,255,255,.75)}
+
+/* ─── PERIOD SELECTOR + DIAGNOSTIC STRIP (v3.0) ─── */
+.period-bar{background:#fff;border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;position:sticky;top:56px;z-index:150;box-shadow:0 1px 0 rgba(0,0,0,.02)}
+.period-bar-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-right:2px}
+.period-chips{display:flex;gap:4px;background:#F1F1EB;padding:3px;border-radius:9px;flex-wrap:wrap}
+.period-chip{padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;color:#555;cursor:pointer;border:none;background:transparent;transition:all .15s ease;white-space:nowrap}
+.period-chip:hover{background:rgba(254,191,39,.18);color:var(--d)}
+.period-chip.active{background:var(--d);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.period-chip.active:hover{background:var(--d);color:#fff}
+.period-custom{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.period-custom input[type=date]{padding:5px 8px;border-radius:7px;border:1px solid var(--border);font-size:12px;font-family:inherit;color:var(--d);background:#fafafa}
+.period-custom input[type=date]:focus{outline:none;border-color:var(--y);background:#fff}
+.granularity-toggle{display:flex;gap:3px;background:#F1F1EB;padding:3px;border-radius:8px;margin-left:auto}
+.granularity-toggle .gt-btn{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;color:#555;cursor:pointer;border:none;background:transparent}
+.granularity-toggle .gt-btn.active{background:#fff;color:var(--d);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.period-range-info{font-size:11px;color:var(--muted);padding:4px 10px;background:rgba(150,193,31,.08);border-radius:7px;font-weight:500;white-space:nowrap}
+@media(max-width:760px){.period-bar{padding:10px 12px;gap:8px}.period-chips{flex:1;justify-content:flex-start;overflow-x:auto}.granularity-toggle{margin-left:0;width:100%;justify-content:flex-start;margin-top:4px}}
+
+.diag-strip{background:#FFF9E5;border-bottom:1px solid #F5E6B3;padding:8px 24px;display:flex;align-items:center;gap:16px;font-size:11.5px;flex-wrap:wrap}
+.diag-strip.ok{background:rgba(150,193,31,.08);border-color:rgba(150,193,31,.25)}
+.diag-strip.warn{background:#FFF9E5;border-color:#F5E6B3}
+.diag-strip.err{background:rgba(232,64,64,.05);border-color:rgba(232,64,64,.18)}
+.diag-item{display:flex;align-items:center;gap:5px;color:#555;font-weight:500}
+.diag-item strong{color:var(--d);font-weight:700}
+.diag-item.empty{color:var(--red)}
+.diag-item.empty strong{color:var(--red)}
+.diag-divider{color:#ccc;font-weight:300}
+.diag-action{margin-left:auto;font-size:11px;color:#1d5fa6;text-decoration:none;font-weight:600;padding:3px 9px;background:rgba(59,130,246,.08);border-radius:5px;cursor:pointer;border:none;font-family:inherit}
+.diag-action:hover{background:rgba(59,130,246,.16)}
+@media(max-width:760px){.diag-strip{padding:8px 12px}.diag-divider{display:none}.diag-action{margin-left:0}}
+
+/* ─── KPI CARDS ─── */
+.kpi{background:var(--card);border-radius:12px;padding:16px 18px;border:1px solid var(--border);position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px}
+.kpi.cy::after{background:var(--y)}
+.kpi.cg::after{background:var(--g)}
+.kpi.cr::after{background:var(--red)}
+.kpi.cb::after{background:var(--blue)}
+.kpi.co::after{background:var(--orange)}
+.kpi.cp::after{background:var(--purple)}
+.kpi-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:6px}
+.kpi-val{font-size:22px;font-weight:800;color:var(--d);line-height:1.1}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:6px}
+.kpi-delta{display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;margin-top:6px}
+.kpi-delta.up{background:rgba(150,193,31,.15);color:#4a7000}
+.kpi-delta.down{background:rgba(232,64,64,.12);color:#a00}
+.kpi-delta.flat{background:rgba(138,138,138,.13);color:#666}
+
+/* ─── CHART CARDS ─── */
+.cc{background:var(--card);border-radius:12px;padding:18px 20px;border:1px solid var(--border)}
+.cc-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.cc-title{font-size:14px;font-weight:700;color:var(--d)}
+.cc-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.chart-h220{height:220px;position:relative}
+.chart-h280{height:280px;position:relative}
+.chart-h320{height:320px;position:relative}
+
+/* ─── INSIGHTS ─── */
+.insight{padding:14px 18px;border-radius:10px;font-size:13px;line-height:1.55;display:flex;align-items:flex-start;gap:10px}
+.insight.green{background:rgba(150,193,31,.08);color:#4a7000;border-left:3px solid var(--g)}
+.insight.yellow{background:rgba(254,191,39,.08);color:#996600;border-left:3px solid var(--y)}
+.insight.red{background:rgba(232,64,64,.06);color:#a00;border-left:3px solid var(--red)}
+.insight.blue{background:rgba(59,130,246,.07);color:#1d5fa6;border-left:3px solid var(--blue)}
+.insight-icon{font-size:18px;flex-shrink:0;margin-top:-2px}
+.insights-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:620px){.insights-grid{grid-template-columns:1fr}}
+
+/* ─── DATA TABLE ─── */
+.dt{width:100%;border-collapse:collapse;font-size:13px}
+.dt th{text-align:left;padding:8px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:2px solid var(--border)}
+.dt td{padding:8px 12px;border-bottom:1px solid var(--border)}
+.dt tr:last-child td{border:none}
+.dt tr:hover td{background:#FAFAF5}
+.rank{font-weight:800;color:var(--red);font-size:13px;width:28px}
+.rank.green{color:#4a7000}
+
+/* ─── BUCKETS ─── */
+.bucket-pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700}
+.bucket-pill.b0{background:rgba(150,193,31,.18);color:#4a7000}
+.bucket-pill.b30{background:rgba(254,191,39,.18);color:#996600}
+.bucket-pill.b60{background:rgba(249,115,22,.18);color:#c2410c}
+.bucket-pill.b90{background:rgba(232,64,64,.15);color:#a00}
+
+/* ─── SPLIT SUMMARY (overdue vs within-term) ─── */
+.split-summary{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px}
+.split-summary .ss-item{display:flex;align-items:center;gap:8px;flex:1;min-width:160px}
+.split-summary .ss-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.split-summary .ss-dot.overdue{background:var(--red)}
+.split-summary .ss-dot.ok{background:var(--g)}
+.split-summary .ss-label{color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;font-size:10px}
+.split-summary .ss-val{font-weight:800;color:var(--d);font-size:14px;line-height:1.1}
+.split-summary .ss-pct{font-size:11px;color:var(--muted);margin-left:4px}
+
+/* ─── QUICK ACTIONS ─── */
+.act-btn{padding:6px 12px;border-radius:7px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:600;color:var(--d);cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .15s;text-decoration:none}
+.act-btn:hover{border-color:var(--y);background:var(--yf)}
+.act-btn.tel{border-color:rgba(150,193,31,.35);color:#4a7000}
+.act-btn.tel:hover{background:rgba(150,193,31,.12)}
+.act-btn.mail{border-color:rgba(59,130,246,.35);color:#1d5fa6}
+.act-btn.mail:hover{background:rgba(59,130,246,.08)}
+
+/* ─── CARD HEADERS WITH STATUS ─── */
+.cc.alert{border-left:3px solid var(--red)}
+.cc.ok{border-left:3px solid var(--g)}
+.cc-title-icon{display:inline-flex;align-items:center;gap:6px}
+.cc-title-tag{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-left:6px;vertical-align:middle}
+.cc-title-tag.red{background:rgba(232,64,64,.13);color:#a00}
+.cc-title-tag.green{background:rgba(150,193,31,.15);color:#4a7000}
+
+/* ─── PAYMENT TIMELINE ─── */
+.pay-tl{padding:6px 0}
+.pay-tl-item{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid var(--border);align-items:center}
+.pay-tl-item:last-child{border:none}
+.pay-tl-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.pay-tl-icon.inb{background:rgba(150,193,31,.18);color:#4a7000}
+.pay-tl-icon.outb{background:rgba(232,64,64,.13);color:var(--red)}
+.pay-tl-date{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:600;width:80px;flex-shrink:0;white-space:nowrap}
+.pay-tl-body{flex:1;min-width:0}
+.pay-tl-title{font-size:13px;font-weight:600;color:var(--d);line-height:1.35}
+.pay-tl-meta{font-size:11px;color:var(--muted);margin-top:1px}
+.pay-tl-amount{font-size:14px;font-weight:800;text-align:right;white-space:nowrap}
+.pay-tl-amount.pos{color:#4a7000}
+.pay-tl-amount.neg{color:var(--red)}
+
+/* ─── EMPTY STATE ─── */
+.empty-state{padding:36px 20px;text-align:center;color:var(--muted)}
+.empty-state .es-icon{font-size:30px;margin-bottom:8px}
+.empty-state .es-title{font-weight:600;color:#666;margin-bottom:5px;font-size:13px}
+.empty-state .es-sub{font-size:12px}
+.empty-state.hero{padding:48px 20px}
+.empty-state.hero .es-icon{font-size:42px;margin-bottom:10px}
+.empty-state.hero .es-title{font-size:15px;color:#4a7000}
+.empty-state.dashed{border:1px dashed var(--border);border-radius:10px;background:#FAFAF5}
+
+/* ─── LOADER ─── */
+.loader{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--y);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* v3.0.3: animated loader для empty-hero */
+.loader-big{width:64px;height:64px;border:5px solid #eee;border-top-color:var(--y);border-right-color:var(--g);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
+.loader-dots{display:inline-flex;gap:6px;justify-content:center;margin-top:10px}
+.loader-dots span{width:8px;height:8px;border-radius:50%;background:var(--y);animation:bounce 1.2s ease-in-out infinite}
+.loader-dots span:nth-child(2){background:var(--g);animation-delay:.15s}
+.loader-dots span:nth-child(3){background:var(--blue);animation-delay:.30s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-8px);opacity:1}}
+
+/* ─── FOOTER ─── */
+.footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:20px}
+
+/* === OTP gate === */
+#dashauth-overlay{position:fixed;inset:0;background:#1E1E1E;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 #dashauth-overlay.is-hidden{display:none}
 .dashauth-card{background:#fff;width:100%;max-width:440px;border-radius:14px;padding:36px 30px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.dashauth-logo{font-size:24px;font-weight:900;color:#FEBF27;margin-bottom:6px;text-align:center}
+.dashauth-logo{font-size:24px;font-weight:900;color:#FEBF27;margin-bottom:6px;letter-spacing:-0.5px;text-align:center}
 .dashauth-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#888;text-align:center;margin-bottom:24px}
 .dashauth-icon{font-size:36px;text-align:center;margin-bottom:16px}
-.dashauth-h1{font-size:18px;font-weight:800;text-align:center;margin-bottom:6px}
+.dashauth-h1{font-size:18px;font-weight:800;text-align:center;color:#1E1E1E;margin-bottom:6px}
 .dashauth-desc{font-size:13px;color:#666;text-align:center;line-height:1.55;margin-bottom:20px}
-.dashauth-input{width:100%;padding:12px 14px;border:2px solid #E5E5DC;border-radius:8px;font-size:14px;outline:none;font-family:inherit}
+.dashauth-input{width:100%;padding:12px 14px;border:2px solid #E5E5DC;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
 .dashauth-input:focus{border-color:#FEBF27}
-.dashauth-input.code{font-family:'SF Mono',Menlo,monospace;letter-spacing:.4em;text-align:center;font-size:18px}
-.dashauth-btn{width:100%;padding:13px;background:#1E1E1E;color:#fff;border:0;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;margin-top:14px;font-family:inherit}
+.dashauth-input.code{font-family:'SF Mono',Menlo,Consolas,monospace;letter-spacing:.4em;text-align:center;font-size:18px}
+.dashauth-btn{width:100%;padding:13px;background:#1E1E1E;color:#fff;border:0;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;margin-top:14px;font-family:inherit;transition:background .15s}
 .dashauth-btn:hover{background:#000}
-.dashauth-btn:disabled{opacity:.5}
-.dashauth-msg{font-size:12.5px;margin-top:12px;text-align:center;min-height:18px}
+.dashauth-btn:disabled{opacity:.5;cursor:not-allowed}
+.dashauth-msg{font-size:12.5px;line-height:1.5;margin-top:12px;text-align:center;min-height:18px}
 .dashauth-msg.is-error{color:#DC2626}
-.dashauth-msg a{color:#FEBF27;font-weight:600}
+.dashauth-msg a{color:#FEBF27;font-weight:600;text-decoration:underline}
 .dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
-.dashauth-session{position:fixed;top:65px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:8px}
-.dashauth-session button{background:none;border:0;color:#96C11F;cursor:pointer;font-size:14px}
+.dashauth-back:hover{color:#FEBF27}
+/* v2.77.1: top:115px — нижче period-bar (sticky top:56px, висота ~55px) щоб не overlap'ило granularity toggle */
+.dashauth-session{position:fixed;top:115px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-family:-apple-system,sans-serif;font-weight:600;display:flex;align-items:center;gap:8px}
+@media(max-width:760px){.dashauth-session{top:auto;bottom:12px;right:12px;left:12px;justify-content:center}}
+.dashauth-session button{background:none;border:0;color:#96C11F;cursor:pointer;font-size:14px;padding:0;line-height:1}
 body.dash-locked{overflow:hidden}
 </style>
 </head>
 <body class="dash-locked">
 
+<!-- ===== OTP GATE OVERLAY ===== -->
+<script src="../auth-google.js"></script>
 <div id="dashauth-overlay">
   <div class="dashauth-card">
     <div class="dashauth-logo">snEco</div>
-    <div class="dashauth-sub">Procurement Planning · Confidential</div>
+    <div class="dashauth-sub">Procurement Dashboard · Confidential</div>
     <div id="dashauth-stage"></div>
   </div>
 </div>
@@ -105,77 +257,118 @@ body.dash-locked{overflow:hidden}
   const overlay = document.getElementById('dashauth-overlay');
   const stage = document.getElementById('dashauth-stage');
   let email = '';
+
   function unlock(token, em, exp){
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify({token, email:em, exp})); } catch(e){}
     document.body.classList.remove('dash-locked');
     overlay.classList.add('is-hidden');
+    showSessionBadge(em, exp);
+    if (typeof window.bootProcurement === 'function') window.bootProcurement(token);
+  }
+  function showSessionBadge(em, exp){
     const b = document.createElement('div');
     b.className = 'dashauth-session';
-    const mins = Math.max(0, Math.floor((exp*1000 - Date.now())/60000));
-    b.innerHTML = '✓ ' + em + ' · ' + mins + ' min <button title="Lock">🔒</button>';
+    const totalMins = Math.max(0, Math.floor((exp*1000 - Date.now())/60000));
+    const timeLabel = totalMins >= 60
+      ? Math.floor(totalMins/60) + 'h ' + (totalMins%60 ? (totalMins%60) + 'm' : '')
+      : totalMins + 'min';
+    b.innerHTML = '✓ ' + em + ' · ' + timeLabel.trim() + ' <button title="Lock">🔒</button>';
     b.querySelector('button').onclick = () => { localStorage.removeItem(STORAGE_KEY); location.reload(); };
     document.body.appendChild(b);
-    if (typeof window.bootDashboard === 'function') window.bootDashboard(token);
   }
   async function verifyExisting(){
     let s; try { s = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null'); } catch(e){}
     if (!s || !s.token || !s.exp || s.exp*1000 < Date.now()) return null;
     try {
       const r = await fetch(WORKER+'/api/session/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({token: s.token, block: BLOCK})});
-      const j = await r.json(); return j.ok ? s : null;
+      const j = await r.json();
+      return j.ok ? s : null;
     } catch(e) { return null; }
   }
   function renderEmail(){
-    stage.innerHTML = `<div class="dashauth-icon">📦</div><div class="dashauth-h1">Введіть email</div>
-      <div class="dashauth-desc">Якщо ваш email у whitelist — надійде 6-значний код.</div>
-      <input class="dashauth-input" type="email" id="auth-em" placeholder="ім'я@sneco.ua" autofocus>
+    stage.innerHTML = `
+      <div class="dashauth-icon">🛒</div>
+      <div class="dashauth-h1">Введіть email</div>
+      <div class="dashauth-desc">Procurement Dashboard — постачальники, lead-time, історія закупок. Якщо ваш email у whitelist — на нього надійде 6-значний код. Авторизація через Google (швидко) або OTP-код. Сесія діє 30 днів.</div>
+      <div id="google-signin-btn" style="display:flex;justify-content:center;margin:18px 0 8px"></div>
+      <div style="font-size:11px;color:#777;text-align:center;margin:8px 0 4px">— або через email-код —</div>
+      <input class="dashauth-input" type="email" id="auth-em" placeholder="ім'я@sneco.ua" autocomplete="email" autofocus>
       <button class="dashauth-btn" id="auth-send">Надіслати код</button>
       <div class="dashauth-msg" id="auth-msg"></div>
-      <a href="../" class="dashauth-back">← Brand Bible</a>`;
+      <a href="../" class="dashauth-back">← Каталог дашбордів</a>
+    `;
+    // v2.78.35 (Богдан): Google Sign-In primary, OTP fallback
+    if (window.SnecoAuth) {
+      const gBtn = document.getElementById('google-signin-btn');
+      window.SnecoAuth.signInWithGoogle(BLOCK, gBtn,
+        (j) => unlock(j.token, j.email, j.exp),
+        (errMsg) => {
+          const msgEl = document.getElementById('auth-msg');
+          if (msgEl) { msgEl.textContent = errMsg; msgEl.className = 'dashauth-msg is-error'; }
+        }
+      );
+    }
+
     const em = document.getElementById('auth-em');
     const send = document.getElementById('auth-send');
     const msg = document.getElementById('auth-msg');
-    em.addEventListener('keydown', e => { if(e.key==='Enter') send.click(); });
+    em.addEventListener('keydown', e=>{ if(e.key==='Enter') send.click(); });
     send.onclick = async () => {
       const v = em.value.trim();
       if (!v || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { msg.textContent='Введіть правильний email.'; msg.className='dashauth-msg is-error'; return; }
-      send.disabled=true; send.textContent='Надсилаємо…'; msg.textContent='';
+      send.disabled = true; send.textContent = 'Надсилаємо...'; msg.textContent='';
       try {
-        const r = await fetch(WORKER+'/api/otp/request', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email:v, block:BLOCK})});
+        const r = await fetch(WORKER+'/api/otp/request', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email:v, block: BLOCK})});
         if (!r.ok) {
           const j = await r.json().catch(()=>({}));
-          if (j.error === 'not_in_whitelist') msg.innerHTML = `❌ Цього email немає у whitelist. <a href="mailto:vg@sneco.ua?subject=procurement-dashboard">✉ Запит до vg@sneco.ua</a>`;
-          else msg.textContent = 'Помилка: ' + (j.error || r.status);
-          msg.className='dashauth-msg is-error'; send.disabled=false; send.textContent='Надіслати код'; return;
+          if (j.error === 'not_in_whitelist') {
+            msg.innerHTML = `❌ Цього email немає у whitelist. <a href="mailto:vg@sneco.ua?subject=Finance%20Dashboard%20whitelist">✉ Запит до vg@sneco.ua</a>`;
+          } else {
+            msg.textContent = 'Помилка: ' + (j.error || r.status);
+          }
+          msg.className='dashauth-msg is-error';
+          send.disabled=false; send.textContent='Надіслати код'; return;
         }
-        email = v; renderCode();
-      } catch(e) { msg.textContent='Помилка: '+e.message; msg.className='dashauth-msg is-error'; send.disabled=false; send.textContent='Надіслати код'; }
+        email = v;
+        renderCode();
+      } catch(e) {
+        msg.textContent = 'Помилка мережі: ' + e.message;
+        msg.className='dashauth-msg is-error';
+        send.disabled=false; send.textContent='Надіслати код';
+      }
     };
   }
   function renderCode(){
-    stage.innerHTML = `<div class="dashauth-icon">🔢</div><div class="dashauth-h1">Введіть код з листа</div>
-      <div class="dashauth-desc">${email}</div>
+    stage.innerHTML = `
+      <div class="dashauth-icon">🔢</div>
+      <div class="dashauth-h1">Введіть код з листа</div>
+      <div class="dashauth-desc">${email}<br>Код надіслано — перевірте пошту (включно зі спамом).</div>
       <input class="dashauth-input code" type="text" id="auth-code" inputmode="numeric" maxlength="6" placeholder="••••••" autofocus>
       <button class="dashauth-btn" id="auth-verify">Підтвердити</button>
       <div class="dashauth-msg" id="auth-msg"></div>
-      <a href="#" class="dashauth-back" id="auth-back">← Інший email</a>`;
+      <a href="#" class="dashauth-back" id="auth-back">← Інший email</a>
+    `;
     const code = document.getElementById('auth-code');
     const verify = document.getElementById('auth-verify');
     const msg = document.getElementById('auth-msg');
-    code.addEventListener('keydown', e => { if(e.key==='Enter') verify.click(); });
-    document.getElementById('auth-back').onclick = e => { e.preventDefault(); renderEmail(); };
+    code.addEventListener('keydown', e=>{ if(e.key==='Enter') verify.click(); });
+    document.getElementById('auth-back').onclick = e=>{ e.preventDefault(); renderEmail(); };
     verify.onclick = async () => {
       const c = code.value.trim();
       if (!/^\d{6}$/.test(c)) { msg.textContent='Код — 6 цифр.'; msg.className='dashauth-msg is-error'; return; }
-      verify.disabled=true; verify.textContent='Перевіряємо…'; msg.textContent='';
+      verify.disabled=true; verify.textContent='Перевіряємо...'; msg.textContent='';
       try {
-        const r = await fetch(WORKER+'/api/otp/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, block:BLOCK, code:c})});
+        const r = await fetch(WORKER+'/api/otp/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, block: BLOCK, code: c})});
         const j = await r.json();
-        if (!r.ok) { msg.textContent='Невірний код.'; msg.className='dashauth-msg is-error'; verify.disabled=false; verify.textContent='Підтвердити'; return; }
+        if (!r.ok) { msg.textContent = 'Невірний або застарілий код.'; msg.className='dashauth-msg is-error'; verify.disabled=false; verify.textContent='Підтвердити'; return; }
         unlock(j.token, j.email, j.exp);
-      } catch(e) { msg.textContent='Помилка: '+e.message; msg.className='dashauth-msg is-error'; verify.disabled=false; verify.textContent='Підтвердити'; }
+      } catch(e) {
+        msg.textContent = 'Помилка: ' + e.message; msg.className='dashauth-msg is-error';
+        verify.disabled=false; verify.textContent='Підтвердити';
+      }
     };
   }
+
   (async()=>{
     const sess = await verifyExisting();
     if (sess) { unlock(sess.token, sess.email, sess.exp); return; }
@@ -183,359 +376,1445 @@ body.dash-locked{overflow:hidden}
   })();
 })();
 </script>
+<!-- ===== END OTP GATE ===== -->
 
+<!-- TOPBAR -->
 <div class="topbar">
-  <div style="display:flex;align-items:center;min-width:0">
+  <div style="display:flex;align-items:center;min-width:0;flex:0 1 auto">
     <div class="logo">
-      <div class="logo-box">sn</div>
+      <img class="logo-img" src="../../logo/SNECO%20logo%20W.svg" alt="snEco">
       <div>
-        <div class="logo-text">snEco · Procurement</div>
-        <div class="logo-sub">Виробничий баланс · сировина · стоки</div>
+        <div class="logo-text">snEco · Finance</div>
+        <div class="logo-sub">Рахунки · Гроші · Витрати по напрямах</div>
       </div>
     </div>
-    <nav class="nav-menu">
+    <!-- v2.76.0 — Unified nav menu -->
+    <nav class="nav-menu" id="navMenu">
       <a class="nav-link" href="../customer-360/customer-360.html">👥 Customer 360</a>
-      <a class="nav-link" href="../finance/finance.html">💰 Finance</a>
+      <a class="nav-link active" href="../finance/procurement.html">🛒 Finance</a>
       <a class="nav-link" href="../dashboard.html">📊 Sales</a>
       <a class="nav-link" href="../inventory/inventory.html">📦 Inventory</a>
       <a class="nav-link" href="../production/production.html">🏭 Production</a>
-      <a class="nav-link active" href="./procurement.html">📦 Procurement</a>
+      <a class="nav-link" href="../procurement/procurement.html">🛒 Procurement</a>
       <a class="nav-link" href="../../">📘 Brand Bible</a>
     </nav>
   </div>
   <div class="topbar-right">
-    <span class="meta" id="syncMeta">Завантаження…</span>
+    <button class="nav-toggle" onclick="document.getElementById('navMenu').classList.toggle('open')" aria-label="Меню">☰</button>
+    <span class="badge badge-green" id="syncStatus">✓ Перевіряємо sync...</span>
+    <span class="badge badge-gray" id="lastUpdate">—</span>
   </div>
 </div>
 
+<!-- PERIOD SELECTOR BAR (v3.0) -->
 <div class="period-bar" id="periodBar" style="display:none">
   <span class="period-bar-label">Період</span>
   <div class="period-chips" id="periodChips">
     <button class="period-chip" data-period="7d">7 днів</button>
-    <button class="period-chip" data-period="30d">30 днів</button>
+    <button class="period-chip active" data-period="30d">30 днів</button>
+    <button class="period-chip" data-period="60d">60 днів</button>
     <button class="period-chip" data-period="90d">90 днів</button>
-    <button class="period-chip active" data-period="180d">180 днів</button>
-    <button class="period-chip" data-period="ytd">2026 YTD</button>
+    <button class="period-chip" data-period="6m">6 міс</button>
+    <button class="period-chip" data-period="12m">12 міс</button>
+    <button class="period-chip" data-period="ytd">YTD</button>
     <button class="period-chip" data-period="all">Усе</button>
   </div>
+  <div class="period-custom">
+    <span style="font-size:11px">або:</span>
+    <input type="date" id="periodFrom" title="Від">
+    <span>→</span>
+    <input type="date" id="periodTo" title="До">
+  </div>
   <span class="period-range-info" id="periodRangeInfo">—</span>
+  <div class="granularity-toggle" id="granToggle" title="Деталізація графіка cash flow">
+    <button class="gt-btn" data-gran="day">День</button>
+    <button class="gt-btn" data-gran="week">Тиждень</button>
+    <button class="gt-btn active" data-gran="month">Місяць</button>
+  </div>
 </div>
 
-<main id="main"><div class="loading-state"><div class="spinner"></div>Тягне дані з D1…</div></main>
+<!-- DIAGNOSTIC STRIP (v3.0) — показує row counts усіх таблиць -->
+<div class="diag-strip" id="diagStrip" style="display:none"></div>
+
+<!-- CONTENT -->
+<div class="wrap" id="contentWrap">
+  <div class="empty-hero">
+    <div class="loader-big"></div>
+    <div class="eh-title">Завантажуємо фінансові дані…</div>
+    <div class="eh-sub">Рахунки, надходження, витрати з МойСклад · ~5-10 сек</div>
+    <div class="loader-dots"><span></span><span></span><span></span></div>
+  </div>
+</div>
+
+<div class="footer">
+  snEco Procurement Dashboard v3.1.3 (v2.78.39) · expense_item ПРАЦЮЄ через href resolve + 60d chip + fetch retry · MoySklad → D1 → Worker · Cron щодня 06:00
+</div>
 
 <script>
+// ============================================================================
+// FINANCE DASHBOARD — main logic (v3.0 — period filter + granularity + diag strip)
+// ============================================================================
+// Дані:
+//   • РАХУНКИ (ms_invoices_out) — джерело правди про дебіторку, planned dates.
+//   • ГРОШІ (ms_payments) — фактичні надходження (inbound) і витрати (outbound).
+//   • expense_item — стаття витрат для outbound paymentout (v2.72 fix — категорії
+//     більше не падають у "(не вказано)").
+//
+// v3.0 changes:
+//   • Period selector: 7д · 30д · 90д · 6м · 12м · YTD · Усе + custom range
+//   • Granularity toggle: день · тиждень · місяць (для cash flow chart)
+//   • Diagnostic strip — row counts + freshness одразу видно що порожнє
+//   • Усі KPI / charts / tables re-renderable при зміні period
+//   • Period choice persistent у localStorage
+// ============================================================================
+
 const WORKER = 'https://sneco-auth.vg-ab6.workers.dev';
+const STORAGE_KEY = 'snEco-jwt-procurement-dashboard';
+const PERIOD_STORAGE = 'snEco-finance-period-v3';
+
+let allCounterparties = [];
+let allInvoices = [];    // РАХУНКИ — invoices_out
+let allPayments = [];    // ГРОШІ — paymentin + paymentout
+
 let _token = null;
-let _data = { stocks:[], processings:[], materials:[], products:[] };
-let _stockByAid = {};
-let _currentPeriod = '180d';
+let _charts = {};
 
-const fmt = (n, dec=0) => n == null ? '—' : Number(n).toLocaleString('uk-UA', {maximumFractionDigits: dec, minimumFractionDigits: dec});
-const fmtKop = (k) => fmt(Math.round((k||0)/100));
-const esc = (s) => String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// === v3.0 — Period filter state ===========================================
+// currentPeriod = { preset:'30d'|'7d'|...|'custom', from:Date|null, to:Date|null }
+// `from`/`to` обчислюються динамічно або беруться з custom range.
+let currentPeriod = loadPeriod() || { preset: '30d' };
+let currentGran = localStorage.getItem('snEco-fin-gran') || 'month'; // day/week/month
 
-async function postJson(path, body){
-  const r = await fetch(WORKER+path, {method:'POST', headers:{'Authorization':'Bearer '+_token, 'Content-Type':'application/json'}, body: JSON.stringify(body)});
-  if (!r.ok) { const t = await r.text().catch(()=>''); const e = new Error(`${path} HTTP ${r.status}: ${t.slice(0,200)}`); e.status = r.status; throw e; }
-  return r.json();
+function loadPeriod(){
+  try { return JSON.parse(localStorage.getItem(PERIOD_STORAGE)); } catch(e){ return null; }
 }
-async function fetchAll(type, params={}){
-  const all = []; let offset = 0; const limit = 10000;
-  while (true) {
-    const j = await postJson('/api/dashboard/data', {type, limit, offset, ...params});
-    all.push(...(j.items||[]));
-    if (!j.items || j.items.length < limit) break;
-    offset += limit;
-  }
-  return all;
+function savePeriod(){
+  try { localStorage.setItem(PERIOD_STORAGE, JSON.stringify(currentPeriod)); } catch(e){}
 }
 
-function rowClass(d){ if (d == null) return ''; if (d < 14) return 'bad'; if (d < 30) return 'warn'; return 'ok'; }
-
-function categorize(folderPath){
-  const p = String(folderPath||'').toLowerCase();
-  if (p.includes('свеж') || p.includes('свіж')) return 'fresh_cheese';
-  if (p.includes('сушен')) return 'dried_cheese';
-  if (p.includes('гофро') || p.includes('гофра')) return 'cardboard';
-  if (p.includes('упаковк') || p.includes('пакет') || p.includes('стікер')) return 'packaging';
-  if (p.includes('пачк') || p.includes('продукц') || p.includes('готов')) return 'final_package';
-  return null;
-}
-const CAT_LABEL = {fresh_cheese:'Свіжий сир', packaging:'Упаковка', cardboard:'Гофротара', dried_cheese:'Сушений сир', final_package:'Готові пачки'};
-
+// Розрахунок діапазону дат для поточного period.
+// Повертає { from:Date, to:Date, label:string, days:number, prevFrom:Date, prevTo:Date }
 function resolvePeriod(p){
-  const now = new Date(); let from = new Date(now); let label;
-  switch(p){
-    case '7d':   from.setDate(now.getDate()-6);  label='7 днів'; break;
-    case '30d':  from.setDate(now.getDate()-29); label='30 днів'; break;
-    case '90d':  from.setDate(now.getDate()-89); label='90 днів'; break;
-    case '180d': from.setDate(now.getDate()-179); label='180 днів'; break;
-    case 'ytd':  from = new Date(2026,0,1); label='YTD 2026'; break;
-    case 'all':  from = new Date(2023,0,1); label='Усе'; break;
-    default:     from.setDate(now.getDate()-179); label='180 днів';
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+  let from, to = today, label;
+  switch(p.preset){
+    case '7d':   from = new Date(now); from.setDate(now.getDate()-6);  from.setHours(0,0,0,0); label = '7 днів'; break;
+    case '30d':  from = new Date(now); from.setDate(now.getDate()-29); from.setHours(0,0,0,0); label = '30 днів'; break;
+    case '60d':  from = new Date(now); from.setDate(now.getDate()-59); from.setHours(0,0,0,0); label = '60 днів'; break;
+    case '90d':  from = new Date(now); from.setDate(now.getDate()-89); from.setHours(0,0,0,0); label = '90 днів'; break;
+    case '6m':   from = new Date(now); from.setMonth(now.getMonth()-6); from.setHours(0,0,0,0); label = '6 місяців'; break;
+    case '12m':  from = new Date(now); from.setFullYear(now.getFullYear()-1); from.setHours(0,0,0,0); label = '12 місяців'; break;
+    case 'ytd':  from = new Date(now.getFullYear(), 0, 1, 0, 0, 0); label = 'YTD ' + now.getFullYear(); break;
+    case 'all':  from = new Date(2020, 0, 1); label = 'Усі дані'; break;
+    case 'custom':
+      from = p.from ? new Date(p.from) : new Date(now.getFullYear(), now.getMonth()-1, 1);
+      to   = p.to   ? new Date(p.to)   : today;
+      to.setHours(23,59,59,999);
+      label = `${df(from.toISOString())} → ${df(to.toISOString())}`;
+      break;
+    default:
+      from = new Date(now); from.setDate(now.getDate()-29); from.setHours(0,0,0,0);
+      label = '30 днів';
   }
-  from.setHours(0,0,0,0);
-  return {from: from.toISOString().slice(0,10), to: now.toISOString().slice(0,10), label};
+  const days = Math.max(1, Math.round((to.getTime() - from.getTime())/86400000) + 1);
+  // Previous period — однакова тривалість, безпосередньо перед from
+  const prevTo = new Date(from.getTime() - 1);
+  const prevFrom = new Date(prevTo.getTime() - (days-1)*86400000);
+  prevFrom.setHours(0,0,0,0);
+  return { from, to, prevFrom, prevTo, label, days };
 }
 
-function fmtMonth(ym){
-  const months = ['Січ','Лют','Бер','Кві','Тра','Чер','Лип','Сер','Вер','Жов','Лис','Гру'];
-  const [y, m] = ym.split('-');
-  return `${months[parseInt(m,10)-1]} ${y.slice(2)}`;
+// ISO date strings (YYYY-MM-DD)
+function isoDate(d){ return d.toISOString().slice(0,10); }
+
+// Перевіряє чи дата (ISO або Date) попадає у [from,to] включно
+function inRange(dateStr, from, to){
+  if (!dateStr) return false;
+  const d = String(dateStr).slice(0,10);
+  return d >= isoDate(from) && d <= isoDate(to);
 }
 
-window.bootDashboard = async function(token){
-  _token = token;
-  const main = document.getElementById('main');
-  try {
-    let syncTxt = '';
+// === Number formatters ===
+const nf  = n => Number(Math.round(n)||0).toLocaleString('uk-UA');
+const nfm = n => {
+  const abs = Math.abs(n);
+  if (abs >= 1e6) return (n/1e6).toFixed(1) + 'M';
+  if (abs >= 1e3) return (n/1e3).toFixed(0) + 'K';
+  return String(Math.round(n));
+};
+const df  = d => { try { return new Date(d).toLocaleDateString('uk-UA', {day:'2-digit', month:'2-digit', year:'numeric'}); } catch(e){ return d; }};
+const dfShort = d => { try { return new Date(d).toLocaleDateString('uk-UA', {day:'2-digit', month:'2-digit'}); } catch(e){ return d; }};
+
+async function fetchJson(type, opts){
+  // v2.76.1: retry з exponential backoff для transient 5xx / network errors
+  const body = Object.assign({ type, limit: 50000 }, opts || {});
+  const MAX_ATTEMPTS = 3;
+  const BACKOFF_MS = [500, 1500, 3500];
+  let lastErr = null;
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
     try {
-      const ls = await fetch(WORKER+'/api/dashboard/last-sync', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'}).then(r => r.ok ? r.json() : null);
-      if (ls && ls.last) {
-        const dt = new Date((ls.last.finished_at || ls.last.started_at) * 1000);
-        syncTxt = `Sync: ${dt.toLocaleString('uk-UA', {dateStyle:'short', timeStyle:'short'})}`;
-      }
-    } catch(e){}
-
-    const [stocks, processings, materials, products] = await Promise.all([
-      fetchAll('stocks'),
-      fetchAll('processings').catch(()=>[]),
-      fetchAll('processing_materials').catch(()=>[]),
-      fetchAll('processing_products').catch(()=>[]),
-    ]);
-    _data = { stocks, processings, materials, products };
-    _stockByAid = {};
-    stocks.forEach(s => { if (s.assortment_id) _stockByAid[s.assortment_id] = s; });
-
-    document.getElementById('syncMeta').textContent =
-      `${syncTxt} · ${stocks.length} stocks · ${processings.length} processings · ${materials.length+products.length} positions`;
-
-    if (stocks.length === 0 && processings.length === 0) {
-      main.innerHTML = `<div class="note"><strong>⏳ Перший sync ще не пройшов.</strong> Чекаємо <code>procurement-sync</code> з input <code>full=true</code>.</div>`;
-      return;
-    }
-
-    document.getElementById('periodBar').style.display = 'flex';
-    document.querySelectorAll('.period-chip').forEach(b => {
-      b.addEventListener('click', () => {
-        document.querySelectorAll('.period-chip').forEach(x => x.classList.remove('active'));
-        b.classList.add('active');
-        _currentPeriod = b.dataset.period;
-        render();
+      const ctrl = new AbortController();
+      const timeoutId = setTimeout(() => ctrl.abort(), 45000);
+      const r = await fetch(WORKER + '/api/dashboard/data', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + _token },
+        body: JSON.stringify(body),
+        signal: ctrl.signal,
       });
-    });
-    render();
+      clearTimeout(timeoutId);
+      if (!r.ok) {
+        let txt = '';
+        try { txt = await r.text(); } catch(_){}
+        if (r.status >= 500 && attempt < MAX_ATTEMPTS - 1) {
+          console.warn(`[fetchJson ${type}] HTTP ${r.status}, retry #${attempt+1} через ${BACKOFF_MS[attempt]}ms`);
+          await new Promise(res => setTimeout(res, BACKOFF_MS[attempt]));
+          continue;
+        }
+        throw new Error(`${type}: HTTP ${r.status}${txt ? ' — ' + txt.slice(0,200) : ''}`);
+      }
+      const j = await r.json();
+      return j.items || j.rows || j.results || [];
+    } catch (err) {
+      lastErr = err;
+      const isNetwork = err.name === 'AbortError' || err.name === 'TypeError' ||
+                        String(err.message || '').match(/load failed|network|fetch|timeout/i);
+      if (isNetwork && attempt < MAX_ATTEMPTS - 1) {
+        console.warn(`[fetchJson ${type}] network ${err.message}, retry #${attempt+1} через ${BACKOFF_MS[attempt]}ms`);
+        await new Promise(res => setTimeout(res, BACKOFF_MS[attempt]));
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw lastErr || new Error(`${type}: усі ${MAX_ATTEMPTS} спроби failed`);
+}
+
+// === Boot ===
+window.bootProcurement = async function(token){
+  _token = token;
+  updateSyncBadge();
+
+  try {
+    const [cp, inv, pay] = await Promise.all([
+      fetchJson('counterparties'),
+      fetchJson('invoices_out'),
+      fetchJson('payments'),
+    ]);
+    allCounterparties = cp || [];
+    allInvoices = inv || [];
+    allPayments = pay || [];
+
+    console.log(`Loaded: ${allCounterparties.length} CPs, ${allInvoices.length} invoices_out, ${allPayments.length} payments`);
+
+    // v3.0: показати period selector + diagnostic strip після успішного load
+    document.getElementById('periodBar').style.display = 'flex';
+    document.getElementById('diagStrip').style.display = 'flex';
+    wirePeriodSelector();
+    wireGranularitySelector();
+    renderDiagnostic();
+    renderDashboard();
   } catch(e) {
-    console.error(e);
-    main.innerHTML = `<div class="empty-state">⚠ Помилка: <code>${esc(e.message)}</code></div>`;
+    console.error('Boot error', e);
+    document.getElementById('contentWrap').innerHTML = `
+      <div class="empty-hero">
+        <div class="eh-icon">⚠️</div>
+        <div class="eh-title">Не вдалось завантажити дані</div>
+        <div class="eh-sub">${escapeHtml(e.message)}<br><br>Перевір що Worker задеплоєний з блоком <code>procurement-dashboard</code> і що cron sync пройшов.</div>
+      </div>`;
   }
 };
 
-function render(){
-  const main = document.getElementById('main');
-  const range = resolvePeriod(_currentPeriod);
-  document.getElementById('periodRangeInfo').textContent = `${range.from} → ${range.to} · ${range.label}`;
-  const { stocks, processings, materials, products } = _data;
-
-  const procInWindow = processings.filter(p => {
-    const m = (p.ms_moment||'').slice(0,10);
-    return m >= range.from && m <= range.to && p.applicable;
+// === v3.0 — period selector wiring ===
+function wirePeriodSelector(){
+  const chips = document.getElementById('periodChips');
+  const from  = document.getElementById('periodFrom');
+  const to    = document.getElementById('periodTo');
+  // Активувати поточний chip
+  chips.querySelectorAll('.period-chip').forEach(b => {
+    b.classList.toggle('active', b.dataset.period === currentPeriod.preset);
   });
-  const procIds = new Set(procInWindow.map(p => p.id));
-  const matsInWindow = materials.filter(m => procIds.has(m.processing_id));
-  const prodsInWindow = products.filter(p => procIds.has(p.processing_id));
-
-  let freshKg=0, driedKg=0;
-  matsInWindow.forEach(m => {
-    const s = _stockByAid[m.assortment_id];
-    const cat = s && categorize(s.folder_path);
-    if (cat === 'fresh_cheese') freshKg += (m.quantity||0);
+  // Заповнити custom inputs якщо custom
+  if (currentPeriod.preset === 'custom') {
+    if (currentPeriod.from) from.value = isoDate(new Date(currentPeriod.from));
+    if (currentPeriod.to)   to.value   = isoDate(new Date(currentPeriod.to));
+  }
+  chips.addEventListener('click', e => {
+    const b = e.target.closest('.period-chip');
+    if (!b) return;
+    chips.querySelectorAll('.period-chip').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    currentPeriod = { preset: b.dataset.period };
+    from.value = ''; to.value = '';
+    savePeriod();
+    updatePeriodInfo();
+    renderDashboard();
   });
-  prodsInWindow.forEach(p => {
-    const s = _stockByAid[p.assortment_id];
-    const cat = s && categorize(s.folder_path);
-    if (cat === 'dried_cheese') driedKg += (p.quantity||0);
-  });
-  const yieldPct = freshKg > 0 ? (driedKg / freshKg * 100) : null;
+  const handleCustom = () => {
+    if (!from.value || !to.value) return;
+    chips.querySelectorAll('.period-chip').forEach(x => x.classList.remove('active'));
+    currentPeriod = { preset: 'custom', from: from.value, to: to.value };
+    savePeriod();
+    updatePeriodInfo();
+    renderDashboard();
+  };
+  from.addEventListener('change', handleCustom);
+  to.addEventListener('change', handleCustom);
+  updatePeriodInfo();
+}
 
-  const stockTargets = stocks.filter(s => ['fresh_cheese','packaging','cardboard'].includes(categorize(s.folder_path)||''));
-  stockTargets.sort((a,b) => {
-    const aD = a.stock_days != null && a.stock_days > 0 ? a.stock_days : 99999;
-    const bD = b.stock_days != null && b.stock_days > 0 ? b.stock_days : 99999;
-    return aD - bD;
+function wireGranularitySelector(){
+  // v3.0.2: event delegation на document — ловить кліки і з #granToggle (sticky bar)
+  // і з #granToggleChart (дублікат біля cash flow chart). Обидва синхронізуються.
+  const sticky = document.getElementById('granToggle');
+  sticky.querySelectorAll('.gt-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.gran === currentGran);
   });
-  const criticalCount = stockTargets.filter(s => s.stock_days != null && s.stock_days > 0 && s.stock_days < 14).length;
-
-  const packsByName = {};
-  prodsInWindow.forEach(p => {
-    const s = _stockByAid[p.assortment_id];
-    const cat = s && categorize(s.folder_path);
-    if (cat !== 'final_package') return;
-    const name = s ? s.name : ('?'+p.assortment_id.slice(0,6));
-    packsByName[name] = (packsByName[name] || 0) + (p.quantity||0);
-  });
-  const topPacks = Object.entries(packsByName).sort((a,b) => b[1]-a[1]).slice(0, 15);
-  const totalPacks = topPacks.reduce((a,[,v]) => a+v, 0);
-
-  const matsByMonth = {};
-  procInWindow.forEach(p => {
-    const ym = (p.ms_moment||'').slice(0,7);
-    if (!matsByMonth[ym]) matsByMonth[ym] = {fresh:0, packaging:0, cardboard:0, dried:0};
-    materials.filter(m => m.processing_id === p.id).forEach(m => {
-      const s = _stockByAid[m.assortment_id];
-      const cat = s && categorize(s.folder_path);
-      if (cat === 'fresh_cheese') matsByMonth[ym].fresh += (m.quantity||0);
-      if (cat === 'packaging')    matsByMonth[ym].packaging += (m.quantity||0);
-      if (cat === 'cardboard')    matsByMonth[ym].cardboard += (m.quantity||0);
+  document.addEventListener('click', e => {
+    const b = e.target.closest('.granularity-toggle .gt-btn');
+    if (!b) return;
+    const newGran = b.dataset.gran;
+    if (newGran === currentGran) return;
+    currentGran = newGran;
+    try { localStorage.setItem('snEco-fin-gran', currentGran); } catch(e){}
+    // Синхронізуємо ВСІ granularity-toggle на сторінці
+    document.querySelectorAll('.granularity-toggle').forEach(gt => {
+      gt.querySelectorAll('.gt-btn').forEach(x => {
+        x.classList.toggle('active', x.dataset.gran === currentGran);
+      });
     });
-    products.filter(pr => pr.processing_id === p.id).forEach(pr => {
-      const s = _stockByAid[pr.assortment_id];
-      const cat = s && categorize(s.folder_path);
-      if (cat === 'dried_cheese') matsByMonth[ym].dried += (pr.quantity||0);
-    });
+    renderDashboard();
   });
-  const months = Object.keys(matsByMonth).sort();
+}
 
-  const byPlan = {};
-  procInWindow.forEach(p => {
-    const plan = p.processing_plan_name || '(без плану)';
-    if (!byPlan[plan]) byPlan[plan] = {count:0, freshIn:0, driedOut:0, packOut:0, sumKop:0};
-    byPlan[plan].count++;
-    byPlan[plan].sumKop += (p.processing_sum_kop||0);
-    materials.filter(m => m.processing_id === p.id).forEach(m => {
-      const s = _stockByAid[m.assortment_id];
-      const cat = s && categorize(s.folder_path);
-      if (cat === 'fresh_cheese') byPlan[plan].freshIn += (m.quantity||0);
-    });
-    products.filter(pr => pr.processing_id === p.id).forEach(pr => {
-      const s = _stockByAid[pr.assortment_id];
-      const cat = s && categorize(s.folder_path);
-      if (cat === 'dried_cheese') byPlan[plan].driedOut += (pr.quantity||0);
-      if (cat === 'final_package') byPlan[plan].packOut += (pr.quantity||0);
-    });
+function updatePeriodInfo(){
+  const r = resolvePeriod(currentPeriod);
+  document.getElementById('periodRangeInfo').textContent =
+    `${df(r.from.toISOString())} → ${df(r.to.toISOString())} · ${r.days} дн.`;
+}
+
+// === v3.0 — Diagnostic strip ===
+function renderDiagnostic(){
+  const el = document.getElementById('diagStrip');
+  const cpN = allCounterparties.length;
+  const invN = allInvoices.length;
+  const payN = allPayments.length;
+  const payIn  = allPayments.filter(p => isInbound(p)).length;
+  const payOut = allPayments.filter(p => isOutbound(p)).length;
+  const withExpense = allPayments.filter(p => p.expense_item && String(p.expense_item).trim() && !/не вказано/.test(p.expense_item)).length;
+  const expensePct = payOut > 0 ? Math.round(withExpense / payOut * 100) : 0;
+
+  const issues = [];
+  if (invN === 0) issues.push('invoices_out');
+  if (payN === 0) issues.push('payments');
+  if (cpN === 0) issues.push('counterparties');
+  if (payOut > 0 && expensePct < 20) issues.push('expense_item < 20%');
+
+  el.className = 'diag-strip ' + (issues.length === 0 ? 'ok' : issues.length === 1 ? 'warn' : 'err');
+  el.innerHTML = `
+    <span class="diag-item ${cpN ? '' : 'empty'}">👥 <strong>${nf(cpN)}</strong> контрагентів</span>
+    <span class="diag-divider">·</span>
+    <span class="diag-item ${invN ? '' : 'empty'}">📋 <strong>${nf(invN)}</strong> рахунків</span>
+    <span class="diag-divider">·</span>
+    <span class="diag-item ${payN ? '' : 'empty'}">💳 <strong>${nf(payN)}</strong> платежів <span style="color:var(--muted)">(in: ${nf(payIn)} · out: ${nf(payOut)})</span></span>
+    <span class="diag-divider">·</span>
+    <span class="diag-item ${expensePct >= 20 ? '' : 'empty'}">📊 <strong>${expensePct}%</strong> виплат з категорією
+      ${expensePct < 20 ? '<span style="color:var(--red);font-weight:700" title="parse_payments не витягувала expenseItem — fixed у v2.72, чекаємо full sync">⚠ v2.72</span>' : ''}
+    </span>
+    ${issues.length > 0
+      ? `<button class="diag-action" onclick="alert('Проблема: ${issues.join(', ')}\\n\\nЩо робити:\\n1) Перевір що Run #18+ МoySklad Sync пройшов успішно\\n2) Apply migration 0004 у D1 (для expense_item_id, payment_purpose)\\n3) wrangler deploy\\n4) Запусти full sync через workflow_dispatch')">Що робити?</button>`
+      : `<span class="diag-action" style="background:rgba(150,193,31,.12);color:#4a7000">✓ дані OK</span>`}
+  `;
+}
+
+// === Helpers — payment direction ===
+function isInbound(p) {
+  const t = String(p.payment_type||'').toLowerCase();
+  if (t.includes('вхід') || t.includes('incoming') || t.includes('paymentin')) return true;
+  if (t.includes('вих') || t.includes('outgoing') || t.includes('paymentout')) return false;
+  try {
+    const raw = typeof p.raw_json === 'string' ? JSON.parse(p.raw_json) : (p.raw_json||{});
+    const metaType = raw?.meta?.type || raw?.type || '';
+    if (String(metaType).toLowerCase() === 'paymentin') return true;
+    if (String(metaType).toLowerCase() === 'paymentout') return false;
+  } catch(e) {}
+  return true;
+}
+function isOutbound(p) {
+  const t = String(p.payment_type||'').toLowerCase();
+  if (t.includes('вих') || t.includes('outgoing') || t.includes('paymentout')) return true;
+  if (t.includes('вхід') || t.includes('incoming') || t.includes('paymentin')) return false;
+  try {
+    const raw = typeof p.raw_json === 'string' ? JSON.parse(p.raw_json) : (p.raw_json||{});
+    const metaType = raw?.meta?.type || raw?.type || '';
+    if (String(metaType).toLowerCase() === 'paymentout') return true;
+  } catch(e) {}
+  return false;
+}
+
+function getExpenseItem(p) {
+  if (p.expense_item && String(p.expense_item).trim()) return String(p.expense_item).trim();
+  try {
+    const raw = typeof p.raw_json === 'string' ? JSON.parse(p.raw_json) : (p.raw_json||{});
+    const ei = raw['Стаття витрат'] || raw['expenseItem'] || raw?.expenseItem?.name || '';
+    if (ei && String(ei).trim()) return String(ei).trim();
+  } catch(e){}
+  return '(не вказано)';
+}
+
+// === Main render ===
+function renderDashboard(){
+  // === Build CP lookup ===
+  const cpById = {};
+  const cpByName = {};
+  allCounterparties.forEach(c => {
+    if (c.id) cpById[c.id] = c;
+    const nm = (c.name||'').trim();
+    if (nm) cpByName[nm] = c;
   });
-  const plans = Object.entries(byPlan).sort((a,b) => b[1].count - a[1].count);
+  const matchCP = (item) => (item.agent_id && cpById[item.agent_id]) || (item.agent && cpByName[(item.agent||'').trim()]) || null;
 
-  main.innerHTML = `
-    <div class="kpis">
-      <div class="kpi blue"><div class="label">Свіжий сир ВХІД</div><div class="value">${fmt(freshKg, 1)} кг</div><div class="sub">за ${range.label}</div></div>
-      <div class="kpi green"><div class="label">Сушений сир ВИХІД</div><div class="value">${fmt(driedKg, 1)} кг</div><div class="sub">за ${range.label}</div></div>
-      <div class="kpi"><div class="label">Yield (вихід %)</div><div class="value">${yieldPct != null ? yieldPct.toFixed(1)+'%' : '—'}</div><div class="sub">dried / fresh</div></div>
-      <div class="kpi green"><div class="label">Готових пачок</div><div class="value">${fmt(totalPacks)}</div><div class="sub">сума ТОП-15</div></div>
-      <div class="kpi"><div class="label">Виробничих циклів</div><div class="value">${fmt(procInWindow.length)}</div><div class="sub">applicable</div></div>
-      <div class="kpi red"><div class="label">Критичних &lt; 14 дн</div><div class="value">${criticalCount}</div><div class="sub">сировина/упаковка</div></div>
-    </div>
+  const now = new Date();
+  const today = now.toISOString().slice(0,10);
+  const todayMs = Date.now();
 
-    <div class="section">
-      <h2>🏭 Виробничий баланс · по техкартах <span class="h2-sub">${plans.length} планів · ${range.label}</span></h2>
-      ${plans.length === 0 ? '<div class="empty-state">Нема processing операцій у періоді</div>' : `
-      <table>
-        <thead><tr>
-          <th>Техкарта</th><th>Циклів</th><th>Свіжий ВХІД, кг</th><th>Сушений ВИХІД, кг</th><th>Готові пачки</th><th>Yield %</th><th>Собівартість ₴</th>
-        </tr></thead>
+  // v3.0: period-driven windows (заміна жорстко вшитих 30/60/90)
+  // periodFrom..periodTo — поточне вікно вибране юзером
+  // prevFrom..prevTo  — попереднє вікно тієї ж тривалості (для delta %)
+  const range = resolvePeriod(currentPeriod);
+  const periodFrom = isoDate(range.from);
+  const periodTo   = isoDate(range.to);
+  const prevFrom   = isoDate(range.prevFrom);
+  const prevTo     = isoDate(range.prevTo);
+  const periodLabel = range.label;
+  const periodDays  = range.days;
+
+  // Legacy compat константи (для блоків, які ще використовують "90 днів" / "next 30 днів")
+  const c30 = new Date(now.getTime() - 30*86400000).toISOString().slice(0,10);
+  const c60 = new Date(now.getTime() - 60*86400000).toISOString().slice(0,10);
+  const c90 = new Date(now.getTime() - 90*86400000).toISOString().slice(0,10);
+  const future30 = new Date(now.getTime() + 30*86400000).toISOString().slice(0,10);
+
+  // ─── FLAG: empty invoices? ───────────────────────────────────────────────
+  const hasInvoices = allInvoices.length > 0;
+  const invoicesEmptyMsg = `Чекаємо синхронізацію рахунків з MoySklad`;
+
+  // ============================================================================
+  // SECTION 1 — KPIs (Row 1 + Row 2)
+  // ============================================================================
+
+  // v3.0: Row 1 KPIs — driven by currentPeriod (а не жорстко 30/60)
+  const sumInRange = (items, getDate, getAmount, pred) =>
+    items.filter(x => (!pred || pred(x))).reduce((a,x) => {
+      const d = String(getDate(x)||'').slice(0,10);
+      return d >= periodFrom && d <= periodTo ? a + getAmount(x) : a;
+    }, 0);
+  const sumInPrev = (items, getDate, getAmount, pred) =>
+    items.filter(x => (!pred || pred(x))).reduce((a,x) => {
+      const d = String(getDate(x)||'').slice(0,10);
+      return d >= prevFrom && d <= prevTo ? a + getAmount(x) : a;
+    }, 0);
+
+  const invLast30  = sumInRange(allInvoices, i => i.ms_moment, i => (i.sum_kop||0)/100);
+  const invPrev30  = sumInPrev (allInvoices, i => i.ms_moment, i => (i.sum_kop||0)/100);
+  const invDelta   = invPrev30 > 0 ? ((invLast30 - invPrev30)/invPrev30*100) : null;
+
+  const cashLast30 = sumInRange(allPayments, p => p.ms_moment, p => (p.sum_kop||0)/100, isInbound);
+  const cashPrev30 = sumInPrev (allPayments, p => p.ms_moment, p => (p.sum_kop||0)/100, isInbound);
+  const cashDelta  = cashPrev30 > 0 ? ((cashLast30 - cashPrev30)/cashPrev30*100) : null;
+
+  const expLast30  = sumInRange(allPayments, p => p.ms_moment, p => (p.sum_kop||0)/100, isOutbound);
+  const expPrev30  = sumInPrev (allPayments, p => p.ms_moment, p => (p.sum_kop||0)/100, isOutbound);
+  const expDelta   = expPrev30 > 0 ? ((expLast30 - expPrev30)/expPrev30*100) : null;
+
+  const netCashFlow = cashLast30 - expLast30;
+  const netPrev     = cashPrev30 - expPrev30;
+  const netDelta    = netPrev !== 0 ? ((netCashFlow - netPrev)/Math.abs(netPrev)*100) : null;
+
+  // v2.78 (multi-currency): аналіз валютного складу payments + invoices у вибраному періоді.
+  // Sum_kop вже нормалізовано в UAH — це для INFO badge, щоб бачити що частина обороту EUR/USD.
+  const _inPeriod = (item) => {
+    const d = String(item.ms_moment||'').slice(0,10);
+    return d >= periodFrom && d <= periodTo;
+  };
+  const currencyBreakdown = {};
+  [...allPayments, ...allInvoices].forEach(item => {
+    if (!_inPeriod(item)) return;
+    const cur = (item.currency || 'UAH').toUpperCase();
+    if (!currencyBreakdown[cur]) currencyBreakdown[cur] = { count: 0, sum_uah: 0, sum_orig: 0 };
+    currencyBreakdown[cur].count++;
+    currencyBreakdown[cur].sum_uah += (item.sum_kop || 0) / 100;
+    currencyBreakdown[cur].sum_orig += (item.sum_orig_kop || item.sum_kop || 0) / 100;
+  });
+  const nonUahCurrencies = Object.entries(currencyBreakdown).filter(([cur]) => cur !== 'UAH');
+  const hasMultiCurrency = nonUahCurrencies.length > 0;
+  const currencySymbol = { UAH: '₴', EUR: '€', USD: '$', PLN: 'zł', GBP: '£' };
+  const symbolOf = cur => currencySymbol[cur] || cur;
+  const totalPeriodUah = Object.values(currencyBreakdown).reduce((a,s) => a + s.sum_uah, 0);
+  const nonUahShare = totalPeriodUah > 0 ? (nonUahCurrencies.reduce((a,[_,s]) => a + s.sum_uah, 0) / totalPeriodUah * 100) : 0;
+
+  // Row 2 — поточний стан AR (з invoices)
+  // v2.72.3 ROUNDING FIX: фільтрувати на цілих ₴ (Math.round) — MoySklad payedSum
+  // іноді з offset 1-99 копійок, display округлює до "0 ₴" але kop > 0.
+  // v2.78.1 (materiality threshold 1%): MoySklad rounding artifacts.
+  // Рахунок 27895₴ оплачено 27894.26₴ → 0.74₴ "борг" = 0.003% → НЕ борг.
+  const DEBT_THRESHOLD_PCT = 0.01;
+  const isMaterialDebt = (i) => {
+    const sk = i.sum_kop || 0;
+    if (sk <= 0) return false;
+    const diff = sk - (i.payed_sum_kop || 0);
+    return diff > 0 && diff >= sk * DEBT_THRESHOLD_PCT;
+  };
+  const invDebtUah = i => isMaterialDebt(i) ? Math.round(((i.sum_kop||0) - (i.payed_sum_kop||0)) / 100) : 0;
+  const openInvoices = allInvoices.filter(isMaterialDebt);
+
+  const freshAR = openInvoices.filter(i => {
+    const planned = (i.payment_planned_moment||'').slice(0,10);
+    return planned && planned >= today;
+  });
+  const overdueAR = openInvoices.filter(i => {
+    const planned = (i.payment_planned_moment||'').slice(0,10);
+    return planned && planned < today;
+  });
+  const freshARTotal = freshAR.reduce((a,i) => a + ((i.sum_kop||0)-(i.payed_sum_kop||0))/100, 0);
+  const overdueARTotal = overdueAR.reduce((a,i) => a + ((i.sum_kop||0)-(i.payed_sum_kop||0))/100, 0);
+
+  // Заплановано до оплати у наступні 30 днів
+  const plannedNext30 = openInvoices.filter(i => {
+    const planned = (i.payment_planned_moment||'').slice(0,10);
+    return planned && planned >= today && planned <= future30;
+  });
+  const plannedNext30Total = plannedNext30.reduce((a,i) => a + ((i.sum_kop||0)-(i.payed_sum_kop||0))/100, 0);
+
+  // DSO — invoices, що повністю оплачені, avg днів від ms_moment до повної оплати.
+  // Approx: бо payment date не лінкована до конкретного invoice, беремо payment_planned_moment - ms_moment
+  // для повністю-сплачених invoices як proxy для DSO (плановий цикл).
+  let dso = null;
+  const paidInvoices = allInvoices.filter(i => (i.payed_sum_kop||0) >= (i.sum_kop||0) && (i.sum_kop||0) > 0 && i.ms_moment && i.payment_planned_moment);
+  if (paidInvoices.length) {
+    let total = 0, n = 0;
+    paidInvoices.forEach(i => {
+      const days = (new Date(i.payment_planned_moment).getTime() - new Date(i.ms_moment).getTime())/86400000;
+      if (days >= 0 && days <= 365) { total += days; n++; }
+    });
+    dso = n > 0 ? Math.round(total / n) : null;
+  }
+
+  // ============================================================================
+  // SECTION 2 — CASH FLOW (v3.0: period + granularity-driven)
+  // ============================================================================
+  // Granularity: day → YYYY-MM-DD · week → YYYY-Www (ISO) · month → YYYY-MM
+  // Якщо період < 14 днів → forced day; < 90 днів → принаймні week.
+  let effectiveGran = currentGran;
+  if (periodDays <= 14 && effectiveGran === 'month') effectiveGran = 'day';
+  if (periodDays >= 730 && effectiveGran === 'day') effectiveGran = 'month';
+
+  function bucketKey(dateStr){
+    const d = new Date(dateStr);
+    if (effectiveGran === 'day') return dateStr.slice(0,10);
+    if (effectiveGran === 'week'){
+      // ISO week
+      const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+      const dayN = (t.getUTCDay() + 6) % 7;
+      t.setUTCDate(t.getUTCDate() - dayN + 3);
+      const firstThu = new Date(Date.UTC(t.getUTCFullYear(), 0, 4));
+      const week = 1 + Math.round(((t - firstThu) / 86400000 - 3 + ((firstThu.getUTCDay() + 6) % 7)) / 7);
+      return `${t.getUTCFullYear()}-W${String(week).padStart(2,'0')}`;
+    }
+    return dateStr.slice(0,7);
+  }
+  function bucketLabel(key){
+    if (effectiveGran === 'day') return dfShort(key);
+    if (effectiveGran === 'week') return key.replace('-W','/T');
+    // month
+    const [y,m] = key.split('-');
+    const monthNames = ['січ','лют','бер','кві','тра','чер','лип','сер','вер','жов','лис','гру'];
+    return `${monthNames[parseInt(m,10)-1]} ${y.slice(2)}`;
+  }
+  function* eachBucket(){
+    const cur = new Date(range.from); cur.setHours(0,0,0,0);
+    const end = new Date(range.to);   end.setHours(0,0,0,0);
+    if (effectiveGran === 'day'){
+      while (cur <= end){ yield bucketKey(isoDate(cur)); cur.setDate(cur.getDate()+1); }
+    } else if (effectiveGran === 'week'){
+      const seen = new Set();
+      while (cur <= end){
+        const k = bucketKey(isoDate(cur));
+        if (!seen.has(k)){ seen.add(k); yield k; }
+        cur.setDate(cur.getDate()+1);
+      }
+    } else { // month
+      const seen = new Set();
+      while (cur <= end){
+        const k = isoDate(cur).slice(0,7);
+        if (!seen.has(k)){ seen.add(k); yield k; }
+        cur.setMonth(cur.getMonth()+1);
+        cur.setDate(1);
+      }
+    }
+  }
+
+  const months = [...eachBucket()];
+  const invByMonth = {}, cashByMonth = {}, expByMonth = {};
+  months.forEach(m => { invByMonth[m] = 0; cashByMonth[m] = 0; expByMonth[m] = 0; });
+
+  allInvoices.forEach(i => {
+    const d = String(i.ms_moment||'').slice(0,10);
+    if (d < periodFrom || d > periodTo) return;
+    const k = bucketKey(d);
+    if (k in invByMonth) invByMonth[k] += (i.sum_kop||0)/100;
+  });
+  allPayments.forEach(p => {
+    const d = String(p.ms_moment||'').slice(0,10);
+    if (d < periodFrom || d > periodTo) return;
+    const k = bucketKey(d);
+    if (!(k in cashByMonth)) return;
+    if (isInbound(p)) cashByMonth[k] += (p.sum_kop||0)/100;
+    else if (isOutbound(p)) expByMonth[k] += (p.sum_kop||0)/100;
+  });
+  const chartLabels = months.map(bucketLabel);
+
+  // ============================================================================
+  // SECTION 3 — Витрати по напрямах (expense_item) · v3.0 driven by period
+  // ============================================================================
+  const outboundInPeriod = allPayments.filter(p => {
+    if (!isOutbound(p)) return false;
+    const d = String(p.ms_moment||'').slice(0,10);
+    return d >= periodFrom && d <= periodTo;
+  });
+  const outboundPrev = allPayments.filter(p => {
+    if (!isOutbound(p)) return false;
+    const d = String(p.ms_moment||'').slice(0,10);
+    return d >= prevFrom && d <= prevTo;
+  });
+
+  const expByItem = {};
+  const expByItemLastM = {};       // змінна "Минулий міс." тепер = "Попер. період"
+  outboundInPeriod.forEach(p => {
+    const k = getExpenseItem(p);
+    expByItem[k] = (expByItem[k]||0) + (p.sum_kop||0)/100;
+  });
+  outboundPrev.forEach(p => {
+    const k = getExpenseItem(p);
+    expByItemLastM[k] = (expByItemLastM[k]||0) + (p.sum_kop||0)/100;
+  });
+  const expByItemSorted = Object.entries(expByItem).sort((a,b) => b[1]-a[1]);
+  const expTotal90 = expByItemSorted.reduce((a,[,v]) => a+v, 0);
+
+  // v3.0 NEW: TOP постачальники (outbound payments by agent) у поточному періоді
+  const outByAgent = {};
+  outboundInPeriod.forEach(p => {
+    const cp = (p.agent_id && cpById[p.agent_id]) || cpByName[(p.agent||'').trim()] || null;
+    const key = cp ? (cp.id || cp.name) : (p.agent || '—');
+    const name = cp ? cp.name : (p.agent || '—');
+    if (!outByAgent[key]) outByAgent[key] = { name, sum: 0, count: 0, cp };
+    outByAgent[key].sum += (p.sum_kop||0)/100;
+    outByAgent[key].count++;
+  });
+  const topSuppliers = Object.values(outByAgent).sort((a,b) => b.sum - a.sum).slice(0, 10);
+  // TOP-8 для doughnut, решта в "Інші"
+  const top8 = expByItemSorted.slice(0, 8);
+  const others = expByItemSorted.slice(8);
+  const othersSum = others.reduce((a,[,v]) => a+v, 0);
+  const doughnutLabels = [...top8.map(([k]) => k), ...(othersSum > 0 ? ['Інші'] : [])];
+  const doughnutData = [...top8.map(([,v]) => v), ...(othersSum > 0 ? [othersSum] : [])];
+
+  // ============================================================================
+  // SECTION 4 — AR Aging (на основі payment_planned_moment)
+  // ============================================================================
+  // Buckets:
+  //   b0  — в межах терміну   (planned >= today)
+  //   b30 — 1-30 днів прострочено   (today - planned ∈ [1, 30])
+  //   b60 — 31-60
+  //   b90 — 60+
+  const buckets = { b0: 0, b30: 0, b60: 0, b90: 0 };
+  const bucketsCount = { b0: 0, b30: 0, b60: 0, b90: 0 };
+  openInvoices.forEach(i => {
+    const planned = (i.payment_planned_moment||'').slice(0,10);
+    if (!planned) return;
+    const daysOverdue = Math.floor((todayMs - new Date(planned).getTime())/86400000);
+    const balance = ((i.sum_kop||0) - (i.payed_sum_kop||0))/100;
+    if (daysOverdue <= 0) { buckets.b0 += balance; bucketsCount.b0++; }
+    else if (daysOverdue <= 30) { buckets.b30 += balance; bucketsCount.b30++; }
+    else if (daysOverdue <= 60) { buckets.b60 += balance; bucketsCount.b60++; }
+    else { buckets.b90 += balance; bucketsCount.b90++; }
+  });
+  const openARTotal = openInvoices.reduce((a,i) => a + ((i.sum_kop||0)-(i.payed_sum_kop||0))/100, 0);
+
+  // ============================================================================
+  // SECTION 5 — TOP-10 Дебіторів (split)
+  // ============================================================================
+  function buildDebtors(invoicesSubset) {
+    const map = {};
+    invoicesSubset.forEach(i => {
+      const cp = matchCP(i);
+      const key = cp ? (cp.id || cp.name) : (i.agent_id || i.agent || 'unknown');
+      const balance = ((i.sum_kop||0) - (i.payed_sum_kop||0))/100;
+      const planned = (i.payment_planned_moment||'').slice(0,10);
+      const daysOverdue = planned ? Math.max(0, Math.floor((todayMs - new Date(planned).getTime())/86400000)) : 0;
+      if (!map[key]) map[key] = {
+        cp: cp || { name: i.agent || 'Невідомий', __virtual: true },
+        balance: 0, maxDaysOverdue: 0, count: 0
+      };
+      map[key].balance += balance;
+      map[key].count++;
+      if (daysOverdue > map[key].maxDaysOverdue) map[key].maxDaysOverdue = daysOverdue;
+    });
+    return Object.values(map).sort((a,b) => b.balance - a.balance);
+  }
+  const overdueDebtors = buildDebtors(overdueAR).slice(0, 10);
+  const freshDebtors = buildDebtors(freshAR).slice(0, 10);
+
+  // ============================================================================
+  // SECTION 6 — Очікувані надходження наступні 30 днів
+  // ============================================================================
+  const upcomingReceipts = plannedNext30.map(i => {
+    const cp = matchCP(i);
+    const planned = i.payment_planned_moment;
+    const daysUntil = Math.max(0, Math.floor((new Date(planned).getTime() - todayMs)/86400000));
+    return {
+      planned,
+      cpName: cp ? cp.name : (i.agent || '—'),
+      amount: ((i.sum_kop||0) - (i.payed_sum_kop||0))/100,
+      daysUntil,
+      invName: i.name || ''
+    };
+  }).sort((a,b) => (a.planned||'').localeCompare(b.planned||''));
+
+  // ============================================================================
+  // SECTION 7 — Останні 20 платежів
+  // ============================================================================
+  const last20Payments = [...allPayments]
+    .filter(p => p.ms_moment)
+    .sort((a,b) => (b.ms_moment||'').localeCompare(a.ms_moment||''))
+    .slice(0, 20)
+    .map(p => {
+      const cp = matchCP(p);
+      const inb = isInbound(p);
+      const outb = isOutbound(p);
+      return {
+        date: p.ms_moment,
+        type: inb ? 'inbound' : (outb ? 'outbound' : 'other'),
+        cpName: cp ? cp.name : (p.agent || '—'),
+        expenseItem: outb ? getExpenseItem(p) : '',
+        amount: (p.sum_kop||0)/100,
+        name: p.name || ''
+      };
+    });
+
+  // ============================================================================
+  // SECTION 8 — Concentration / insights data
+  // ============================================================================
+  const top1ExpenseShare = expTotal90 > 0 && expByItemSorted[0] ? (expByItemSorted[0][1] / expTotal90 * 100) : 0;
+  const top1ExpenseName = expByItemSorted[0] ? expByItemSorted[0][0] : null;
+
+  const allDebtors = buildDebtors(openInvoices);
+  const top1DebtorShare = openARTotal > 0 && allDebtors[0] ? (allDebtors[0].balance / openARTotal * 100) : 0;
+  const top1DebtorName = allDebtors[0] ? allDebtors[0].cp.name : null;
+
+  const criticalOverdueTotal = buckets.b90;
+  const criticalOverdueCount = bucketsCount.b90;
+
+  // ============================================================================
+  // BUILD HTML
+  // ============================================================================
+
+  const deltaPill = (val) => {
+    if (val === null) return '<span class="kpi-delta flat">— н/д</span>';
+    const sign = val >= 0 ? '↑' : '↓';
+    const cls = val > 1 ? 'up' : val < -1 ? 'down' : 'flat';
+    return `<span class="kpi-delta ${cls}">${sign} ${Math.abs(val).toFixed(1)}%</span>`;
+  };
+
+  // KPI helper — graceful empty state коли invoices = 0
+  function invKpi(label, val, sub, colorClass, emptyOverride){
+    if (!hasInvoices && emptyOverride) {
+      return `
+        <div class="kpi ${colorClass}">
+          <div class="kpi-lbl">${label}</div>
+          <div class="kpi-val">0 ₴</div>
+          <div class="kpi-sub">${invoicesEmptyMsg}</div>
+        </div>`;
+    }
+    return `
+      <div class="kpi ${colorClass}">
+        <div class="kpi-lbl">${label}</div>
+        <div class="kpi-val">${val}</div>
+        <div class="kpi-sub">${sub}</div>
+      </div>`;
+  }
+
+  // Debtors table renderer
+  function renderDebtorsTable(list, variant){
+    const isOverdue = variant === 'overdue';
+    if (list.length === 0) {
+      return `
+        <div class="empty-state hero">
+          <div class="es-icon">${isOverdue ? '✅' : '🎉'}</div>
+          <div class="es-title">${isOverdue ? 'Усі рахунки в строк!' : 'Нема відкритої дебіторки у межах терміну'}</div>
+          <div class="es-sub">${!hasInvoices ? invoicesEmptyMsg : (isOverdue ? 'Жодного клієнта з простроченою дебіторкою' : 'Усі поточні рахунки — або в overdue, або сплачені')}</div>
+        </div>
+      `;
+    }
+    return `
+      <table class="dt">
+        <thead>
+          <tr>
+            <th style="width:30px">#</th>
+            <th>Контрагент</th>
+            <th style="text-align:right">Борг ₴</th>
+            <th style="text-align:center;width:60px" title="Днів прострочки від payment_planned_moment">Днів</th>
+            <th style="text-align:right;width:140px">Контакт</th>
+          </tr>
+        </thead>
         <tbody>
-          ${plans.map(([plan, d]) => {
-            const y = d.freshIn > 0 ? (d.driedOut / d.freshIn * 100) : null;
-            return `<tr>
-              <td>${esc(plan)}</td>
-              <td>${fmt(d.count)}</td>
-              <td>${fmt(d.freshIn, 1)}</td>
-              <td>${fmt(d.driedOut, 1)}</td>
-              <td>${fmt(d.packOut)}</td>
-              <td class="${y != null && y < 15 ? 'bad' : y != null && y < 25 ? 'warn' : 'ok'}">${y != null ? y.toFixed(1) + '%' : '—'}</td>
-              <td>${fmtKop(d.sumKop)}</td>
-            </tr>`;
-          }).join('')}
-        </tbody>
-      </table>`}
-    </div>
-
-    <div class="g2">
-      <div class="section">
-        <h2>📈 Помісячно: свіжий ВХІД vs сушений ВИХІД</h2>
-        ${months.length === 0 ? '<div class="empty-state muted">Нема даних</div>' : `<div class="chart-h220"><canvas id="ioChart"></canvas></div>`}
-      </div>
-      <div class="section">
-        <h2>📦 Помісячно: упаковка + гофра</h2>
-        ${months.length === 0 ? '<div class="empty-state muted">Нема даних</div>' : `<div class="chart-h220"><canvas id="packChart"></canvas></div>`}
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>🍪 Готові пачки по смаках <span class="h2-sub">ТОП-15 за ${range.label}</span></h2>
-      ${topPacks.length === 0 ? '<div class="empty-state muted">Нема даних</div>' : `
-      <table>
-        <thead><tr><th>Назва пачки</th><th>Вироблено</th><th>% частка</th></tr></thead>
-        <tbody>
-          ${topPacks.map(([name, qty]) => `
-            <tr>
-              <td>${esc(name)}</td>
-              <td>${fmt(qty)}</td>
-              <td>${totalPacks > 0 ? (qty/totalPacks*100).toFixed(1) : '0'}%</td>
-            </tr>`).join('')}
-        </tbody>
-      </table>`}
-    </div>
-
-    <div class="section">
-      <h2>⏳ Прогноз закінчення сировини · snapshot з МойСклад</h2>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:10px">
-        Резерв = 0 для сировини/упаковки — нормально (резервуються лише готові пачки замовленнями покупців).
-      </div>
-      <table>
-        <thead><tr><th>Матеріал</th><th>Залишок</th><th>Днів вистачить</th></tr></thead>
-        <tbody>
-          ${stockTargets.slice(0, 30).map(s => {
-            const days = s.stock_days != null && s.stock_days > 0 ? s.stock_days : null;
-            const cat = categorize(s.folder_path);
-            return `<tr>
-              <td><span class="muted">${CAT_LABEL[cat] || cat}</span> · ${esc(s.name || s.code || s.assortment_id)}</td>
-              <td>${fmt(s.stock, s.uom_name === 'кг' ? 1 : 0)} <span class="muted">${esc(s.uom_name||'')}</span></td>
-              <td class="${rowClass(days)}">${days != null ? fmt(days, 1) + ' дн' : '<span class="muted">∞</span>'}</td>
-            </tr>`;
+          ${list.map((d,i) => {
+            const c = d.cp;
+            const phone = c.phone || '';
+            const em = c.email || '';
+            const desc = c.description || '';
+            const daysClass = d.maxDaysOverdue > 60 ? 'b90' : d.maxDaysOverdue > 30 ? 'b60' : d.maxDaysOverdue > 0 ? 'b30' : 'b0';
+            const rankCls = isOverdue ? 'rank' : 'rank green';
+            const sumColor = isOverdue ? 'var(--red)' : '#4a7000';
+            const subject = isOverdue
+              ? `Прострочена%20дебіторка%20${nf(d.balance)}%20%E2%82%B4`
+              : `Деталі%20оплати%20${nf(d.balance)}%20%E2%82%B4`;
+            return `
+              <tr>
+                <td class="${rankCls}">${i+1}</td>
+                <td>
+                  <div style="font-weight:600">${escapeHtml(c.name)}</div>
+                  <div style="font-size:11px;color:var(--muted)">${d.count} рахунк${d.count===1?'.':d.count<5?'и.':'ів.'}${em ? ' · ' + escapeHtml(em) : ''}${phone ? ' · ' + escapeHtml(phone) : ''}</div>
+                </td>
+                <td style="text-align:right;font-weight:700;color:${sumColor}">${nf(d.balance)}</td>
+                <td style="text-align:center"><span class="bucket-pill ${daysClass}">${d.maxDaysOverdue}</span></td>
+                <td style="text-align:right;white-space:nowrap">
+                  ${phone ? `<a href="tel:${escapeAttr(phone)}" class="act-btn tel" title="${escapeAttr(phone)}">📞</a>` : ''}
+                  ${em ? `<a href="mailto:${escapeAttr(em)}?subject=${subject}" class="act-btn mail" title="${escapeAttr(em)}">✉</a>` : ''}
+                  ${!phone && !em ? '<span style="color:var(--muted);font-size:11px">—</span>' : ''}
+                </td>
+              </tr>
+            `;
           }).join('')}
         </tbody>
       </table>
-      <div style="margin-top:8px;font-size:11px;color:var(--muted)">
-        <span class="bad" style="padding:2px 8px;border-radius:3px">&lt; 14 дн</span> критично ·
-        <span class="warn" style="padding:2px 8px;border-radius:3px">14–30 дн</span> запланувати ·
-        <span class="ok" style="padding:2px 8px;border-radius:3px">&gt; 30 дн</span> ок ·
-        ${stockTargets.length > 30 ? `показано 30 з ${stockTargets.length}` : ''}
+    `;
+  }
+
+  // Expense items table
+  function renderExpenseTable(){
+    const top10 = expByItemSorted.slice(0, 10);
+    if (top10.length === 0) {
+      return `<div class="empty-state"><div class="es-icon">💸</div><div class="es-title">Немає витрат за ${periodLabel}</div><div class="es-sub">Перевір що paymentout sync з MoySklad працює. Якщо все = "(не вказано)" — потрібен v2.72 sync для категоризації.</div></div>`;
+    }
+    return `
+      <table class="dt">
+        <thead>
+          <tr>
+            <th style="width:30px">#</th>
+            <th>Стаття витрат</th>
+            <th style="text-align:right">${periodLabel} ₴</th>
+            <th style="text-align:right">Попер. період ₴</th>
+            <th style="text-align:right;width:70px">% усіх</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${top10.map(([item, sum], i) => {
+            const lastM = expByItemLastM[item] || 0;
+            const pct = expTotal90 > 0 ? (sum/expTotal90*100) : 0;
+            return `
+              <tr>
+                <td class="rank">${i+1}</td>
+                <td><div style="font-weight:600">${escapeHtml(item)}</div></td>
+                <td style="text-align:right;font-weight:700;color:var(--red)">${nf(sum)}</td>
+                <td style="text-align:right;color:#666">${nf(lastM)}</td>
+                <td style="text-align:right;color:var(--muted)">${pct.toFixed(1)}%</td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  // ============================================================================
+  // HTML compose
+  // ============================================================================
+  const html = `
+    <!-- HEADER -->
+    <div class="fin-header">
+      <div class="fin-title">🛒 Procurement Dashboard</div>
+      <div class="fin-sub">Рахунки · Гроші · Витрати по напрямах · AR aging · Очікувані надходження</div>
+    </div>
+
+    ${hasMultiCurrency ? `
+    <!-- v2.78 MULTI-CURRENCY BANNER -->
+    <div style="background:linear-gradient(135deg,#e8f4ff 0%,#fff4e0 100%);border:1px solid #b3d4ff;border-radius:8px;padding:14px 18px;margin:14px 0 0;display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+      <div style="font-size:24px">🌍</div>
+      <div style="flex:1;min-width:240px">
+        <div style="font-weight:600;color:#1a4d8c;font-size:14px;margin-bottom:4px">Multi-currency обіг за ${periodLabel}</div>
+        <div style="font-size:12.5px;color:#444">${nonUahShare.toFixed(1)}% обороту — у валютах ≠ UAH. Усі KPIs нормалізовано в UAH за курсом на момент кожної транзакції з MoySklad.</div>
       </div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        ${Object.entries(currencyBreakdown).sort((a,b)=>b[1].sum_uah-a[1].sum_uah).map(([cur, stats]) => `
+          <div style="background:#fff;border:1px solid #d8e5f5;border-radius:6px;padding:8px 14px;text-align:center;min-width:110px">
+            <div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.5px">${cur}</div>
+            <div style="font-size:14px;font-weight:600;color:#1a4d8c">${symbolOf(cur)} ${nfm(stats.sum_orig)}</div>
+            <div style="font-size:10px;color:#888">${stats.count} операц. · ${nfm(stats.sum_uah)} ₴</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    ` : ''}
+
+    <!-- SECTION 1 — KPI ROW 1: за останні 30 днів -->
+    <div class="g4">
+      ${invKpi(
+        `🛒 Виставлено рахунків (${periodLabel})`,
+        `${nfm(invLast30)} ₴`,
+        deltaPill(invDelta) + ' vs попер. період',
+        'cy',
+        true
+      )}
+      <div class="kpi cg">
+        <div class="kpi-lbl">✅ Надходження (${periodLabel})</div>
+        <div class="kpi-val">${nfm(cashLast30)} ₴</div>
+        ${deltaPill(cashDelta)} <span style="font-size:10px;color:var(--muted)">vs попер.</span>
+      </div>
+      <div class="kpi cr">
+        <div class="kpi-lbl">💸 Витрати (${periodLabel})</div>
+        <div class="kpi-val">${nfm(expLast30)} ₴</div>
+        ${deltaPill(expDelta)} <span style="font-size:10px;color:var(--muted)">vs попер.</span>
+      </div>
+      <div class="kpi ${netCashFlow >= 0 ? 'cg' : 'cr'}">
+        <div class="kpi-lbl">📊 Net Cash Flow (${periodLabel})</div>
+        <div class="kpi-val" style="color:${netCashFlow >= 0 ? '#4a7000' : 'var(--red)'}">${netCashFlow >= 0 ? '+' : ''}${nfm(netCashFlow)} ₴</div>
+        ${deltaPill(netDelta)} <span style="font-size:10px;color:var(--muted)">vs попер.</span>
+      </div>
+    </div>
+
+    <!-- KPI ROW 2: поточний стан AR -->
+    <div class="g4" style="margin-top:14px">
+      ${invKpi(
+        '📋 Дебіторка в межах терміну',
+        `${nfm(freshARTotal)} ₴`,
+        `${freshAR.length} рахунк${freshAR.length===1?'.':freshAR.length<5?'и.':'ів.'} · planned ≥ today`,
+        'cg',
+        true
+      )}
+      ${invKpi(
+        '🔴 ПРОТЕРМІНОВАНО',
+        `${nfm(overdueARTotal)} ₴`,
+        `${overdueAR.length} рахунк${overdueAR.length===1?'.':overdueAR.length<5?'и.':'ів.'} · planned &lt; today`,
+        overdueARTotal > 0 ? 'cr' : 'cg',
+        true
+      )}
+      ${invKpi(
+        '📅 Заплановано до оплати (30д)',
+        `${nfm(plannedNext30Total)} ₴`,
+        `${plannedNext30.length} рахунк${plannedNext30.length===1?'.':plannedNext30.length<5?'и.':'ів.'} у наступні 30 днів`,
+        'cp',
+        true
+      )}
+      <div class="kpi cb">
+        <div class="kpi-lbl">📈 DSO — днів</div>
+        <div class="kpi-val">${dso !== null ? dso + ' дн' : '—'}</div>
+        <div class="kpi-sub">${dso !== null ? 'avg ms_moment→планова оплата' : 'нема повністю-оплачених рахунків'}</div>
+      </div>
+    </div>
+
+    <!-- SECTION 2 — CASH FLOW CHART -->
+    <div class="sec">💸 Грошовий потік — рахунки, надходження, витрати · ${periodLabel}</div>
+    <div class="cc">
+      <div class="cc-head">
+        <div>
+          <div class="cc-title">${months.length} ${effectiveGran === 'day' ? 'днів' : effectiveGran === 'week' ? 'тижнів' : 'місяців'} · 3 dataset</div>
+          <div class="cc-sub">Виставлено рахунків (yellow) · Надходження (green) · Витрати (red, negative)${!hasInvoices ? ' · ⚠ рахунки = 0' : ''}</div>
+        </div>
+        <!-- v3.0.2: дублікат granularity toggle ПРЯМО біля графіка (синхронізується з sticky-bar) -->
+        <div class="granularity-toggle" id="granToggleChart" title="Деталізація графіка">
+          <button class="gt-btn ${effectiveGran === 'day' ? 'active' : ''}" data-gran="day">День</button>
+          <button class="gt-btn ${effectiveGran === 'week' ? 'active' : ''}" data-gran="week">Тиждень</button>
+          <button class="gt-btn ${effectiveGran === 'month' ? 'active' : ''}" data-gran="month">Місяць</button>
+        </div>
+      </div>
+      <div class="chart-h320"><canvas id="cashFlowChart"></canvas></div>
+    </div>
+
+    <!-- SECTION 3 — ВИТРАТИ ПО НАПРЯМАХ -->
+    <div class="sec">📊 Витрати по напрямах · ${periodLabel}</div>
+    <div class="g2">
+      <div class="cc">
+        <div class="cc-head">
+          <div>
+            <div class="cc-title">Структура витрат (по категоріях)</div>
+            <div class="cc-sub">TOP-8 + Інші · Σ ${nfm(expTotal90)} ₴ за ${periodLabel}${expByItemSorted.find(x => x[0] === '(не вказано)') ? ` · ⚠ ${(expByItemSorted.find(x => x[0]==='(не вказано)')[1]/Math.max(1,expTotal90)*100).toFixed(0)}% без категорії` : ''}</div>
+          </div>
+        </div>
+        <div class="chart-h320"><canvas id="expDoughnut"></canvas></div>
+      </div>
+      <div class="cc">
+        <div class="cc-head">
+          <div>
+            <div class="cc-title">TOP-10 статей витрат</div>
+            <div class="cc-sub">Сума за ${periodLabel}, попер. період, % від всіх</div>
+          </div>
+        </div>
+        ${renderExpenseTable()}
+      </div>
+    </div>
+
+    <!-- SECTION 3b — TOP-10 ПОСТАЧАЛЬНИКІВ (v3.0 NEW) -->
+    <div class="sec">🏭 ТОП-10 постачальників · кому ми платили · ${periodLabel}</div>
+    <div class="cc">
+      ${topSuppliers.length === 0 ? `
+        <div class="empty-state"><div class="es-icon">📭</div><div class="es-title">Немає виплат за ${periodLabel}</div></div>
+      ` : `
+        <div class="cc-head" style="margin-bottom:8px">
+          <div class="cc-sub">Σ ${nfm(topSuppliers.reduce((a,s) => a+s.sum, 0))} ₴ виплачено ТОП-10 з ${nfm(expTotal90)} ₴ всього</div>
+        </div>
+        <table class="dt">
+          <thead><tr><th style="width:30px">#</th><th>Постачальник</th><th style="text-align:right">Виплачено ₴</th><th style="text-align:center;width:70px">Платежів</th><th style="text-align:right;width:70px">% усіх</th><th style="text-align:right;width:140px">Контакт</th></tr></thead>
+          <tbody>
+            ${topSuppliers.map((s, i) => {
+              const pct = expTotal90 > 0 ? (s.sum/expTotal90*100) : 0;
+              const phone = s.cp?.phone || '';
+              const em = s.cp?.email || '';
+              return `
+                <tr>
+                  <td class="rank">${i+1}</td>
+                  <td>
+                    <div style="font-weight:600">${escapeHtml(s.name)}</div>
+                    ${s.cp?.legal_address ? `<div style="font-size:11px;color:var(--muted)">${escapeHtml(s.cp.legal_address)}</div>` : ''}
+                  </td>
+                  <td style="text-align:right;font-weight:700;color:var(--red)">${nf(s.sum)}</td>
+                  <td style="text-align:center">${s.count}</td>
+                  <td style="text-align:right;color:var(--muted)">${pct.toFixed(1)}%</td>
+                  <td style="text-align:right;white-space:nowrap">
+                    ${phone ? `<a href="tel:${escapeAttr(phone)}" class="act-btn tel" title="${escapeAttr(phone)}">📞</a>` : ''}
+                    ${em ? `<a href="mailto:${escapeAttr(em)}" class="act-btn mail" title="${escapeAttr(em)}">✉</a>` : ''}
+                    ${!phone && !em ? '<span style="color:var(--muted);font-size:11px">—</span>' : ''}
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      `}
+    </div>
+
+    <!-- SECTION 4 — AR AGING -->
+    <div class="sec">📊 AR aging — на основі payment_planned_moment</div>
+    <div class="g2">
+      <div class="cc">
+        <div class="cc-head">
+          <div>
+            <div class="cc-title">Розподіл відкритої дебіторки</div>
+            <div class="cc-sub">${openInvoices.length} рахунк${openInvoices.length===1?'.':openInvoices.length<5?'и.':'ів.'} · ${nfm(openARTotal)} ₴ загалом</div>
+          </div>
+        </div>
+        ${hasInvoices ? `<div class="chart-h280"><canvas id="agingChart"></canvas></div>
+        <div class="split-summary">
+          <div class="ss-item">
+            <div class="ss-dot ok"></div>
+            <div>
+              <div class="ss-label">В межах терміну</div>
+              <div class="ss-val">${nfm(freshARTotal)} ₴<span class="ss-pct">${openARTotal > 0 ? (freshARTotal/openARTotal*100).toFixed(1) : '0'}%</span></div>
+            </div>
+          </div>
+          <div class="ss-item">
+            <div class="ss-dot overdue"></div>
+            <div>
+              <div class="ss-label">Протерміновано</div>
+              <div class="ss-val">${nfm(overdueARTotal)} ₴<span class="ss-pct">${openARTotal > 0 ? (overdueARTotal/openARTotal*100).toFixed(1) : '0'}%</span></div>
+            </div>
+          </div>
+        </div>` : `<div class="empty-state dashed"><div class="es-icon">📭</div><div class="es-title">${invoicesEmptyMsg}</div><div class="es-sub">AR aging з'явиться після наступного sync рахунків</div></div>`}
+      </div>
+      <div class="cc">
+        <div class="cc-head">
+          <div>
+            <div class="cc-title">Buckets — деталізація</div>
+            <div class="cc-sub">За payment_planned_moment vs. today</div>
+          </div>
+        </div>
+        ${hasInvoices ? `<table class="dt">
+          <thead><tr><th>Bucket</th><th style="text-align:right">Рахунк.</th><th style="text-align:right">Сума ₴</th><th style="text-align:right">% AR</th><th style="text-align:center;width:70px">Статус</th></tr></thead>
+          <tbody>
+            <tr><td><span class="bucket-pill b0">🟢 В межах терміну</span><div style="font-size:10px;color:var(--muted);margin-top:3px">planned ≥ today</div></td><td style="text-align:right">${bucketsCount.b0}</td><td style="text-align:right;font-weight:600">${nf(buckets.b0)}</td><td style="text-align:right;color:var(--muted)">${openARTotal > 0 ? (buckets.b0/openARTotal*100).toFixed(1) : '0'}%</td><td style="text-align:center;color:#4a7000;font-weight:700;font-size:11px">OK</td></tr>
+            <tr><td><span class="bucket-pill b30">🟡 1-30 днів прострочки</span><div style="font-size:10px;color:#996600;margin-top:3px;font-weight:600">м'яко прострочено</div></td><td style="text-align:right">${bucketsCount.b30}</td><td style="text-align:right;font-weight:600">${nf(buckets.b30)}</td><td style="text-align:right;color:var(--muted)">${openARTotal > 0 ? (buckets.b30/openARTotal*100).toFixed(1) : '0'}%</td><td style="text-align:center;color:#996600;font-weight:700;font-size:11px">⚠</td></tr>
+            <tr><td><span class="bucket-pill b60">🟠 31-60 днів прострочки</span><div style="font-size:10px;color:#c2410c;margin-top:3px;font-weight:600">прострочено</div></td><td style="text-align:right">${bucketsCount.b60}</td><td style="text-align:right;font-weight:600">${nf(buckets.b60)}</td><td style="text-align:right;color:var(--muted)">${openARTotal > 0 ? (buckets.b60/openARTotal*100).toFixed(1) : '0'}%</td><td style="text-align:center;color:#c2410c;font-weight:700;font-size:11px">⚠⚠</td></tr>
+            <tr><td><span class="bucket-pill b90">🔴 60+ днів прострочки</span><div style="font-size:10px;color:var(--red);margin-top:3px;font-weight:700">критично</div></td><td style="text-align:right">${bucketsCount.b90}</td><td style="text-align:right;font-weight:600;color:var(--red)">${nf(buckets.b90)}</td><td style="text-align:right;color:var(--red)">${openARTotal > 0 ? (buckets.b90/openARTotal*100).toFixed(1) : '0'}%</td><td style="text-align:center;color:var(--red);font-weight:700;font-size:11px">🔴🔴</td></tr>
+          </tbody>
+        </table>` : `<div class="empty-state dashed"><div class="es-icon">📭</div><div class="es-title">${invoicesEmptyMsg}</div></div>`}
+      </div>
+    </div>
+
+    <!-- SECTION 5 — TOP-10 DEBTORS SPLIT -->
+    <div class="sec">📞 ТОП-10 дебіторів — overdue vs у межах терміну</div>
+    <div class="g2">
+      <div class="cc ${overdueDebtors.length ? 'alert' : 'ok'}">
+        <div class="cc-head">
+          <div>
+            <div class="cc-title">🔴 Протерміновані<span class="cc-title-tag red">терміново дзвонити</span></div>
+            <div class="cc-sub">${overdueDebtors.length ? `${overdueDebtors.length} клієнт${overdueDebtors.length>1?'и':''} · Σ ${nfm(overdueARTotal)} ₴` : (hasInvoices ? 'Жодного' : invoicesEmptyMsg)}</div>
+          </div>
+        </div>
+        ${renderDebtorsTable(overdueDebtors, 'overdue')}
+      </div>
+      <div class="cc ok">
+        <div class="cc-head">
+          <div>
+            <div class="cc-title">📋 В межах терміну<span class="cc-title-tag green">нормально</span></div>
+            <div class="cc-sub">${freshDebtors.length ? `${freshDebtors.length} клієнт${freshDebtors.length>1?'и':''} · Σ ${nfm(freshARTotal)} ₴` : (hasInvoices ? 'Жодного' : invoicesEmptyMsg)}</div>
+          </div>
+        </div>
+        ${renderDebtorsTable(freshDebtors, 'fresh')}
+      </div>
+    </div>
+
+    <!-- SECTION 6 — UPCOMING RECEIPTS -->
+    <div class="sec">⏳ Очікувані надходження — наступні 30 днів</div>
+    <div class="cc">
+      ${!hasInvoices ? `
+        <div class="empty-state dashed">
+          <div class="es-icon">📭</div>
+          <div class="es-title">${invoicesEmptyMsg}</div>
+          <div class="es-sub">Очікувані надходження будуються з payment_planned_moment рахунків.<br>Поки що список пустий — заповниться після наступного sync.</div>
+        </div>
+      ` : upcomingReceipts.length === 0 ? `
+        <div class="empty-state">
+          <div class="es-icon">📭</div>
+          <div class="es-title">Немає очікуваних надходжень</div>
+          <div class="es-sub">Жоден відкритий рахунок не має payment_planned_moment у наступні 30 днів.</div>
+        </div>
+      ` : `
+        <div class="cc-head" style="margin-bottom:8px">
+          <div class="cc-sub">${upcomingReceipts.length} рахунків · ${nfm(upcomingReceipts.reduce((a,u) => a+u.amount, 0))} ₴ очікується</div>
+        </div>
+        <table class="dt">
+          <thead>
+            <tr>
+              <th style="width:90px">Planned</th>
+              <th>Контрагент</th>
+              <th>Рахунок</th>
+              <th style="text-align:right">Сума ₴</th>
+              <th style="text-align:right;width:80px">Днів</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${upcomingReceipts.slice(0, 30).map(u => `
+              <tr>
+                <td style="white-space:nowrap;font-weight:600">${df(u.planned)}</td>
+                <td>${escapeHtml(u.cpName)}</td>
+                <td style="font-size:11px;color:var(--muted)">${escapeHtml(u.invName)}</td>
+                <td style="text-align:right;font-weight:700">${nf(u.amount)}</td>
+                <td style="text-align:right">${u.daysUntil <= 3 ? `<span class="bucket-pill b30">через ${u.daysUntil}</span>` : `<span style="color:var(--muted)">через ${u.daysUntil} дн</span>`}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        ${upcomingReceipts.length > 30 ? `<div style="text-align:center;padding:10px;color:var(--muted);font-size:12px">показано перші 30 з ${upcomingReceipts.length}</div>` : ''}
+      `}
+    </div>
+
+    <!-- SECTION 7 — LAST 20 PAYMENTS -->
+    <div class="sec">🕐 Останні 20 платежів — timeline</div>
+    <div class="cc">
+      ${last20Payments.length === 0 ? `
+        <div class="empty-state"><div class="es-icon">📭</div><div class="es-title">Немає платежів</div></div>
+      ` : `
+        <div class="pay-tl">
+          ${last20Payments.map(p => {
+            const isInb = p.type === 'inbound';
+            const isOut = p.type === 'outbound';
+            const iconCls = isInb ? 'inb' : isOut ? 'outb' : 'inb';
+            const amtCls = isInb ? 'pos' : isOut ? 'neg' : '';
+            const icon = isInb ? '🛒' : isOut ? '💸' : '•';
+            const sign = isInb ? '+' : isOut ? '−' : '';
+            const meta = isOut && p.expenseItem ? `<div class="pay-tl-meta">Стаття: <strong>${escapeHtml(p.expenseItem)}</strong>${p.name ? ' · ' + escapeHtml(p.name) : ''}</div>` : (p.name ? `<div class="pay-tl-meta">${escapeHtml(p.name)}</div>` : '');
+            return `
+              <div class="pay-tl-item">
+                <div class="pay-tl-date">${df(p.date)}</div>
+                <div class="pay-tl-icon ${iconCls}">${icon}</div>
+                <div class="pay-tl-body">
+                  <div class="pay-tl-title">${escapeHtml(p.cpName)}</div>
+                  ${meta}
+                </div>
+                <div class="pay-tl-amount ${amtCls}">${sign}${nf(p.amount)} ₴</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `}
+    </div>
+
+    <!-- SECTION 8 — AUTO-INSIGHTS -->
+    <div class="sec">🧠 Auto-insights</div>
+    <div class="insights-grid">
+
+      <!-- 1. Critical overdue -->
+      <div class="insight ${criticalOverdueCount > 0 ? 'red' : (overdueAR.length > 0 ? 'yellow' : 'green')}">
+        <div class="insight-icon">${criticalOverdueCount > 0 ? '🔴' : (overdueAR.length > 0 ? '⚠️' : '✅')}</div>
+        <div>
+          <strong>${
+            criticalOverdueCount > 0
+              ? `${criticalOverdueCount} рахунк${criticalOverdueCount===1?'':criticalOverdueCount<5?'и':'ів'} прострочено &gt; 60 днів на ${nfm(criticalOverdueTotal)} ₴`
+              : overdueAR.length > 0
+                ? `${overdueAR.length} рахунк${overdueAR.length===1?'':overdueAR.length<5?'и':'ів'} протерміновано на ${nfm(overdueARTotal)} ₴`
+                : 'Жодного простроченого рахунку'
+          }</strong>
+          <br><span style="color:#666">${
+            criticalOverdueCount > 0
+              ? 'Терміново — призначити дзвінок або escalation'
+              : overdueAR.length > 0
+                ? 'Прострочка є, але до критичних 60 днів не дійшло'
+                : (hasInvoices ? 'Здоровий стан AR — всі рахунки в межах терміну' : invoicesEmptyMsg)
+          }</span>
+        </div>
+      </div>
+
+      <!-- 2. Net cash flow / DSO -->
+      ${(() => {
+        const cls = netCashFlow < 0 ? 'red' : netCashFlow > expLast30 * 0.3 ? 'green' : 'yellow';
+        const icon = netCashFlow < 0 ? '🩸' : netCashFlow > 0 ? '🟢' : '🟡';
+        let title, body;
+        if (netCashFlow < 0) {
+          title = `Cash burn ${nfm(Math.abs(netCashFlow))} ₴ за 30 днів`;
+          body = `Витрати (${nfm(expLast30)} ₴) перевищують надходження (${nfm(cashLast30)} ₴)${dso !== null ? ` · DSO ${dso} дн` : ''}`;
+        } else if (netCashFlow > 0) {
+          title = `Net cash positive +${nfm(netCashFlow)} ₴ за 30 днів`;
+          body = `Надходження (${nfm(cashLast30)} ₴) перевищують витрати (${nfm(expLast30)} ₴)${dso !== null ? ` · DSO ${dso} дн` : ''}`;
+        } else {
+          title = `Break-even за 30 днів`;
+          body = `Надходження = витрати = ${nfm(cashLast30)} ₴${dso !== null ? ` · DSO ${dso} дн` : ''}`;
+        }
+        return `
+          <div class="insight ${cls}">
+            <div class="insight-icon">${icon}</div>
+            <div>
+              <strong>${title}</strong>
+              <br><span style="color:#666">${body}</span>
+            </div>
+          </div>
+        `;
+      })()}
+
+      <!-- 3. Healthy AR / зайнятість дебіторки -->
+      ${(() => {
+        if (!hasInvoices) {
+          return `
+            <div class="insight blue">
+              <div class="insight-icon">📋</div>
+              <div>
+                <strong>${invoicesEmptyMsg}</strong>
+                <br><span style="color:#666">AR insights з'являться після наступного sync рахунків</span>
+              </div>
+            </div>
+          `;
+        }
+        const freshPct = openARTotal > 0 ? (freshARTotal/openARTotal*100) : 0;
+        const cls = freshPct > 70 ? 'green' : freshPct > 40 ? 'yellow' : 'red';
+        const icon = freshPct > 70 ? '✅' : freshPct > 40 ? '🟡' : '🔴';
+        return `
+          <div class="insight ${cls}">
+            <div class="insight-icon">${icon}</div>
+            <div>
+              <strong>${freshPct.toFixed(0)}% дебіторки у межах терміну</strong>
+              <br><span style="color:#666">${nfm(freshARTotal)} ₴ в строк · ${nfm(overdueARTotal)} ₴ прострочено · planned до 30д: ${nfm(plannedNext30Total)} ₴</span>
+            </div>
+          </div>
+        `;
+      })()}
+
+      <!-- 4. Concentration — top1 expense category OR top1 debtor -->
+      ${(() => {
+        // якщо є дебітори — показуємо їх concentration
+        if (allDebtors.length > 0 && top1DebtorName) {
+          const cls = top1DebtorShare > 50 ? 'red' : top1DebtorShare > 30 ? 'yellow' : 'green';
+          const icon = top1DebtorShare > 50 ? '🎯' : top1DebtorShare > 30 ? '⚠️' : '👥';
+          return `
+            <div class="insight ${cls}">
+              <div class="insight-icon">${icon}</div>
+              <div>
+                <strong>TOP-1 дебітор = ${top1DebtorShare.toFixed(1)}% усіх боргів</strong>
+                <br><span style="color:#666">${escapeHtml(top1DebtorName)} — ${nfm(allDebtors[0].balance)} ₴</span>
+              </div>
+            </div>
+          `;
+        }
+        // інакше — concentration у витратах
+        if (top1ExpenseName) {
+          const cls = top1ExpenseShare > 50 ? 'yellow' : 'blue';
+          const icon = top1ExpenseShare > 50 ? '🎯' : '📊';
+          return `
+            <div class="insight ${cls}">
+              <div class="insight-icon">${icon}</div>
+              <div>
+                <strong>TOP-1 стаття витрат = ${top1ExpenseShare.toFixed(1)}% усіх витрат за 90д</strong>
+                <br><span style="color:#666">${escapeHtml(top1ExpenseName)} — ${nfm(expByItemSorted[0][1])} ₴</span>
+              </div>
+            </div>
+          `;
+        }
+        return `
+          <div class="insight green">
+            <div class="insight-icon">✅</div>
+            <div>
+              <strong>Немає концентрації ризиків</strong>
+              <br><span style="color:#666">Ні дебіторської, ні видаткової концентрації не виявлено</span>
+            </div>
+          </div>
+        `;
+      })()}
+
     </div>
   `;
 
-  if (months.length > 0) {
-    setTimeout(() => {
-      const ctx1 = document.getElementById('ioChart')?.getContext('2d');
-      if (ctx1) {
-        new Chart(ctx1, {
-          type: 'bar',
-          data: {
-            labels: months.map(fmtMonth),
-            datasets: [
-              {label:'Свіжий ВХІД, кг', data: months.map(m => matsByMonth[m].fresh), backgroundColor:'rgba(59,130,246,0.7)'},
-              {label:'Сушений ВИХІД, кг', data: months.map(m => matsByMonth[m].dried), backgroundColor:'rgba(150,193,31,0.7)'},
-            ]
+  document.getElementById('contentWrap').innerHTML = html;
+
+  // ============================================================================
+  // CHARTS
+  // ============================================================================
+  setTimeout(() => {
+    // Cash flow — 3 datasets
+    const cfCtx = document.getElementById('cashFlowChart');
+    if (cfCtx) {
+      if (_charts.cf) _charts.cf.destroy();
+      _charts.cf = new Chart(cfCtx, {
+        type: 'bar',
+        data: {
+          labels: chartLabels,
+          datasets: [
+            {
+              label: 'Виставлено рахунків (₴)',
+              data: months.map(m => invByMonth[m]),
+              backgroundColor: 'rgba(254,191,39,.75)',
+              borderColor: '#FEBF27',
+              borderWidth: 1,
+            },
+            {
+              label: 'Надходження (₴)',
+              data: months.map(m => cashByMonth[m]),
+              backgroundColor: 'rgba(150,193,31,.75)',
+              borderColor: '#96C11F',
+              borderWidth: 1,
+            },
+            {
+              label: 'Витрати (₴, negative)',
+              data: months.map(m => -expByMonth[m]),
+              backgroundColor: 'rgba(232,64,64,.65)',
+              borderColor: '#E84040',
+              borderWidth: 1,
+            },
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { display: true, position: 'top', labels: { font: { size: 11 } } },
+            tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${nf(Math.abs(ctx.parsed.y))} ₴` } }
           },
-          options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{font:{size:10}}}}}
+          scales: { y: { ticks: { callback: v => nfm(v) + ' ₴' } } }
+        }
+      });
+    }
+
+    // Expense doughnut
+    const expCtx = document.getElementById('expDoughnut');
+    if (expCtx && doughnutData.length > 0) {
+      if (_charts.exp) _charts.exp.destroy();
+      _charts.exp = new Chart(expCtx, {
+        type: 'doughnut',
+        data: {
+          labels: doughnutLabels,
+          datasets: [{
+            data: doughnutData,
+            backgroundColor: ['#E84040', '#F97316', '#FEBF27', '#96C11F', '#3B82F6', '#7209B7', '#0EA5E9', '#EC4899', '#8a8a8a'],
+            borderWidth: 2,
+            borderColor: '#fff',
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { padding: 8, font: { size: 10.5 }, boxWidth: 12 } },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  const pct = expTotal90 > 0 ? (ctx.parsed/expTotal90*100).toFixed(1) : '0';
+                  return `${ctx.label}: ${nf(ctx.parsed)} ₴ (${pct}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // AR aging doughnut
+    if (hasInvoices) {
+      const agCtx = document.getElementById('agingChart');
+      if (agCtx) {
+        if (_charts.ag) _charts.ag.destroy();
+        _charts.ag = new Chart(agCtx, {
+          type: 'doughnut',
+          data: {
+            labels: [
+              '🟢 В межах терміну',
+              '🟡 1-30 днів прострочки',
+              '🟠 31-60 днів прострочки',
+              '🔴 60+ днів критично'
+            ],
+            datasets: [{
+              data: [buckets.b0, buckets.b30, buckets.b60, buckets.b90],
+              backgroundColor: ['#96C11F', '#FEBF27', '#F97316', '#E84040'],
+              borderWidth: 2,
+              borderColor: '#fff',
+            }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom', labels: { padding: 10, font: { size: 10.5 }, boxWidth: 14 } },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => {
+                    const pct = openARTotal > 0 ? (ctx.parsed/openARTotal*100).toFixed(1) : '0';
+                    return `${nf(ctx.parsed)} ₴ (${pct}%)`;
+                  }
+                }
+              }
+            }
+          }
         });
       }
-      const ctx2 = document.getElementById('packChart')?.getContext('2d');
-      if (ctx2) {
-        new Chart(ctx2, {
-          type: 'bar',
-          data: {
-            labels: months.map(fmtMonth),
-            datasets: [
-              {label:'Упаковка', data: months.map(m => matsByMonth[m].packaging), backgroundColor:'rgba(254,191,39,0.7)'},
-              {label:'Гофротара', data: months.map(m => matsByMonth[m].cardboard), backgroundColor:'rgba(232,64,64,0.7)'},
-            ]
-          },
-          options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{font:{size:10}}}}}
-        });
-      }
-    }, 50);
+    }
+  }, 50);
+}
+
+// === Helpers ===
+function escapeHtml(s){return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);}
+function escapeAttr(s){return escapeHtml(s).replace(/"/g,'&quot;');}
+
+// === Last-sync badge ===
+async function updateSyncBadge(){
+  const statusEl = document.getElementById('syncStatus');
+  const updateEl = document.getElementById('lastUpdate');
+  try {
+    const r = await fetch(WORKER + '/api/dashboard/last-sync', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'});
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    const j = await r.json();
+    const items = j.items || [];
+    const ok = items.find(x => x.status === 'success');
+    if (!ok) { statusEl.textContent = '⚠ Sync не успішний'; return; }
+    const d = new Date(ok.finished_at * 1000);
+    const fmt = d.toLocaleString('uk-UA', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+    const ageH = Math.round((Date.now() - d.getTime()) / 36e5);
+    statusEl.textContent = `✓ Sync: ${fmt}`;
+    updateEl.textContent = ageH < 1 ? 'щойно' : ageH < 24 ? ageH + ' год тому' : Math.round(ageH/24) + ' дн. тому';
+  } catch(e) {
+    statusEl.textContent = '⚠ Sync info недоступне';
   }
 }
 </script>
