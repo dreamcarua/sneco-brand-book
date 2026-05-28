@@ -2165,7 +2165,9 @@ body.is-admin section.admin-only { display: block !important; }
 .idea-proposal-preview .ipp-body th { background: var(--black-05); font-weight: 700; }
 </style>
   <!-- v2.78.35 (Богдан): Google Sign-In primary для HR/Prices/Maintenance OTP-gate -->
-  <script defer src="dashboard/auth-google.js"></script>
+  <!-- v2.78.58 hotfix: defer ламав Google Sign-In у sec-hr/sec-prices/sec-production/sec-admin
+       (mountOtpForm викликається синхронно і не бачив SnecoAuth). Sync завантаження. -->
+  <script src="dashboard/auth-google.js"></script>
 </head>
 <body class="lang-uk">
 
