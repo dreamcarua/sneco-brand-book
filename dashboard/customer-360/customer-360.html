@@ -646,6 +646,7 @@ body.dash-locked{overflow:hidden}
   <div class="search-wrap">
     <div class="search-icon">🔍</div>
     <input type="text" class="search-input" id="custSearch" placeholder="Знайди клієнта за назвою / ЄДРПОУ / email…" autocomplete="off">
+    <button id="custSearchClear" type="button" title="Очистити пошук (Esc)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:transparent;border:none;font-size:18px;color:var(--muted);cursor:pointer;display:none;padding:4px 8px;line-height:1">×</button>
     <div class="search-results" id="searchResults"></div>
   </div>
   <div class="quick-pills" id="quickPills">
@@ -2255,7 +2256,7 @@ function _buildOverviewHtml(){
       <div class="ov-section">
         <div class="ov-concentration">
           ⚠ <b>Висока концентрація portfolio:</b> ТОП-5 клієнтів = <b>${concentration.share.toFixed(1)}%</b> усієї виручки.
-          Втрата одного = серйозний удар. Рекомендовано диверсифікувати у меньших клієнтів.
+          Втрата одного = серйозний удар. Рекомендовано диверсифікувати у менших клієнтів.
           ТОП-5: ${concentration.top5.map(c => `<b>${escapeHtml(c.name)}</b>`).join(' · ')}.
         </div>
       </div>
@@ -2412,7 +2413,7 @@ function _buildOverviewHtml(){
         <div class="ov-section-title">🔥 Heatmap портфелю · сегмент × health</div>
         <div class="ov-heatmap">
           <div style="font-size:11.5px;color:#666;margin-bottom:6px">
-            VIP &gt; 500K ₴ LTV · Mid 100K–500K · SMB &lt; 100K. Click cell — пізніше додамо drill-down.
+            VIP &gt; 500K ₴ LTV · Mid 100K–500K · SMB &lt; 100K. <b>Клік на клітинку</b> → побачиш список клієнтів цього сегменту.
           </div>
           <div class="ov-heatmap-grid">
             <div class="ov-heatmap-cell header"></div>
@@ -3065,8 +3066,20 @@ function _buildLegacyListsHtml(customersPool){
 function setupSearch(){
   const input = document.getElementById('custSearch');
   const results = document.getElementById('searchResults');
+  // v2.78.55+: clear button (×)
+  const clearBtn = document.getElementById('custSearchClear');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      input.value = '';
+      results.classList.remove('open');
+      clearBtn.style.display = 'none';
+      input.focus();
+    });
+  }
+  const updateClearBtn = () => { if (clearBtn) clearBtn.style.display = input.value.length > 0 ? 'block' : 'none'; };
   input.addEventListener('input', () => {
     const q = input.value.trim().toLowerCase();
+    updateClearBtn();
     if (q.length < 2) { results.classList.remove('open'); return; }
     const matches = allCounterparties
       .filter(c => {
