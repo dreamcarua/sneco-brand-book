@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>snEco · Attribution — Source Breakdown</title>
+<style>
+:root {
+  --bg: #0f1419; --card: #1a1f2b; --border: #2a3142;
+  --text: #e4e6eb; --text-muted: #9ba3b4;
+  --yellow: #febf27; --green: #96c11f; --red: #ef4444;
+  --black-05: rgba(0,0,0,0.25);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, system-ui, sans-serif; font-size: 14px; line-height: 1.5; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 24px; }
+.topbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--card); border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+.logo { font-weight: 800; font-size: 18px; letter-spacing: -0.02em; }
+.logo .sub { color: var(--text-muted); font-weight: 500; margin-left: 8px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+.card-title { font-weight: 800; font-size: 16px; margin-bottom: 12px; color: var(--yellow); }
+.muted { color: var(--text-muted); font-size: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+th { font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 11px; letter-spacing: 0.08em; }
+.placeholder { background: linear-gradient(180deg, rgba(254,191,39,0.08) 0%, transparent 100%); border-left: 4px solid var(--yellow); padding: 16px 20px; border-radius: 6px; }
+.placeholder h3 { color: var(--yellow); margin-bottom: 8px; font-size: 15px; }
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.kpi { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+.kpi-num { font-size: 28px; font-weight: 900; color: var(--green); line-height: 1; }
+.kpi-label { font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-top: 6px; letter-spacing: 0.08em; }
+button { background: var(--yellow); color: #000; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 13px; }
+button:hover { opacity: 0.9; }
+#auth-gate, #app { display: none; }
+#auth-gate.active, #app.active { display: block; }
+.auth-form { max-width: 360px; margin: 60px auto; background: var(--card); padding: 28px; border-radius: 12px; border: 1px solid var(--border); }
+.auth-form h2 { margin-bottom: 16px; }
+.auth-form input { width: 100%; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 14px; margin-bottom: 12px; }
+.err { color: var(--red); font-size: 12px; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<div id="auth-gate" class="active">
+  <div class="auth-form">
+    <h2>🔐 snEco · Attribution</h2>
+    <p class="muted" style="margin-bottom:16px">Введи email щоб увійти. OTP-код прийде на пошту.</p>
+    <input id="email" type="email" placeholder="your.email@sneco.ua">
+    <input id="otp" type="text" placeholder="6-digit OTP" style="display:none">
+    <button id="login-btn">Надіслати код</button>
+    <div class="err" id="err"></div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="topbar">
+    <div class="logo">snEco · Attribution<span class="sub">/ Source Breakdown</span></div>
+    <div><a href="../customer-360/customer-360.html" style="color:var(--text-muted);text-decoration:none">← Customer 360</a></div>
+  </div>
+  <div class="wrap">
+
+    <div class="kpi-grid" id="kpi-grid">
+      <div class="kpi"><div class="kpi-num" id="kpi-touchpoints">—</div><div class="kpi-label">Touchpoints (12 міс)</div></div>
+      <div class="kpi"><div class="kpi-num" id="kpi-visitors">—</div><div class="kpi-label">Unique visitors</div></div>
+      <div class="kpi"><div class="kpi-num" id="kpi-sources">—</div><div class="kpi-label">Active sources</div></div>
+      <div class="kpi"><div class="kpi-num" id="kpi-campaigns">—</div><div class="kpi-label">Active campaigns</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 Top Sources (last 12 months)</div>
+      <table id="sources-table">
+        <thead><tr><th>Source</th><th>Touchpoints</th></tr></thead>
+        <tbody id="sources-tbody"><tr><td colspan="2" class="muted">Loading…</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 Full Breakdown (source × medium × campaign)</div>
+      <table id="breakdown-table">
+        <thead><tr><th>Source</th><th>Medium</th><th>Campaign</th><th>Touchpoints</th><th>Unique</th><th>Converted</th></tr></thead>
+        <tbody id="breakdown-tbody"><tr><td colspan="6" class="muted">Loading…</td></tr></tbody>
+      </table>
+    </div>
+
+    <!-- v2.78.65: Placeholder для майбутніх фіч (per CLAUDE.md rule — внизу) -->
+    <div class="placeholder">
+      <h3>🟡 У РОЗРОБЦІ · Coming next</h3>
+      <ul style="margin-top:8px;padding-left:20px;font-size:13px;line-height:1.7">
+        <li><strong>Conversion funnel</strong> — Visitor → Lead → Customer per source</li>
+        <li><strong>ROAS calculation</strong> — when paid spend integration ready (Meta/LinkedIn Ads API)</li>
+        <li><strong>Cohort analysis</strong> — LTV by acquisition month + source</li>
+        <li><strong>Attribution models</strong> — first-touch / last-touch / linear / time-decay</li>
+        <li><strong>UTM-builder UI</strong> — generate UTM URLs directly in dashboard</li>
+      </ul>
+      <p class="muted" style="margin-top:10px">Status: <strong>infrastructure ready</strong> (D1 schema + Worker endpoint + tracking script у Brand Bible). Чекаємо: GTM go-live, перші UTM-кампанії з вимірюваним обʼємом, потім будуємо UI.</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const WORKER_URL = 'https://sneco-auth.vg-ab6.workers.dev';
+const BLOCK = 'customer-dashboard'; // використовуємо існуючий whitelist
+
+let _token = null;
+
+async function login() {
+  const email = document.getElementById('email').value.trim();
+  const otp = document.getElementById('otp').value.trim();
+  const err = document.getElementById('err');
+  const btn = document.getElementById('login-btn');
+  if (!email) { err.textContent = 'Введи email'; return; }
+  err.textContent = '';
+  if (!otp) {
+    btn.textContent = '⏳ Sending...';
+    btn.disabled = true;
+    const r = await fetch(`${WORKER_URL}/api/otp/request`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ email, block: BLOCK })
+    });
+    const j = await r.json();
+    btn.disabled = false;
+    if (!r.ok) { err.textContent = j.error || 'Помилка'; btn.textContent = 'Надіслати код'; return; }
+    document.getElementById('otp').style.display = 'block';
+    btn.textContent = 'Увійти';
+    return;
+  }
+  btn.textContent = '⏳ Verifying...';
+  btn.disabled = true;
+  const r = await fetch(`${WORKER_URL}/api/otp/verify`, {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ email, otp, block: BLOCK })
+  });
+  const j = await r.json();
+  btn.disabled = false;
+  btn.textContent = 'Увійти';
+  if (!r.ok || !j.token) { err.textContent = j.error || 'Невірний код'; return; }
+  _token = j.token;
+  localStorage.setItem('snEco_attr_token', _token);
+  showApp();
+}
+
+async function showApp() {
+  document.getElementById('auth-gate').classList.remove('active');
+  document.getElementById('app').classList.add('active');
+  await loadData();
+}
+
+async function loadData() {
+  try {
+    const r = await fetch(`${WORKER_URL}/api/attribution/breakdown`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${_token}` },
+      body: JSON.stringify({ months: 12 })
+    });
+    const d = await r.json();
+    if (!r.ok) { console.error(d); return; }
+
+    const breakdown = d.breakdown || [];
+    const topSources = d.top_sources || [];
+    // KPIs
+    let totalTp = 0, uniqueVisitors = 0, sources = new Set(), campaigns = new Set();
+    breakdown.forEach(b => {
+      totalTp += b.touchpoints || 0;
+      uniqueVisitors += b.unique_visitors || 0;
+      sources.add(b.source);
+      if (b.campaign && b.campaign !== '(no-campaign)') campaigns.add(b.campaign);
+    });
+    document.getElementById('kpi-touchpoints').textContent = totalTp.toLocaleString();
+    document.getElementById('kpi-visitors').textContent = uniqueVisitors.toLocaleString();
+    document.getElementById('kpi-sources').textContent = sources.size;
+    document.getElementById('kpi-campaigns').textContent = campaigns.size;
+
+    // Top sources
+    const srcTb = document.getElementById('sources-tbody');
+    srcTb.innerHTML = topSources.length === 0
+      ? '<tr><td colspan="2" class="muted">Поки немає даних. Чекаємо першу кампанію з UTM-тегами.</td></tr>'
+      : topSources.map(s => `<tr><td><strong>${esc(s.source)}</strong></td><td>${(s.n||0).toLocaleString()}</td></tr>`).join('');
+
+    // Full breakdown
+    const bdTb = document.getElementById('breakdown-tbody');
+    bdTb.innerHTML = breakdown.length === 0
+      ? '<tr><td colspan="6" class="muted">Поки немає даних. Перейди до <a href="https://brand.sneco.ua/#sec-digital" style="color:var(--yellow)">Brand Bible → UTM convention</a> щоб запустити першу кампанію.</td></tr>'
+      : breakdown.map(b => `<tr>
+          <td>${esc(b.source)}</td>
+          <td>${esc(b.medium||'-')}</td>
+          <td>${esc(b.campaign||'-')}</td>
+          <td>${(b.touchpoints||0).toLocaleString()}</td>
+          <td>${(b.unique_visitors||0).toLocaleString()}</td>
+          <td>${(b.converted_customers||0).toLocaleString()}</td>
+        </tr>`).join('');
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function esc(s) {
+  return String(s||'').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// Init
+(async () => {
+  const saved = localStorage.getItem('snEco_attr_token');
+  if (saved) {
+    // Verify saved token
+    const r = await fetch(`${WORKER_URL}/api/session/verify`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: saved })
+    });
+    const j = await r.json();
+    if (r.ok && j.blocks && j.blocks.includes(BLOCK)) {
+      _token = saved;
+      showApp();
+      return;
+    }
+    localStorage.removeItem('snEco_attr_token');
+  }
+  document.getElementById('login-btn').addEventListener('click', login);
+  document.getElementById('email').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+  document.getElementById('otp').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+})();
+</script>
+
+</body>
+</html>
