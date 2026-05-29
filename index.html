@@ -2329,6 +2329,11 @@ body.is-admin section.admin-only { display: block !important; }
 <span class="dot"></span>
 <span data-lang="uk">🎓 Онбординг — як працюють системи</span><span data-lang="en">🎓 Onboarding — how systems work</span><span data-lang="sk">🎓 Onboarding — ako fungujú systémy</span>
 </button>
+<!-- v2.78.66: R&D Lab — каталог експериментів сушіння (idea #12 Ярослав) -->
+<button class="nav-link" data-target="rd-lab" type="button">
+<span class="dot"></span>
+<span data-lang="uk">🔬 R&amp;D Lab</span><span data-lang="en">🔬 R&amp;D Lab</span><span data-lang="sk">🔬 R&amp;D Lab</span>
+</button>
 <button class="nav-link" data-target="documents" type="button">
 <span class="dot"></span>
 <span data-lang="uk">Документи</span><span data-lang="en">Documents</span><span data-lang="sk">Dokumenty</span>
@@ -2381,7 +2386,7 @@ body.is-admin section.admin-only { display: block !important; }
     snEco / Prime Snack LLC<br/>
     Sneco SK s.r.o.<br/>
 <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" rel="noopener" target="_blank">sneco.ua</a><br/><br/>
-    Brand Bible v2.78.65 · 2026
+    Brand Bible v2.78.66 · 2026
   </div>
 </nav>
 <main class="main">
@@ -2393,7 +2398,7 @@ body.is-admin section.admin-only { display: block !important; }
 <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
 <span data-lang="sk">Jedna ingrediencia. <span class="qr-ns-accent">Žiadne kompromisy.</span> Syrový snack 21. storočia.</span>
 </div>
-<div class="qr-meta">v2.78.65 · 2026</div>
+<div class="qr-meta">v2.78.66 · 2026</div>
 </div>
 <!-- ============================================================
      INTRO
@@ -7412,6 +7417,382 @@ body.is-admin section.admin-only { display: block !important; }
 </ol>
 </div>
 </div>
+<!-- ═══════════════════════════════════════════════════════════════════
+       👋 РОЗДІЛ 0. WELCOME ONBOARDING — для нових співробітників (v2.78.66)
+       Заснований на abrisart.ua/brand/onboarding pattern + snEco audit
+       ═══════════════════════════════════════════════════════════════════ -->
+
+<!-- ────── 0.1 WELCOME — Founder TL;DR ────── -->
+<div class="ob-chapter ob-content-panel active" data-ob-panel="all,new">
+<h3>👋 <span data-lang="uk">0. Ласкаво просимо у snEco</span><span data-lang="en">0. Welcome to snEco</span><span data-lang="sk">0. Vitajte v snEco</span></h3>
+<p data-lang="uk">Якщо ти новачок — почни звідси. Це 5-хвилинний welcome guide про головне.</p>
+<p data-lang="en">If you're new — start here. 5-min welcome guide to the essentials.</p>
+<p data-lang="sk">Ak si nový — začni tu. 5-min welcome guide.</p>
+</div>
+
+<div class="ob-content-panel active" data-ob-panel="all,new" style="margin:20px 0 32px">
+<div class="card" style="background:linear-gradient(135deg,#1E1E1E 0%,#2A2A2A 100%);color:#fff;padding:32px 36px;border-radius:14px">
+<div style="font-size:11px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#FEBF27;margin-bottom:14px">⏱ <span data-lang="uk">2 хвилини про snEco</span><span data-lang="en">2 minutes about snEco</span><span data-lang="sk">2 minúty o snEco</span></div>
+<div style="font-size:15px;line-height:1.7;color:#E5E5E5">
+<p data-lang="uk" style="margin-top:0"><strong style="color:#FEBF27">snEco</strong> — це власна патентована технологія <strong>VacWave Bio Nutrition</strong> (мікрохвильово-вакуумна сушка при 36-38°C), яка перетворює свіжий сир у хрусткий снек із 100% продуктом і shelf life 8-18 місяців без холодильника. Брати Пилип і Вадим Гришини почали з домашньої сироварні у Харкові 2015 року, 2 роки експериментів — і у 2016 на ринку з'явився перший snEco.</p>
+<p data-lang="uk" style="margin-bottom:0">Сьогодні: 2 заводи (Мукачево UA + Гуменне SK), 25× зростання за 6 років, перший snack у світі з <strong style="color:#FEBF27">SIAL Grand Prix 2024 (Париж)</strong>, активні ринки UA + SK + SE (через Arvid Nordquist у ICA та Coop). Головний фокус 2026 — масштабування дистрибуції в ЄС/США.</p>
+<p data-lang="en" style="margin-top:0"><strong style="color:#FEBF27">snEco</strong> — our patented <strong>VacWave Bio Nutrition</strong> technology (microwave-vacuum drying at 36-38°C), which turns fresh cheese into a crunchy snack with 100% product and 8-18 months shelf life without refrigeration. Brothers Pylyp and Vadym Gryshyn started with a home cheese-making setup in Kharkiv 2015, 2 years of experiments — and in 2016 the first snEco hit the market.</p>
+<p data-lang="en" style="margin-bottom:0">Today: 2 plants (Mukachevo UA + Humenné SK), 25× growth over 6 years, world's first snack with <strong style="color:#FEBF27">SIAL Grand Prix 2024 (Paris)</strong>, active markets UA + SK + SE (via Arvid Nordquist into ICA and Coop). Main focus 2026 — scaling EU/US distribution.</p>
+<p data-lang="sk" style="margin-top:0"><strong style="color:#FEBF27">snEco</strong> — naša patentovaná technológia <strong>VacWave Bio Nutrition</strong> (mikrovlnno-vákuové sušenie pri 36-38°C), ktorá premieňa čerstvý syr na chrumkavý snack so 100% produktom a trvanlivosťou 8-18 mesiacov bez chladenia. Bratia Pylyp a Vadym Gryshyn začali domácou syrárňou v Charkove 2015, 2 roky experimentov — a v roku 2016 prišiel prvý snEco.</p>
+<p data-lang="sk" style="margin-bottom:0">Dnes: 2 závody (Mukachevo UA + Humenné SK), 25× rast za 6 rokov, prvý snack na svete s <strong style="color:#FEBF27">SIAL Grand Prix 2024 (Paríž)</strong>, aktívne trhy UA + SK + SE (cez Arvid Nordquist do ICA a Coop). Hlavný fokus 2026 — škálovanie EÚ/US distribúcie.</p>
+</div>
+<div style="margin-top:20px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.12);display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:14px;text-align:center">
+<div><div style="font-size:24px;font-weight:900;color:#FEBF27;line-height:1">76%</div><div style="font-size:10px;color:#999;margin-top:4px;text-transform:uppercase;letter-spacing:0.08em">D2C repeat</div></div>
+<div><div style="font-size:24px;font-weight:900;color:#FEBF27;line-height:1">100%</div><div style="font-size:10px;color:#999;margin-top:4px;text-transform:uppercase;letter-spacing:0.08em">B2B reorder</div></div>
+<div><div style="font-size:24px;font-weight:900;color:#96C11F;line-height:1">94%</div><div style="font-size:10px;color:#999;margin-top:4px;text-transform:uppercase;letter-spacing:0.08em">Trade show</div></div>
+<div><div style="font-size:24px;font-weight:900;color:#FEBF27;line-height:1">+126%</div><div style="font-size:10px;color:#999;margin-top:4px;text-transform:uppercase;letter-spacing:0.08em">Promo lift</div></div>
+<div><div style="font-size:24px;font-weight:900;color:#96C11F;line-height:1">×25</div><div style="font-size:10px;color:#999;margin-top:4px;text-transform:uppercase;letter-spacing:0.08em">Growth</div></div>
+</div>
+</div>
+</div>
+
+<!-- ────── 0.2 DAY-1 / WEEK-1 CHECKLIST ────── -->
+<div class="ob-chapter ob-content-panel active" data-ob-panel="all,new">
+<h3>📌 <span data-lang="uk">Твій перший день / тиждень</span><span data-lang="en">Your first day / week</span><span data-lang="sk">Tvoj prvý deň / týždeň</span></h3>
+<p data-lang="uk">Чеклист для системного onboarding'у. Перейди по пунктах — нічого не пропускай.</p>
+<p data-lang="en">Checklist for systematic onboarding. Go through each — don't skip.</p>
+<p data-lang="sk">Checklist pre systematický onboarding. Prejdi každý — neprehoditeľne.</p>
+</div>
+
+<div class="ob-content-panel active" data-ob-panel="all,new" style="margin:0 0 32px">
+<div class="grid-2" style="gap:16px">
+<div class="card" style="border-left:4px solid var(--green)">
+<div style="font-size:11px;font-weight:800;letter-spacing:0.10em;text-transform:uppercase;color:var(--green);margin-bottom:10px">🌅 <span data-lang="uk">День 1 (30 хв)</span><span data-lang="en">Day 1 (30 min)</span><span data-lang="sk">Deň 1 (30 min)</span></div>
+<ul style="font-size:13.5px;line-height:1.75;padding-left:18px;margin:0">
+<li data-lang="uk">Прочитав цей розділ Welcome ✓</li>
+<li data-lang="uk">Перевір що увійшов через <a href="https://brand.sneco.ua/" style="color:var(--green)">brand.sneco.ua</a> з робочою <code>@sneco.ua</code> поштою (Google Sign-in)</li>
+<li data-lang="uk">Зайди у <a href="#sec-team" onclick="document.querySelector('[data-target=team]')?.click();return false;" style="color:var(--green)">👥 Команда</a> — побач org-структуру + хто з чим допоможе</li>
+<li data-lang="uk">Прочитай <a href="#sec-manifesto" onclick="document.querySelector('[data-target=manifesto]')?.click();return false;" style="color:var(--green)">Маніфест</a> — за що ми боремось</li>
+<li data-lang="uk">Подивись <a href="#sec-story" onclick="document.querySelector('[data-target=story]')?.click();return false;" style="color:var(--green)">📖 Історію</a> — звідки взявся snEco</li>
+<li data-lang="en">Read this Welcome section ✓</li>
+<li data-lang="en">Sign in to <a href="https://brand.sneco.ua/" style="color:var(--green)">brand.sneco.ua</a> with your <code>@sneco.ua</code> work email (Google Sign-in)</li>
+<li data-lang="en">Go to <a href="#sec-team" onclick="document.querySelector('[data-target=team]')?.click();return false;" style="color:var(--green)">👥 Team</a> — see org structure + who helps with what</li>
+<li data-lang="en">Read <a href="#sec-manifesto" onclick="document.querySelector('[data-target=manifesto]')?.click();return false;" style="color:var(--green)">Manifesto</a> — what we fight for</li>
+<li data-lang="en">Watch <a href="#sec-story" onclick="document.querySelector('[data-target=story]')?.click();return false;" style="color:var(--green)">📖 Story</a> — where snEco came from</li>
+<li data-lang="sk">Prečítaj túto Welcome sekciu ✓</li>
+<li data-lang="sk">Prihlás sa na <a href="https://brand.sneco.ua/" style="color:var(--green)">brand.sneco.ua</a> svojou <code>@sneco.ua</code> poštou (Google Sign-in)</li>
+<li data-lang="sk">Choď na <a href="#sec-team" onclick="document.querySelector('[data-target=team]')?.click();return false;" style="color:var(--green)">👥 Tím</a> — pozri org štruktúru</li>
+<li data-lang="sk">Prečítaj <a href="#sec-manifesto" onclick="document.querySelector('[data-target=manifesto]')?.click();return false;" style="color:var(--green)">Manifest</a></li>
+<li data-lang="sk">Pozri <a href="#sec-story" onclick="document.querySelector('[data-target=story]')?.click();return false;" style="color:var(--green)">📖 História</a></li>
+</ul>
+</div>
+<div class="card" style="border-left:4px solid var(--yellow)">
+<div style="font-size:11px;font-weight:800;letter-spacing:0.10em;text-transform:uppercase;color:var(--yellow);margin-bottom:10px">📅 <span data-lang="uk">Тиждень 1 (2-3 год)</span><span data-lang="en">Week 1 (2-3 h)</span><span data-lang="sk">Týždeň 1 (2-3 h)</span></div>
+<ul style="font-size:13.5px;line-height:1.75;padding-left:18px;margin:0">
+<li data-lang="uk">Поговори зі своїм керівником про роль (KAM → Ярослав, Marketing → vg, Виробництво → Богдан/Валерія, Export → Ірина)</li>
+<li data-lang="uk">Прочитай нижче розділи "Як говорити про snEco" + "Що НЕ казати" + Глосарій</li>
+<li data-lang="uk">Подивись свою роль вгорі ↑ у tab'ах — побачиш потрібні дашборди</li>
+<li data-lang="uk">Подивись <a href="#sec-claims" onclick="document.querySelector('[data-target=claims]')?.click();return false;" style="color:var(--yellow)">📣 Меседжі</a> + <a href="#sec-voice" onclick="document.querySelector('[data-target=voice]')?.click();return false;" style="color:var(--yellow)">Voice</a></li>
+<li data-lang="uk">Подай свою першу <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false;" style="color:var(--yellow)">💡 Ідею</a> (тиждень = достатньо щоб щось помітити)</li>
+<li data-lang="en">Talk to your manager about your role (KAM → Yaroslav, Marketing → vg, Production → Bohdan/Valeriia, Export → Iryna)</li>
+<li data-lang="en">Read sections below: "How to talk about snEco" + "What NOT to say" + Glossary</li>
+<li data-lang="en">Pick your role tab above ↑ — see your dashboards</li>
+<li data-lang="en">Read <a href="#sec-claims" onclick="document.querySelector('[data-target=claims]')?.click();return false;" style="color:var(--yellow)">📣 Messages</a> + <a href="#sec-voice" onclick="document.querySelector('[data-target=voice]')?.click();return false;" style="color:var(--yellow)">Voice</a></li>
+<li data-lang="en">Submit your first <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false;" style="color:var(--yellow)">💡 Idea</a></li>
+<li data-lang="sk">Porozprávaj sa s vedúcim o role (KAM → Yaroslav, Marketing → vg, Výroba → Bohdan/Valeriia, Export → Iryna)</li>
+<li data-lang="sk">Prečítaj sekcie nižšie: „Ako hovoriť o snEco" + „Čo NEHOVORIŤ" + Glosár</li>
+<li data-lang="sk">Vyber svoju rolu vyššie ↑</li>
+<li data-lang="sk">Prečítaj <a href="#sec-claims" onclick="document.querySelector('[data-target=claims]')?.click();return false;" style="color:var(--yellow)">📣 Messages</a> + <a href="#sec-voice" onclick="document.querySelector('[data-target=voice]')?.click();return false;" style="color:var(--yellow)">Voice</a></li>
+<li data-lang="sk">Podaj svoj prvý <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false;" style="color:var(--yellow)">💡 Nápad</a></li>
+</ul>
+</div>
+</div>
+</div>
+
+<!-- ────── 0.3 CONTACT ROUTING MATRIX ────── -->
+<div class="ob-chapter ob-content-panel active" data-ob-panel="all,new,kam,marketing,production,finance">
+<h3>👥 <span data-lang="uk">Хто з чим допоможе</span><span data-lang="en">Who helps with what</span><span data-lang="sk">Kto pomôže s čím</span></h3>
+<p data-lang="uk">Замість писати у спільний чат — пиши прямо потрібній людині. Економить час обох.</p>
+<p data-lang="en">Instead of asking in the group chat — write directly to the right person. Saves time for both.</p>
+<p data-lang="sk">Namiesto písania do skupinového chatu — píš priamo správnej osobe. Šetrí čas oboch.</p>
+</div>
+
+<div class="ob-content-panel active" data-ob-panel="all,new,kam,marketing,production,finance" style="margin:0 0 32px">
+<div class="card" style="padding:0">
+<table style="width:100%;border-collapse:collapse;font-size:13px">
+<thead style="background:var(--card)">
+<tr><th style="text-align:left;padding:12px 16px;border-bottom:2px solid var(--border);font-weight:700;color:var(--yellow);text-transform:uppercase;font-size:11px;letter-spacing:0.08em"><span data-lang="uk">Питання про…</span><span data-lang="en">Question about…</span><span data-lang="sk">Otázka o…</span></th>
+<th style="text-align:left;padding:12px 16px;border-bottom:2px solid var(--border);font-weight:700;color:var(--yellow);text-transform:uppercase;font-size:11px;letter-spacing:0.08em"><span data-lang="uk">Пиши</span><span data-lang="en">Ask</span><span data-lang="sk">Píš</span></th>
+<th style="text-align:left;padding:12px 16px;border-bottom:2px solid var(--border);font-weight:700;color:var(--yellow);text-transform:uppercase;font-size:11px;letter-spacing:0.08em">Email</th></tr>
+</thead>
+<tbody>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 16px;font-weight:600"><span data-lang="uk">Стратегія, маркетинг, нові партнери, PR</span><span data-lang="en">Strategy, marketing, new partners, PR</span><span data-lang="sk">Stratégia, marketing, noví partneri, PR</span></td><td style="padding:10px 16px">Вадим Гришин · CEO</td><td style="padding:10px 16px"><code>vg@sneco.ua</code></td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 16px;font-weight:600"><span data-lang="uk">Фінанси, виробництво (стратегія), операційка</span><span data-lang="en">Finance, production (strategy), operations</span><span data-lang="sk">Financie, výroba (stratégia), operations</span></td><td style="padding:10px 16px">Пилип Гришин · CFO/COO</td><td style="padding:10px 16px"><code>fg@abrisart.com</code></td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 16px;font-weight:600"><span data-lang="uk">Операційні процеси на UA заводі</span><span data-lang="en">UA plant operations</span><span data-lang="sk">UA závod operácie</span></td><td style="padding:10px 16px">Богдан Скляров · COO</td><td style="padding:10px 16px"><code>bs@sneco.ua</code></td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 16px;font-weight:600"><span data-lang="uk">Виробництво / R&amp;D / якість (Гуменне SK)</span><span data-lang="en">Production / R&amp;D / quality (Humenné SK)</span><span data-lang="sk">Výroba / R&amp;D / kvalita (Humenné)</span></td><td style="padding:10px 16px">Валерія Желізник · Head of Production SK</td><td style="padding:10px 16px"><code>sk@sneco.ua</code></td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 16px;font-weight:600"><span data-lang="uk">UA продажі (ритейл, KAM)</span><span data-lang="en">UA sales (retail, KAM)</span><span data-lang="sk">UA predaj (retail, KAM)</span></td><td style="padding:10px 16px">Ярослав Севчук · Comm. Director</td><td style="padding:10px 16px"><code>ys@sneco.ua</code></td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 16px;font-weight:600"><span data-lang="uk">Експорт / міжнародні дистрибʼютори (DE/SE/EE/PL)</span><span data-lang="en">Export / international distributors</span><span data-lang="sk">Export / medzinárodní distribútori</span></td><td style="padding:10px 16px">Ірина Петришина · Head of Export</td><td style="padding:10px 16px"><code>worldwide@sneco.ua</code></td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 16px;font-weight:600"><span data-lang="uk">SKU база / штрихкоди / асортимент</span><span data-lang="en">SKU registry / barcodes / assortment</span><span data-lang="sk">SKU register / čiarové kódy</span></td><td style="padding:10px 16px">Валентина · Sales support</td><td style="padding:10px 16px"><code>sales@sneco.ua</code></td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 16px;font-weight:600"><span data-lang="uk">Brand Bible / системи / IT / доступи</span><span data-lang="en">Brand Bible / systems / IT / access</span><span data-lang="sk">Brand Bible / systémy / IT / prístupy</span></td><td style="padding:10px 16px">Вадим Гришин · Tech</td><td style="padding:10px 16px"><code>vg@sneco.ua</code></td></tr>
+<tr><td style="padding:10px 16px;font-weight:600"><span data-lang="uk">Не впевнений до кого?</span><span data-lang="en">Not sure who to ask?</span><span data-lang="sk">Neviete koho?</span></td><td style="padding:10px 16px"><em data-lang="uk">Пиши vg@sneco.ua → переадресує</em><em data-lang="en">Write vg@sneco.ua → he forwards</em><em data-lang="sk">Píš vg@sneco.ua → preposlanie</em></td><td style="padding:10px 16px"><code>vg@sneco.ua</code></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- ────── 0.4 ELEVATOR PITCH — як говорити про snEco ────── -->
+<div class="ob-chapter ob-content-panel active" data-ob-panel="all,new,kam,marketing">
+<h3>🎙 <span data-lang="uk">Як говорити про snEco</span><span data-lang="en">How to talk about snEco</span><span data-lang="sk">Ako hovoriť o snEco</span></h3>
+<p data-lang="uk">3 версії elevator pitch — для дзвінків, виставок, презентацій. Запам'ятай і використовуй.</p>
+<p data-lang="en">3 elevator pitch versions — for calls, trade shows, presentations. Memorize and use.</p>
+<p data-lang="sk">3 verzie elevator pitch — pre hovory, trade show, prezentácie. Zapamätaj a používaj.</p>
+</div>
+
+<div class="ob-content-panel active" data-ob-panel="all,new,kam,marketing" style="margin:0 0 32px">
+<div class="grid-3" style="gap:14px">
+<div class="card" style="border-top:3px solid var(--yellow)">
+<div style="font-size:11px;font-weight:800;letter-spacing:0.10em;text-transform:uppercase;color:var(--yellow);margin-bottom:8px">⏱ 15 sec</div>
+<p style="font-size:13.5px;line-height:1.55;margin:0" data-lang="uk">«snEco — це хрусткий снек із 100% сиру. Запатентована технологія, без зайвих добавок, shelf life 18 місяців без холодильника. SIAL Grand Prix 2024 у Парижі.»</p>
+<p style="font-size:13.5px;line-height:1.55;margin:0" data-lang="en">"snEco — a crunchy snack made from 100% cheese. Patented technology, no additives, 18-month shelf life with no refrigeration. SIAL Grand Prix 2024 in Paris."</p>
+<p style="font-size:13.5px;line-height:1.55;margin:0" data-lang="sk">„snEco — chrumkavý snack zo 100% syra. Patentovaná technológia, bez prísad, trvanlivosť 18 mesiacov bez chladenia. SIAL Grand Prix 2024 Paríž."</p>
+</div>
+<div class="card" style="border-top:3px solid var(--green)">
+<div style="font-size:11px;font-weight:800;letter-spacing:0.10em;text-transform:uppercase;color:var(--green);margin-bottom:8px">⏱ 60 sec</div>
+<p style="font-size:13.5px;line-height:1.55;margin:0" data-lang="uk">«Сир — найстаріший fast-food, але зі своїми мінусами: швидко псується, потребує холодильника, тяжкий у дорогу. У 2015 ми придумали як зробити сир, який не псується, не потребує холодильника і залишається тим самим продуктом — без зайвих добавок. 2 роки експериментів — і у 2016 з'явився snEco. Сьогодні це 2 заводи, 25× зростання, активні ринки UA + SK + SE, перший SIAL Grand Prix серед сирних снеків. Шукаємо партнерів у ЄС/США.»</p>
+<p style="font-size:13.5px;line-height:1.55;margin:0" data-lang="en">"Cheese is the oldest fast-food, but with downsides: spoils fast, needs a fridge, hard to take on the go. In 2015 we figured out how to make cheese that doesn't spoil, doesn't need refrigeration, and stays the same product — no additives. 2 years of experiments — and in 2016 snEco was born. Today: 2 plants, 25× growth, active markets UA + SK + SE, world's first SIAL Grand Prix in cheese snacks. Looking for partners in EU/US."</p>
+<p style="font-size:13.5px;line-height:1.55;margin:0" data-lang="sk">„Syr je najstarší fast-food, ale má nedostatky: rýchlo sa kazí, potrebuje chladničku, ťažko nositeľný. V 2015 sme prišli na to ako urobiť syr, ktorý sa nekazí, nepotrebuje chladenie a ostáva tým istým produktom — bez prísad. 2 roky experimentov — a v 2016 vznikol snEco. Dnes: 2 závody, 25× rast, aktívne UA + SK + SE, prvý SIAL Grand Prix v syrových snackoch. Hľadáme partnerov v EÚ/US."</p>
+</div>
+<div class="card" style="border-top:3px solid var(--yellow)">
+<div style="font-size:11px;font-weight:800;letter-spacing:0.10em;text-transform:uppercase;color:var(--yellow);margin-bottom:8px">⏱ 3 min</div>
+<p style="font-size:13.5px;line-height:1.6;margin:0" data-lang="uk">Для повного pitch'у — використовуй <a href="#sec-press-coverage" onclick="document.querySelector('[data-target=press-coverage]')?.click();return false;" style="color:var(--yellow);font-weight:700">snEco Story Deck</a> (Documents → snEco story 2025.pdf). 12 слайдів, 3 хв, готовий для виставкових презентацій. Завантажуй з документів.</p>
+<p style="font-size:13.5px;line-height:1.6;margin:0" data-lang="en">For a full pitch — use <a href="#sec-press-coverage" onclick="document.querySelector('[data-target=press-coverage]')?.click();return false;" style="color:var(--yellow);font-weight:700">snEco Story Deck</a> (Documents → snEco story 2025.pdf). 12 slides, 3 min, ready for trade show presentations.</p>
+<p style="font-size:13.5px;line-height:1.6;margin:0" data-lang="sk">Pre plný pitch — použi <a href="#sec-press-coverage" onclick="document.querySelector('[data-target=press-coverage]')?.click();return false;" style="color:var(--yellow);font-weight:700">snEco Story Deck</a> (Documents → snEco story 2025.pdf). 12 slidov, 3 min, pripravené pre trade show.</p>
+</div>
+</div>
+</div>
+
+<!-- ────── 0.5 FORBIDDEN WORDS ────── -->
+<div class="ob-chapter ob-content-panel active" data-ob-panel="all,new,kam,marketing">
+<h3>❌ <span data-lang="uk">Що НЕ казати про snEco</span><span data-lang="en">What NOT to say about snEco</span><span data-lang="sk">Čo NEHOVORIŤ o snEco</span></h3>
+<p data-lang="uk">Ці фрази шкодять бренду — їх або не вживай, або заміни на правильні.</p>
+<p data-lang="en">These phrases hurt the brand — don't use or replace with the correct ones.</p>
+<p data-lang="sk">Tieto frázy škodia značke — nepoužívaj alebo nahraď správnymi.</p>
+</div>
+
+<div class="ob-content-panel active" data-ob-panel="all,new,kam,marketing" style="margin:0 0 32px">
+<div class="grid-2" style="gap:14px">
+<div class="card" style="border-left:4px solid var(--red,#EF4444);background:rgba(239,68,68,0.05)">
+<div style="font-size:11px;font-weight:800;letter-spacing:0.10em;text-transform:uppercase;color:#EF4444;margin-bottom:10px">❌ <span data-lang="uk">Не кажи</span><span data-lang="en">Don't say</span><span data-lang="sk">Nehovor</span></div>
+<ul style="font-size:13px;line-height:1.85;padding-left:18px;margin:0">
+<li data-lang="uk"><s>«NASA-технологія»</s> — це нашa власна патентована, не NASA's</li>
+<li data-lang="uk"><s>«86% повернення»</s> — стара цифра, не sync'ується</li>
+<li data-lang="uk"><s>«Sneco» / «SNECO»</s> — пишемо <strong>snEco</strong> (текст) або <strong>SNÉCO</strong> (тільки graphic logo)</li>
+<li data-lang="uk"><s>«Gryshin»</s> — пишемо <strong>Gryshyn</strong> (з G)</li>
+<li data-lang="uk"><s>«Запоріжжя/Полтава»</s> — наш UA завод у <strong>Мукачево</strong></li>
+<li data-lang="uk"><s>«Кубики / палички»</s> — наш формат — <strong>кульки</strong></li>
+<li data-lang="en"><s>"NASA technology"</s> — it's our own patented, not NASA's</li>
+<li data-lang="en"><s>"86% return rate"</s> — legacy number, doesn't sync</li>
+<li data-lang="en"><s>"Sneco" / "SNECO"</s> — write <strong>snEco</strong> (text) or <strong>SNÉCO</strong> (only graphic logo)</li>
+<li data-lang="en"><s>"Gryshin"</s> — write <strong>Gryshyn</strong> (with G)</li>
+<li data-lang="en"><s>"Cubes / sticks"</s> — our format is <strong>balls</strong></li>
+<li data-lang="sk"><s>„NASA technológia"</s> — naša vlastná patentovaná</li>
+<li data-lang="sk"><s>„86% návrat"</s> — stará cifra, nesynchronizuje</li>
+<li data-lang="sk"><s>„Sneco" / „SNECO"</s> — píšeme <strong>snEco</strong> (text) alebo <strong>SNÉCO</strong> (iba graphic logo)</li>
+<li data-lang="sk"><s>„Gryshin"</s> — píšeme <strong>Gryshyn</strong></li>
+</ul>
+</div>
+<div class="card" style="border-left:4px solid var(--green);background:rgba(150,193,31,0.05)">
+<div style="font-size:11px;font-weight:800;letter-spacing:0.10em;text-transform:uppercase;color:var(--green);margin-bottom:10px">✅ <span data-lang="uk">Кажи</span><span data-lang="en">Say</span><span data-lang="sk">Hovor</span></div>
+<ul style="font-size:13px;line-height:1.85;padding-left:18px;margin:0">
+<li data-lang="uk">«Власна запатентована технологія VacWave Bio Nutrition»</li>
+<li data-lang="uk">«76% D2C repeat» (з контекстом 12-міс rolling)</li>
+<li data-lang="uk">«100% B2B reorder» (25+ UA chains)</li>
+<li data-lang="uk">«Мукачево UA + Гуменне SK» — 2 заводи</li>
+<li data-lang="uk">«Хрусткі сирні кульки»</li>
+<li data-lang="uk">«SIAL Grand Prix 2024 Paris»</li>
+<li data-lang="uk">«100% solar power on production»</li>
+<li data-lang="en">"Our patented VacWave Bio Nutrition technology"</li>
+<li data-lang="en">"76% D2C repeat" (with 12-month rolling context)</li>
+<li data-lang="en">"100% B2B reorder" (25+ UA chains)</li>
+<li data-lang="en">"Mukachevo UA + Humenné SK" — 2 plants</li>
+<li data-lang="en">"Crunchy cheese balls"</li>
+<li data-lang="en">"SIAL Grand Prix 2024 Paris"</li>
+<li data-lang="en">"100% solar power on production"</li>
+<li data-lang="sk">„Vlastná patentovaná technológia VacWave Bio Nutrition"</li>
+<li data-lang="sk">„76% D2C opakované" (12-mes rolling)</li>
+<li data-lang="sk">„100% B2B reorder" (25+ UA reťazcov)</li>
+<li data-lang="sk">„Mukachevo UA + Humenné SK" — 2 závody</li>
+<li data-lang="sk">„Chrumkavé syrové guľôčky"</li>
+<li data-lang="sk">„SIAL Grand Prix 2024 Paríž"</li>
+</ul>
+</div>
+</div>
+</div>
+
+<!-- ────── 0.6 GLOSSARY ────── -->
+<div class="ob-chapter ob-content-panel active" data-ob-panel="all,new,kam,marketing,production,finance">
+<h3>📖 <span data-lang="uk">Глосарій — терміни за 30 сек</span><span data-lang="en">Glossary — terms in 30 sec</span><span data-lang="sk">Glosár — termíny za 30 s</span></h3>
+<p data-lang="uk">Швидкий словник snEco термінів — щоб не питати команду на нараді.</p>
+<p data-lang="en">Quick snEco terms dictionary — so you don't have to ask in meetings.</p>
+<p data-lang="sk">Rýchly slovník snEco termínov — aby ste sa nepýtali na schôdzach.</p>
+</div>
+
+<div class="ob-content-panel active" data-ob-panel="all,new,kam,marketing,production,finance" style="margin:0 0 32px">
+<div class="grid-2" style="gap:16px">
+<div class="card">
+<div style="font-size:11px;font-weight:800;letter-spacing:0.10em;text-transform:uppercase;color:var(--yellow);margin-bottom:10px">🏭 <span data-lang="uk">Технологія &amp; виробництво</span><span data-lang="en">Tech &amp; production</span><span data-lang="sk">Tech &amp; výroba</span></div>
+<dl style="font-size:13px;line-height:1.65;margin:0">
+<dt style="font-weight:700;margin-top:8px">VacWave Bio Nutrition</dt><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="uk">Наша патентована технологія: мікрохвильова сушка у вакуумі при 36-38°C. Patent UA №139035.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="en">Our patented tech: microwave vacuum drying at 36-38°C. UA Patent №139035.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="sk">Naša patentovaná technológia: mikrovlnno-vákuové sušenie 36-38°C. UA patent č. 139035.</dd>
+<dt style="font-weight:700;margin-top:8px">FSSC 22000</dt><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="uk">Food Safety System Certification — top food safety стандарт. У snEco є 3 сертифікати, до 07.03.2027.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="en">Food Safety System Certification — top food safety standard. snEco has 3 certs, valid until 07.03.2027.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="sk">Top food safety štandard. snEco má 3 certifikáty do 07.03.2027.</dd>
+<dt style="font-weight:700;margin-top:8px">IFS Food v8</dt><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="uk">International Featured Standard — для входу у Lidl/Aldi/Kaufland EU. snEco SK ✅ лютий 2026.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="en">International Featured Standard — for Lidl/Aldi/Kaufland EU entry. Sneco SK ✅ Feb 2026.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="sk">Pre vstup do Lidl/Aldi/Kaufland EU. Sneco SK ✅ feb 2026.</dd>
+<dt style="font-weight:700;margin-top:8px">aw</dt><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="uk">Water activity — мікробіологічна стабільність. snEco кульки aw &lt; 0.6 = безпечно при ambient.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="en">Water activity — microbial stability. snEco balls aw &lt; 0.6 = safe at ambient.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="sk">Water activity — mikrobiálna stabilita. snEco aw &lt; 0.6 = bezpečné ambient.</dd>
+<dt style="font-weight:700;margin-top:8px">SKU / EAN</dt><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="uk">Stock Keeping Unit / штрихкод. У snEco 89 SKU. Реєстр у Documents.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="en">Stock Keeping Unit / barcode. snEco has 89 SKUs. Registry in Documents.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="sk">Stock Keeping Unit / čiarový kód. snEco má 89 SKU.</dd>
+</dl>
+</div>
+<div class="card">
+<div style="font-size:11px;font-weight:800;letter-spacing:0.10em;text-transform:uppercase;color:var(--green);margin-bottom:10px">💼 <span data-lang="uk">Бізнес &amp; продажі</span><span data-lang="en">Business &amp; sales</span><span data-lang="sk">Biznis &amp; predaj</span></div>
+<dl style="font-size:13px;line-height:1.65;margin:0">
+<dt style="font-weight:700;margin-top:8px">D2C / B2B</dt><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="uk">Direct-to-Consumer (sneco.ua сайт) / Business-to-Business (мережі, ритейл). Різні KPIs.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="en">Direct-to-Consumer (sneco.ua site) / Business-to-Business (chains, retail). Different KPIs.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="sk">Direct-to-Consumer / Business-to-Business. Rôzne KPIs.</dd>
+<dt style="font-weight:700;margin-top:8px">KAM</dt><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="uk">Key Account Manager — менеджер з обслуговування ритейл-мережі (АТБ, Сільпо, Auchan). У snEco веде Ярослав/Валентина.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="en">Key Account Manager — manages retail chain (АТБ, Сільпо, Auchan). At snEco: Yaroslav/Valentyna.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="sk">Key Account Manager — manažér retail reťazca. snEco: Yaroslav/Valentyna.</dd>
+<dt style="font-weight:700;margin-top:8px">HoReCa</dt><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="uk">Hotels, Restaurants, Catering — премія канал з 500г форматом.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="en">Hotels, Restaurants, Catering — premium channel with 500g format.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="sk">Hotels, Restaurants, Catering — premium kanál s 500g formátom.</dd>
+<dt style="font-weight:700;margin-top:8px">PL · Private Label</dt><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="uk">Виробництво під чужим брендом (GRYZBERI на наших snEco кульках).</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="en">Manufacturing under another brand (GRYZBERI on our balls).</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="sk">Výroba pod cudzou značkou (GRYZBERI).</dd>
+<dt style="font-weight:700;margin-top:8px">MOQ</dt><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="uk">Minimum Order Quantity — мінімальне замовлення. У snEco залежить від формату.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="en">Minimum Order Quantity — depends on format.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="sk">Minimum Order Quantity.</dd>
+<dt style="font-weight:700;margin-top:8px">Clean label</dt><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="uk">Продукт без зайвих добавок — короткий зрозумілий склад. snEco = тільки сир + спеції/горіхи.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="en">Product without additives — short readable ingredients. snEco = cheese + spices/nuts only.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="sk">Produkt bez prísad — krátke zloženie. snEco = iba syr + korenie/orechy.</dd>
+<dt style="font-weight:700;margin-top:8px">MoySklad</dt><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="uk">Наша ERP-система — джерело правди про продажі, склад, замовлення. Дашборди беруть дані звідти.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="en">Our ERP — source of truth for sales, stock, orders. Dashboards pull from it.</dd><dd style="margin:0 0 6px 16px;color:var(--text-muted)" data-lang="sk">Náš ERP — zdroj pravdy pre predaj, sklad, objednávky.</dd>
+</dl>
+</div>
+</div>
+</div>
+
+<!-- ────── 0.7 TEMPLATES — готові шаблони для копіювання ────── -->
+<div class="ob-chapter ob-content-panel active" data-ob-panel="all,new,kam,marketing">
+<h3>✍ <span data-lang="uk">Готові шаблони листів</span><span data-lang="en">Ready email templates</span><span data-lang="sk">Hotové email šablóny</span></h3>
+<p data-lang="uk">Не пиши з нуля. Копіюй ці шаблони, заміняй [placeholders] і відправляй.</p>
+<p data-lang="en">Don't write from scratch. Copy these templates, replace [placeholders], send.</p>
+<p data-lang="sk">Nepíš odznova. Kopíruj šablóny, vymeň [placeholders], pošli.</p>
+</div>
+
+<div class="ob-content-panel active" data-ob-panel="all,new,kam,marketing" style="margin:0 0 32px">
+<details class="card" style="cursor:pointer">
+<summary style="padding:14px 18px;font-weight:700;font-size:14px"><span data-lang="uk">📧 Sample request response (EN) — відповідь на запит про зразки</span><span data-lang="en">📧 Sample request response (EN)</span><span data-lang="sk">📧 Sample request response (EN)</span></summary>
+<pre style="margin:0;padding:14px 18px;background:var(--card);font-size:12px;line-height:1.55;white-space:pre-wrap;border-radius:0 0 8px 8px">Hi [Name],
+
+Thanks for your interest in snEco cheese snacks!
+
+I'm sending you a sample box with our most popular SKUs:
+- Cheddar 28g, Gouda 28g, Smoked Suluguni 28g, Mozzarella 28g
+- Plus our new Smoked Emmental and Blue Royale
+
+The package will ship from our Humenné (SK) facility — DHL,
+delivery ~3-5 business days. Tracking ID will follow.
+
+While you're tasting, here are the key facts:
+- 100% real cheese, no additives
+- Patented VacWave Bio Nutrition technology (36-38°C drying)
+- 18-month shelf life without refrigeration
+- SIAL Grand Prix 2024 Paris (food innovation Oscar)
+- FSSC 22000 + IFS Food v8 certified
+
+Curious to hear what you think — and happy to set up a call
+next week to discuss commercial opportunities.
+
+Best regards,
+[Your Name]
+[Title], snEco
+www.sneco.ua</pre>
+</details>
+
+<details class="card" style="cursor:pointer;margin-top:10px">
+<summary style="padding:14px 18px;font-weight:700;font-size:14px"><span data-lang="uk">📧 Distributor cold intro (EN) — холодний лист потенційному дистрибʼютору</span><span data-lang="en">📧 Distributor cold intro (EN)</span><span data-lang="sk">📧 Distributor cold intro (EN)</span></summary>
+<pre style="margin:0;padding:14px 18px;background:var(--card);font-size:12px;line-height:1.55;white-space:pre-wrap;border-radius:0 0 8px 8px">Subject: snEco · SIAL Grand Prix 2024 winner — partnership in [Country]?
+
+Hi [Name],
+
+I'm reaching out from snEco — a cheese snack brand from Ukraine
+that won SIAL Innovation Grand Prix in Paris 2024 (the food
+industry's highest innovation award).
+
+What makes us different:
+- 100% real cheese (no additives, single-ingredient)
+- 18-month shelf life without refrigeration
+- Patented technology (VacWave Bio Nutrition, 36-38°C drying)
+- Already in 25+ UA chains, 100% reorder rate, +126% promo lift
+
+We're actively expanding distribution in [Country] and looking
+for an experienced partner who knows [Country]'s premium snacks
+and HoReCa channels.
+
+Would a 15-minute call next week work for you to explore fit?
+
+I can send a sample box ahead of the call if you'd like to taste.
+
+Best regards,
+[Your Name]
+[Title], snEco
+www.sneco.ua | linkedin.com/company/sneco</pre>
+</details>
+
+<details class="card" style="cursor:pointer;margin-top:10px">
+<summary style="padding:14px 18px;font-weight:700;font-size:14px"><span data-lang="uk">📧 Price inquiry response (EN) — відповідь на запит цін</span><span data-lang="en">📧 Price inquiry response (EN)</span><span data-lang="sk">📧 Price inquiry response (EN)</span></summary>
+<pre style="margin:0;padding:14px 18px;background:var(--card);font-size:12px;line-height:1.55;white-space:pre-wrap;border-radius:0 0 8px 8px">Hi [Name],
+
+Thanks for your interest.
+
+I'll send you a detailed price list (EXW Humenné, SK) for our
+main retail SKUs (28g, 14g, 20g packs). Volume tiers:
+- Pilot order: 1 pallet (any SKU mix)
+- Standard: 1 container (FCL)
+- Strategic: monthly recurring
+
+Please share:
+1. Target country / channels (retail / HoReCa / e-com)
+2. Estimated monthly volume (units or revenue)
+3. Preferred SKU mix
+4. Your typical margin / target retail price
+
+I'll come back with a tailored proposal. Or — let's jump on a
+quick 20-min call this week?
+
+Best,
+[Your Name]
+snEco</pre>
+</details>
+</div>
+
+<!-- ────── 0.8 IDEAS WORKFLOW — як подати ідею ────── -->
+<div class="ob-chapter ob-content-panel active" data-ob-panel="all,new,kam,marketing,production,finance">
+<h3>💡 <span data-lang="uk">Як подати ідею — і що далі</span><span data-lang="en">How to submit an idea — and what happens next</span><span data-lang="sk">Ako podať nápad — a čo ďalej</span></h3>
+<p data-lang="uk">Будь-яка ідея що покращить роботу snEco — пиши через Ideas Workflow. Це швидше ніж писати у чат.</p>
+<p data-lang="en">Any idea that improves snEco — submit via Ideas Workflow. Faster than writing in chat.</p>
+<p data-lang="sk">Akýkoľvek nápad pre zlepšenie snEco — podaj cez Ideas Workflow. Rýchlejšie ako chat.</p>
+</div>
+
+<div class="ob-content-panel active" data-ob-panel="all,new,kam,marketing,production,finance" style="margin:0 0 32px">
+<div class="card" style="padding:24px 28px">
+<ol style="font-size:14px;line-height:1.85;margin:0;padding-left:24px">
+<li data-lang="uk">Відкрий <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false;" style="color:var(--yellow);font-weight:700">💡 Пропозиції</a> у sidebar</li>
+<li data-lang="uk">Натисни <strong>"+ Нова пропозиція"</strong></li>
+<li data-lang="uk">Опиши ідею в кількох реченнях. Можна додати файли (PDF, картинки, до 6×10MB)</li>
+<li data-lang="uk">Submit → ти отримаєш email "Ідею прийнято"</li>
+<li data-lang="uk"><strong>vg відповість за тиждень</strong> з пропозицією як реалізувати + email тобі</li>
+<li data-lang="uk">Якщо ОК — натискаєш "Погоджую" → починається implementation</li>
+<li data-lang="uk">Якщо є нюанси — натискаєш "Внести зміни" + пишеш що міняти</li>
+<li data-lang="uk">Коли implementation готова — отримуєш email "Done" з посиланням</li>
+<li data-lang="en">Open <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false;" style="color:var(--yellow);font-weight:700">💡 Ideas</a> in sidebar</li>
+<li data-lang="en">Click <strong>"+ New idea"</strong></li>
+<li data-lang="en">Describe in a few sentences. Attach files if needed (PDF, images, up to 6×10MB)</li>
+<li data-lang="en">Submit → you get an email "Idea received"</li>
+<li data-lang="en"><strong>vg responds within a week</strong> with a proposal — emails you</li>
+<li data-lang="en">If OK — click "Approve" → implementation starts</li>
+<li data-lang="en">If concerns — click "Request changes" + write what to change</li>
+<li data-lang="en">When done — you get an email "Done" with a link</li>
+<li data-lang="sk">Otvor <a href="#sec-ideas" onclick="document.querySelector('[data-target=ideas]')?.click();return false;" style="color:var(--yellow);font-weight:700">💡 Nápady</a> v sidebar</li>
+<li data-lang="sk">Klikni <strong>„+ Nový nápad"</strong></li>
+<li data-lang="sk">Opíš v pár vetách. Pripoj súbory ak treba (PDF, obrázky, do 6×10MB)</li>
+<li data-lang="sk">Submit → dostaneš email „Nápad prijatý"</li>
+<li data-lang="sk"><strong>vg odpovedá do týždňa</strong> s návrhom riešenia</li>
+<li data-lang="sk">Ak OK — klikni „Schvaľujem" → začína sa implementácia</li>
+<li data-lang="sk">Ak treba úpravy — klikni „Zmeny" + napíš čo</li>
+<li data-lang="sk">Po dokončení — email „Done" s linkom</li>
+</ol>
+</div>
+</div>
+
 <!-- ═══════════════════════════════════════════════════════════
        РОЗДІЛ 1. ЯК ВЛАШТОВАНА BRAND BIBLE — структура книги
        ═══════════════════════════════════════════════════════════ -->
@@ -7954,6 +8335,123 @@ body.is-admin section.admin-only { display: block !important; }
     try { applyRole(localStorage.getItem('sneco_ob_role') || 'all'); } catch(e) { applyRole('all'); }
   })();
 </script>
+<!-- ============================================================
+     R&D LAB — каталог експериментів сушіння (v2.78.66, idea #12 Ярослав)
+     ============================================================ -->
+<section class="section" id="sec-rd-lab" style="padding:56px 64px">
+<div class="section-eyebrow"><span data-lang="uk">R&amp;D Lab</span><span data-lang="en">R&amp;D Lab</span><span data-lang="sk">R&amp;D Lab</span></div>
+<h2 class="section-title"><span data-lang="uk">🔬 R&amp;D Lab — каталог експериментів сушіння</span><span data-lang="en">🔬 R&amp;D Lab — drying experiments catalog</span><span data-lang="sk">🔬 R&amp;D Lab — katalóg sušiacich experimentov</span></h2>
+<div class="section-lead">
+<span data-lang="uk">Внутрішня база знань VacWave експериментів. Кожен новий тест продукту — фіксуємо сюди: продукт-сировина, режим сушки, результат, оцінка перспективності. Це усуває "tribal knowledge" — і прискорює запуск новинок (від ідеї до полиці) на 2-3 місяці.</span>
+<span data-lang="en">Internal VacWave experiments knowledge base. Every new product test — captured here: raw product, drying mode, result, viability score. Eliminates tribal knowledge — speeds up new SKU launches (from idea to shelf) by 2-3 months.</span>
+<span data-lang="sk">Interná báza znalostí VacWave experimentov. Každý nový test produktu — zachytávame tu: surovina, sušiaci režim, výsledok, hodnotenie perspektívy. Odstraňuje tribal knowledge — zrýchľuje uvádzanie noviniek (od nápadu po regál) o 2-3 mesiace.</span>
+</div>
+
+<h3 class="block-title">📋 <span data-lang="uk">Що фіксуємо для кожного експерименту</span><span data-lang="en">What we capture per experiment</span><span data-lang="sk">Čo zachytávame pri každom experimente</span></h3>
+<div class="grid-3">
+<div class="card">
+<div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--yellow);margin-bottom:8px">1. <span data-lang="uk">Вхід</span><span data-lang="en">Input</span><span data-lang="sk">Vstup</span></div>
+<ul style="font-size:12.5px;line-height:1.7;padding-left:18px;margin:0">
+<li><span data-lang="uk">Дата експерименту</span><span data-lang="en">Experiment date</span><span data-lang="sk">Dátum experimentu</span></li>
+<li><span data-lang="uk">Сировина (тип, постачальник, batch)</span><span data-lang="en">Raw material (type, supplier, batch)</span><span data-lang="sk">Surovina (typ, dodávateľ, batch)</span></li>
+<li><span data-lang="uk">Вологість / жирність / % cтартові</span><span data-lang="en">Initial moisture / fat / %</span><span data-lang="sk">Počiatočná vlhkosť / tuk / %</span></li>
+<li><span data-lang="uk">Фракція (розмір кубика / товщина)</span><span data-lang="en">Cut size (cube / thickness)</span><span data-lang="sk">Rezanie (kocka / hrúbka)</span></li>
+<li><span data-lang="uk">Маса перед сушкою (брутто кг)</span><span data-lang="en">Mass before drying (gross kg)</span><span data-lang="sk">Hmotnosť pred sušením (brutto kg)</span></li>
+</ul>
+</div>
+<div class="card">
+<div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--yellow);margin-bottom:8px">2. <span data-lang="uk">Процес</span><span data-lang="en">Process</span><span data-lang="sk">Proces</span></div>
+<ul style="font-size:12.5px;line-height:1.7;padding-left:18px;margin:0">
+<li><span data-lang="uk">Камера (Мукачево / Гуменне)</span><span data-lang="en">Chamber (Mukachevo / Humenné)</span><span data-lang="sk">Komora (Mukachevo / Humenné)</span></li>
+<li><span data-lang="uk">Температура (°C, target 36-38)</span><span data-lang="en">Temperature (°C, target 36-38)</span><span data-lang="sk">Teplota (°C, target 36-38)</span></li>
+<li><span data-lang="uk">Тиск (vacuum mbar)</span><span data-lang="en">Pressure (vacuum mbar)</span><span data-lang="sk">Tlak (vacuum mbar)</span></li>
+<li><span data-lang="uk">Магнетронів вкл / потужність</span><span data-lang="en">Magnetrons on / power</span><span data-lang="sk">Magnetróny zap / výkon</span></li>
+<li><span data-lang="uk">Час циклу (хв)</span><span data-lang="en">Cycle time (min)</span><span data-lang="sk">Čas cyklu (min)</span></li>
+<li><span data-lang="uk">Профіль охолодження</span><span data-lang="en">Cooling profile</span><span data-lang="sk">Chladiaci profil</span></li>
+</ul>
+</div>
+<div class="card">
+<div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--yellow);margin-bottom:8px">3. <span data-lang="uk">Вихід</span><span data-lang="en">Output</span><span data-lang="sk">Výstup</span></div>
+<ul style="font-size:12.5px;line-height:1.7;padding-left:18px;margin:0">
+<li><span data-lang="uk">Маса після (нетто кг)</span><span data-lang="en">Mass after (net kg)</span><span data-lang="sk">Hmotnosť po (netto kg)</span></li>
+<li><span data-lang="uk">% втрати ваги</span><span data-lang="en">Weight loss %</span><span data-lang="sk">Strata hmotnosti %</span></li>
+<li><span data-lang="uk">aw / залишкова вологість</span><span data-lang="en">aw / residual moisture</span><span data-lang="sk">aw / zvyšková vlhkosť</span></li>
+<li><span data-lang="uk">Зовнішній вигляд (фото)</span><span data-lang="en">Appearance (photo)</span><span data-lang="sk">Vzhľad (foto)</span></li>
+<li><span data-lang="uk">Текстура (crispness 1-5)</span><span data-lang="en">Texture (crispness 1-5)</span><span data-lang="sk">Textúra (chrumkavosť 1-5)</span></li>
+<li><span data-lang="uk">Смак (дегустація: 3 expert score)</span><span data-lang="en">Taste (3 expert score)</span><span data-lang="sk">Chuť (3 expert score)</span></li>
+</ul>
+</div>
+<div class="card">
+<div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--green);margin-bottom:8px">4. <span data-lang="uk">Стабільність</span><span data-lang="en">Stability</span><span data-lang="sk">Stabilita</span></div>
+<ul style="font-size:12.5px;line-height:1.7;padding-left:18px;margin:0">
+<li><span data-lang="uk">Tests T+30 / T+90 / T+180 днів</span><span data-lang="en">Tests T+30 / T+90 / T+180 days</span><span data-lang="sk">Testy T+30 / T+90 / T+180 dní</span></li>
+<li><span data-lang="uk">Збереження hrumkavosti / смаку</span><span data-lang="en">Crispness / taste retention</span><span data-lang="sk">Zachovanie chrumkavosti / chuti</span></li>
+<li><span data-lang="uk">Мікробіологія через X днів</span><span data-lang="en">Microbiology at X days</span><span data-lang="sk">Mikrobiológia v X dní</span></li>
+<li><span data-lang="uk">Окислення жирів</span><span data-lang="en">Fat oxidation</span><span data-lang="sk">Oxidácia tukov</span></li>
+<li><span data-lang="uk">Estimated shelf life</span><span data-lang="en">Estimated shelf life</span><span data-lang="sk">Odhadovaná trvanlivosť</span></li>
+</ul>
+</div>
+<div class="card">
+<div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--green);margin-bottom:8px">5. <span data-lang="uk">Економіка</span><span data-lang="en">Economics</span><span data-lang="sk">Ekonomika</span></div>
+<ul style="font-size:12.5px;line-height:1.7;padding-left:18px;margin:0">
+<li><span data-lang="uk">Cost сировини €/кг</span><span data-lang="en">Raw material cost €/kg</span><span data-lang="sk">Náklady suroviny €/kg</span></li>
+<li><span data-lang="uk">Energy cost per batch</span><span data-lang="en">Energy cost per batch</span><span data-lang="sk">Energetické náklady per batch</span></li>
+<li><span data-lang="uk">Yield rate %</span><span data-lang="en">Yield rate %</span><span data-lang="sk">Yield rate %</span></li>
+<li><span data-lang="uk">Estimated cost FG €/100г</span><span data-lang="en">Estimated FG cost €/100g</span><span data-lang="sk">Odhadované náklady FG €/100g</span></li>
+<li><span data-lang="uk">Потенційна РРЦ €/100г</span><span data-lang="en">Target retail €/100g</span><span data-lang="sk">Cieľová maloobchodná €/100g</span></li>
+<li><span data-lang="uk">Маржа %</span><span data-lang="en">Margin %</span><span data-lang="sk">Marža %</span></li>
+</ul>
+</div>
+<div class="card">
+<div style="font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--green);margin-bottom:8px">6. <span data-lang="uk">Висновок</span><span data-lang="en">Verdict</span><span data-lang="sk">Záver</span></div>
+<ul style="font-size:12.5px;line-height:1.7;padding-left:18px;margin:0">
+<li>🟢 <span data-lang="uk">Перспективний — у roadmap</span><span data-lang="en">Promising — to roadmap</span><span data-lang="sk">Sľubný — do roadmap</span></li>
+<li>🟡 <span data-lang="uk">Потребує доопрацювання</span><span data-lang="en">Needs refinement</span><span data-lang="sk">Potrebuje doladenie</span></li>
+<li>🔴 <span data-lang="uk">Недоцільний — закрити</span><span data-lang="en">Not viable — close</span><span data-lang="sk">Nevhodný — uzavrieť</span></li>
+<li><span data-lang="uk">Наступний крок (план)</span><span data-lang="en">Next step (plan)</span><span data-lang="sk">Ďalší krok (plán)</span></li>
+<li><span data-lang="uk">Хто отримає шорт-листок</span><span data-lang="en">Owner of next step</span><span data-lang="sk">Owner ďalšieho kroku</span></li>
+</ul>
+</div>
+</div>
+
+<h3 class="block-title" style="margin-top:36px">⚙️ <span data-lang="uk">Як ведемо</span><span data-lang="en">How we maintain it</span><span data-lang="sk">Ako vedieme</span></h3>
+<div class="card" style="background:linear-gradient(180deg, rgba(150,193,31,0.06) 0%, transparent 100%);border-left:4px solid var(--green);padding:16px 22px">
+<ul style="font-size:13.5px;line-height:1.75;margin:0;padding-left:20px">
+<li><span data-lang="uk"><strong>Owner процесу:</strong> Валерія (R&amp;D, Гуменне) + Богдан (COO) як reviewer</span><span data-lang="en"><strong>Process owner:</strong> Valeriia (R&amp;D, Humenné) + Bohdan (COO) as reviewer</span><span data-lang="sk"><strong>Vlastník procesu:</strong> Valeriia (R&amp;D, Humenné) + Bohdan (COO) ako reviewer</span></li>
+<li><span data-lang="uk"><strong>Storage:</strong> Google Sheets «snEco R&amp;D Experiments» — single source of truth. Лінк у Maintenance (admin).</span><span data-lang="en"><strong>Storage:</strong> Google Sheets "snEco R&amp;D Experiments" — single source of truth. Link in Maintenance (admin).</span><span data-lang="sk"><strong>Úložisko:</strong> Google Sheets „snEco R&amp;D Experiments" — single source of truth. Link v Maintenance (admin).</span></li>
+<li><span data-lang="uk"><strong>Cadence:</strong> кожен експеримент — запис у той самий день. Зведена ревізія раз на місяць (1-й тиждень нового місяця).</span><span data-lang="en"><strong>Cadence:</strong> each experiment — entry same day. Monthly review (1st week of new month).</span><span data-lang="sk"><strong>Cadence:</strong> každý experiment — záznam v ten istý deň. Mesačná revízia (1. týždeň nového mesiaca).</span></li>
+<li><span data-lang="uk"><strong>Pipeline → продукт:</strong> 🟢 експерименти → R&amp;D pipeline у sec-equipment → roadmap → запуск (sec-roadmap).</span><span data-lang="en"><strong>Pipeline → product:</strong> 🟢 experiments → R&amp;D pipeline in sec-equipment → roadmap → launch (sec-roadmap).</span><span data-lang="sk"><strong>Pipeline → produkt:</strong> 🟢 experimenty → R&amp;D pipeline v sec-equipment → roadmap → launch (sec-roadmap).</span></li>
+<li><span data-lang="uk"><strong>Конфіденційність:</strong> внутрішнє ноу-хау — full data tільки для R&amp;D + topmanagement; sales/marketing бачить тільки результати «🟢 у pipeline».</span><span data-lang="en"><strong>Confidentiality:</strong> internal know-how — full data only for R&amp;D + topmanagement; sales/marketing sees only "🟢 in pipeline" results.</span><span data-lang="sk"><strong>Dôvernosť:</strong> interné know-how — full data iba pre R&amp;D + topmanagement; sales/marketing vidí iba „🟢 v pipeline" výsledky.</span></li>
+</ul>
+</div>
+
+<h3 class="block-title" style="margin-top:36px">📈 <span data-lang="uk">Що це нам дає</span><span data-lang="en">What this gives us</span><span data-lang="sk">Čo nám to dáva</span></h3>
+<div class="grid-3">
+<div class="card card-sm" style="border-top:3px solid var(--yellow)">
+<div style="font-size:22px;font-weight:900;color:var(--yellow);line-height:1">2-3 міс</div>
+<div style="font-size:12px;color:var(--text-muted);margin-top:4px"><span data-lang="uk">прискорення NPD циклу</span><span data-lang="en">NPD cycle speedup</span><span data-lang="sk">zrýchlenie NPD cyklu</span></div>
+</div>
+<div class="card card-sm" style="border-top:3px solid var(--green)">
+<div style="font-size:22px;font-weight:900;color:var(--green);line-height:1">−40%</div>
+<div style="font-size:12px;color:var(--text-muted);margin-top:4px"><span data-lang="uk">повторних тестів того ж продукту</span><span data-lang="en">repeat tests of same product</span><span data-lang="sk">opakovaných testov toho istého produktu</span></div>
+</div>
+<div class="card card-sm" style="border-top:3px solid var(--yellow)">
+<div style="font-size:22px;font-weight:900;color:var(--yellow);line-height:1">∞</div>
+<div style="font-size:12px;color:var(--text-muted);margin-top:4px"><span data-lang="uk">збереження memory після зміни команди</span><span data-lang="en">memory preserved across team changes</span><span data-lang="sk">memory zachovaná naprieč tímovými zmenami</span></div>
+</div>
+</div>
+
+<!-- v2.78.66 — placeholder для майбутнього live registry (правило: внизу секції) -->
+<div class="idea-proposal-preview" style="margin-top:36px;padding:18px 22px;background:rgba(254,191,39,0.06);border-left:4px solid var(--yellow);border-radius:8px">
+<div style="font-size:11px;font-weight:800;letter-spacing:0.10em;text-transform:uppercase;color:var(--yellow);margin-bottom:8px">🟡 <span data-lang="uk">У розробці · live registry</span><span data-lang="en">In development · live registry</span><span data-lang="sk">Vo vývoji · live register</span></div>
+<div style="font-size:13.5px;line-height:1.65">
+<span data-lang="uk">Наступний крок — embed Google Sheets з реальними експериментами (read-only public view: продукт + дата + verdict). Повна таблиця — за паролем admin/R&amp;D. Owner: Валерія/Богдан.</span>
+<span data-lang="en">Next step — embed Google Sheets with real experiments (read-only public view: product + date + verdict). Full table — password-gated admin/R&amp;D. Owner: Valeriia/Bohdan.</span>
+<span data-lang="sk">Ďalší krok — embed Google Sheets so skutočnými experimentmi (read-only public view: produkt + dátum + verdict). Plná tabuľka — chránené heslom admin/R&amp;D. Owner: Valeriia/Bohdan.</span>
+</div>
+</div>
+
+</section>
 <!-- ============================================================
      DOCUMENTS & CERTIFICATES
      ============================================================ -->
