@@ -726,37 +726,7 @@ function rebuildAll(){
   buildAlerts();
   buildPeriodCompare();
   buildSalesFocus();
-  // Rebuild charts only for the currently visible tab
-  if(currentTab===1){
-    buildOverviewCurrentMonth();
-    buildSparkline();
-    buildOverviewTopClients();
-    buildOverviewTopProducts();
-    buildOverviewMetrics();
-    buildOverviewYoY();
-    buildOverviewMargin();
-    buildOverviewAR();
-  }
-  if(currentTab===2){
-    buildMainChart();
-    buildCashflow();
-    buildReturns();
-    buildAvgOrder();
-    buildOrders();
-  }
-  if(currentTab===3){
-    buildTopClients();
-    buildTopProducts();
-    buildTopClientsMargin();
-    buildTopProductsMargin();
-    buildTopClientsAbsMargin();
-    buildTopProductsAbsMargin();
-    buildFunnel();
-    buildGeoChart();
-    buildChannelChart();
-    buildCohort();
-    buildSleeping();
-  }
+  // v2.78.67: only tab 5 ("Виробництво") is active in production dashboard
 }
 
 // ── Chart helpers ──────────────────────────────────────────
