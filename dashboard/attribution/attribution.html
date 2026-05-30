@@ -136,7 +136,7 @@ async function login() {
   btn.textContent = 'Увійти';
   if (!r.ok || !j.token) { err.textContent = j.error || 'Невірний код'; return; }
   _token = j.token;
-  localStorage.setItem('snEco_attr_token', _token);
+  localStorage.setItem('snEco-jwt-attribution-dashboard', _token);
   showApp();
 }
 
@@ -147,13 +147,19 @@ async function showApp() {
 }
 
 async function loadData() {
+  const tbodies = [document.getElementById('sources-tbody'), document.getElementById('breakdown-tbody')];
+  tbodies.forEach(tb => tb && (tb.innerHTML = '<tr><td colspan="6" class="muted">⏳ Loading…</td></tr>'));
   try {
     const r = await fetch(`${WORKER_URL}/api/attribution/breakdown`, {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${_token}` },
       body: JSON.stringify({ months: 12 })
     });
     const d = await r.json();
-    if (!r.ok) { console.error(d); return; }
+    if (!r.ok) {
+      console.error(d);
+      tbodies.forEach(tb => tb && (tb.innerHTML = `<tr><td colspan="6" class="muted">❌ ${esc(d.error || 'Error loading data')}</td></tr>`));
+      return;
+    }
 
     const breakdown = d.breakdown || [];
     const topSources = d.top_sources || [];
@@ -199,7 +205,8 @@ function esc(s) {
 
 // Init
 (async () => {
-  const saved = localStorage.getItem('snEco_attr_token');
+  let saved = null;
+  try { saved = localStorage.getItem('snEco-jwt-attribution-dashboard'); } catch(e) { /* incognito */ }
   if (saved) {
     // Verify saved token
     const r = await fetch(`${WORKER_URL}/api/session/verify`, {
@@ -212,7 +219,7 @@ function esc(s) {
       showApp();
       return;
     }
-    localStorage.removeItem('snEco_attr_token');
+    localStorage.removeItem('snEco-jwt-attribution-dashboard');
   }
   document.getElementById('login-btn').addEventListener('click', login);
   document.getElementById('email').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
