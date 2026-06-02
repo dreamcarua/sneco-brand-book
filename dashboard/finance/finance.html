@@ -396,6 +396,7 @@ body.dash-locked{overflow:hidden}
       <a class="nav-link" href="../inventory/inventory.html">📦 Inventory</a>
       <a class="nav-link" href="../production/production.html">🏭 Production</a>
       <a class="nav-link" href="../procurement/procurement.html">🛒 Procurement</a>
+      <a class="nav-link" href="../attribution/attribution.html">🎯 Attribution</a>
       <a class="nav-link" href="../../">📘 Brand Bible</a>
     </nav>
   </div>
@@ -652,6 +653,14 @@ function wirePeriodSelector(){
   });
   const handleCustom = () => {
     if (!from.value || !to.value) return;
+    // v2.78.71 audit fix: валідація from <= to
+    if (from.value > to.value) {
+      const info = document.getElementById('periodRangeInfo');
+      if (info) { info.textContent = '⚠️ "Від" має бути ≤ "До"'; info.style.color = '#ef4444'; info.style.fontWeight = '700'; }
+      return;
+    }
+    const info = document.getElementById('periodRangeInfo');
+    if (info) { info.style.color = ''; info.style.fontWeight = ''; }
     chips.querySelectorAll('.period-chip').forEach(x => x.classList.remove('active'));
     currentPeriod = { preset: 'custom', from: from.value, to: to.value };
     savePeriod();
