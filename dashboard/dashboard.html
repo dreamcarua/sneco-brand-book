@@ -386,6 +386,7 @@ body.dash-locked{overflow:hidden}
       <a class="nav-link" href="./inventory/inventory.html">📦 Inventory</a>
       <a class="nav-link" href="./production/production.html">🏭 Production</a>
       <a class="nav-link" href="./procurement/procurement.html">🛒 Procurement</a>
+      <a class="nav-link" href="./attribution/attribution.html">🎯 Attribution</a>
       <a class="nav-link" href="../">📘 Brand Bible</a>
     </nav>
   </div>
@@ -3434,6 +3435,23 @@ function buildActionItems(){
 
 // Show tab 1 (triggers full init for tab 1 content, others load on click)
 showTab(1);
+
+// v2.78.71 audit fix: stale-data warning якщо baked monthly > 14 днів
+try {
+  const gen = D && D.generated;  // "DD.MM.YYYY HH:MM"
+  if (gen) {
+    const [d, m, y] = gen.split(' ')[0].split('.');
+    const genDate = new Date(`${y}-${m}-${d}`);
+    const ageDays = Math.floor((Date.now() - genDate.getTime()) / 86400000);
+    if (ageDays > 14) {
+      const wrap = document.querySelector('.wrap') || document.body;
+      const banner = document.createElement('div');
+      banner.style.cssText = 'background:#fff3cd;border:2px solid #ffc107;padding:14px 18px;margin:16px 0;border-radius:8px;color:#856404;font-weight:600;font-size:14px';
+      banner.innerHTML = `⚠️ <strong>Старі дані</strong> — Sales dataset згенеровано ${ageDays} днів тому (${gen} UTC). Live last-sync badge вгорі показує справжній sync status. Розгляньте перебудову dashboard.html через /api fetch (замість baked JSON).`;
+      wrap.insertBefore(banner, wrap.firstChild);
+    }
+  }
+} catch(e) { console.warn('[stale-check] failed:', e.message); }
 
 // === Real last-sync badge (v2.56) — fetches /api/dashboard/last-sync ===
 (async function(){
