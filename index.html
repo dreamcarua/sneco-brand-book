@@ -14440,7 +14440,20 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
     const container = document.getElementById('admin-blocks-container');
     const msgEl = document.getElementById('admin-msg');
     if (!container) return;
-    if (!sess.isAdmin) {
+    // v2.78.77 audit fix: re-verify session з Worker — це fix старих JWT'ів де isAdmin stale
+    // (Worker handleSessionVerify тепер re-evaluates isAdmin з поточного ADMIN_EMAILS env)
+    if (sess && sess.token) {
+      try {
+        const v = await snAuth.post('/api/session/verify', { token: sess.token });
+        if (v && v.ok) {
+          sess.isAdmin = !!v.isAdmin;
+          if (v.email) sess.email = v.email;
+          // Update sessionStorage з оновленим isAdmin
+          snAuth.saveSession('admin', sess);
+        }
+      } catch(e) { console.warn('[admin-ui] session verify failed:', e.message); }
+    }
+    if (!sess || !sess.isAdmin) {
       container.innerHTML = '<div style="padding:18px;color:#dc2626;font-size:13px"><span data-lang="uk">⛔ Ваш email не в списку адмінів. Доступ лише для засновників.</span><span data-lang="en">⛔ Your email is not on the admin list. Access restricted to founders.</span><span data-lang="sk">⛔ Váš email nie je v zozname adminov. Prístup len pre zakladateľov.</span></div>';
       applyLang();
       return;
