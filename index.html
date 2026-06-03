@@ -14204,21 +14204,30 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
     workerUrl: WORKER_URL,
     sessionFor(block) {
       try {
-        const raw = sessionStorage.getItem(SS_PREFIX + block);
+        // v2.78.78 audit fix: localStorage замість sessionStorage — auth persist між сесіями (JWT 30 діб)
+        // Migrate old sessionStorage entries to localStorage (one-time)
+        const lsRaw = localStorage.getItem(SS_PREFIX + block);
+        const ssRaw = sessionStorage.getItem(SS_PREFIX + block);
+        let raw = lsRaw;
+        if (!lsRaw && ssRaw) {
+          localStorage.setItem(SS_PREFIX + block, ssRaw);
+          sessionStorage.removeItem(SS_PREFIX + block);
+          raw = ssRaw;
+        }
         if (!raw) return null;
         const s = JSON.parse(raw);
         if (s.exp && Date.now() / 1000 > s.exp) {
-          sessionStorage.removeItem(SS_PREFIX + block);
+          localStorage.removeItem(SS_PREFIX + block);
           return null;
         }
         return s;
       } catch (e) { return null; }
     },
     saveSession(block, sess) {
-      try { sessionStorage.setItem(SS_PREFIX + block, JSON.stringify(sess)); } catch (e) {}
+      try { localStorage.setItem(SS_PREFIX + block, JSON.stringify(sess)); } catch (e) {}
     },
     clear(block) {
-      try { sessionStorage.removeItem(SS_PREFIX + block); } catch (e) {}
+      try { localStorage.removeItem(SS_PREFIX + block); sessionStorage.removeItem(SS_PREFIX + block); } catch (e) {}
     },
     async post(path, body, opts = {}) {
       const headers = { 'Content-Type': 'application/json' };
@@ -14234,18 +14243,20 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
       try {
         const now = Date.now() / 1000;
         let firstValid = null;
-        for (let i = 0; i < sessionStorage.length; i++) {
-          const k = sessionStorage.key(i);
-          if (!k || !k.startsWith(SS_PREFIX)) continue;
-          try {
-            const s = JSON.parse(sessionStorage.getItem(k) || '{}');
-            if (s.token && s.email && (!s.exp || s.exp > now)) {
-              // Prefer admin session — return immediately
-              if (s.isAdmin) return s;
-              // Save first valid as fallback (no cross-call cache)
-              if (!firstValid) firstValid = s;
-            }
-          } catch (e) {}
+        // v2.78.78 audit fix: читаємо ОБИДВА storage (localStorage primary + sessionStorage migrate)
+        const sources = [localStorage, sessionStorage];
+        for (const store of sources) {
+          for (let i = 0; i < store.length; i++) {
+            const k = store.key(i);
+            if (!k || !k.startsWith(SS_PREFIX)) continue;
+            try {
+              const s = JSON.parse(store.getItem(k) || '{}');
+              if (s.token && s.email && (!s.exp || s.exp > now)) {
+                if (s.isAdmin) return s;
+                if (!firstValid) firstValid = s;
+              }
+            } catch (e) {}
+          }
         }
         return firstValid;
       } catch (e) { return null; }
