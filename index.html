@@ -14448,8 +14448,14 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
       if (block === 'admin') renderAdminUi(sess);
     } else if (mount) {
       mountOtpForm(mount, block, sess => {
+        // v2.78.80 audit fix: hard reload після login — гарантує snAuthApplyAdminClass + правильний state
+        console.log('[otp-success] block:', block, 'email:', sess && sess.email, 'isAdmin:', sess && sess.isAdmin);
         setBlockUnlocked(rootEl, true, sess);
-        if (block === 'admin') renderAdminUi(sess);
+        if (block === 'admin') {
+          // Reload щоб body.is-admin class set, admin-only sections видимі, renderAdminUi працює clean
+          setTimeout(() => { location.reload(); }, 600);
+          return;
+        }
       });
     }
     rootEl.querySelectorAll('[data-otp-logout="' + block + '"]').forEach(btn => {
