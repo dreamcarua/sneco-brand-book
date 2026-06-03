@@ -14204,8 +14204,8 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
     workerUrl: WORKER_URL,
     sessionFor(block) {
       try {
-        // v2.78.78 audit fix: localStorage замість sessionStorage — auth persist між сесіями (JWT 30 діб)
-        // Migrate old sessionStorage entries to localStorage (one-time)
+        // v2.78.79 audit fix: STRICT validation — return null якщо sess corrupted (no token/email)
+        // Це fix для bug де empty {} session показувала "NaN min" замість OTP form
         const lsRaw = localStorage.getItem(SS_PREFIX + block);
         const ssRaw = sessionStorage.getItem(SS_PREFIX + block);
         let raw = lsRaw;
@@ -14216,12 +14216,24 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
         }
         if (!raw) return null;
         const s = JSON.parse(raw);
-        if (s.exp && Date.now() / 1000 > s.exp) {
+        // STRICT: session needs token + email + valid exp
+        if (!s || !s.token || !s.email || !s.exp) {
+          // Corrupted session — очищуємо
+          localStorage.removeItem(SS_PREFIX + block);
+          sessionStorage.removeItem(SS_PREFIX + block);
+          return null;
+        }
+        if (Date.now() / 1000 > s.exp) {
           localStorage.removeItem(SS_PREFIX + block);
           return null;
         }
         return s;
-      } catch (e) { return null; }
+      } catch (e) {
+        // Cleanup corrupted JSON
+        try { localStorage.removeItem(SS_PREFIX + block); } catch(_) {}
+        try { sessionStorage.removeItem(SS_PREFIX + block); } catch(_) {}
+        return null;
+      }
     },
     saveSession(block, sess) {
       try { localStorage.setItem(SS_PREFIX + block, JSON.stringify(sess)); } catch (e) {}
@@ -14409,6 +14421,12 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
   applyLang();
 
   function setBlockUnlocked(rootEl, on, sess) {
+    // v2.78.79 audit fix: refuse to unlock with corrupted session
+    if (on && (!sess || !sess.token || !sess.email || !sess.exp)) {
+      console.warn('[setBlockUnlocked] refusing — sess corrupted:', sess);
+      on = false;
+      sess = null;
+    }
     rootEl.classList.toggle('is-unlocked', on);
     rootEl.classList.toggle('is-locked', !on);
     if (on && sess) {
