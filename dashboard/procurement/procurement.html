@@ -448,7 +448,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Procurement Dashboard v1.0 (v2.78.62) · scaffold від Finance template · MoySklad → D1 → Worker · Cron щодня 03:00
+  snEco Procurement Dashboard v1.0 (v2.78.62) · MoySklad procurement (постачальники + закупівлі) → D1 → Worker · Cron щодня 03:00
 </div>
 
 <script>
@@ -1279,7 +1279,7 @@ function renderDashboard(){
     <!-- SECTION 1 — KPI ROW 1: за останні 30 днів -->
     <div class="g4">
       ${invKpi(
-        `🛒 Виставлено рахунків (${periodLabel})`,
+        `🛒 Отримано рахунків (${periodLabel})`,
         `${nfm(invLast30)} ₴`,
         deltaPill(invDelta) + ' vs попер. період',
         'cy',
@@ -1338,7 +1338,7 @@ function renderDashboard(){
       <div class="cc-head">
         <div>
           <div class="cc-title">${months.length} ${effectiveGran === 'day' ? 'днів' : effectiveGran === 'week' ? 'тижнів' : 'місяців'} · 3 dataset</div>
-          <div class="cc-sub">Виставлено рахунків (yellow) · Надходження (green) · Витрати (red, negative)${!hasInvoices ? ' · ⚠ рахунки = 0' : ''}</div>
+          <div class="cc-sub">Отримано рахунків (yellow) · Сплачено (green) · Витрати (red, negative)${!hasInvoices ? ' · ⚠ немає рахунків від постачальників' : ''}</div>
         </div>
         <!-- v3.0.2: дублікат granularity toggle ПРЯМО біля графіка (синхронізується з sticky-bar) -->
         <div class="granularity-toggle" id="granToggleChart" title="Деталізація графіка">
@@ -1696,7 +1696,7 @@ function renderDashboard(){
           labels: chartLabels,
           datasets: [
             {
-              label: 'Виставлено рахунків (₴)',
+              label: 'Отримано рахунків (₴)',
               data: months.map(m => invByMonth[m]),
               backgroundColor: 'rgba(254,191,39,.75)',
               borderColor: '#FEBF27',
