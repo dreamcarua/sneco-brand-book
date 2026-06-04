@@ -14333,10 +14333,15 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
       const back = mountEl.querySelector('[data-role="back"]');
       const input = mountEl.querySelector(stage === 'email' ? '[data-role="email"]' : '[data-role="code"]');
       // v2.78.35 (Богдан): Google Sign-In у email stage — primary метод
+      // v2.78.82 audit fix: save session + pass entire {token,email,isAdmin,exp} object
       const gBtnContainer = mountEl.querySelector('[data-role="google-btn"]');
       if (gBtnContainer && window.SnecoAuth && stage === 'email') {
         window.SnecoAuth.signInWithGoogle(block, gBtnContainer,
-          (j) => onSuccess && onSuccess(j.token, j.email, j.exp),
+          (j) => {
+            // Save full session to localStorage — without це auth не persist
+            snAuth.saveSession(block, { token: j.token, email: j.email, isAdmin: j.isAdmin, exp: j.exp });
+            onSuccess && onSuccess(j);  // entire object — not 3 args
+          },
           (errMsg) => { msg.className = 'otp-msg otp-error'; msg.textContent = errMsg; }
         );
       }
