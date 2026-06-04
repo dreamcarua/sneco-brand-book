@@ -1269,22 +1269,50 @@ body.dash-locked{overflow:hidden}
 const D = {monthly:[],annual:[],quarterly:[],seasonality:[],hist:[],stock:[],stock_detail:{abc:[],critical:[],in_transit:[]},stock_history:[],top_clients:[],top_products:[],clients_by_year:{},products_by_year:{},clients_by_quarter:{},products_by_quarter:{},clients_by_month:{},products_by_month:{},daily_30:[],margin_trend:[],ar_monthly:[],ar_current:[],dso_days:[],funnel_monthly:[],geo_split:{},channel_split:{},client_cohort:{},sleeping_clients:[],production:{},prod_by_techcard:{},prod_by_product:{},dried_monthly:[],dried_by_product:{},supply_monthly:[],techcards:[],generated:"",summary:{}};
 window.D = D;
 
-// v2.78.74 audit fix: live fetch з shared dataset (inventory/data.json генерується щодня MoySklad sync)
-// Замість baked 4.6MB JSON — тягнемо свіжі дані. Якщо fetch fail (rare) — показуємо empty UI замість stale.
+// v2.78.83 UX polish: loading + empty + error states навколо fetch (Phase B audit)
+function showFetchBanner(text, type) {
+  // type: 'loading' (yellow) | 'error' (red) | null (remove)
+  let banner = document.getElementById('fetch-state-banner');
+  if (!type) { if (banner) banner.remove(); return; }
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'fetch-state-banner';
+    banner.style.cssText = 'position:fixed;top:54px;left:0;right:0;z-index:50;padding:10px 18px;text-align:center;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.08);transition:all 0.3s';
+    document.body.appendChild(banner);
+  }
+  const styles = {
+    loading: 'background:rgba(254,191,39,0.95);color:#1E1E1E',
+    error:   'background:rgba(239,68,68,0.95);color:#fff',
+    empty:   'background:rgba(150,193,31,0.95);color:#1E1E1E'
+  };
+  banner.style.cssText += ';' + (styles[type] || styles.loading);
+  banner.innerHTML = text;
+}
+
+showFetchBanner('⏳ Завантажуємо актуальні дані…', 'loading');
 fetch('../inventory/data.json?v=' + Date.now())
-  .then(r => r.ok ? r.json() : null)
+  .then(r => {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  })
   .then(fresh => {
     if (fresh && fresh.generated) {
       Object.assign(D, fresh);
       window.D = D;
       console.log('[sales] live data loaded:', fresh.generated);
-      // Re-render initial tab якщо showTab існує
       try { if (typeof showTab === 'function') showTab(1); } catch(e) {}
+      // Auto-hide banner after 1.5s
+      setTimeout(() => showFetchBanner(null), 1500);
+      showFetchBanner('✅ Дані оновлено · згенеровано ' + fresh.generated, 'empty');
     } else {
+      showFetchBanner('⚠️ Дані недоступні — показуємо порожній стан', 'error');
       console.warn('[sales] data.json fetch failed — empty UI');
     }
   })
-  .catch(e => console.error('[sales] fetch error:', e.message));
+  .catch(e => {
+    showFetchBanner('❌ Помилка завантаження: ' + e.message + ' · <a href="javascript:location.reload()" style="color:inherit;text-decoration:underline">перезавантажити</a>', 'error');
+    console.error('[sales] fetch error:', e.message);
+  });
 // ── Технічні позиції — виключаємо з усього складу ─────────
 const STOCK_EXCLUDE=['маркетинг'];
 const _stockEx=s=>STOCK_EXCLUDE.some(ex=>(s.name||'').toLowerCase().includes(ex));
