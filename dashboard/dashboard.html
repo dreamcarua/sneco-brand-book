@@ -245,6 +245,9 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <script>
+
+// v2.78.88 SECURITY: XSS protection — escape user-controlled strings from MoySklad
+function escapeHtml(s){return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);}
 (function(){
   const WORKER = 'https://sneco-auth.vg-ab6.workers.dev';
   const BLOCK = 'dashboard';
@@ -1286,7 +1289,8 @@ function showFetchBanner(text, type) {
     empty:   'background:rgba(150,193,31,0.95);color:#1E1E1E'
   };
   banner.style.cssText += ';' + (styles[type] || styles.loading);
-  banner.innerHTML = text;
+  // v2.78.88 SECURITY: text comes from caller — escape якщо містить error messages (e.message може мати HTML)
+  banner.innerHTML = String(text || '').replace(/<script/gi, '&lt;script');
 }
 
 showFetchBanner('⏳ Завантажуємо актуальні дані…', 'loading');
@@ -2642,7 +2646,7 @@ function buildOverviewTopClients(){
   cont.innerHTML=`<table class="dt" style="width:100%"><tbody>${top10.map((c,i)=>`
     <tr>
       <td class="rank" style="width:24px">${i+1}</td>
-      <td style="word-break:break-word"><strong>${c.name}</strong></td>
+      <td style="word-break:break-word"><strong>${escapeHtml(c.name)}</strong></td>
       <td style="text-align:right;white-space:nowrap;padding-left:8px"><strong>${fmtN(c.revenue)}</strong></td>
       <td style="min-width:55px"><div class="bar-wrap"><div class="bar-fill" style="width:${Math.round(c.revenue/maxRev*100)}%;background:var(--y)"></div></div></td>
     </tr>`).join('')}</tbody></table>`;
@@ -2664,7 +2668,7 @@ function buildOverviewTopProducts(){
   cont.innerHTML=`<table class="dt" style="width:100%"><tbody>${top10.map((p,i)=>`
     <tr>
       <td class="rank" style="width:24px">${i+1}</td>
-      <td style="word-break:break-word"><strong>${p.name}</strong></td>
+      <td style="word-break:break-word"><strong>${escapeHtml(p.name)}</strong></td>
       <td style="text-align:right;white-space:nowrap;padding-left:8px"><strong>${fmtN(p.revenue)}</strong></td>
       <td style="min-width:55px"><div class="bar-wrap"><div class="bar-fill" style="width:${Math.round(p.revenue/maxRev*100)}%;background:var(--g)"></div></div></td>
     </tr>`).join('')}</tbody></table>`;
