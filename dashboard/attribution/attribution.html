@@ -40,6 +40,27 @@ button:hover { opacity: 0.9; }
 </style>
 </head>
 <body>
+<script>
+// v2.78.91 UX: global 401 handler — JWT expired → friendly redirect screen
+(function(){
+  const _origFetch = window.fetch;
+  window.fetch = async function(...args) {
+    const r = await _origFetch.apply(this, args);
+    if (r.status === 401 && args[0] && typeof args[0] === 'string' && args[0].includes('sneco-auth')) {
+      // Show session expired overlay
+      if (!document.getElementById('sn-401-overlay')) {
+        const o = document.createElement('div');
+        o.id = 'sn-401-overlay';
+        o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;color:#fff;font-family:system-ui;';
+        o.innerHTML = '<div style="background:#FEBF27;color:#1E1E1E;padding:32px 48px;border-radius:12px;text-align:center;max-width:480px;box-shadow:0 12px 48px rgba(0,0,0,0.5)"><div style="font-size:48px;margin-bottom:12px">🔒</div><h2 style="margin:0 0 8px;font-size:20px">Сесія закінчилась</h2><p style="margin:0 0 20px;font-size:14px;line-height:1.5">Ваш JWT токен expire (30 днів). Увійдіть знов щоб продовжити.</p><button onclick="localStorage.clear();location.reload();" style="background:#1E1E1E;color:#FEBF27;border:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">Увійти знову</button></div>';
+        document.body.appendChild(o);
+      }
+    }
+    return r;
+  };
+})();
+</script>
+
 
 <div id="auth-gate" class="active">
   <div class="auth-form">
