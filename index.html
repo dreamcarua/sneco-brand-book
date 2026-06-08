@@ -32,6 +32,32 @@
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <style>
+/* v2.78.98 WCAG: yellow on white text — використовуй darker fallback */
+.kpi-num, .num-yellow, [style*="color:#FEBF27"]:not([style*="background"]) {
+  /* Якщо yellow на light bg — fallback to darker amber для contrast */
+}
+@media (prefers-color-scheme: light) {
+  .text-yellow-on-light { color: #8B5C00 !important; } /* darker amber 4.5:1 на white */
+}
+.kpi-num[data-on-white="true"] { color: #8B5C00 !important; }
+
+/* Focus visible for keyboard accessibility */
+*:focus-visible {
+  outline: 2px solid #FEBF27;
+  outline-offset: 2px;
+}
+
+/* Skip-to-content link для screen readers */
+.sn-skip-link {
+  position: absolute; left: -9999px; top: -9999px;
+  background: #1E1E1E; color: #FEBF27;
+  padding: 12px 18px; text-decoration: none;
+  font-weight: 700; z-index: 99999;
+}
+.sn-skip-link:focus {
+  left: 12px; top: 12px;
+}
+
 /* ============================================================
    FONT LOADING
    Brand fonts: Qanelas (body, 10 weights) + HighVoltage Rough (display).
@@ -2169,7 +2195,7 @@ body.is-admin section.admin-only { display: block !important; }
 <script src="dashboard/auth-google.js"></script>
 </head>
 <body class="lang-uk">
-<button aria-label="Menu" class="burger" id="burger">☰</button>
+<button aria-label="Menu" class="burger" id="burger" aria-label="Меню">☰</button>
 <div class="copy-toast" id="copyToast">Copied!</div>
 <!-- Floating language switcher — top right (v2.31) -->
 <div aria-label="Language switcher" class="lang-floater" role="tablist">
@@ -2407,7 +2433,7 @@ body.is-admin section.admin-only { display: block !important; }
 <!-- ============================================================
      MANIFESTO
      ============================================================ -->
-<section class="section active" id="sec-manifesto" style="padding:0">
+<div id="main-content"><section class="section active" id="sec-manifesto" style="padding:0">
 <div class="hero" style="padding:140px 64px;min-height:88vh;display:flex;flex-direction:column;justify-content:center">
 <div class="hero-eyebrow"><span data-lang="uk">Маніфест</span><span data-lang="en">Manifesto</span><span data-lang="sk">Manifest</span></div>
 <h1 class="hero-title" style="font-size:60px;line-height:1.1;letter-spacing:-1px;max-width:920px;font-weight:800">
@@ -14543,7 +14569,7 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
             <div class="admin-block-title">${meta.icon} <span data-lang="uk">${meta.uk}</span><span data-lang="en">${meta.en}</span><span data-lang="sk">${meta.sk || meta.uk}</span></div>
             <div class="admin-block-desc"><span data-lang="uk">Кому надсилається OTP-код для цього розділу. Адміни (${(data.admins||[]).join(', ')}) завжди мають доступ.</span><span data-lang="en">Who can request an OTP for this section. Admins (${(data.admins||[]).join(', ')}) always have access.</span><span data-lang="sk">Komu sa posiela OTP-kód pre túto sekciu. Adminovia (${(data.admins||[]).join(', ')}) majú vždy prístup.</span></div>
             <div class="admin-emails-list">
-              ${emails.map(e => `<span class="admin-email-chip${(data.admins||[]).includes(e) ? ' is-admin' : ''}">${escapeHtml2(e)}${(data.admins||[]).includes(e) ? '' : ` <button class="admin-email-remove" data-remove="${escapeHtml2(e)}" title="Remove">×</button>`}</span>`).join('')}
+              ${emails.map(e => `<span class="admin-email-chip${(data.admins||[]).includes(e) ? ' is-admin' : ''}">${escapeHtml2(e)}${(data.admins||[]).includes(e) ? '' : ` <button class="admin-email-remove" data-remove="${escapeHtml2(e)}" title="Remove" aria-label="Закрити">×</button>`}</span>`).join('')}
               ${emails.length === 0 ? '<span style="color:var(--text-muted);font-size:12px">empty</span>' : ''}
             </div>
             <div class="admin-add-row">
@@ -14670,7 +14696,7 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
         <div class="idea-modal" style="max-width:420px">
           <div class="idea-modal-header">
             <h3>📧 ${t('Вхід через email', 'Email login', 'Prihlásenie cez email')}</h3>
-            <button class="idea-modal-close" data-role="close">×</button>
+            <button class="idea-modal-close" data-role="close" aria-label="Закрити">×</button>
           </div>
           <div class="idea-modal-body">
             <div class="idea-modal-field">
@@ -14777,7 +14803,7 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
         <div class="idea-modal">
           <div class="idea-modal-header">
             <h3>💡 ${t('Драфт рішення для', 'Draft solution for', 'Návrh riešenia pre')}: ${escapeHtml2(idea.title)}</h3>
-            <button class="idea-modal-close" data-role="close">×</button>
+            <button class="idea-modal-close" data-role="close" aria-label="Закрити">×</button>
           </div>
           <div class="idea-modal-body">
             <div class="idea-modal-field">
@@ -15202,7 +15228,7 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
       const commentAttachList = bodyEl.querySelector('[data-role="comment-attach-list"]');
       function renderCommentAttachments() {
         commentAttachList.innerHTML = commentAttachments.map((a, i) =>
-          `<span class="ideas-attach-chip${a._uploading ? ' is-uploading' : ''}">📄 ${escapeHtml2(a.name)} ${a._uploading ? '⏳' : ''}<button data-rm="${i}">×</button></span>`
+          `<span class="ideas-attach-chip${a._uploading ? ' is-uploading' : ''}">📄 ${escapeHtml2(a.name)} ${a._uploading ? '⏳' : ''}<button data-rm="${i}" aria-label="Закрити">×</button></span>`
         ).join('');
         commentAttachList.querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', () => {
           commentAttachments.splice(Number(b.dataset.rm), 1); renderCommentAttachments();
@@ -15301,7 +15327,7 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
     const attachListEl = formEl.querySelector('[data-role="attach-list"]');
     function renderPendingAttachments() {
       attachListEl.innerHTML = pendingAttachments.map((a, i) =>
-        `<span class="ideas-attach-chip${a._uploading ? ' is-uploading' : ''}">📄 ${escapeHtml2(a.name)} ${a._uploading ? '⏳' : ''}<button data-rm="${i}">×</button></span>`
+        `<span class="ideas-attach-chip${a._uploading ? ' is-uploading' : ''}">📄 ${escapeHtml2(a.name)} ${a._uploading ? '⏳' : ''}<button data-rm="${i}" aria-label="Закрити">×</button></span>`
       ).join('');
       attachListEl.querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', () => {
         pendingAttachments.splice(Number(b.dataset.rm), 1); renderPendingAttachments();
@@ -15515,5 +15541,5 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
   } catch (e) { /* no-op */ }
 })();
 </script>
-</body>
+</div></body>
 </html>
