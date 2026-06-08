@@ -3743,7 +3743,7 @@ function renderCustomerView(c){
                     : healthScore.total >= 40 ? 'Потребує уваги' : 'Критичний стан';
   const healthColor = healthScore.total >= 70 ? 'var(--g)' : healthScore.total >= 40 ? 'var(--y)' : 'var(--red)';
 
-  // Next order forecast (avgOrderSize у грн)
+  // Next order forecast (avgOrderSize у ₴)
   const avgOrderSize = ordersCount ? totalShipped / ordersCount : 0;
   const nextOrder = calcNextOrderForecast({ daysSinceLast, avgCadenceDays, lastOrder, avgOrderSize });
 
