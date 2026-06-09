@@ -938,7 +938,7 @@ function buildAvgOrder(){
   const data=getFiltered().filter(r=>r.avg_order>0);
   const lbl=data.map(r=>r.ym);
   const vals=data.map(r=>r.avg_order);
-  mkChart('avgOrderChart',{type:'line',data:{labels:lbl,datasets:[{label:'Середній чек',data:vals,borderColor:Y,backgroundColor:YF,borderWidth:2.5,fill:true,tension:.4,pointRadius:0,pointHoverRadius:5}]},options:{...JSON.parse(JSON.stringify(baseOpts)),scales:{x:{grid:{display:false},ticks:{maxRotation:45,maxTicksLimit:20}},y:{grid:{color:'#F0F0E8'},ticks:{callback:v=>fmtK(v)+' грн'}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` Середній чек: ${Math.round(ctx.raw).toLocaleString('uk-UA')} ₴`}}}}});
+  mkChart('avgOrderChart',{type:'line',data:{labels:lbl,datasets:[{label:'Середній чек',data:vals,borderColor:Y,backgroundColor:YF,borderWidth:2.5,fill:true,tension:.4,pointRadius:0,pointHoverRadius:5}]},options:{...JSON.parse(JSON.stringify(baseOpts)),scales:{x:{grid:{display:false},ticks:{maxRotation:45,maxTicksLimit:20}},y:{grid:{color:'#F0F0E8'},ticks:{callback:v=>fmtK(v)+' ₴'}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` Середній чек: ${Math.round(ctx.raw).toLocaleString('uk-UA')} ₴`}}}}});
 }
 
 // ── ORDERS ─────────────────────────────────────────────────
@@ -1359,7 +1359,7 @@ function buildStock(){
   if(catWrap && !catWrap.querySelector('canvas')) catWrap.innerHTML='<canvas id="stockCatChart"></canvas>';
   if(catNames.length) mkChart('stockCatChart',{type:'bar',data:{
     labels:catNames,
-    datasets:[{label:'Тис. грн',data:catVals,backgroundColor:catColors,borderRadius:6,borderSkipped:false}]
+    datasets:[{label:'Тис. ₴',data:catVals,backgroundColor:catColors,borderRadius:6,borderSkipped:false}]
   },options:{responsive:true,maintainAspectRatio:false,
     plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmtK(ctx.raw)} тис. ₴`}}},
     scales:{x:{grid:{display:false}},y:{grid:{color:'#F0F0E8'},ticks:{callback:v=>fmtK(v)}}}}});
@@ -1526,7 +1526,7 @@ function buildAnnualTable(){
       <td><span class="tag ${cfClass}">${cf>=0?'+':''}${(cf/1e6).toFixed(2)}М</span></td>
       <td>${(a.shipments/1e6).toFixed(2)}М</td>
       <td>${a.orders.toLocaleString('uk-UA')}</td>
-      <td>${a.avg_order.toLocaleString('uk-UA')}грн</td>
+      <td>${a.avg_order.toLocaleString('uk-UA')}₴</td>
       <td><span class="tag tr">${(a.returns/1000).toFixed(1)}К</span></td>
       <td>${yoyHtml}</td>
     </tr>`;
@@ -1737,7 +1737,7 @@ function buildTopClientsAbsMargin(){
   const colors = withAbs.map(r=>r.absMargin>=0?'rgba(254,191,39,0.80)':'rgba(232,64,64,0.75)');
   mkChart('clientsAbsMarginChart',{type:'bar',data:{
     labels:withAbs.map(r=>r.name.length>28?r.name.substring(0,28)+'…':r.name),
-    datasets:[{label:'Прибуток, грн',data:withAbs.map(r=>Math.round(r.absMargin/1000)),backgroundColor:colors,borderRadius:4,borderSkipped:false}]
+    datasets:[{label:'Прибуток, ₴',data:withAbs.map(r=>Math.round(r.absMargin/1000)),backgroundColor:colors,borderRadius:4,borderSkipped:false}]
   },options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
     plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmtK(ctx.raw)} тис. ₴`}}},
     scales:{x:{grid:{color:'#F0F0E8'},ticks:{callback:v=>fmtK(v)}},y:{grid:{display:false},ticks:{font:{size:10},color:'#444'}}}}});
@@ -1780,7 +1780,7 @@ function buildTopProductsAbsMargin(){
   const colors = withAbs.map(r=>r.absMargin>=0?'rgba(150,193,31,0.80)':'rgba(232,64,64,0.75)');
   mkChart('productsAbsMarginChart',{type:'bar',data:{
     labels:withAbs.map(r=>r.name.length>30?r.name.substring(0,30)+'…':r.name),
-    datasets:[{label:'Прибуток, грн',data:withAbs.map(r=>Math.round(r.absMargin/1000)),backgroundColor:colors,borderRadius:4,borderSkipped:false}]
+    datasets:[{label:'Прибуток, ₴',data:withAbs.map(r=>Math.round(r.absMargin/1000)),backgroundColor:colors,borderRadius:4,borderSkipped:false}]
   },options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
     plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmtK(ctx.raw)} тис. ₴`}}},
     scales:{x:{grid:{color:'#F0F0E8'},ticks:{callback:v=>fmtK(v)}},y:{grid:{display:false},ticks:{font:{size:10},color:'#444'}}}}});
@@ -2161,7 +2161,7 @@ function buildSupplyChart(){
       plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.raw} тис. ₴`}}},
       scales:{
         x:{grid:{display:false},ticks:{maxRotation:45,maxTicksLimit:12}},
-        y:{grid:{color:'#F0F0E8'},ticks:{callback:v=>fmtK(v)+' тис. грн'}}
+        y:{grid:{color:'#F0F0E8'},ticks:{callback:v=>fmtK(v)+' тис. ₴'}}
       }
     }
   });
@@ -2191,11 +2191,11 @@ function buildTurnover(){
       </div>
       <div class="kpi" style="grid-column:1/-1">
         <div class="kpi-lbl">Вартість запасів на складі</div>
-        <div class="kpi-val">${fmtN(stockValue)}<span class="kpi-unit">грн</span></div>
+        <div class="kpi-val">${fmtN(stockValue)}<span class="kpi-unit">₴</span></div>
       </div>
       <div class="kpi" style="grid-column:1/-1">
         <div class="kpi-lbl">Сировина на складі</div>
-        <div class="kpi-val">${fmtN(rawMatValue)}<span class="kpi-unit">грн</span></div>
+        <div class="kpi-val">${fmtN(rawMatValue)}<span class="kpi-unit">₴</span></div>
       </div>
     </div>`;
   document.getElementById('turnoverContent').innerHTML=html;
@@ -2215,7 +2215,7 @@ function buildRawMaterial(){
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:12px 0">
       <div class="kpi cy">
         <div class="kpi-lbl">Вартість сировини</div>
-        <div class="kpi-val">${fmtN(rawMat.value)}<span class="kpi-unit">грн</span></div>
+        <div class="kpi-val">${fmtN(rawMat.value)}<span class="kpi-unit">₴</span></div>
       </div>
       <div class="kpi cy">
         <div class="kpi-lbl">Кількість позицій</div>
@@ -2452,7 +2452,7 @@ function buildOverviewMargin(){
   const marginVals=data.map(r=>(r.cogs>0||r.profit>0)?r.margin_pct:null);
   const hasAnyMargin=marginVals.some(v=>v!==null);
   const datasets=[
-    {label:'Виручка (тис.грн)',data:revVals,backgroundColor:YF,borderColor:Y,borderWidth:1.5,borderRadius:4,yAxisID:'y',order:2}
+    {label:'Виручка (тис.₴)',data:revVals,backgroundColor:YF,borderColor:Y,borderWidth:1.5,borderRadius:4,yAxisID:'y',order:2}
   ];
   if(hasAnyMargin){
     datasets.push({label:'Маржа %',data:marginVals,borderColor:G,backgroundColor:'transparent',borderWidth:2.5,
@@ -2500,7 +2500,7 @@ function buildOverviewAR(){
         <div style="padding:12px;background:#F9F9F5;border-radius:10px;text-align:center">
           <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Всього AR</div>
           <div style="font-size:18px;font-weight:700">${fmtK(Math.round(arTotal/1000))} тис.</div>
-          <div style="font-size:10px;color:var(--muted);margin-top:2px">грн</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">₴</div>
         </div>
         <div style="padding:12px;background:#F9F9F5;border-radius:10px;text-align:center">
           <div style="font-size:11px;color:var(--muted);margin-bottom:4px">DSO (днів)</div>
