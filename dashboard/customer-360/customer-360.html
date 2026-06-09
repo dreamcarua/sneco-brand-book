@@ -1700,7 +1700,7 @@ function calcMovers(allCounterparties){
     .filter(x => x.pct < 0 && x.pct > -100 && x.c.__metrics.last30Rev > 0)
     .sort((a,b) => a.pct - b.pct).slice(0, 100);
 
-  // Absolute ₴ change (last30 - prev30) — тут можна -100% включати, бо це "падіння на N грн"
+  // Absolute ₴ change (last30 - prev30) — тут можна -100% включати, бо це "падіння на N ₴"
   const withAbs = eligible.map(c => ({ c, abs: c.__metrics.last30Rev - c.__metrics.prev30Rev }));
   const topGrowAbs = withAbs.filter(x => x.abs > 0).sort((a,b) => b.abs - a.abs).slice(0, 100);
   const topDeclineAbs = withAbs.filter(x => x.abs < 0).sort((a,b) => a.abs - b.abs).slice(0, 100);
@@ -4614,7 +4614,7 @@ function renderNotes(c){
   // Balance: structured (kop) → raw_json
   let balance = null, overdueAmount = null;
   if (c.balance_kop !== undefined && c.balance_kop !== null) balance = c.balance_kop / 100;
-  else { const b = raw['Баланс, грн'] || raw['balance']; if (b !== undefined && b !== null && b !== '') balance = parseFloat(b) || 0; }
+  else { const b = raw['Баланс, ₴'] || raw['balance']; if (b !== undefined && b !== null && b !== '') balance = parseFloat(b) || 0; }
   if (c.overdue_debt_kop !== undefined && c.overdue_debt_kop !== null) overdueAmount = c.overdue_debt_kop / 100;
   else { const o = raw['Борг прострочений'] || raw['overdueDebt']; if (o !== undefined && o !== null && o !== '') overdueAmount = parseFloat(o) || 0; }
 
