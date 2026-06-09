@@ -268,7 +268,11 @@ body.dash-locked{overflow:hidden}
 <script>
 
 // v2.78.88 SECURITY: XSS protection — escape user-controlled strings from MoySklad
-function escapeHtml(s){return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);}
+// v2.78.110: use central snEco.escapeHtml, fallback inline if helpers.js не loaded
+    function escapeHtml(s){
+      if (window.snEco && window.snEco.escapeHtml) return window.snEco.escapeHtml(s);
+      return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+    })[c]);}
 (function(){
   const WORKER = 'https://sneco-auth.vg-ab6.workers.dev';
   const BLOCK = 'dashboard';
