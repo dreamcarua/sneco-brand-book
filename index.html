@@ -8463,6 +8463,25 @@ snEco</pre>
 </div>
 </section>
 <script>
+
+// v2.78.105: Reusable UI banner (replaces alert())
+window.snBanner = function(text, type){
+  type = type || 'info';
+  let b = document.getElementById('sn-banner');
+  if (!b){
+    b = document.createElement('div');
+    b.id = 'sn-banner';
+    b.style.cssText = 'position:fixed;top:64px;left:50%;transform:translateX(-50%);z-index:9999;padding:14px 24px;border-radius:8px;font-weight:600;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,0.15);transition:opacity 0.3s;max-width:90vw';
+    document.body.appendChild(b);
+  }
+  const colors = {info:'#FEBF27;color:#1E1E1E',success:'#96C11F;color:#fff',error:'#DC2626;color:#fff',warn:'#F59E0B;color:#1E1E1E'};
+  b.style.cssText += ';background:'+(colors[type]||colors.info);
+  b.textContent = text;
+  b.style.opacity = '1';
+  clearTimeout(window._snBannerTimer);
+  window._snBannerTimer = setTimeout(()=>{ b.style.opacity='0'; setTimeout(()=>b.remove(),400); }, type==='error'?5000:3000);
+};
+
   // v2.78.53: Role tabs filtering
   (function(){
     const tabs = document.querySelectorAll('.ob-role-tab');
@@ -15136,14 +15155,14 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
         try {
           await snAuth.post('/api/ideas/close', { idea_id: idea.id }, { token: adminSess.token });
           await loadList();
-        } catch (e) { alert('Error: ' + e.message); }
+        } catch (e) { snBanner('Error: ' + e.message, 'error'); }
       });
       const reopenBtn = bodyEl.querySelector('.is-reopen');
       if (reopenBtn) reopenBtn.addEventListener('click', async () => {
         try {
           await snAuth.post('/api/ideas/reopen', { idea_id: idea.id }, { token: adminSess.token });
           await loadList();
-        } catch (e) { alert('Error: ' + e.message); }
+        } catch (e) { snBanner('Error: ' + e.message, 'error'); }
       });
 
       // v2.78.39: Workflow buttons
@@ -15174,7 +15193,7 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
             await loadList();
           });
         } catch (e) {
-          alert('Error: ' + e.message);
+          snBanner('Error: ' + e.message, 'error');
         } finally {
           writeBtn.disabled = false;
         }
@@ -15198,7 +15217,7 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
           await snAuth.post('/api/ideas/respond', { idea_id: idea.id, action: 'approve' }, { token: ideaToken });
           await toggleCard(card); await toggleCard(card);
           await loadList();
-        } catch (e) { alert('Error: ' + e.message); }
+        } catch (e) { snBanner('Error: ' + e.message, 'error'); }
       });
       const changesBtn = bodyEl.querySelector('[data-role="request-changes"]');
       if (changesBtn) changesBtn.addEventListener('click', async () => {
@@ -15208,7 +15227,7 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
           await snAuth.post('/api/ideas/respond', { idea_id: idea.id, action: 'request_changes', note: note.trim() }, { token: ideaToken });
           await toggleCard(card); await toggleCard(card);
           await loadList();
-        } catch (e) { alert('Error: ' + e.message); }
+        } catch (e) { snBanner('Error: ' + e.message, 'error'); }
       });
       // Admin transitions
       bodyEl.querySelectorAll('[data-role="transition"]').forEach(btn => {
@@ -15219,7 +15238,7 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
             await snAuth.post('/api/ideas/transition', { idea_id: idea.id, status: target }, { token: ideaToken });
             await toggleCard(card); await toggleCard(card);
             await loadList();
-          } catch (e) { alert('Error: ' + e.message); }
+          } catch (e) { snBanner('Error: ' + e.message, 'error'); }
         });
       });
       // Wire comment file upload
@@ -15247,7 +15266,7 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
           } catch (e) {
             const idx = commentAttachments.indexOf(placeholder);
             if (idx >= 0) commentAttachments.splice(idx, 1);
-            alert('Upload error: ' + e.message);
+            snBanner('Upload error: ' + e.message, 'error');
           }
           renderCommentAttachments();
         }
@@ -15346,7 +15365,7 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
         } catch (e) {
           const idx = pendingAttachments.indexOf(placeholder);
           if (idx >= 0) pendingAttachments.splice(idx, 1);
-          alert('Upload error: ' + e.message);
+          snBanner('Upload error: ' + e.message, 'error');
         }
         renderPendingAttachments();
       }
