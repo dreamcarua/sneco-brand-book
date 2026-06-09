@@ -426,7 +426,11 @@ body.dash-locked{overflow:hidden}
   // v2.78.39: check if "generated" in inline D is older than 24h → show banner
 
 // v2.78.88 SECURITY: XSS protection — escape user-controlled strings from MoySklad
-function escapeHtml(s){return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);}
+// v2.78.110: use central snEco.escapeHtml, fallback inline if helpers.js не loaded
+    function escapeHtml(s){
+      if (window.snEco && window.snEco.escapeHtml) return window.snEco.escapeHtml(s);
+      return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+    })[c]);}
   (function(){
     try {
       const m = document.documentElement.outerHTML.match(/"generated":\s*"([^"]+)"/);
