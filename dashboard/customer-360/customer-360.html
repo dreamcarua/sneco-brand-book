@@ -1425,25 +1425,30 @@ function calcCrossSell(c, allDemandPositions, allCounterparties){
 let currentOverviewFilter = 'all';
 
 function applyOverviewFilter(customers, filter){
-  if (!filter || filter === 'all') return customers.filter(c => c.__metrics?.totalShipped > 0);
+  // v2.78.114 (Idea #7489f62d Ярослав + #c0bb1e65 sales):
+  // ALWAYS exclude роздріб + архівних з УСІХ Overview filters.
+  // Раніше exclude робилось тільки у calcPortfolioKPIs, але Action Items / PDZ / Movers
+  // bypass'или цей фільтр і показували роздрібну (D2C/Tilda/Розетка) заборгованість.
+  const pool = excludeRetailAndArchived(customers);
+  if (!filter || filter === 'all') return pool.filter(c => c.__metrics?.totalShipped > 0);
   const cutoff30 = new Date(Date.now() - 30*86400000).toISOString().slice(0,10);
   const cutoff60 = new Date(Date.now() - 60*86400000).toISOString().slice(0,10);
   const curMonthYM = new Date().toISOString().slice(0,7);
   switch(filter) {
-    case 'active':  return customers.filter(c => c.__metrics?.lastOrder && c.__metrics.lastOrder.slice(0,10) >= cutoff30);
-    case 'at-risk': return customers.filter(c => c.__metrics?.totalShipped > 0 && c.__health >= 40 && c.__health < 70);
-    case 'dormant': return customers.filter(c => {
+    case 'active':  return pool.filter(c => c.__metrics?.lastOrder && c.__metrics.lastOrder.slice(0,10) >= cutoff30);
+    case 'at-risk': return pool.filter(c => c.__metrics?.totalShipped > 0 && c.__health >= 40 && c.__health < 70);
+    case 'dormant': return pool.filter(c => {
       const m = c.__metrics; if (!m || m.totalShipped <= 0) return false;
       return m.lastOrder && m.lastOrder.slice(0,10) < cutoff60;
     });
-    case 'new': return customers.filter(c => {
+    case 'new': return pool.filter(c => {
       const m = c.__metrics; if (!m?.byMonth) return false;
       const firstM = Object.keys(m.byMonth).sort()[0];
       return firstM === curMonthYM;
     });
-    case 'vip': return customers.filter(c => c.__metrics?.totalShipped > 500000);
+    case 'vip': return pool.filter(c => c.__metrics?.totalShipped > 500000);
   }
-  return customers.filter(c => c.__metrics?.totalShipped > 0);
+  return pool.filter(c => c.__metrics?.totalShipped > 0);
 }
 
 window.setOverviewFilter = function(f){
