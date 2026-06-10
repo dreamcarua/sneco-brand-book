@@ -47,13 +47,57 @@ snEco.showFetchBanner = function(text, type){
 };
 
 // === 401 handler (session expired overlay) ===
-snEco.handle401 = function(){
+// v2.78.115: показує Google Sign-In + OTP fallback ПРЯМО у overlay (без зайвих reload)
+snEco.handle401 = function(block){
   if (document.getElementById('sn-401-overlay')) return;
+  // BLOCK auto-detect якщо не passed (читаємо з window або URL)
+  if (!block) {
+    block = window._snAuthBlock ||
+            (location.pathname.includes('customer-360') ? 'customer-dashboard' :
+             location.pathname.includes('finance') ? 'finance-dashboard' :
+             location.pathname.includes('procurement') ? 'procurement-dashboard' :
+             location.pathname.includes('inventory') ? 'inventory-dashboard' :
+             location.pathname.includes('production') ? 'production-dashboard' :
+             location.pathname.includes('attribution') ? 'attribution-dashboard' :
+             'dashboard');
+  }
   const o = document.createElement('div');
   o.id = 'sn-401-overlay';
-  o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;color:#fff;font-family:system-ui;';
-  o.innerHTML = '<div style="background:#FEBF27;color:#1E1E1E;padding:32px 48px;border-radius:12px;text-align:center;max-width:480px"><div style="font-size:48px;margin-bottom:12px">🔒</div><h2 style="margin:0 0 8px;font-size:20px">Сесія закінчилась</h2><p style="margin:0 0 20px;font-size:14px">Увійдіть знов щоб продовжити.</p><button onclick="localStorage.clear();location.reload();" style="background:#1E1E1E;color:#FEBF27;border:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">Увійти знову</button></div>';
+  o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;color:#fff;font-family:system-ui;padding:20px';
+  o.innerHTML = `
+    <div style="background:#FEBF27;color:#1E1E1E;padding:30px 32px;border-radius:12px;text-align:center;max-width:420px;box-shadow:0 12px 48px rgba(0,0,0,0.5)">
+      <div style="font-size:42px;margin-bottom:8px">🔒</div>
+      <h2 style="margin:0 0 6px;font-size:19px">Сесія закінчилась</h2>
+      <p style="margin:0 0 16px;font-size:13px;line-height:1.5;color:#3a3a3a">Увійдіть знову — через Google (1 клік) або email-OTP</p>
+      <div id="sn401-google-btn" style="display:flex;justify-content:center;margin-bottom:12px;min-height:42px"></div>
+      <div style="font-size:11px;color:#5a5a5a;margin:8px 0">— або —</div>
+      <button onclick="localStorage.removeItem('snEco-jwt-${block}'); location.reload();" style="background:#1E1E1E;color:#FEBF27;border:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;width:100%">Увійти через email-OTP</button>
+      <div id="sn401-msg" style="font-size:12px;color:#dc2626;margin-top:10px;min-height:14px"></div>
+    </div>`;
   document.body.appendChild(o);
+  // Запуск Google Sign-In у overlay
+  let attempts = 0;
+  function tryStartGoogle() {
+    attempts++;
+    if (window.SnecoAuth) {
+      const gBtn = document.getElementById('sn401-google-btn');
+      const msg = document.getElementById('sn401-msg');
+      window.SnecoAuth.signInWithGoogle(block, gBtn,
+        (j) => {
+          localStorage.setItem('snEco-jwt-' + block,
+            JSON.stringify({token: j.token, email: j.email, exp: j.exp}));
+          location.reload();
+        },
+        (err) => { if (msg) msg.textContent = err; }
+      );
+    } else if (attempts < 25) {
+      setTimeout(tryStartGoogle, 200);  // wait for auth-google.js
+    } else {
+      const msg = document.getElementById('sn401-msg');
+      if (msg) msg.textContent = 'Google auth недоступний — використайте OTP';
+    }
+  }
+  tryStartGoogle();
 };
 
 // === Fetch wrapper з error handling + 401 ===
