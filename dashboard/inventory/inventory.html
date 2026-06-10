@@ -239,10 +239,16 @@ body.dash-locked{overflow:hidden}
     const r = await _origFetch.apply(this, args);
     if (r.status === 401 && args[0] && typeof args[0] === 'string' && args[0].includes('sneco-auth')) {
       // Show session expired overlay
-      // v2.78.115: delegate до snEco.handle401 (Google Sign-In inline)
-      window._snAuthBlock = 'inventory-dashboard';
-      if (window.snEco?.handle401) {
-        window.snEco.handle401('inventory-dashboard');
+      // v2.78.116: ONLY show overlay коли native login form НЕ показано
+      // Native form має body.dash-locked + #dashauth-overlay visible
+      // Якщо вони уже showing — skip (native form handles login)
+      const _nativeLogin = document.body?.classList?.contains('dash-locked') ||
+                            document.getElementById('dashauth-overlay');
+      if (!_nativeLogin) {
+        window._snAuthBlock = 'inventory-dashboard';
+        if (window.snEco?.handle401) {
+          window.snEco.handle401('inventory-dashboard');
+        }
       }
     }
     return r;
