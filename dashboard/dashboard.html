@@ -1393,7 +1393,9 @@ function trendPill(delta,suffix=''){
 // ── Filters ───────────────────────────────────────────────
 function getFiltered(){
   return D.monthly.filter(r=>{
-    if(filters.year!=='all'&&r.year!==filters.year)return false;
+    // v2.78.129: r.year може бути int (з D1 JSON), filters.year - string
+    // strict !== never matched — використати String() для безпечного compare
+    if(filters.year!=='all'&&String(r.year)!==String(filters.year))return false;
     if(filters.q!=='all'){
       const qn='Q'+Math.ceil(r.month/3);
       if(qn!==filters.q)return false;
