@@ -2765,7 +2765,12 @@ function buildOverviewStock(){
     return;
   }
   const cats=sd.categories||{};
-  const catRows=Object.entries(cats).map(([cat,v])=>`
+  // v2.78.133: cats може бути list [{name,value,items}] АБО dict {name: {value,items}}
+  // Frontend очікував dict, але Python sync writes list → keys ставали '0','1','2'
+  const catList = Array.isArray(cats)
+    ? cats.map(c => [c.name || '—', c])
+    : Object.entries(cats);
+  const catRows=catList.map(([cat,v])=>`
     <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)">
       <span>${catBadge(cat)}</span>
       <span style="font-size:13px"><strong>${fmtK(Math.round((v.value||0)/1000))} тис.</strong> <span style="color:var(--muted)">· ${v.items||0} поз.</span></span>
