@@ -196,6 +196,7 @@ body.dash-locked{overflow:hidden}
         <button class="btn btn-o" id="csvBtn">⬇ CSV</button>
         <button class="btn btn-o" id="refreshBtn">↻ Статуси</button>
         <button class="btn btn-d" id="draftBtn">Створити чернетки (0)</button>
+        <button class="btn btn-o" id="delBtn" style="border-color:#d33;color:#c00">🗑 Видалити (0)</button>
       </div>
     </div>
     <div class="note">Вкажіть рахунок-платник (зверху) → виберіть рахунки галочками → «Створити чернетки» → платіжки зʼявляться у Приват24 на підпис КЕП. Гроші не йдуть без вашого підпису.</div>
@@ -206,9 +207,9 @@ body.dash-locked{overflow:hidden}
       <thead><tr>
         <th><input type="checkbox" id="selAll"></th>
         <th>Отримувач</th><th>ЄДРПОУ</th><th>IBAN</th><th>№</th><th>Дата</th>
-        <th class="num">Сума, ₴</th><th class="num">ПДВ, ₴</th><th>Статус</th><th>Призначення платежу</th><th>⚠</th>
+        <th class="num">Сума, ₴</th><th class="num">ПДВ, ₴</th><th>Статус</th><th>Призначення платежу</th><th>⚠</th><th></th>
       </tr></thead>
-      <tbody id="tbody"><tr><td colspan="11" class="muted" style="text-align:center;padding:30px">Завантаження…</td></tr></tbody>
+      <tbody id="tbody"><tr><td colspan="12" class="muted" style="text-align:center;padding:30px">Завантаження…</td></tr></tbody>
     </table>
   </div>
 </div>
@@ -266,7 +267,7 @@ async function loadInvoices(){
     ROWS=(d.rows||d.data||[]).sort((a,b)=>({red:0,amber:1,ok:2}[a.severity]-({red:0,amber:1,ok:2}[b.severity])) || (a.recipient||'').localeCompare(b.recipient||''));
     renderKpis();render();
   }catch(e){
-    document.getElementById('tbody').innerHTML=`<tr><td colspan="11" class="muted" style="text-align:center;padding:30px">Немає даних або помилка: ${e.message}.<br>Дані зʼявляться після розбору першого архіву.</td></tr>`;
+    document.getElementById('tbody').innerHTML=`<tr><td colspan="12" class="muted" style="text-align:center;padding:30px">Немає даних або помилка: ${e.message}.<br>Дані зʼявляться після розбору першого архіву.</td></tr>`;
     document.getElementById('cntBadge').textContent='0 рахунків';
   }
 }
@@ -283,7 +284,7 @@ function renderKpis(){
 function render(){
   const rows=ROWS.filter(r=>FILTER==='all'||r.severity===FILTER);
   const tb=document.getElementById('tbody');
-  if(!rows.length){tb.innerHTML='<tr><td colspan="11" class="muted" style="text-align:center;padding:30px">Немає рахунків у цьому фільтрі.</td></tr>';updateDraftBtn();return;}
+  if(!rows.length){tb.innerHTML='<tr><td colspan="12" class="muted" style="text-align:center;padding:30px">Немає рахунків у цьому фільтрі.</td></tr>';updateDraftBtn();return;}
   tb.innerHTML=rows.map(r=>{
     const sb=r.severity==='ok'?'sb-ok':r.severity==='amber'?'sb-amber':'sb-red';
     const sl=r.severity==='ok'?'OK':r.severity==='amber'?'звірити':'ручна';
@@ -297,8 +298,10 @@ function render(){
       <td>${statusBadge(r.status)}</td>
       <td style="max-width:340px">${esc(r.purpose)||'—'}</td>
       <td class="flags">${esc(r.flags)||''}</td>
+      <td><button class="rowdel" data-id="${r.id}" title="Видалити з таблиці" style="border:none;background:none;cursor:pointer;color:#c00;font-size:14px;padding:2px 6px">🗑</button></td>
     </tr>`;}).join('');
   tb.querySelectorAll('.rowchk').forEach(c=>c.onchange=updateDraftBtn);
+  tb.querySelectorAll('.rowdel').forEach(b=>b.onclick=()=>delRows([b.dataset.id]));
   updateDraftBtn();
 }
 function esc(s){return s==null?'':String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
@@ -308,7 +311,7 @@ function statusBadge(s){
   return `<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap;background:${m[1]};color:${m[2]}">${m[0]}</span>`;
 }
 function selectedIds(){return [...document.querySelectorAll('.rowchk:checked')].map(c=>c.dataset.id);}
-function updateDraftBtn(){document.getElementById('draftBtn').textContent='Створити чернетки ('+selectedIds().length+')';}
+function updateDraftBtn(){const n=selectedIds().length;document.getElementById('draftBtn').textContent='Створити чернетки ('+n+')';const db=document.getElementById('delBtn');if(db)db.textContent='🗑 Видалити ('+n+')';}
 
 document.getElementById('filters').onclick=e=>{if(!e.target.dataset.f)return;FILTER=e.target.dataset.f;
   document.querySelectorAll('#filters .chip').forEach(c=>c.classList.toggle('active',c===e.target));render();};
@@ -342,6 +345,17 @@ document.getElementById('draftBtn').onclick=async()=>{
   }catch(e){toast('Помилка створення: '+e.message);}
   btn.disabled=false;updateDraftBtn();
 };
+
+async function delRows(ids){
+  if(!ids||!ids.length){toast('Виберіть рахунки для видалення (галочками).');return;}
+  if(!confirm('Видалити '+ids.length+' рахунк(ів) з таблиці?\nЦе прибирає їх лише з цього списку, платежі у Приват24 не чіпаються.'))return;
+  try{
+    const res=await api('/api/pay/delete',{ids});
+    toast('Видалено з таблиці: '+(res.deleted||0)+'.');
+    await loadInvoices();
+  }catch(e){toast('Помилка видалення: '+e.message);}
+}
+document.getElementById('delBtn').onclick=()=>delRows(selectedIds());
 
 document.getElementById('upBtn').onclick=async()=>{
   const fs=document.getElementById('zipInput').files;if(!fs.length){toast('Оберіть файли.');return;}
