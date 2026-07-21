@@ -181,8 +181,9 @@ body.dash-locked{overflow:hidden}
   <div class="cc" style="margin-bottom:12px">
     <div class="row" style="gap:10px;align-items:center;margin-bottom:10px;padding:10px 12px;background:var(--yf);border:1px solid var(--y);border-radius:8px">
       <span style="font-weight:700;font-size:13px;white-space:nowrap">💳 Рахунок-платник:</span>
-      <input type="text" id="payerIban" placeholder="UA + 27 цифр — ваш рахунок snEco у Приват24" style="flex:1;min-width:240px">
-      <span class="muted" style="font-size:11px;white-space:nowrap">звідки списуються кошти (1 раз, збережеться)</span>
+      <select id="payerSelect" style="flex:1;min-width:260px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:#fff"><option value="">Завантаження рахунків…</option></select>
+      <input type="text" id="payerIban" placeholder="UA + 27 цифр" style="flex:1;min-width:220px;display:none">
+      <span class="muted" style="font-size:11px;white-space:nowrap">залишки з Приват24</span>
     </div>
     <div class="row" style="justify-content:space-between">
       <div class="row" id="filters">
@@ -223,7 +224,7 @@ function toast(m,ms){const t=document.getElementById('toast');t.textContent=m;t.
 
 window.bootDashboard=async function(token,em){
   TOKEN=token;EMAIL=em||'';
-  try{localStorage.getItem;const pi=localStorage.getItem('snEco-payer-iban');if(pi)document.getElementById('payerIban').value=pi;}catch(e){}
+  loadAccounts();
   await loadInvoices();
 };
 
@@ -231,6 +232,32 @@ async function api(path,body){
   const r=await fetch(WORKER+path,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},body:JSON.stringify(body||{})});
   if(!r.ok){let j={};try{j=await r.json();}catch(e){}throw new Error(j.error||('HTTP '+r.status));}
   return r.json();
+}
+
+function getPayer(){
+  const sel=document.getElementById('payerSelect'), man=document.getElementById('payerIban');
+  if(sel && sel.style.display!=='none' && sel.value && sel.value!=='__manual__') return sel.value;
+  return (man.value||'').trim();
+}
+async function loadAccounts(){
+  const sel=document.getElementById('payerSelect'), man=document.getElementById('payerIban');
+  let saved='';try{saved=localStorage.getItem('snEco-payer-iban')||'';}catch(e){}
+  try{
+    const d=await api('/api/pay/accounts',{});
+    const accs=(d.accounts||[]).filter(a=>!a.currency||a.currency==='UAH');
+    if(!accs.length) throw new Error(d.error||'рахунки не підтяглися');
+    sel.innerHTML='<option value="">— оберіть рахунок —</option>'+accs.map(a=>{
+      const bal=a.balance!=null?(Number(String(a.balance).replace(/\s/g,''))||0):null;
+      const bs=bal!=null?bal.toLocaleString('uk-UA',{minimumFractionDigits:2,maximumFractionDigits:2})+' ₴':'';
+      return '<option value="'+a.iban+'">'+a.iban+(bs?' · '+bs:'')+(a.name?' · '+esc(a.name):'')+'</option>';
+    }).join('')+'<option value="__manual__">✍️ інший (вписати вручну)</option>';
+    if(saved && accs.some(a=>a.iban===saved)) sel.value=saved;
+    sel.onchange=()=>{man.style.display=sel.value==='__manual__'?'':'none';if(sel.value&&sel.value!=='__manual__'){try{localStorage.setItem('snEco-payer-iban',sel.value);}catch(e){}}};
+    man.style.display=sel.value==='__manual__'?'':'none';
+  }catch(e){
+    sel.style.display='none'; man.style.display=''; man.value=saved;
+    man.placeholder='UA + 27 цифр ('+((e&&e.message)||'рахунки недоступні')+')';
+  }
 }
 
 async function loadInvoices(){
@@ -303,8 +330,8 @@ document.getElementById('refreshBtn').onclick=async()=>{
 };
 document.getElementById('draftBtn').onclick=async()=>{
   const ids=selectedIds();if(!ids.length){toast('Виберіть рахунки.');return;}
-  const payer=document.getElementById('payerIban').value.trim();
-  if(!/^UA\d{27}$/.test(payer)){toast('Спершу вкажіть IBAN рахунку-платника (UA + 27 цифр) у жовтому полі зверху.');const pi=document.getElementById('payerIban');pi.style.borderColor='var(--red)';pi.focus();pi.scrollIntoView({behavior:'smooth',block:'center'});return;}
+  const payer=getPayer();
+  if(!/^UA\d{27}$/.test(payer)){toast('Спершу оберіть рахунок-платник у жовтому полі зверху.');const ps=document.getElementById('payerSelect');ps.style.borderColor='var(--red)';(ps.style.display==='none'?document.getElementById('payerIban'):ps).focus();ps.scrollIntoView({behavior:'smooth',block:'center'});return;}
   if(!confirm('Створити '+ids.length+' чернеток платежів у Приват24? Далі підпишете їх КЕП у Приват24.'))return;
   const btn=document.getElementById('draftBtn');btn.disabled=true;btn.textContent='Створюю…';
   try{
