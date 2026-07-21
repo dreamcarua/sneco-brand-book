@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>snEco — Платежі</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--y:#FEBF27;--g:#96C11F;--d:#1E1E1E;--bg:#F4F4EF;--card:#fff;--muted:#8a8a8a;--border:#E5E5DC;--red:#E84040;--blue:#3B82F6;
+--okf:#EAF7EA;--ambf:#FFF6E0;--redf:#FCE4E4;--okb:#96C11F;--ambb:#E0A800;--redb:#E84040}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--d);font-size:14px;min-height:100vh}
+.topbar{background:var(--d);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-box{width:32px;height:32px;background:var(--y);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:var(--d)}
+.logo-text{color:#fff;font-size:15px;font-weight:700}
+.logo-sub{color:rgba(255,255,255,.4);font-size:11px;margin-top:1px}
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-green{background:rgba(150,193,31,.2);color:var(--g);border:1px solid rgba(150,193,31,.3)}
+.wrap{padding:20px 24px;max-width:1500px;margin:0 auto}
+.sec{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:22px 0 12px;display:flex;align-items:center;gap:8px}
+.sec::after{content:'';flex:1;height:1px;background:var(--border)}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:960px){.g4{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){.g4{grid-template-columns:1fr}.wrap{padding:12px 10px}}
+.kpi{background:var(--card);border-radius:12px;padding:16px 18px;border:1px solid var(--border)}
+.kpi-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:6px}
+.kpi-val{font-size:26px;font-weight:800;line-height:1.1}
+.cc{background:var(--card);border-radius:12px;padding:18px 20px;border:1px solid var(--border)}
+.cc-title{font-size:14px;font-weight:700;margin-bottom:12px}
+.btn{padding:10px 16px;border:0;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-d{background:var(--d);color:#fff}.btn-d:hover{background:#000}
+.btn-y{background:var(--y);color:var(--d)}.btn-y:hover{filter:brightness(.96)}
+.btn-o{background:#fff;color:var(--d);border:1px solid var(--border)}.btn-o:hover{background:#f7f7f2}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.chip{padding:6px 12px;border-radius:16px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--muted)}
+.chip.active{background:var(--d);color:#fff;border-color:var(--d)}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;padding:9px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:2px solid var(--border);position:sticky;top:56px;background:var(--bg);z-index:5}
+td{padding:8px;border-bottom:1px solid var(--border);vertical-align:top}
+tr.sev-ok td:first-child{box-shadow:inset 3px 0 0 var(--okb)}
+tr.sev-amber td:first-child{box-shadow:inset 3px 0 0 var(--ambb)}
+tr.sev-red td:first-child{box-shadow:inset 3px 0 0 var(--redb)}
+tr.sev-amber{background:var(--ambf)}tr.sev-red{background:var(--redf)}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.iban{font-family:'SF Mono',Menlo,Consolas,monospace;font-size:11px}
+.sbadge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+.sb-ok{background:var(--okf);color:#4a7d0a}.sb-amber{background:var(--ambf);color:#8a6d00}.sb-red{background:var(--redf);color:#a11}
+.flags{font-size:11px;color:#a11;max-width:190px}
+.tablewrap{background:var(--card);border-radius:12px;border:1px solid var(--border);overflow:auto;max-height:70vh}
+.muted{color:var(--muted)}
+.upload-box{border:2px dashed var(--border);border-radius:12px;padding:22px;text-align:center;background:#fff}
+.note{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
+input[type=text]{padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none}
+input[type=text]:focus{border-color:var(--y)}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--d);color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;z-index:9998;opacity:0;transition:opacity .2s;max-width:90vw}
+#toast.show{opacity:1}
+/* OTP gate */
+#dashauth-overlay{position:fixed;inset:0;background:#1E1E1E;z-index:9999;display:flex;align-items:center;justify-content:center}
+#dashauth-overlay.is-hidden{display:none}
+.dashauth-card{background:#fff;width:100%;max-width:440px;border-radius:14px;padding:36px 30px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.dashauth-logo{font-size:24px;font-weight:900;color:#FEBF27;margin-bottom:6px;text-align:center}
+.dashauth-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#888;text-align:center;margin-bottom:24px}
+.dashauth-icon{font-size:36px;text-align:center;margin-bottom:16px}
+.dashauth-h1{font-size:18px;font-weight:800;text-align:center;margin-bottom:6px}
+.dashauth-desc{font-size:13px;color:#666;text-align:center;line-height:1.55;margin-bottom:20px}
+.dashauth-input{width:100%;padding:12px 14px;border:2px solid #E5E5DC;border-radius:8px;font-size:14px;font-family:inherit;outline:none}
+.dashauth-input:focus{border-color:#FEBF27}
+.dashauth-input.code{font-family:monospace;letter-spacing:.4em;text-align:center;font-size:18px}
+.dashauth-btn{width:100%;padding:13px;background:#1E1E1E;color:#fff;border:0;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;margin-top:14px;font-family:inherit}
+.dashauth-btn:hover{background:#000}.dashauth-btn:disabled{opacity:.5}
+.dashauth-msg{font-size:12.5px;line-height:1.5;margin-top:12px;text-align:center;min-height:18px}
+.dashauth-msg.is-error{color:#DC2626}.dashauth-msg a{color:#FEBF27;font-weight:600}
+.dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
+.dashauth-session{position:fixed;top:8px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-weight:600;display:flex;gap:8px}
+.dashauth-session button{background:none;border:0;color:#96C11F;cursor:pointer;font-size:14px}
+body.dash-locked{overflow:hidden}
+</style>
+</head>
+<body class="dash-locked">
+
+<!-- ===== OTP GATE (pattern v2.51+) ===== -->
+<div id="dashauth-overlay"><div class="dashauth-card">
+  <div class="dashauth-logo">snEco</div>
+  <div class="dashauth-sub">Платежі · Confidential</div>
+  <div id="dashauth-stage"></div>
+</div></div>
+<script>
+(function(){
+  const WORKER='https://sneco-auth.vg-ab6.workers.dev';
+  const BLOCK='payments-dashboard';
+  const STORAGE_KEY='snEco-jwt-'+BLOCK;
+  const overlay=document.getElementById('dashauth-overlay');
+  const stage=document.getElementById('dashauth-stage');
+  let email='';
+  function unlock(token,em,exp){
+    try{localStorage.setItem(STORAGE_KEY,JSON.stringify({token,email:em,exp}));}catch(e){}
+    document.body.classList.remove('dash-locked');overlay.classList.add('is-hidden');
+    const b=document.createElement('div');b.className='dashauth-session';
+    const mins=Math.max(0,Math.floor((exp*1000-Date.now())/60000));
+    b.innerHTML='✓ '+em+' · '+mins+' min <button title="Lock">🔒</button>';
+    b.querySelector('button').onclick=()=>{localStorage.removeItem(STORAGE_KEY);location.reload();};
+    document.body.appendChild(b);
+    if(typeof window.bootDashboard==='function')window.bootDashboard(token,em);
+  }
+  async function verifyExisting(){
+    let s;try{s=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');}catch(e){}
+    if(!s||!s.token||!s.exp||s.exp*1000<Date.now())return null;
+    try{const r=await fetch(WORKER+'/api/session/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:s.token,block:BLOCK})});const j=await r.json();return j.ok?s:null;}catch(e){return null;}
+  }
+  function renderEmail(){
+    stage.innerHTML=`<div class="dashauth-icon">💳</div><div class="dashauth-h1">Введіть email</div>
+      <div class="dashauth-desc">Якщо ваш email у whitelist — надійде 6-значний код. Сесія 1 год.</div>
+      <input class="dashauth-input" type="email" id="auth-em" placeholder="ім'я@sneco.ua" autofocus>
+      <button class="dashauth-btn" id="auth-send">Надіслати код</button>
+      <div class="dashauth-msg" id="auth-msg"></div><a href="../" class="dashauth-back">← Brand Bible</a>`;
+    const em=document.getElementById('auth-em'),send=document.getElementById('auth-send'),msg=document.getElementById('auth-msg');
+    em.addEventListener('keydown',e=>{if(e.key==='Enter')send.click();});
+    send.onclick=async()=>{const v=em.value.trim();
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){msg.textContent='Введіть правильний email.';msg.className='dashauth-msg is-error';return;}
+      send.disabled=true;send.textContent='Надсилаємо...';msg.textContent='';
+      try{const r=await fetch(WORKER+'/api/otp/request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:v,block:BLOCK})});
+        if(!r.ok){const j=await r.json().catch(()=>({}));msg.innerHTML=j.error==='not_in_whitelist'?`❌ Email не у whitelist. <a href="mailto:vg@sneco.ua?subject=Платежі%20whitelist">✉ Запит</a>`:'Помилка: '+(j.error||r.status);msg.className='dashauth-msg is-error';send.disabled=false;send.textContent='Надіслати код';return;}
+        email=v;renderCode();
+      }catch(e){msg.textContent='Помилка мережі: '+e.message;msg.className='dashauth-msg is-error';send.disabled=false;send.textContent='Надіслати код';}};
+  }
+  function renderCode(){
+    stage.innerHTML=`<div class="dashauth-icon">🔢</div><div class="dashauth-h1">Введіть код з листа</div>
+      <div class="dashauth-desc">${email}<br>Перевірте пошту (і спам).</div>
+      <input class="dashauth-input code" type="text" id="auth-code" inputmode="numeric" maxlength="6" placeholder="••••••" autofocus>
+      <button class="dashauth-btn" id="auth-verify">Підтвердити</button>
+      <div class="dashauth-msg" id="auth-msg"></div><a href="#" class="dashauth-back" id="auth-back">← Інший email</a>`;
+    const code=document.getElementById('auth-code'),verify=document.getElementById('auth-verify'),msg=document.getElementById('auth-msg');
+    code.addEventListener('keydown',e=>{if(e.key==='Enter')verify.click();});
+    document.getElementById('auth-back').onclick=e=>{e.preventDefault();renderEmail();};
+    verify.onclick=async()=>{const c=code.value.trim();
+      if(!/^\d{6}$/.test(c)){msg.textContent='Код — 6 цифр.';msg.className='dashauth-msg is-error';return;}
+      verify.disabled=true;verify.textContent='Перевіряємо...';
+      try{const r=await fetch(WORKER+'/api/otp/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,block:BLOCK,code:c})});
+        const j=await r.json();if(!r.ok){msg.textContent='Невірний або застарілий код.';msg.className='dashauth-msg is-error';verify.disabled=false;verify.textContent='Підтвердити';return;}
+        unlock(j.token,j.email,j.exp);
+      }catch(e){msg.textContent='Помилка: '+e.message;msg.className='dashauth-msg is-error';verify.disabled=false;verify.textContent='Підтвердити';}};
+  }
+  (async()=>{const s=await verifyExisting();if(s){unlock(s.token,s.email,s.exp);return;}renderEmail();})();
+})();
+</script>
+<!-- ===== END OTP GATE ===== -->
+
+<div class="topbar">
+  <div class="logo"><div class="logo-box">sn</div><div>
+    <div class="logo-text">snEco · Платежі</div>
+    <div class="logo-sub">Рахунки на оплату → Приват24 · ТОВ «ПРАЙМ СНЕК»</div>
+  </div></div>
+  <div><span class="badge badge-green" id="cntBadge">—</span></div>
+</div>
+
+<div class="wrap">
+  <!-- Upload -->
+  <div class="sec">📥 Завантаження архіву</div>
+  <div class="upload-box">
+    <input type="file" id="zipInput" accept=".zip">
+    <button class="btn btn-y" id="upBtn" style="margin-left:8px">Завантажити та розпізнати</button>
+    <div class="note">ZIP з рахунками (pdf / скан / doc / xls / фото). Розпізнавання ~1-2 хв, потім оновіть таблицю нижче.
+      Якщо кнопка неактивна — endpoint завантаження ще деплоїться (Фаза 2.5); поки що архів обробляється через GitHub Action (тека <code>inbox/</code>).</div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="sec">📊 Огляд</div>
+  <div class="g4">
+    <div class="kpi"><div class="kpi-lbl">Рахунків</div><div class="kpi-val" id="kInv">—</div></div>
+    <div class="kpi"><div class="kpi-lbl">Сума до оплати</div><div class="kpi-val" id="kSum">—</div></div>
+    <div class="kpi"><div class="kpi-lbl">🟩 Готові</div><div class="kpi-val" id="kOk" style="color:var(--g)">—</div></div>
+    <div class="kpi"><div class="kpi-lbl">🟨 Звірити / 🟥 Ручні</div><div class="kpi-val" id="kFlag" style="color:var(--ambb)">—</div></div>
+  </div>
+
+  <!-- Controls -->
+  <div class="sec">🧾 Рахунки до оплати</div>
+  <div class="cc" style="margin-bottom:12px">
+    <div class="row" style="justify-content:space-between">
+      <div class="row" id="filters">
+        <span class="chip active" data-f="all">Всі</span>
+        <span class="chip" data-f="ok">🟩 Готові</span>
+        <span class="chip" data-f="amber">🟨 Звірити</span>
+        <span class="chip" data-f="red">🟥 Ручні</span>
+      </div>
+      <div class="row">
+        <input type="text" id="payerIban" placeholder="IBAN рахунку-платника (звідки платимо)" style="width:320px">
+        <button class="btn btn-o" id="csvBtn">⬇ CSV</button>
+        <button class="btn btn-d" id="draftBtn">Створити чернетки (0)</button>
+      </div>
+    </div>
+    <div class="note">Виберіть рахунки галочками → «Створити чернетки» → платіжки зʼявляться у Приват24 на підпис КЕП. Гроші не йдуть без вашого підпису.</div>
+  </div>
+
+  <div class="tablewrap">
+    <table>
+      <thead><tr>
+        <th><input type="checkbox" id="selAll"></th>
+        <th>Отримувач</th><th>ЄДРПОУ</th><th>IBAN</th><th>№</th><th>Дата</th>
+        <th class="num">Сума, ₴</th><th class="num">ПДВ, ₴</th><th>Призначення платежу</th><th>⚠</th>
+      </tr></thead>
+      <tbody id="tbody"><tr><td colspan="10" class="muted" style="text-align:center;padding:30px">Завантаження…</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const WORKER='https://sneco-auth.vg-ab6.workers.dev';
+let ROWS=[], FILTER='all', TOKEN='', EMAIL='';
+const kop=v=>v==null?0:v/100;
+const fmt=v=>kop(v).toLocaleString('uk-UA',{minimumFractionDigits:2,maximumFractionDigits:2});
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);}
+
+window.bootDashboard=async function(token,em){
+  TOKEN=token;EMAIL=em||'';
+  try{localStorage.getItem;const pi=localStorage.getItem('snEco-payer-iban');if(pi)document.getElementById('payerIban').value=pi;}catch(e){}
+  await loadInvoices();
+};
+
+async function api(path,body){
+  const r=await fetch(WORKER+path,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},body:JSON.stringify(body||{})});
+  if(!r.ok){let j={};try{j=await r.json();}catch(e){}throw new Error(j.error||('HTTP '+r.status));}
+  return r.json();
+}
+
+async function loadInvoices(){
+  try{
+    const d=await api('/api/dashboard/data',{type:'pmt_invoices',limit:5000});
+    ROWS=(d.rows||d.data||[]).sort((a,b)=>({red:0,amber:1,ok:2}[a.severity]-({red:0,amber:1,ok:2}[b.severity])) || (a.recipient||'').localeCompare(b.recipient||''));
+    renderKpis();render();
+  }catch(e){
+    document.getElementById('tbody').innerHTML=`<tr><td colspan="10" class="muted" style="text-align:center;padding:30px">Немає даних або помилка: ${e.message}.<br>Дані зʼявляться після розбору першого архіву.</td></tr>`;
+    document.getElementById('cntBadge').textContent='0 рахунків';
+  }
+}
+function renderKpis(){
+  const sum=ROWS.reduce((s,r)=>s+(r.amount_kop||0),0);
+  const ok=ROWS.filter(r=>r.severity==='ok').length;
+  const flag=ROWS.filter(r=>r.severity!=='ok').length;
+  document.getElementById('kInv').textContent=ROWS.length;
+  document.getElementById('kSum').textContent=fmt(sum)+' ₴';
+  document.getElementById('kOk').textContent=ok;
+  document.getElementById('kFlag').textContent=flag;
+  document.getElementById('cntBadge').textContent=ROWS.length+' рахунків · '+fmt(sum)+' ₴';
+}
+function render(){
+  const rows=ROWS.filter(r=>FILTER==='all'||r.severity===FILTER);
+  const tb=document.getElementById('tbody');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="10" class="muted" style="text-align:center;padding:30px">Немає рахунків у цьому фільтрі.</td></tr>';updateDraftBtn();return;}
+  tb.innerHTML=rows.map(r=>{
+    const sb=r.severity==='ok'?'sb-ok':r.severity==='amber'?'sb-amber':'sb-red';
+    const sl=r.severity==='ok'?'OK':r.severity==='amber'?'звірити':'ручна';
+    return `<tr class="sev-${r.severity}" data-id="${r.id}">
+      <td><input type="checkbox" class="rowchk" data-id="${r.id}" ${r.severity==='red'?'disabled title="ручна обробка"':''}></td>
+      <td>${esc(r.recipient)||'—'}<br><span class="sbadge ${sb}">${sl}</span></td>
+      <td>${esc(r.edrpou)||'—'}</td>
+      <td class="iban">${r.iban?esc(r.iban)+(r.iban_valid?' ✓':' ⚠'):'—'}</td>
+      <td>${esc(r.invoice_no)||'—'}</td><td>${esc(r.invoice_date)||'—'}</td>
+      <td class="num">${fmt(r.amount_kop)}</td><td class="num">${fmt(r.vat_kop)}</td>
+      <td style="max-width:340px">${esc(r.purpose)||'—'}</td>
+      <td class="flags">${esc(r.flags)||''}</td>
+    </tr>`;}).join('');
+  tb.querySelectorAll('.rowchk').forEach(c=>c.onchange=updateDraftBtn);
+  updateDraftBtn();
+}
+function esc(s){return s==null?'':String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+function selectedIds(){return [...document.querySelectorAll('.rowchk:checked')].map(c=>c.dataset.id);}
+function updateDraftBtn(){document.getElementById('draftBtn').textContent='Створити чернетки ('+selectedIds().length+')';}
+
+document.getElementById('filters').onclick=e=>{if(!e.target.dataset.f)return;FILTER=e.target.dataset.f;
+  document.querySelectorAll('#filters .chip').forEach(c=>c.classList.toggle('active',c===e.target));render();};
+document.getElementById('selAll').onchange=e=>{document.querySelectorAll('.rowchk:not(:disabled)').forEach(c=>c.checked=e.target.checked);updateDraftBtn();};
+document.getElementById('payerIban').onchange=e=>{try{localStorage.setItem('snEco-payer-iban',e.target.value.trim());}catch(x){}};
+
+document.getElementById('csvBtn').onclick=()=>{
+  const head=['Отримувач','ЄДРПОУ','IBAN','№','Дата','Сума','ПДВ','Призначення','Прапорці'];
+  const lines=[head.join(';')].concat(ROWS.map(r=>[r.recipient,r.edrpou,r.iban,r.invoice_no,r.invoice_date,kop(r.amount_kop).toFixed(2),kop(r.vat_kop).toFixed(2),r.purpose,r.flags].map(v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"').join(';')));
+  const blob=new Blob(['﻿'+lines.join('\n')],{type:'text/csv'});const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='sneco_platezhi.csv';a.click();
+};
+
+document.getElementById('draftBtn').onclick=async()=>{
+  const ids=selectedIds();if(!ids.length){toast('Виберіть рахунки.');return;}
+  const payer=document.getElementById('payerIban').value.trim();
+  if(!/^UA\d{27}$/.test(payer)){toast('Вкажіть коректний IBAN рахунку-платника (UA + 27 цифр).');return;}
+  if(!confirm('Створити '+ids.length+' чернеток платежів у Приват24? Далі підпишете їх КЕП у Приват24.'))return;
+  const btn=document.getElementById('draftBtn');btn.disabled=true;btn.textContent='Створюю…';
+  try{
+    const res=await api('/api/pay/create-drafts',{ids,payer_account:payer});
+    const ok=(res.results||[]).filter(x=>x.ok).length, err=(res.results||[]).filter(x=>!x.ok).length;
+    toast('Створено чернеток: '+ok+(err?(' · помилок: '+err):'')+'. Підпишіть у Приват24.');
+    await loadInvoices();
+  }catch(e){toast('Помилка: '+e.message+' (endpoint Фази 3 ще не задеплоєно?)');}
+  btn.disabled=false;updateDraftBtn();
+};
+
+document.getElementById('upBtn').onclick=async()=>{
+  const f=document.getElementById('zipInput').files[0];if(!f){toast('Оберіть ZIP.');return;}
+  const btn=document.getElementById('upBtn');btn.disabled=true;btn.textContent='Завантаження…';
+  try{
+    const r=await fetch(WORKER+'/api/pay/upload',{method:'POST',headers:{'Authorization':'Bearer '+TOKEN,'X-Filename':encodeURIComponent(f.name)},body:f});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    toast('Архів завантажено. Розбір запущено — оновіть таблицю за 1-2 хв.');
+  }catch(e){toast('Завантаження недоступне (Фаза 2.5): '+e.message);}
+  btn.disabled=false;btn.textContent='Завантажити та розпізнати';
+};
+</script>
+</body>
+</html>
