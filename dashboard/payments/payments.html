@@ -162,10 +162,9 @@ body.dash-locked{overflow:hidden}
   <!-- Upload -->
   <div class="sec">📥 Завантаження архіву</div>
   <div class="upload-box">
-    <input type="file" id="zipInput" accept=".zip">
+    <input type="file" id="zipInput" multiple>
     <button class="btn btn-y" id="upBtn" style="margin-left:8px">Завантажити та розпізнати</button>
-    <div class="note">ZIP з рахунками (pdf / скан / doc / xls / фото). Розпізнавання ~1-2 хв, потім оновіть таблицю нижче.
-      Якщо кнопка неактивна — endpoint завантаження ще деплоїться (Фаза 2.5); поки що архів обробляється через GitHub Action (тека <code>inbox/</code>).</div>
+    <div class="note">Будь-які файли або архіви одразу: pdf, скани, фото (в т.ч. HEIC), doc/docx/rtf/odt, xls/xlsx/ods, csv/txt, zip/rar/7z. Система сама розпізнає реквізити. Розпізнавання ~1-2 хв.</div>
   </div>
 
   <!-- KPIs -->
@@ -190,6 +189,7 @@ body.dash-locked{overflow:hidden}
       <div class="row">
         <input type="text" id="payerIban" placeholder="IBAN рахунку-платника (звідки платимо)" style="width:320px">
         <button class="btn btn-o" id="csvBtn">⬇ CSV</button>
+        <button class="btn btn-o" id="refreshBtn">↻ Статуси</button>
         <button class="btn btn-d" id="draftBtn">Створити чернетки (0)</button>
       </div>
     </div>
@@ -201,9 +201,9 @@ body.dash-locked{overflow:hidden}
       <thead><tr>
         <th><input type="checkbox" id="selAll"></th>
         <th>Отримувач</th><th>ЄДРПОУ</th><th>IBAN</th><th>№</th><th>Дата</th>
-        <th class="num">Сума, ₴</th><th class="num">ПДВ, ₴</th><th>Призначення платежу</th><th>⚠</th>
+        <th class="num">Сума, ₴</th><th class="num">ПДВ, ₴</th><th>Статус</th><th>Призначення платежу</th><th>⚠</th>
       </tr></thead>
-      <tbody id="tbody"><tr><td colspan="10" class="muted" style="text-align:center;padding:30px">Завантаження…</td></tr></tbody>
+      <tbody id="tbody"><tr><td colspan="11" class="muted" style="text-align:center;padding:30px">Завантаження…</td></tr></tbody>
     </table>
   </div>
 </div>
@@ -231,11 +231,11 @@ async function api(path,body){
 
 async function loadInvoices(){
   try{
-    const d=await api('/api/dashboard/data',{type:'pmt_invoices',limit:5000});
+    const d=await api('/api/pay/list',{});
     ROWS=(d.rows||d.data||[]).sort((a,b)=>({red:0,amber:1,ok:2}[a.severity]-({red:0,amber:1,ok:2}[b.severity])) || (a.recipient||'').localeCompare(b.recipient||''));
     renderKpis();render();
   }catch(e){
-    document.getElementById('tbody').innerHTML=`<tr><td colspan="10" class="muted" style="text-align:center;padding:30px">Немає даних або помилка: ${e.message}.<br>Дані зʼявляться після розбору першого архіву.</td></tr>`;
+    document.getElementById('tbody').innerHTML=`<tr><td colspan="11" class="muted" style="text-align:center;padding:30px">Немає даних або помилка: ${e.message}.<br>Дані зʼявляться після розбору першого архіву.</td></tr>`;
     document.getElementById('cntBadge').textContent='0 рахунків';
   }
 }
@@ -252,7 +252,7 @@ function renderKpis(){
 function render(){
   const rows=ROWS.filter(r=>FILTER==='all'||r.severity===FILTER);
   const tb=document.getElementById('tbody');
-  if(!rows.length){tb.innerHTML='<tr><td colspan="10" class="muted" style="text-align:center;padding:30px">Немає рахунків у цьому фільтрі.</td></tr>';updateDraftBtn();return;}
+  if(!rows.length){tb.innerHTML='<tr><td colspan="11" class="muted" style="text-align:center;padding:30px">Немає рахунків у цьому фільтрі.</td></tr>';updateDraftBtn();return;}
   tb.innerHTML=rows.map(r=>{
     const sb=r.severity==='ok'?'sb-ok':r.severity==='amber'?'sb-amber':'sb-red';
     const sl=r.severity==='ok'?'OK':r.severity==='amber'?'звірити':'ручна';
@@ -263,6 +263,7 @@ function render(){
       <td class="iban">${r.iban?esc(r.iban)+(r.iban_valid?' ✓':' ⚠'):'—'}</td>
       <td>${esc(r.invoice_no)||'—'}</td><td>${esc(r.invoice_date)||'—'}</td>
       <td class="num">${fmt(r.amount_kop)}</td><td class="num">${fmt(r.vat_kop)}</td>
+      <td>${statusBadge(r.status)}</td>
       <td style="max-width:340px">${esc(r.purpose)||'—'}</td>
       <td class="flags">${esc(r.flags)||''}</td>
     </tr>`;}).join('');
@@ -270,6 +271,11 @@ function render(){
   updateDraftBtn();
 }
 function esc(s){return s==null?'':String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+function statusBadge(s){
+  const M={'new':['Новий','#efefe9','#666'],'approved':['Готово','#EAF7EA','#4a7d0a'],'draft_created':['Очікує розгляду','#FFF6E0','#8a6d00'],'signed':['Підписано','#EAF7EA','#2f7d0a'],'rejected':['Відхилено','#FCE4E4','#a11'],'paid':['Оплачено','#EAF7EA','#2f7d0a'],'skipped':['Пропущено','#efefe9','#888']};
+  const m=M[s]||M['new'];
+  return `<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap;background:${m[1]};color:${m[2]}">${m[0]}</span>`;
+}
 function selectedIds(){return [...document.querySelectorAll('.rowchk:checked')].map(c=>c.dataset.id);}
 function updateDraftBtn(){document.getElementById('draftBtn').textContent='Створити чернетки ('+selectedIds().length+')';}
 
@@ -285,6 +291,12 @@ document.getElementById('csvBtn').onclick=()=>{
   a.href=URL.createObjectURL(blob);a.download='sneco_platezhi.csv';a.click();
 };
 
+document.getElementById('refreshBtn').onclick=async()=>{
+  const b=document.getElementById('refreshBtn');b.disabled=true;b.textContent='↻…';
+  try{const res=await api('/api/pay/refresh-status',{});toast('Статуси оновлено ('+(res.updated||0)+' платіжок).');await loadInvoices();}
+  catch(e){toast('Помилка оновлення статусів: '+e.message);}
+  b.disabled=false;b.textContent='↻ Статуси';
+};
 document.getElementById('draftBtn').onclick=async()=>{
   const ids=selectedIds();if(!ids.length){toast('Виберіть рахунки.');return;}
   const payer=document.getElementById('payerIban').value.trim();
