@@ -78,6 +78,7 @@ body.dash-locked{overflow:hidden}
 </style>
 </head>
 <body class="dash-locked">
+<script src="../auth-google.js"></script>
 
 <!-- ===== OTP GATE (pattern v2.51+) ===== -->
 <div id="dashauth-overlay"><div class="dashauth-card">
@@ -109,11 +110,14 @@ body.dash-locked{overflow:hidden}
     try{const r=await fetch(WORKER+'/api/session/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:s.token,block:BLOCK})});const j=await r.json();return j.ok?s:null;}catch(e){return null;}
   }
   function renderEmail(){
-    stage.innerHTML=`<div class="dashauth-icon">💳</div><div class="dashauth-h1">Введіть email</div>
-      <div class="dashauth-desc">Якщо ваш email у whitelist — надійде 6-значний код. Сесія 1 год.</div>
+    stage.innerHTML=`<div class="dashauth-icon">💳</div><div class="dashauth-h1">Вхід у «Платежі»</div>
+      <div class="dashauth-desc">Google (швидко) або email-код. Доступ лише whitelist. Сесія 30 днів.</div>
+      <div id="google-signin-btn" style="display:flex;justify-content:center;margin:18px 0 8px"></div>
+      <div style="font-size:11px;color:#777;text-align:center;margin:8px 0 4px">— або через email-код —</div>
       <input class="dashauth-input" type="email" id="auth-em" placeholder="ім'я@sneco.ua" autofocus>
       <button class="dashauth-btn" id="auth-send">Надіслати код</button>
       <div class="dashauth-msg" id="auth-msg"></div><a href="../" class="dashauth-back">← Brand Bible</a>`;
+    if(window.SnecoAuth){window.SnecoAuth.signInWithGoogle(BLOCK,document.getElementById('google-signin-btn'),j=>unlock(j.token,j.email,j.exp),err=>{const m=document.getElementById('auth-msg');if(m){m.textContent=err;m.className='dashauth-msg is-error';}});}
     const em=document.getElementById('auth-em'),send=document.getElementById('auth-send'),msg=document.getElementById('auth-msg');
     em.addEventListener('keydown',e=>{if(e.key==='Enter')send.click();});
     send.onclick=async()=>{const v=em.value.trim();
