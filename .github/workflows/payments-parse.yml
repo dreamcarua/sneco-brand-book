@@ -1,0 +1,70 @@
+# snEco · payments — розбір архіву рахунків на оплату → D1 (pmt_invoices)
+# Trigger: ручний (workflow_dispatch) з шляхом до архіву в inbox,
+#          або будь-який push нового архіву у dashboard/payments/inbox/*.zip.
+# Далі (Фаза 2.5) додамо trigger із Worker R2 після завантаження у дашборді.
+
+name: payments-parse
+
+on:
+  workflow_dispatch:
+    inputs:
+      zip_path:
+        description: 'Шлях до архіву в репо (напр. dashboard/payments/inbox/2026-05.zip)'
+        required: false
+        default: ''
+      batch_id:
+        description: 'ID партії (напр. 2026-05)'
+        required: false
+        default: 'manual'
+      use_claude:
+        description: 'Уточнювати складні рахунки через Claude (потрібен ANTHROPIC_API_KEY)'
+        type: boolean
+        default: false
+  push:
+    paths:
+      - 'dashboard/payments/inbox/**.zip'
+
+jobs:
+  parse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: System deps (poppler + tesseract ukr/rus)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils tesseract-ocr tesseract-ocr-ukr tesseract-ocr-rus
+
+      - name: Python deps
+        run: |
+          pip install --upgrade pip
+          pip install python-docx openpyxl
+
+      - name: Resolve archive
+        id: pick
+        run: |
+          ZIP="${{ github.event.inputs.zip_path }}"
+          if [ -z "$ZIP" ]; then
+            ZIP=$(ls -t dashboard/payments/inbox/*.zip 2>/dev/null | head -1)
+          fi
+          echo "zip=$ZIP" >> "$GITHUB_OUTPUT"
+          echo "Обрано архів: $ZIP"
+
+      - name: Parse + ingest
+        env:
+          WORKER_URL:        https://sneco-auth.vg-ab6.workers.dev
+          SYNC_API_KEY:      ${{ secrets.SYNC_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          cd dashboard/payments
+          Z="../../${{ steps.pick.outputs.zip }}"
+          [ -f "$Z" ] || { echo "::error::Архів не знайдено: $Z"; exit 1; }
+          FLAGS=""
+          [ "${{ github.event.inputs.use_claude }}" = "true" ] && FLAGS="--claude"
+          python parse.py --zip "$Z" --batch-id "${{ github.event.inputs.batch_id }}" \
+            --uploaded-by "gh-actions" --out out.json --ingest $FLAGS
+
+      - name: Notify on failure
+        if: failure()
+        run: echo "::error::payments-parse failed at $(date -u +%H:%M)"
