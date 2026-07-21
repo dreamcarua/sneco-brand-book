@@ -155,7 +155,7 @@ body.dash-locked{overflow:hidden}
     <div class="logo-text">snEco · Платежі</div>
     <div class="logo-sub">Рахунки на оплату → Приват24 · ТОВ «ПРАЙМ СНЕК»</div>
   </div></div>
-  <div><span class="badge badge-green" id="cntBadge">—</span></div>
+  <div style="margin-right:230px"><span class="badge badge-green" id="cntBadge">—</span></div>
 </div>
 
 <div class="wrap">
@@ -245,7 +245,7 @@ async function loadAccounts(){
   try{
     const d=await api('/api/pay/accounts',{});
     const accs=(d.accounts||[]).filter(a=>!a.currency||a.currency==='UAH');
-    if(!accs.length) throw new Error(d.error||'рахунки не підтяглися');
+    if(!accs.length) throw new Error('ПБ '+(d.pb_status||'')+': '+String(d.pb_snippet||d.error||'порожньо').slice(0,90));
     sel.innerHTML='<option value="">— оберіть рахунок —</option>'+accs.map(a=>{
       const bal=a.balance!=null?(Number(String(a.balance).replace(/\s/g,''))||0):null;
       const bs=bal!=null?bal.toLocaleString('uk-UA',{minimumFractionDigits:2,maximumFractionDigits:2})+' ₴':'';
