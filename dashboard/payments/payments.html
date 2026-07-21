@@ -313,13 +313,15 @@ document.getElementById('draftBtn').onclick=async()=>{
 };
 
 document.getElementById('upBtn').onclick=async()=>{
-  const f=document.getElementById('zipInput').files[0];if(!f){toast('Оберіть ZIP.');return;}
+  const fs=document.getElementById('zipInput').files;if(!fs.length){toast('Оберіть файли.');return;}
   const btn=document.getElementById('upBtn');btn.disabled=true;btn.textContent='Завантаження…';
   try{
-    const r=await fetch(WORKER+'/api/pay/upload',{method:'POST',headers:{'Authorization':'Bearer '+TOKEN,'X-Filename':encodeURIComponent(f.name)},body:f});
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    toast('Архів завантажено. Розбір запущено — оновіть таблицю за 1-2 хв.');
-  }catch(e){toast('Завантаження недоступне (Фаза 2.5): '+e.message);}
+    const fd=new FormData();for(const f of fs)fd.append('files',f,f.name);
+    const r=await fetch(WORKER+'/api/pay/upload',{method:'POST',headers:{'Authorization':'Bearer '+TOKEN},body:fd});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error(j.error||('HTTP '+r.status));
+    toast('Завантажено файлів: '+(j.files||fs.length)+'. Розпізнавання ~2-10 хв, далі натисніть «↻ Статуси» або оновіть сторінку.');
+  }catch(e){toast('Помилка завантаження: '+e.message);}
   btn.disabled=false;btn.textContent='Завантажити та розпізнати';
 };
 </script>
