@@ -194,7 +194,7 @@ body.dash-locked{overflow:hidden}
       </div>
       <div class="row">
         <button class="btn btn-o" id="csvBtn">⬇ CSV</button>
-        <button class="btn btn-o" id="refreshBtn">↻ Статуси</button>
+        <button class="btn btn-o" id="refreshBtn">↻ Синхронізувати з Приват24</button>
         <button class="btn btn-d" id="draftBtn">Створити чернетки (0)</button>
         <button class="btn btn-o" id="delBtn" style="border-color:#d33;color:#c00">🗑 Видалити (0)</button>
       </div>
@@ -306,7 +306,7 @@ function render(){
 }
 function esc(s){return s==null?'':String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
 function statusBadge(s){
-  const M={'new':['Новий','#efefe9','#666'],'approved':['Готово','#EAF7EA','#4a7d0a'],'draft_created':['Очікує розгляду','#FFF6E0','#8a6d00'],'signed':['Підписано','#EAF7EA','#2f7d0a'],'rejected':['Відхилено','#FCE4E4','#a11'],'paid':['Оплачено','#EAF7EA','#2f7d0a'],'skipped':['Пропущено','#efefe9','#888']};
+  const M={'new':['Новий','#efefe9','#666'],'approved':['Готово','#EAF7EA','#4a7d0a'],'draft_created':['Чернетка','#FFF6E0','#8a6d00'],'signed':['Підписано','#EAF7EA','#2f7d0a'],'rejected':['Відхилено','#FCE4E4','#a11'],'paid':['Оплачено','#EAF7EA','#2f7d0a'],'skipped':['Пропущено','#efefe9','#888']};
   const m=M[s]||M['new'];
   return `<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap;background:${m[1]};color:${m[2]}">${m[0]}</span>`;
 }
@@ -326,10 +326,14 @@ document.getElementById('csvBtn').onclick=()=>{
 };
 
 document.getElementById('refreshBtn').onclick=async()=>{
-  const b=document.getElementById('refreshBtn');b.disabled=true;b.textContent='↻…';
-  try{const res=await api('/api/pay/refresh-status',{});toast('Статуси оновлено ('+(res.updated||0)+' платіжок).');await loadInvoices();}
-  catch(e){toast('Помилка оновлення статусів: '+e.message);}
-  b.disabled=false;b.textContent='↻ Статуси';
+  const b=document.getElementById('refreshBtn');b.disabled=true;b.textContent='↻ Синхронізую…';
+  try{
+    const res=await api('/api/pay/sync',{});const s=res.summary||{};
+    toast('Синхронізовано з Приват24 → чернеток: '+(s.draft||0)+', підписаних: '+(s.signed||0)+', оплачених: '+(s.paid||0)+(s.deleted?(', видалених у ПБ: '+s.deleted):''),7000);
+    await loadInvoices();
+  }
+  catch(e){toast('Помилка синхронізації: '+e.message);}
+  b.disabled=false;b.textContent='↻ Синхронізувати з Приват24';
 };
 document.getElementById('draftBtn').onclick=async()=>{
   const ids=selectedIds();if(!ids.length){toast('Виберіть рахунки.');return;}
@@ -339,8 +343,10 @@ document.getElementById('draftBtn').onclick=async()=>{
   const btn=document.getElementById('draftBtn');btn.disabled=true;btn.textContent='Створюю…';
   try{
     const res=await api('/api/pay/create-drafts',{ids,payer_account:payer});
-    const okR=(res.results||[]).filter(x=>x.ok), errR=(res.results||[]).filter(x=>!x.ok);
-    toast('Чернеток створено: '+okR.length+(errR.length?(' · помилок: '+errR.length+' — '+(errR[0].error||'')):'')+(okR.length?'. Підпишіть у Приват24.':''), errR.length?7000:3200);
+    const okR=(res.results||[]).filter(x=>x.ok);
+    const skip=(res.results||[]).filter(x=>!x.ok && /вже/.test(x.error||''));
+    const errR=(res.results||[]).filter(x=>!x.ok && !/вже/.test(x.error||''));
+    toast('Створено: '+okR.length+(skip.length?(' · пропущено (вже є): '+skip.length):'')+(errR.length?(' · помилок: '+errR.length+' — '+(errR[0].error||'')):'')+(okR.length?'. Підпишіть у Приват24.':''), (errR.length||skip.length)?7000:3200);
     await loadInvoices();
   }catch(e){toast('Помилка створення: '+e.message);}
   btn.disabled=false;updateDraftBtn();
