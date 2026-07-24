@@ -290,7 +290,7 @@ function render(){
     const sl=r.severity==='ok'?'OK':r.severity==='amber'?'звірити':'ручна';
     return `<tr class="sev-${r.severity}" data-id="${r.id}">
       <td><input type="checkbox" class="rowchk" data-id="${r.id}" ${r.severity==='red'?'disabled title="ручна обробка"':''}></td>
-      <td>${esc(r.recipient)||'—'}<br><span class="sbadge ${sb}">${sl}</span></td>
+      <td>${esc(r.recipient)||'—'}<br><span class="sbadge ${sb}">${sl}</span>${r.file?`<br><span style="font-size:10px;color:#8a8a8a" title="${esc(r.file)}">📄 ${esc(r.file)}</span>`:''}</td>
       <td>${esc(r.edrpou)||'—'}</td>
       <td class="iban">${r.iban?esc(r.iban)+(r.iban_valid?' ✓':' ⚠'):'—'}</td>
       <td>${esc(r.invoice_no)||'—'}</td><td>${esc(r.invoice_date)||'—'}</td>
