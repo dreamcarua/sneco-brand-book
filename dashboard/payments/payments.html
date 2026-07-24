@@ -295,7 +295,7 @@ function render(){
       <td class="iban">${r.iban?esc(r.iban)+(r.iban_valid?' ✓':' ⚠'):'—'}</td>
       <td>${esc(r.invoice_no)||'—'}</td><td>${esc(r.invoice_date)||'—'}</td>
       <td class="num">${fmt(r.amount_kop)}</td><td class="num">${fmt(r.vat_kop)}</td>
-      <td>${statusBadge(r.status)}</td>
+      <td>${statusBadge(r.status)}${r.pb_doc_number?`<br><span style="font-size:10px;color:#8a6d00;font-weight:700" title="Номер платіжного доручення у Приват24 (присвоєно банком)">№${esc(r.pb_doc_number)}</span>`:''}</td>
       <td style="max-width:340px">${esc(r.purpose)||'—'}</td>
       <td class="flags">${esc(r.flags)||''}</td>
       <td><button class="rowdel" data-id="${r.id}" title="Видалити з таблиці" style="border:none;background:none;cursor:pointer;color:#c00;font-size:14px;padding:2px 6px">🗑</button></td>
