@@ -3,3 +3,8 @@
 hr/*.xlsx
 pricing/*.pdf
 documents/sku/*.xlsx
+
+# SECURITY P0 (10.08.2026): дані тепер за JWT через Worker /api/dashboard/blob.
+# data.json НЕ публікувати — містить P&L + список клієнтів.
+dashboard/inventory/data.json
+dashboard/production/data.json
