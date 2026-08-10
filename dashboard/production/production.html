@@ -576,8 +576,19 @@ function showFetchBanner(text, type) {
   banner.innerHTML = String(text || '').replace(/<script/gi, '&lt;script');
 }
 showFetchBanner('⏳ Завантажуємо актуальні дані…', 'loading');
-fetch('./data.json?v=' + Date.now())
-  .then(r => r.ok ? r.json() : null)
+// P0-1 (10.08.2026): спершу JWT-захищений Worker-blob, fallback на публічний data.json (буде прибрано)
+(async function loadDashboardData(){
+  var _WK='https://sneco-auth.vg-ab6.workers.dev', _SK='snEco-jwt-production-dashboard';
+  try {
+    var s = JSON.parse(localStorage.getItem(_SK) || 'null');
+    if (s && s.token) {
+      var wr = await fetch(_WK + '/api/dashboard/blob', {method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+s.token}, body: JSON.stringify({name:'production'})});
+      if (wr.ok) return await wr.json();
+    }
+  } catch(e){}
+  try { var fr = await fetch('./data.json?v=' + Date.now()); if (fr.ok) return await fr.json(); } catch(e){}
+  return null;
+})()
   .then(fresh => {
     if (fresh && fresh.generated) {
       D = fresh;
