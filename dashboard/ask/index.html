@@ -313,7 +313,13 @@ async function ask(){
     const r=await fetch(WORKER+'/api/ask',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({question})});
     const j=await r.json();
     if(r.status===401){card.querySelector('.qa-body').innerHTML='<div class="err">Сесія завершилась. <a href="#" onclick="location.reload();return false" style="color:#c0392b;font-weight:700">Оновити сторінку</a></div>';return;}
-    if(!r.ok){card.querySelector('.qa-body').innerHTML='<div class="err">'+esc(j.message||j.error||('Помилка '+r.status))+'</div>'+(j.sql?sqlBox(j.sql):'');return;}
+    if(!r.ok){
+      const retryBtn=j.retryable?`<div style="margin-top:10px"><button class="chip" id="retry-${Date.now()}" data-retry="${esc(question)}">↻ Спробувати ще раз</button></div>`:'';
+      card.querySelector('.qa-body').innerHTML='<div class="err">'+esc(j.message||j.error||('Помилка '+r.status))+retryBtn+'</div>'+(j.sql?sqlBox(j.sql):'');
+      const rb=card.querySelector('[data-retry]');
+      if(rb)rb.onclick=()=>{card.remove();q.value=rb.dataset.retry;autosize();ask();};
+      return;
+    }
     renderAnswer(card,j);
     loadHistory(true);  // оновити спільну історію/статистику
   }catch(e){
