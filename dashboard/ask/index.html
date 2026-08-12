@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>snEco — AI-асистент даних</title>
+<style>
+:root{--dark:#1E1E1E;--yel:#FEBF27;--grn:#96C11F;--blu:#3B7DD8;--bg:#f3f3f0;--card:#fff;--line:#e6e6e0;--muted:#6b6b6b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--dark);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.55}
+body.dash-locked{overflow:hidden}
+a{color:inherit}
+/* ── auth gate ── */
+#dashauth-overlay{position:fixed;inset:0;background:#1E1E1E;z-index:9999;display:flex;align-items:center;justify-content:center}
+#dashauth-overlay.is-hidden{display:none}
+.dashauth-card{background:#fff;width:100%;max-width:440px;border-radius:14px;padding:36px 30px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.dashauth-logo{font-size:24px;font-weight:900;color:var(--yel);margin-bottom:6px;letter-spacing:-.5px;text-align:center}
+.dashauth-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#888;text-align:center;margin-bottom:24px}
+.dashauth-icon{font-size:36px;text-align:center;margin-bottom:16px}
+.dashauth-h1{font-size:18px;font-weight:800;text-align:center;margin-bottom:6px}
+.dashauth-desc{font-size:13px;color:#666;text-align:center;line-height:1.55;margin-bottom:20px}
+.dashauth-input{width:100%;padding:12px 14px;border:2px solid #E5E5DC;border-radius:8px;font-size:14px;font-family:inherit;outline:none}
+.dashauth-input:focus{border-color:var(--yel)}
+.dashauth-input.code{font-family:monospace;letter-spacing:.4em;text-align:center;font-size:18px}
+.dashauth-btn{width:100%;padding:13px;background:var(--dark);color:#fff;border:0;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;margin-top:14px;font-family:inherit}
+.dashauth-btn:hover{background:#000}.dashauth-btn:disabled{opacity:.5;cursor:not-allowed}
+.dashauth-msg{font-size:12.5px;line-height:1.5;margin-top:12px;text-align:center;min-height:18px}
+.dashauth-msg.is-error{color:#DC2626}.dashauth-msg a{color:var(--yel);font-weight:600}
+.dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
+.dashauth-session{position:fixed;top:12px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#6f9200;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:8px}
+.dashauth-session button{background:none;border:0;color:#6f9200;cursor:pointer;font-size:14px;padding:0}
+/* ── topbar ── */
+.topbar{background:var(--dark);color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:50}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.brand-mark{font-size:19px;font-weight:900;letter-spacing:-.4px}
+.brand-mark span{color:var(--yel)}
+.brand-sub{font-size:10.5px;color:#a8a8a8;letter-spacing:.06em}
+.nav{display:flex;gap:3px;flex-wrap:wrap}
+.nav a{font-size:12px;color:#cfcfcf;text-decoration:none;padding:5px 9px;border-radius:6px;white-space:nowrap}
+.nav a:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav a.on{background:var(--yel);color:var(--dark);font-weight:700}
+/* ── main ── */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 80px}
+.hero h1{font-size:26px;font-weight:900;margin:0 0 4px;letter-spacing:-.5px}
+.hero h1 .ai{background:linear-gradient(90deg,var(--yel),var(--grn));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{margin:0 0 18px;color:var(--muted);font-size:14px}
+.ask-box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.03)}
+.ask-row{display:flex;gap:10px;align-items:flex-end}
+#q{flex:1;border:0;outline:none;resize:none;font-family:inherit;font-size:15.5px;line-height:1.5;padding:8px 6px;max-height:140px;background:transparent;color:var(--dark)}
+#q::placeholder{color:#b0b0a8}
+#sendBtn{flex:0 0 auto;background:var(--dark);color:#fff;border:0;border-radius:10px;width:46px;height:46px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
+#sendBtn:hover{background:#000}#sendBtn:disabled{opacity:.4;cursor:not-allowed}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.chip{font-size:12.5px;background:#fff;border:1px solid var(--line);color:#444;border-radius:20px;padding:7px 13px;cursor:pointer;transition:.12s}
+.chip:hover{border-color:var(--yel);background:#fffdf5}
+.hint{font-size:11.5px;color:#999;margin-top:10px}
+/* ── answers ── */
+.answers{margin-top:24px;display:flex;flex-direction:column;gap:18px}
+.qa{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.03)}
+.qa-q{background:#faf9f4;padding:13px 18px;font-weight:700;font-size:15px;border-bottom:1px solid var(--line);display:flex;gap:9px;align-items:flex-start}
+.qa-q .ic{color:var(--blu)}
+.qa-body{padding:16px 18px}
+.qa-answer{font-size:15px;line-height:1.6;white-space:pre-wrap}
+.qa-answer strong{background:linear-gradient(transparent 62%, #fff1c2 62%);font-weight:800}
+.qa-assume{font-size:12px;color:var(--muted);margin-top:8px;font-style:italic}
+.qa-meta{font-size:11.5px;color:#999;margin-top:12px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.qa-meta button{font-size:11.5px;background:none;border:1px solid var(--line);border-radius:6px;padding:3px 9px;cursor:pointer;color:#555}
+.qa-meta button:hover{border-color:var(--grn);color:var(--grn)}
+.tbl-wrap{margin-top:12px;overflow-x:auto;border:1px solid var(--line);border-radius:8px;max-height:420px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{position:sticky;top:0;background:var(--dark);color:#fff;text-align:left;padding:8px 11px;font-weight:600;white-space:nowrap}
+td{padding:7px 11px;border-bottom:1px solid #f0efe9;white-space:nowrap}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+tr:nth-child(even) td{background:#faf9f4}
+.sql-box{margin-top:12px}
+.sql-box summary{cursor:pointer;font-size:12px;color:var(--muted);font-weight:600;user-select:none}
+.sql-box pre{background:#1e1e1e;color:#d6e9b8;padding:12px 14px;border-radius:8px;overflow-x:auto;font-size:12px;line-height:1.5;margin:8px 0 0;font-family:'SF Mono',Menlo,Consolas,monospace}
+.spin{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.err{color:#c0392b;font-size:14px;background:#fdeeee;border:1px solid #f5c6c6;border-radius:8px;padding:11px 14px}
+.disclaimer{font-size:11.5px;color:#a0a0a0;text-align:center;margin-top:30px;line-height:1.6}
+@media(max-width:640px){.wrap{padding:18px 13px 60px}.hero h1{font-size:22px}.nav{display:none}}
+</style>
+</head>
+<body class="dash-locked">
+<script src="../auth-google.js"></script>
+
+<!-- ── AUTH GATE ── -->
+<div id="dashauth-overlay">
+  <div class="dashauth-card">
+    <div class="dashauth-logo">snEco</div>
+    <div class="dashauth-sub">AI Data Assistant · Confidential</div>
+    <div id="dashauth-stage"></div>
+  </div>
+</div>
+<script>
+(function(){
+  const WORKER='https://sneco-auth.vg-ab6.workers.dev';
+  const BLOCK='ask-dashboard';
+  const STORAGE_KEY='snEco-jwt-'+BLOCK;
+  const overlay=document.getElementById('dashauth-overlay');
+  const stage=document.getElementById('dashauth-stage');
+  let email='';
+  window.__askAuth={ token:null };
+  function unlock(token,em,exp){
+    try{localStorage.setItem(STORAGE_KEY,JSON.stringify({token,email:em,exp}));}catch(e){}
+    window.__askAuth.token=token;
+    document.body.classList.remove('dash-locked');
+    overlay.classList.add('is-hidden');
+    badge(em,exp);
+    if(window.__askInit)window.__askInit();
+  }
+  function badge(em,exp){
+    const b=document.createElement('div');b.className='dashauth-session';
+    const mins=Math.max(0,Math.floor((exp*1000-Date.now())/60000));
+    b.innerHTML='✓ '+em.replace(/[<>&]/g,'')+' <button title="Вийти">🔒</button>';
+    b.querySelector('button').onclick=()=>{localStorage.removeItem(STORAGE_KEY);location.reload();};
+    document.body.appendChild(b);
+  }
+  async function verifyExisting(){
+    let s;try{s=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');}catch(e){}
+    if(!s||!s.token||!s.exp||s.exp*1000<Date.now())return null;
+    try{const r=await fetch(WORKER+'/api/session/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:s.token,block:BLOCK})});const j=await r.json();return j.ok?s:null;}catch(e){return null;}
+  }
+  function renderEmail(){
+    stage.innerHTML=`
+      <div class="dashauth-icon">🤖</div>
+      <div class="dashauth-h1">Вхід до AI-асистента</div>
+      <div class="dashauth-desc">Задавай будь-які питання про продажі, клієнтів, склад — простою мовою. Авторизація через Google або email-код. Сесія 30 днів.</div>
+      <div id="google-signin-btn" style="display:flex;justify-content:center;margin:18px 0 8px"></div>
+      <div style="font-size:11px;color:#777;text-align:center;margin:8px 0 4px">— або через email-код —</div>
+      <input class="dashauth-input" type="email" id="auth-em" placeholder="ім'я@sneco.ua" autocomplete="email">
+      <button class="dashauth-btn" id="auth-send">Надіслати код</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="../../" class="dashauth-back">← Brand Bible</a>`;
+    if(window.SnecoAuth){
+      window.SnecoAuth.signInWithGoogle(BLOCK,document.getElementById('google-signin-btn'),
+        j=>unlock(j.token,j.email,j.exp),
+        m=>{const e=document.getElementById('auth-msg');if(e){e.textContent=m;e.className='dashauth-msg is-error';}});
+    }
+    const em=document.getElementById('auth-em'),send=document.getElementById('auth-send'),msg=document.getElementById('auth-msg');
+    em.addEventListener('keydown',e=>{if(e.key==='Enter')send.click();});
+    send.onclick=async()=>{
+      const v=em.value.trim();
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){msg.textContent='Введіть правильний email.';msg.className='dashauth-msg is-error';return;}
+      send.disabled=true;send.textContent='Надсилаємо...';msg.textContent='';
+      try{
+        const r=await fetch(WORKER+'/api/otp/request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:v,block:BLOCK})});
+        if(!r.ok){const j=await r.json().catch(()=>({}));
+          msg.innerHTML=j.error==='not_in_whitelist'?`❌ Цього email немає у whitelist. <a href="mailto:vg@sneco.ua?subject=AI-assistant%20access">✉ Запит доступу</a>`:'Помилка: '+(j.error||r.status);
+          msg.className='dashauth-msg is-error';send.disabled=false;send.textContent='Надіслати код';return;}
+        email=v;renderCode();
+      }catch(e){msg.textContent='Помилка мережі: '+e.message;msg.className='dashauth-msg is-error';send.disabled=false;send.textContent='Надіслати код';}
+    };
+  }
+  function renderCode(){
+    stage.innerHTML=`
+      <div class="dashauth-icon">🔢</div>
+      <div class="dashauth-h1">Код з листа</div>
+      <div class="dashauth-desc">${email.replace(/[<>&]/g,'')}<br>Перевірте пошту (і спам).</div>
+      <input class="dashauth-input code" type="text" id="auth-code" inputmode="numeric" maxlength="6" placeholder="••••••">
+      <button class="dashauth-btn" id="auth-verify">Підтвердити</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="#" class="dashauth-back" id="auth-back">← Інший email</a>`;
+    const code=document.getElementById('auth-code'),verify=document.getElementById('auth-verify'),msg=document.getElementById('auth-msg');
+    code.addEventListener('keydown',e=>{if(e.key==='Enter')verify.click();});
+    document.getElementById('auth-back').onclick=e=>{e.preventDefault();renderEmail();};
+    verify.onclick=async()=>{
+      const c=code.value.trim();if(!/^\d{6}$/.test(c)){msg.textContent='Код — 6 цифр.';msg.className='dashauth-msg is-error';return;}
+      verify.disabled=true;verify.textContent='Перевіряємо...';msg.textContent='';
+      try{const r=await fetch(WORKER+'/api/otp/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,block:BLOCK,code:c})});const j=await r.json();
+        if(!r.ok){msg.textContent='Невірний або застарілий код.';msg.className='dashauth-msg is-error';verify.disabled=false;verify.textContent='Підтвердити';return;}
+        unlock(j.token,j.email,j.exp);
+      }catch(e){msg.textContent='Помилка: '+e.message;msg.className='dashauth-msg is-error';verify.disabled=false;verify.textContent='Підтвердити';}
+    };
+  }
+  (async()=>{const s=await verifyExisting();if(s){unlock(s.token,s.email,s.exp);return;}renderEmail();})();
+})();
+</script>
+
+<!-- ── TOPBAR ── -->
+<div class="topbar">
+  <div class="brand">
+    <div>
+      <div class="brand-mark">sn<span>É</span>co · 🤖</div>
+      <div class="brand-sub">AI-асистент даних · MoySklad</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a href="../customer-360/customer-360.html">👥 Customer 360</a>
+    <a href="../finance/finance.html">💰 Finance</a>
+    <a href="../dashboard.html">📊 Sales</a>
+    <a href="../inventory/inventory.html">📦 Inventory</a>
+    <a href="../procurement/procurement.html">🛒 Procurement</a>
+    <a class="on" href="./">🤖 AI-асистент</a>
+    <a href="../../">📘 Brand Bible</a>
+  </nav>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <h1><span class="ai">AI-асистент</span> даних</h1>
+    <p>Питай простою мовою — я перекладаю у запит до бази MoySklad і даю відповідь із цифрами. Тільки читання, дані оновлюються щодня.</p>
+  </div>
+
+  <div class="ask-box">
+    <div class="ask-row">
+      <textarea id="q" rows="1" placeholder="Напр.: Скільки ми продали Гауди в липні 2026 і на яку суму?"></textarea>
+      <button id="sendBtn" title="Запитати (Enter)">➤</button>
+    </div>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="hint">💡 Порада: вказуй період і продукт для точності. Під кожною відповіддю видно SQL-запит — можна перевірити.</div>
+
+  <div class="answers" id="answers"></div>
+
+  <div class="disclaimer">
+    AI може помилятися — для критичних рішень перевіряй SQL під відповіддю.<br>
+    Собівартість/маржа поки недоступні (закупівельні ціни не заповнені). Розбіжність ±1-2% з MoySklad — норма.
+  </div>
+</div>
+
+<script>
+const WORKER='https://sneco-auth.vg-ab6.workers.dev';
+const BLOCK='ask-dashboard';
+const $=id=>document.getElementById(id);
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function mdBold(s){return esc(s).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');}
+function fmtCell(v){
+  if(v==null)return '<td class="num" style="color:#bbb">—</td>';
+  if(typeof v==='number'){ const s=Number.isInteger(v)?v.toLocaleString('uk-UA'):v.toLocaleString('uk-UA',{maximumFractionDigits:2}); return '<td class="num">'+esc(s)+'</td>'; }
+  return '<td>'+esc(v)+'</td>';
+}
+const EXAMPLES=[
+  'ТОП-10 клієнтів за виручкою у 2026',
+  'Скільки продали Гауди в липні 2026 і на суму?',
+  'Які продукти найбільше повертають?',
+  'Скільки нових клієнтів зʼявилось у 2026 по місяцях?',
+  'ТОП-5 клієнтів з простроченою заборгованістю',
+  'Динаміка продажів оливки по місяцях',
+];
+$('chips').innerHTML=EXAMPLES.map(e=>`<span class="chip">${esc(e)}</span>`).join('');
+$('chips').querySelectorAll('.chip').forEach(c=>c.onclick=()=>{$('q').value=c.textContent;$('q').focus();autosize();});
+
+const q=$('q');
+function autosize(){q.style.height='auto';q.style.height=Math.min(q.scrollHeight,140)+'px';}
+q.addEventListener('input',autosize);
+q.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ask();}});
+$('sendBtn').onclick=ask;
+
+let busy=false;
+async function ask(){
+  const question=q.value.trim();
+  if(!question||busy)return;
+  const token=(window.__askAuth&&window.__askAuth.token);
+  if(!token){location.reload();return;}
+  busy=true;$('sendBtn').disabled=true;$('sendBtn').innerHTML='<span class="spin"></span>';
+  const card=document.createElement('div');card.className='qa';
+  card.innerHTML=`<div class="qa-q"><span class="ic">❯</span><span>${esc(question)}</span></div><div class="qa-body"><div style="color:#999;font-size:14px">🤔 Думаю над запитом…</div></div>`;
+  $('answers').prepend(card);
+  q.value='';autosize();
+  try{
+    const r=await fetch(WORKER+'/api/ask',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({question})});
+    const j=await r.json();
+    if(r.status===401){card.querySelector('.qa-body').innerHTML='<div class="err">Сесія завершилась. <a href="#" onclick="location.reload();return false" style="color:#c0392b;font-weight:700">Оновити сторінку</a></div>';return;}
+    if(!r.ok){card.querySelector('.qa-body').innerHTML='<div class="err">'+esc(j.message||j.error||('Помилка '+r.status))+'</div>'+(j.sql?sqlBox(j.sql):'');return;}
+    renderAnswer(card,j);
+  }catch(e){
+    card.querySelector('.qa-body').innerHTML='<div class="err">Помилка мережі: '+esc(e.message)+'</div>';
+  }finally{
+    busy=false;$('sendBtn').disabled=false;$('sendBtn').innerHTML='➤';
+  }
+}
+function sqlBox(sql){return `<details class="sql-box"><summary>🔎 Показати SQL-запит</summary><pre>${esc(sql)}</pre></details>`;}
+function renderAnswer(card,j){
+  const body=card.querySelector('.qa-body');
+  let html='';
+  html+=`<div class="qa-answer">${mdBold(j.answer||'')}</div>`;
+  if(j.assumptions)html+=`<div class="qa-assume">📌 ${esc(j.assumptions)}</div>`;
+  if(j.rows&&j.rows.length){
+    const cols=j.columns||Object.keys(j.rows[0]);
+    let t='<div class="tbl-wrap"><table><thead><tr>'+cols.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>';
+    j.rows.slice(0,500).forEach(row=>{t+='<tr>'+cols.map(c=>fmtCell(row[c])).join('')+'</tr>';});
+    t+='</tbody></table></div>';
+    html+=t;
+  }
+  const meta=[];
+  if(typeof j.row_count==='number')meta.push(`${j.row_count} рядків`);
+  if(typeof j.elapsed_ms==='number')meta.push(`${(j.elapsed_ms/1000).toFixed(1)}s`);
+  html+=`<div class="qa-meta"><span>${meta.join(' · ')}</span>`;
+  if(j.rows&&j.rows.length)html+=`<button data-csv="1">⬇ CSV</button>`;
+  html+=`</div>`;
+  if(j.sql)html+=sqlBox(j.sql);
+  body.innerHTML=html;
+  const csvBtn=body.querySelector('[data-csv]');
+  if(csvBtn)csvBtn.onclick=()=>downloadCsv(j.columns||Object.keys(j.rows[0]),j.rows,j.question);
+}
+function downloadCsv(cols,rows,q){
+  const esc2=v=>{v=v==null?'':String(v);return /[",\n;]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+  const csv='﻿'+[cols.join(';'),...rows.map(r=>cols.map(c=>esc2(r[c])).join(';'))].join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='sneco_'+(q||'data').slice(0,30).replace(/[^\wа-яіїєґ]+/gi,'_')+'.csv';a.click();
+}
+window.__askInit=function(){ q.focus(); };
+if(window.__askAuth&&window.__askAuth.token)window.__askInit();
+</script>
+</body>
+</html>
