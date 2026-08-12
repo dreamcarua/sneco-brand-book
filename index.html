@@ -2413,7 +2413,7 @@ body.is-admin section.admin-only { display: block !important; }
     snEco / Prime Snack LLC<br/>
     Sneco SK s.r.o.<br/>
 <a href="mailto:vg@sneco.ua">vg@sneco.ua</a> · <a href="https://sneco.ua" rel="noopener" target="_blank">sneco.ua</a><br/><br/>
-    Brand Bible v2.78.71 · 2026
+    Brand Bible v2.78.73 · 2026
   </div>
 </nav>
 <main class="main">
@@ -2425,7 +2425,7 @@ body.is-admin section.admin-only { display: block !important; }
 <span data-lang="en">One ingredient. <span class="qr-ns-accent">No compromises.</span> The cheese snack of the 21st century.</span>
 <span data-lang="sk">Jedna ingrediencia. <span class="qr-ns-accent">Žiadne kompromisy.</span> Syrový snack 21. storočia.</span>
 </div>
-<div class="qr-meta">v2.78.71 · 2026</div>
+<div class="qr-meta">v2.78.73 · 2026</div>
 </div>
 <!-- ============================================================
      INTRO
@@ -8533,6 +8533,24 @@ snEco</pre>
 <a class="ob-tool-cta" href="https://brand.sneco.ua/dashboard/dashboard.html" target="_blank" rel="noopener noreferrer">Sales →</a>
 </div>
 </div>
+<!-- AI Data Assistant (v2.78.73) -->
+<div class="ob-content-panel active" data-ob-panel="all">
+<div class="ob-tool-card">
+<div class="ob-tool-icon" style="background:linear-gradient(135deg,rgba(254,191,39,.2),rgba(150,193,31,.2));color:#7a6a00">🤖</div>
+<div class="ob-tool-body">
+<div class="ob-tool-title" data-lang-group="">
+<span data-lang="uk">AI-асистент даних — питай простою мовою</span>
+<span data-lang="en">AI Data Assistant — ask in plain language</span><span data-lang="sk">AI dátový asistent — pýtaj sa prirodzene</span>
+</div>
+<div class="ob-tool-desc" data-lang-group="">
+<span data-lang="uk">🆕 Задавай будь-які нешаблонні питання про продажі, клієнтів, склад, оплати — AI перекладає у запит до бази MoySklad і дає відповідь з цифрами, таблицею та SQL для перевірки. Напр.: «ТОП-10 клієнтів за виручкою 2026», «скільки Гауди продали в липні». Тільки читання, без контактів клієнтів. Ліміт 40 питань/год.</span>
+<span data-lang="en">🆕 Ask any ad-hoc question about sales, clients, stock — AI turns it into a MoySklad DB query and answers with numbers, a table and the SQL. Read-only, no client contacts.</span>
+<span data-lang="sk">🆕 Pýtaj sa čokoľvek o predaji, klientoch, sklade — AI to preloží na dotaz do MoySklad a odpovie s číslami, tabuľkou a SQL. Len na čítanie.</span>
+</div>
+</div>
+<a class="ob-tool-cta" href="https://brand.sneco.ua/dashboard/ask/" target="_blank" rel="noopener noreferrer">AI-асистент →</a>
+</div>
+</div>
 <!-- ═══════════════════════════════════════════════════════════
        FAQ
        ═══════════════════════════════════════════════════════════ -->
@@ -11589,6 +11607,14 @@ window.snBanner = function(text, type){
 </div>
 </details>
 <h3 class="block-title" style="margin-top:48px">📜 <span data-lang="uk">Історія версій</span><span data-lang="en">Version history</span><span data-lang="sk">História verzií</span></h3>
+<div class="changelog-entry">
+<span class="changelog-version">v2.78.73</span><span class="changelog-date">12.08.2026</span>
+<ul class="changelog-list">
+<li data-lang="uk"><strong>🤖 AI-асистент даних (text-to-SQL).</strong> Нова gated-сторінка <a href="dashboard/ask/">/dashboard/ask/</a>: команда питає простою мовою про продажі/клієнтів/склад → Claude (Sonnet) генерує SQL по базі MoySklad → відповідь з цифрами, таблицею, CSV-експортом і SQL для перевірки. Безпека: тільки читання (SELECT), 3 рівні захисту + 38 юніт-тестів валідатора, PII заблоковано (без телефонів/email/адрес клієнтів), rate-limit 40 питань/год. Словник даних з усіма пастками MoySklad (sum_kop=0, payment_type UA, agent_id, COGS=0). Доступ: vg/fg/bs/ys/polina. Потрібна активація ANTHROPIC_API_KEY.</li>
+<li data-lang="en"><strong>🤖 AI Data Assistant (text-to-SQL).</strong> New gated page /dashboard/ask/: ask sales/client/stock questions in plain language → Claude generates SQL over MoySklad DB → answer + table + CSV + SQL. Read-only, 3-layer guard + 38 validator tests, PII blocked, 40 q/h rate limit.</li>
+<li data-lang="sk"><strong>🤖 AI dátový asistent (text-to-SQL).</strong> Nová stránka /dashboard/ask/: pýtaj sa prirodzene → Claude vygeneruje SQL nad MoySklad → odpoveď + tabuľka + CSV + SQL. Len na čítanie, PII blokované.</li>
+</ul>
+</div>
 <div class="changelog-entry">
 <span class="changelog-version">v2.78.71</span><span class="changelog-date">09.08.2026</span>
 <ul class="changelog-list">
