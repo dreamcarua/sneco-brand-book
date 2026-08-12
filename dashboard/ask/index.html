@@ -67,6 +67,34 @@ a{color:inherit}
 .qa-src{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.7}
 .qa-src a{color:#3B7DD8;text-decoration:none;border-bottom:1px dotted #3B7DD8}
 .qa-src a:hover{color:#1E1E1E}
+/* tabs */
+.tabs{display:flex;gap:4px;margin:22px 0 4px;border-bottom:2px solid var(--line)}
+.tab{background:none;border:0;font-family:inherit;font-size:13.5px;font-weight:700;color:#8a8a82;padding:9px 15px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px}
+.tab:hover{color:var(--dark)}
+.tab.on{color:var(--dark);border-bottom-color:var(--yel)}
+.pane{display:none}.pane.on{display:block}
+/* history */
+.hsearch{width:100%;padding:10px 13px;border:1px solid var(--line);border-radius:9px;font-family:inherit;font-size:14px;outline:none;margin:14px 0}
+.hsearch:focus{border-color:var(--yel)}
+.hitem{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:12px 15px;margin-bottom:9px;cursor:pointer;transition:.12s}
+.hitem:hover{border-color:var(--yel);box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.hitem-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.hitem-q{font-weight:600;font-size:14.5px;flex:1}
+.hitem-meta{font-size:11.5px;color:#999;white-space:nowrap;display:flex;gap:8px;align-items:center}
+.who{background:#eef4e0;color:#5f7a12;border-radius:10px;padding:2px 8px;font-size:10.5px;font-weight:700}
+.hitem-body{display:none;margin-top:11px;padding-top:11px;border-top:1px solid var(--line);font-size:14px;line-height:1.6;white-space:pre-wrap}
+.hitem.open .hitem-body{display:block}
+/* stats */
+.st-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:11px;margin:16px 0 22px}
+.st-card{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:14px 16px;text-align:center}
+.st-num{font-size:24px;font-weight:900;letter-spacing:-.5px}
+.st-lbl{font-size:11px;color:var(--muted);margin-top:2px}
+.lb{background:var(--card);border:1px solid var(--line);border-radius:11px;overflow:hidden}
+.lb table{font-size:13.5px}
+.lb th{background:var(--dark)}
+.lb .medal{font-size:15px}
+.bar{height:6px;background:linear-gradient(90deg,var(--yel),var(--grn));border-radius:3px;display:inline-block;vertical-align:middle;margin-left:8px}
+.cached-badge{background:#e8f0fb;color:#2f6bbf}
 .qa-meta{font-size:11.5px;color:#999;margin-top:12px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
 .qa-meta button{font-size:11.5px;background:none;border:1px solid var(--line);border-radius:6px;padding:3px 9px;cursor:pointer;color:#555}
 .qa-meta button:hover{border-color:var(--grn);color:var(--grn)}
@@ -207,16 +235,34 @@ tr:nth-child(even) td{background:#faf9f4}
     <p>Питай простою мовою про <b>цифри</b> (продажі, клієнти, склад — з MoySklad) або про <b>бренд</b> (історія, технологія, позиціонування — з Brand Bible). Відповіді з джерелами для перевірки.</p>
   </div>
 
-  <div class="ask-box">
-    <div class="ask-row">
-      <textarea id="q" rows="1" placeholder="Напр.: Скільки ми продали Гауди в липні 2026 і на яку суму?"></textarea>
-      <button id="sendBtn" title="Запитати (Enter)">➤</button>
-    </div>
+  <div class="tabs">
+    <button class="tab on" data-tab="ask">💬 Питати</button>
+    <button class="tab" data-tab="hist">📜 Історія команди</button>
+    <button class="tab" data-tab="stats">📈 Статистика</button>
   </div>
-  <div class="chips" id="chips"></div>
-  <div class="hint">💡 Порада: вказуй період і продукт для точності. Під кожною відповіддю видно SQL-запит — можна перевірити.</div>
 
-  <div class="answers" id="answers"></div>
+  <div class="pane on" id="pane-ask">
+    <div class="ask-box" style="margin-top:16px">
+      <div class="ask-row">
+        <textarea id="q" rows="1" placeholder="Напр.: Скільки ми продали Гауди в липні 2026 і на яку суму?"></textarea>
+        <button id="sendBtn" title="Запитати (Enter)">➤</button>
+      </div>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="hint">💡 Питання зберігаються у спільній історії — команда бачить відповіді й не питає двічі. Повтор того самого за 24 год віддається миттєво з кешу.</div>
+    <div class="answers" id="answers"></div>
+  </div>
+
+  <div class="pane" id="pane-hist">
+    <input class="hsearch" id="hsearch" placeholder="🔎 Пошук по питаннях команди…">
+    <div id="histList"><div style="color:#999;font-size:14px;padding:20px 0">Завантаження…</div></div>
+  </div>
+
+  <div class="pane" id="pane-stats">
+    <div class="st-grid" id="stGrid"></div>
+    <div class="lb"><table id="lbTable"><thead><tr><th>#</th><th>Хто</th><th style="text-align:right">7 днів</th><th style="text-align:right">30 днів</th><th style="text-align:right">Всього</th></tr></thead><tbody></tbody></table></div>
+    <div class="hint" style="margin-top:12px">Статистика оновлюється у реальному часі. Питання зберігаються назавжди — це спільна памʼять команди.</div>
+  </div>
 
   <div class="disclaimer">
     AI може помилятися — для критичних рішень перевіряй SQL під відповіддю.<br>
@@ -269,6 +315,7 @@ async function ask(){
     if(r.status===401){card.querySelector('.qa-body').innerHTML='<div class="err">Сесія завершилась. <a href="#" onclick="location.reload();return false" style="color:#c0392b;font-weight:700">Оновити сторінку</a></div>';return;}
     if(!r.ok){card.querySelector('.qa-body').innerHTML='<div class="err">'+esc(j.message||j.error||('Помилка '+r.status))+'</div>'+(j.sql?sqlBox(j.sql):'');return;}
     renderAnswer(card,j);
+    loadHistory(true);  // оновити спільну історію/статистику
   }catch(e){
     card.querySelector('.qa-body').innerHTML='<div class="err">Помилка мережі: '+esc(e.message)+'</div>';
   }finally{
@@ -281,6 +328,9 @@ function renderAnswer(card,j){
   let html='';
   const modeBadge={data:'📊 Дані MoySklad',knowledge:'📖 Brand Bible',none:'—'}[j.mode]||'';
   if(modeBadge)html+=`<div class="qa-mode">${modeBadge}</div>`;
+  if(j.cached&&j.cached_from){
+    html+=`<div class="qa-mode cached-badge" style="margin-left:6px">⚡ З кешу · питав ${esc(shortMail(j.cached_from.email))} ${esc(ago(j.cached_from.at))}</div>`;
+  }
   // для knowledge — приберемо текстовий "Джерела:" (покажемо чипсами)
   let ansText=j.answer||'';
   if(j.sources&&j.sources.length)ansText=ansText.replace(/\n*Джерела:.*$/s,'').trim();
@@ -313,7 +363,77 @@ function downloadCsv(cols,rows,q){
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
   a.download='sneco_'+(q||'data').slice(0,30).replace(/[^\wа-яіїєґ]+/gi,'_')+'.csv';a.click();
 }
-window.__askInit=function(){ q.focus(); };
+// ── вкладки ──
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));
+  const id=t.dataset.tab;
+  document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id==='pane-'+id));
+  if(id==='hist'||id==='stats')loadHistory();
+});
+
+// ── історія + статистика ──
+let _hist=null;
+function shortMail(e){return String(e||'').split('@')[0];}
+function ago(ts){
+  const s=Math.floor(Date.now()/1000)-ts;
+  if(s<3600)return Math.max(1,Math.floor(s/60))+' хв тому';
+  if(s<86400)return Math.floor(s/3600)+' год тому';
+  if(s<172800)return 'вчора';
+  return new Date(ts*1000).toLocaleDateString('uk-UA');
+}
+async function loadHistory(force){
+  if(_hist&&!force)return renderHistory();
+  const token=(window.__askAuth&&window.__askAuth.token);if(!token)return;
+  try{
+    const r=await fetch(WORKER+'/api/ask/history',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({limit:100})});
+    if(!r.ok){$('histList').innerHTML='<div class="err">Не вдалось завантажити історію ('+r.status+')</div>';return;}
+    _hist=await r.json();renderHistory();
+  }catch(e){$('histList').innerHTML='<div class="err">Помилка: '+esc(e.message)+'</div>';}
+}
+function renderHistory(){
+  if(!_hist)return;
+  const term=($('hsearch').value||'').toLowerCase().trim();
+  const items=(_hist.items||[]).filter(i=>!term||i.question.toLowerCase().includes(term));
+  $('histList').innerHTML=items.length?items.map((i,n)=>`
+    <div class="hitem" data-i="${n}">
+      <div class="hitem-top">
+        <div class="hitem-q">${esc(i.question)}</div>
+        <div class="hitem-meta"><span class="who">${esc(shortMail(i.email))}</span><span>${esc(ago(i.created_at))}</span></div>
+      </div>
+      <div class="hitem-body">${mdBold(String(i.answer||'').replace(/\n*Джерела:.*$/s,''))}
+        ${(i.sources&&i.sources.length)?'<div class="qa-src">📎 '+i.sources.map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a>`).join(' · ')+'</div>':''}
+        ${i.sql?`<details class="sql-box"><summary>🔎 SQL</summary><pre>${esc(i.sql)}</pre></details>`:''}
+        <div style="margin-top:10px"><button class="chip" data-reask="${n}">↻ Запитати знову</button></div>
+      </div>
+    </div>`).join(''):'<div style="color:#999;font-size:14px;padding:20px 0">Нічого не знайдено.</div>';
+  $('histList').querySelectorAll('.hitem').forEach(el=>{
+    el.onclick=(ev)=>{ if(ev.target.closest('[data-reask]')||ev.target.closest('a')||ev.target.closest('summary'))return; el.classList.toggle('open'); };
+  });
+  $('histList').querySelectorAll('[data-reask]').forEach(b=>b.onclick=(ev)=>{
+    ev.stopPropagation();
+    const it=items[+b.dataset.reask];
+    document.querySelector('.tab[data-tab=ask]').click();
+    q.value=it.question;autosize();q.focus();
+  });
+  // статистика
+  const t=_hist.totals||{};
+  $('stGrid').innerHTML=[
+    ['Всього питань',t.total||0],['Учасників',t.users||0],
+    ['📊 По даних',t.data_q||0],['📖 По бренду',t.knowledge_q||0],
+  ].map(([l,v])=>`<div class="st-card"><div class="st-num">${v}</div><div class="st-lbl">${l}</div></div>`).join('');
+  const stats=_hist.stats||[];const max=Math.max(1,...stats.map(s=>s.total));
+  $('lbTable').querySelector('tbody').innerHTML=stats.map((s,i)=>{
+    const medal=['🥇','🥈','🥉'][i]||(i+1);
+    const isMe=s.email===_hist.me;
+    return `<tr${isMe?' style="background:#fffdf0"':''}>
+      <td class="medal">${medal}</td>
+      <td>${esc(shortMail(s.email))}${isMe?' <span style="font-size:10px;color:#96C11F">(ви)</span>':''}<span class="bar" style="width:${Math.round(60*s.total/max)}px"></span></td>
+      <td class="num">${s.d7||0}</td><td class="num">${s.d30||0}</td><td class="num"><b>${s.total}</b></td></tr>`;
+  }).join('')||'<tr><td colspan="5" style="text-align:center;color:#999;padding:14px">Ще немає питань</td></tr>';
+}
+$('hsearch').addEventListener('input',()=>renderHistory());
+
+window.__askInit=function(){ q.focus(); loadHistory(); };
 if(window.__askAuth&&window.__askAuth.token)window.__askInit();
 </script>
 </body>
