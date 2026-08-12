@@ -63,6 +63,10 @@ a{color:inherit}
 .qa-answer{font-size:15px;line-height:1.6;white-space:pre-wrap}
 .qa-answer strong{background:linear-gradient(transparent 62%, #fff1c2 62%);font-weight:800}
 .qa-assume{font-size:12px;color:var(--muted);margin-top:8px;font-style:italic}
+.qa-mode{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.03em;padding:3px 9px;border-radius:12px;margin-bottom:10px;background:#eef4e0;color:#5f7a12}
+.qa-src{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.7}
+.qa-src a{color:#3B7DD8;text-decoration:none;border-bottom:1px dotted #3B7DD8}
+.qa-src a:hover{color:#1E1E1E}
 .qa-meta{font-size:11.5px;color:#999;margin-top:12px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
 .qa-meta button{font-size:11.5px;background:none;border:1px solid var(--line);border-radius:6px;padding:3px 9px;cursor:pointer;color:#555}
 .qa-meta button:hover{border-color:var(--grn);color:var(--grn)}
@@ -200,7 +204,7 @@ tr:nth-child(even) td{background:#faf9f4}
 <div class="wrap">
   <div class="hero">
     <h1><span class="ai">AI-асистент</span> даних</h1>
-    <p>Питай простою мовою — я перекладаю у запит до бази MoySklad і даю відповідь із цифрами. Тільки читання, дані оновлюються щодня.</p>
+    <p>Питай простою мовою про <b>цифри</b> (продажі, клієнти, склад — з MoySklad) або про <b>бренд</b> (історія, технологія, позиціонування — з Brand Bible). Відповіді з джерелами для перевірки.</p>
   </div>
 
   <div class="ask-box">
@@ -234,10 +238,10 @@ function fmtCell(v){
 const EXAMPLES=[
   'ТОП-10 клієнтів за виручкою у 2026',
   'Скільки продали Гауди в липні 2026 і на суму?',
-  'Які продукти найбільше повертають?',
+  'Що таке технологія VacWave?',
+  'Які нагороди отримав snEco?',
   'Скільки нових клієнтів зʼявилось у 2026 по місяцях?',
-  'ТОП-5 клієнтів з простроченою заборгованістю',
-  'Динаміка продажів оливки по місяцях',
+  'Яке позиціонування бренду і меседжі?',
 ];
 $('chips').innerHTML=EXAMPLES.map(e=>`<span class="chip">${esc(e)}</span>`).join('');
 $('chips').querySelectorAll('.chip').forEach(c=>c.onclick=()=>{$('q').value=c.textContent;$('q').focus();autosize();});
@@ -275,7 +279,15 @@ function sqlBox(sql){return `<details class="sql-box"><summary>🔎 Показа
 function renderAnswer(card,j){
   const body=card.querySelector('.qa-body');
   let html='';
-  html+=`<div class="qa-answer">${mdBold(j.answer||'')}</div>`;
+  const modeBadge={data:'📊 Дані MoySklad',knowledge:'📖 Brand Bible',none:'—'}[j.mode]||'';
+  if(modeBadge)html+=`<div class="qa-mode">${modeBadge}</div>`;
+  // для knowledge — приберемо текстовий "Джерела:" (покажемо чипсами)
+  let ansText=j.answer||'';
+  if(j.sources&&j.sources.length)ansText=ansText.replace(/\n*Джерела:.*$/s,'').trim();
+  html+=`<div class="qa-answer">${mdBold(ansText)}</div>`;
+  if(j.sources&&j.sources.length){
+    html+=`<div class="qa-src">📎 Джерела: `+j.sources.map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a>`).join(' · ')+`</div>`;
+  }
   if(j.assumptions)html+=`<div class="qa-assume">📌 ${esc(j.assumptions)}</div>`;
   if(j.rows&&j.rows.length){
     const cols=j.columns||Object.keys(j.rows[0]);
