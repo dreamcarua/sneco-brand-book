@@ -1017,10 +1017,10 @@ function buildFilteredKpis(){
     },
     {
       cls:'cy',
-      label:'Маржинальність',
+      label:'Кеш-маржа',
       value:`${margin.toFixed(1)}<span class="kpi-unit">%</span>`,
       foot:trendPill(margin-prevMargin,' п.п.'),
-      sub:'по вибраному періоду'
+      sub:'(надходження − виплати) / надходження. Це НЕ товарна маржа — її див. у блоці «Маржинальність по товарах»'
     },
     {
       cls:'cg',
@@ -2351,7 +2351,7 @@ function buildOverviewMargin(){
   const lbl=data.map(r=>r.ym.slice(2));
   const revVals=data.map(r=>Math.round((r.revenue||0)/1000));
   // Маржа показується тільки де є собівартість (profit > 0 або cogs > 0)
-  const marginVals=data.map(r=>(r.cogs>0||r.profit>0)?r.margin_pct:null);
+  const marginVals=data.map(r=>(r.cogs>0)?r.margin_pct:null);   // v2.78.82: без COGS маржа невідома, не 100%
   const hasAnyMargin=marginVals.some(v=>v!==null);
   const datasets=[
     {label:'Виручка (тис.₴)',data:revVals,backgroundColor:YF,borderColor:Y,borderWidth:1.5,borderRadius:4,yAxisID:'y',order:2}
