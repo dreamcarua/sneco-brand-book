@@ -908,6 +908,13 @@ function _syncGlobalPeriodUI(){
   }
 }
 
+// Список не залежить від даних — будуємо одразу, щоб до авторизації не було порожньої випадайки
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => _buildGlobalPeriodOptions());
+} else {
+  setTimeout(() => _buildGlobalPeriodOptions(), 0);
+}
+
 window.setGlobalPeriod = function(key){
   window._globalPeriod = key || 'auto';
   try { localStorage.setItem(GPER_LS, window._globalPeriod); } catch(e) {}
@@ -928,6 +935,10 @@ window.setGlobalPeriod = function(key){
     _productCustomRange = null;
   }
   _syncGlobalPeriodUI();
+
+  // Дані ще не приїхали (до авторизації) — просто запам'ятали вибір.
+  // allCounterparties — top-level let, тому НЕ на window: перевіряємо через typeof.
+  if (typeof allCounterparties === 'undefined' || !allCounterparties.length) return;
 
   // Перерендерити те, що зараз на екрані
   const openCust = (typeof _currentCustForProductFilter !== 'undefined' && _currentCustForProductFilter)
