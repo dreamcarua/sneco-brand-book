@@ -62,6 +62,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .search-result-name{font-weight:600;color:var(--d)}
 .search-result-meta{font-size:11px;color:var(--muted);white-space:nowrap}
 .quick-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;justify-content:center}
+/* v2.78.83 — глобальний перемикач періоду */
+.gper-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+.gper-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.gper-select{font:inherit;font-size:13px;font-weight:600;color:var(--d);background:#fff;
+  border:1.5px solid var(--line,#e2e2dd);border-radius:8px;padding:6px 30px 6px 12px;cursor:pointer;
+  appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 11px center}
+.gper-select:focus{outline:2px solid #FEBF27;outline-offset:1px}
+.gper-select.gper-on{border-color:#FEBF27;background-color:#FFFBEF}
+.gper-hint{font-size:11px;color:var(--muted)}
+.gper-reset{display:none;font:inherit;font-size:11px;color:var(--muted);background:transparent;
+  border:1px solid var(--line,#e2e2dd);border-radius:6px;padding:4px 9px;cursor:pointer}
+.gper-reset:hover{color:var(--d);border-color:#bbb}
+.gper-reset.show{display:inline-block}
+.gper-chip-note{font-size:11px;color:#7a6a2a;background:#FFFBEF;border:1px solid #F2E2AE;
+  border-radius:6px;padding:3px 8px;margin-left:6px;white-space:nowrap}
+.gper-chip-note.warn{color:#8a5a12;background:#FFF4E5;border-color:#F5D9AC}
+.gper-chip-note a{color:inherit;text-decoration:underline;margin-left:6px}
+@media print{.gper-bar,.gper-chip-note{display:none}}
 .quick-pill{padding:5px 12px;background:var(--yf);color:#996600;font-size:11px;font-weight:600;border-radius:14px;cursor:pointer;border:1px solid transparent;transition:all .15s}
 .quick-pill:hover{background:var(--y);color:var(--d);border-color:var(--y)}
 
@@ -674,6 +693,16 @@ body.dash-locked{overflow:hidden}
     <button id="custSearchClear" type="button" title="Очистити пошук (Esc)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:transparent;border:none;font-size:18px;color:var(--muted);cursor:pointer;display:none;padding:4px 8px;line-height:1">×</button>
     <div class="search-results" id="searchResults"></div>
   </div>
+  <!-- v2.78.83: ГЛОБАЛЬНИЙ період — керує блоками Overview + карткою клієнта.
+       Локальні чипи всередині блоків лишились: ними можна уточнити окремий блок. -->
+  <div class="gper-bar" id="globalPeriodBar">
+    <span class="gper-label">📅 Період</span>
+    <select id="globalPeriodSelect" class="gper-select" onchange="setGlobalPeriod(this.value)"
+            title="Обери місяць або пресет — застосується до всіх блоків"></select>
+    <span class="gper-hint" id="globalPeriodHint"></span>
+    <button type="button" class="gper-reset" id="globalPeriodReset"
+            onclick="setGlobalPeriod('auto')" title="Повернути кожному блоку його власний період">✕ скинути</button>
+  </div>
   <div class="quick-pills" id="quickPills">
     <span style="display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:11px;padding:5px 0">
       <span class="loader"></span> Готуємо overview…
@@ -693,7 +722,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.78.39 · 🔧 Critical fixes: copySummary combined-aware · aov у metrics → Peer comparison працює · refresh button skip reset · AR aging bucket cleanup · keyboard "n" → openCrmModal · Google Sign-In exp fallback · CS period default 365 · 🎨 Topbar + Google OAuth + JWT 30 діб · Оновлення: щодня 06:00
+  snEco Customer 360 v2.78.83 · 📅 НОВЕ: глобальний перемикач періоду вгорі — обери будь-який місяць за 24 міс або рік, і всі блоки перерахуються. Локальні перемикачі блоків лишились. · 🔧 Critical fixes: copySummary combined-aware · aov у metrics → Peer comparison працює · refresh button skip reset · AR aging bucket cleanup · keyboard "n" → openCrmModal · Google Sign-In exp fallback · CS period default 365 · 🎨 Topbar + Google OAuth + JWT 30 діб · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -798,6 +827,112 @@ window.setCustMetric = function(m){
     const c = allCounterparties.find(x => x.__key === _currentCustKey || x.name === _currentCustKey);
     if (c) renderCustomerView(c);
   }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// v2.78.83 — ГЛОБАЛЬНИЙ ПЕРІОД (VG: «не можу обрати минулі місяці»)
+// Додано ПОВЕРХ існуючих локальних чипів, не замість них.
+// 'auto' = кожен блок живе своїм періодом (стара поведінка, дефолт).
+// Інакше — ключ для _legacyPeriodRange: month:YYYY-MM | year:YYYY | пресет.
+// ═══════════════════════════════════════════════════════════════════════════
+const GPER_LS = 'sneco_c360_global_period';
+if (typeof window._globalPeriod === 'undefined') {
+  try { window._globalPeriod = localStorage.getItem(GPER_LS) || 'auto'; }
+  catch(e) { window._globalPeriod = 'auto'; }
+}
+// Періоди блоків до першого застосування глобального — щоб «скинути» вертало як було
+const _gperDefaults = { ovProd: 'last_month', legacyTop: 'last_month' };
+
+window.isGlobalPeriodOn = () => window._globalPeriod && window._globalPeriod !== 'auto';
+
+// Плашка біля локальних чипів блоку: чи він іде за глобальним періодом, чи відв'язався
+window.gperChipNote = function(blockPeriod, restoreFn){
+  if (!window.isGlobalPeriodOn()) return '';
+  const g = window._globalPeriod;
+  const gLabel = _legacyPeriodRange(new Date(), g).label;
+  if (blockPeriod === g) {
+    return `<span class="gper-chip-note">⛓ за глобальним: <b>${gLabel}</b></span>`;
+  }
+  const bLabel = _legacyPeriodRange(new Date(), blockPeriod).label;
+  return `<span class="gper-chip-note warn">⚠ локально: <b>${bLabel}</b>
+    <a href="javascript:void(0)" onclick="${restoreFn}">← до глобального (${gLabel})</a></span>`;
+};
+
+// Діапазон глобального періоду або null, якщо 'auto'
+window.globalPeriodRange = function(){
+  if (!window.isGlobalPeriodOn()) return null;
+  return _legacyPeriodRange(new Date(), window._globalPeriod);
+};
+
+// Наповнити випадайку: 24 останні місяці + роки + пресети
+function _buildGlobalPeriodOptions(){
+  const sel = document.getElementById('globalPeriodSelect');
+  if (!sel) return;
+  const now = new Date();
+  const MN = ['Січень','Лютий','Березень','Квітень','Травень','Червень',
+              'Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
+  let html = `<optgroup label="Кожен блок сам"><option value="auto">— без глобального періоду —</option></optgroup>`;
+  html += `<optgroup label="Швидкі">`;
+  for (const [k, t] of [['7d','Останні 7 днів'],['30d','Останні 30 днів'],
+                        ['this_month','Поточний місяць'],['last_month','Минулий місяць'],
+                        ['current_q','Поточний квартал'],['ytd','З початку року'],
+                        ['last_year','Минулий рік'],['all','Весь час']]) {
+    html += `<option value="${k}">${t}</option>`;
+  }
+  html += `</optgroup><optgroup label="Конкретний місяць">`;
+  for (let i = 0; i < 24; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = `month:${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    html += `<option value="${key}">${MN[d.getMonth()]} ${d.getFullYear()}</option>`;
+  }
+  html += `</optgroup><optgroup label="Рік">`;
+  for (let y = now.getFullYear(); y >= 2023; y--) html += `<option value="year:${y}">${y} рік</option>`;
+  html += `</optgroup>`;
+  sel.innerHTML = html;
+  sel.value = window._globalPeriod || 'auto';
+  _syncGlobalPeriodUI();
+}
+
+function _syncGlobalPeriodUI(){
+  const sel  = document.getElementById('globalPeriodSelect');
+  const hint = document.getElementById('globalPeriodHint');
+  const rst  = document.getElementById('globalPeriodReset');
+  const on   = window.isGlobalPeriodOn();
+  if (sel) { sel.value = window._globalPeriod || 'auto'; sel.classList.toggle('gper-on', on); }
+  if (rst) rst.classList.toggle('show', on);
+  if (hint) {
+    if (!on) { hint.textContent = 'кожен блок має власний перемикач'; return; }
+    const r = window.globalPeriodRange();
+    const f = r.from.toISOString().slice(0,10), t = r.to.toISOString().slice(0,10);
+    hint.textContent = `застосовано до всіх блоків · ${f} — ${t}`;
+  }
+}
+
+window.setGlobalPeriod = function(key){
+  window._globalPeriod = key || 'auto';
+  try { localStorage.setItem(GPER_LS, window._globalPeriod); } catch(e) {}
+
+  if (window.isGlobalPeriodOn()) {
+    // Блоки, що вміють у key-періоди — підхоплюють глобальний
+    window._ovProdPeriod   = key;
+    window._legacyTopPeriod = key;
+    // ТОП-продукти у картці клієнта — через явний діапазон дат
+    const r = window.globalPeriodRange();
+    _productPeriodDays  = null;
+    _productCustomRange = { from: r.from.toISOString().slice(0,10),
+                            to:   r.to.toISOString().slice(0,10) };
+  } else {
+    window._ovProdPeriod    = _gperDefaults.ovProd;
+    window._legacyTopPeriod = _gperDefaults.legacyTop;
+    _productPeriodDays  = null;
+    _productCustomRange = null;
+  }
+  _syncGlobalPeriodUI();
+
+  // Перерендерити те, що зараз на екрані
+  const openCust = (typeof _currentCustForProductFilter !== 'undefined' && _currentCustForProductFilter)
+    ? _currentCustForProductFilter : null;
+  if (openCust) renderCustomerView(openCust); else renderOverview();
 };
 
 // v2.78.13 (Богдан): Overview-level "Продажі за смаками" — multi-select SKU + metric toggle
@@ -1674,11 +1809,40 @@ function calcPortfolioKPIs(allCounterparties){
       if (h < 40) criticalCount++;
     }
   });
+  // v2.78.83: якщо увімкнено ГЛОБАЛЬНИЙ період — рахуємо виручку за нього,
+  // а не за поточний календарний місяць. Порівняння — з рівним за довжиною відрізком перед ним.
+  let revLabel = 'поточний міс', revPrevLabel = 'попередній міс';
+  if (window.isGlobalPeriodOn && window.isGlobalPeriodOn()) {
+    const r = window.globalPeriodRange();
+    const fromMs = r.from.getTime(), toMs = r.to.getTime();
+    const span = Math.max(toMs - fromMs, 86400000);
+    const pFrom = new Date(fromMs - span - 86400000).toISOString().slice(0,10);
+    const pTo   = new Date(fromMs - 86400000).toISOString().slice(0,10);
+    const fromIso = r.from.toISOString().slice(0,10), toIso = r.to.toISOString().slice(0,10);
+
+    // Множина клієнтів пулу — щоб KPI поважав activeOverviewFilter так само, як раніше
+    const ids = new Set(), names = new Set();
+    pool.forEach(c => { if (c.id) ids.add(c.id); if (c.name) names.add(c.name); });
+
+    totalRevCur = 0; totalRevPrev = 0;
+    (allDemands || []).forEach(d => {
+      if (!(ids.has(d.agent_id) || names.has(d.agent))) return;
+      const dt = (d.ms_moment || '').slice(0,10);
+      if (!dt) return;
+      const sum = (d.sum_kop || 0) / 100;
+      if (dt >= fromIso && dt <= toIso) totalRevCur += sum;
+      else if (dt >= pFrom && dt <= pTo) totalRevPrev += sum;
+    });
+    revLabel = r.label;
+    revPrevLabel = 'попередній рівний відрізок';
+  }
+
   const revDelta = totalRevPrev > 0 ? Math.round((totalRevCur - totalRevPrev) / totalRevPrev * 100) : null;
   const avgHealth = healthCount > 0 ? Math.round(healthSum / healthCount) : 0;
 
   // v2.77.4: + poolSize для KPI sub-line "з 8392" → "з 3500 B2B" (без роздрібу/архівних)
-  return { activeCount, newThisMonth, totalRevCur, totalRevPrev, revDelta, avgHealth, criticalCount, poolSize: pool.length };
+  return { activeCount, newThisMonth, totalRevCur, totalRevPrev, revDelta, avgHealth, criticalCount,
+           poolSize: pool.length, revLabel, revPrevLabel };
 }
 
 // ============================================================================
@@ -2142,7 +2306,13 @@ window.bootCustomer360 = async function(token){
     });
     console.log(`📊 Computed metrics+health for ${allCounterparties.length} customers in ${Math.round(performance.now() - t0)}ms`);
 
-    renderOverview();        // v2.74.0: новий Overview замість renderQuickPills
+    // v2.78.83: глобальний перемикач періоду — наповнити список і застосувати збережений вибір
+    _buildGlobalPeriodOptions();
+    if (window.isGlobalPeriodOn()) {
+      setGlobalPeriod(window._globalPeriod);   // сам викличе renderOverview()
+    } else {
+      renderOverview();      // v2.74.0: новий Overview замість renderQuickPills
+    }
     setupSearch();
     _lastBoot = Date.now();    // v2.71: позначка часу для last-updated badge
     startRefreshTicker();      // v2.71: запуск тікера що оновлює "🔄 Оновлено: …"
@@ -2262,11 +2432,11 @@ function _buildOverviewHtml(){
             <div class="ov-kpi-sub">перше замовл · без роздрібу/архівних</div>
           </div>
           <div class="ov-kpi ${kpis.revDelta !== null && kpis.revDelta >= 0 ? 'green' : 'red'}">
-            <div class="ov-kpi-lbl">💰 Revenue (поточний міс)</div>
+            <div class="ov-kpi-lbl">💰 Revenue (${kpis.revLabel || 'поточний міс'})</div>
             <div class="ov-kpi-val">${nfm(kpis.totalRevCur)} ₴</div>
             <div class="ov-kpi-sub">${kpis.revDelta !== null
-              ? `<span class="ov-kpi-delta ${kpis.revDelta > 1 ? 'up' : kpis.revDelta < -1 ? 'down' : 'flat'}">${kpis.revDelta >= 0 ? '+' : ''}${kpis.revDelta}%</span> vs ${nfm(kpis.totalRevPrev)} ₴ попередній`
-              : 'без попереднього міс'}</div>
+              ? `<span class="ov-kpi-delta ${kpis.revDelta > 1 ? 'up' : kpis.revDelta < -1 ? 'down' : 'flat'}">${kpis.revDelta >= 0 ? '+' : ''}${kpis.revDelta}%</span> vs ${nfm(kpis.totalRevPrev)} ₴ · ${kpis.revPrevLabel || 'попередній міс'}`
+              : 'без попереднього періоду'}</div>
           </div>
           <div class="ov-kpi ${kpis.avgHealth >= 70 ? 'green' : kpis.avgHealth >= 40 ? '' : 'red'}">
             <div class="ov-kpi-lbl">🩺 Avg Health Score</div>
@@ -2816,6 +2986,7 @@ function _buildPortfolioSKUHtml(){
       <button class="prod-chip ${window._ovProdPeriod==='current_q' ? 'active' : ''}" onclick="setOvProdPeriod('current_q')">Поточний квартал</button>
       <button class="prod-chip ${window._ovProdPeriod==='ytd' ? 'active' : ''}" onclick="setOvProdPeriod('ytd')">З початку року</button>
       <button class="prod-chip ${window._ovProdPeriod==='last_year' ? 'active' : ''}" onclick="setOvProdPeriod('last_year')">Минулий рік</button>
+      ${window.gperChipNote(window._ovProdPeriod, "setGlobalPeriod(window._globalPeriod)")}
     </div>`;
 
   const groupChips = `
@@ -2909,17 +3080,47 @@ window.setLegacyDormantDays = function(days){
 };
 
 // Compute (start, end) ISO dates для period key
+// v2.78.83: усі дати будуємо на UTC-полудень. Раніше new Date(y,m,d) = локальна північ,
+// а споживачі роблять .toISOString().slice(0,10) → у Києві (UTC+3) це давало ПОПЕРЕДНІЙ день,
+// тобто «минулий місяць» мовчки втрачав останню добу.
+const _UD = (y, m, day) => new Date(Date.UTC(y, m, day, 12, 0, 0));
+const _MN_GEN = ['січня','лютого','березня','квітня','травня','червня',
+                 'липня','серпня','вересня','жовтня','листопада','грудня'];
+
 function _legacyPeriodRange(now, key){
   const y = now.getFullYear();
   const m = now.getMonth();
+
+  // v2.78.83: конкретний місяць — month:YYYY-MM
+  if (typeof key === 'string' && key.startsWith('month:')) {
+    const [yy, mm] = key.slice(6).split('-').map(Number);
+    if (yy && mm) {
+      return { from: _UD(yy, mm-1, 1), to: _UD(yy, mm, 0),
+               label: `${_MN_GEN[mm-1]} ${yy}` };
+    }
+  }
+  // v2.78.83: конкретний рік — year:YYYY
+  if (typeof key === 'string' && key.startsWith('year:')) {
+    const yy = Number(key.slice(5));
+    if (yy) return { from: _UD(yy, 0, 1), to: _UD(yy, 11, 31), label: `${yy} рік` };
+  }
+  // v2.78.83: довільний діапазон — range:YYYY-MM-DD..YYYY-MM-DD
+  if (typeof key === 'string' && key.startsWith('range:')) {
+    const [f, t] = key.slice(6).split('..');
+    if (f && t) return { from: new Date(f + 'T12:00:00Z'), to: new Date(t + 'T12:00:00Z'),
+                         label: `${f} — ${t}` };
+  }
+
   switch(key){
+    case 'all':        return { from: _UD(2000, 0, 1), to: now, label: 'весь час' };
     case '7d':         return { from: new Date(now.getTime() - 7*86400000), to: now, label: 'останні 7 днів' };
     case '30d':        return { from: new Date(now.getTime() - 30*86400000), to: now, label: 'останні 30 днів' };
-    case 'last_month': { const f = new Date(y, m-1, 1); const t = new Date(y, m, 0); return { from: f, to: t, label: 'минулий місяць' }; }
-    case 'current_q':  { const qStartMonth = Math.floor(m/3)*3; return { from: new Date(y, qStartMonth, 1), to: now, label: 'поточний квартал' }; }
-    case 'ytd':        return { from: new Date(y, 0, 1), to: now, label: 'з початку року' };
-    case 'last_year':  return { from: new Date(y-1, 0, 1), to: new Date(y-1, 11, 31), label: 'минулий рік' };
-    default:           return { from: new Date(y, m-1, 1), to: new Date(y, m, 0), label: 'минулий місяць' };
+    case 'this_month': return { from: _UD(y, m, 1), to: now, label: 'поточний місяць' };
+    case 'last_month': return { from: _UD(y, m-1, 1), to: _UD(y, m, 0), label: 'минулий місяць' };
+    case 'current_q':  { const q = Math.floor(m/3)*3; return { from: _UD(y, q, 1), to: now, label: 'поточний квартал' }; }
+    case 'ytd':        return { from: _UD(y, 0, 1), to: now, label: 'з початку року' };
+    case 'last_year':  return { from: _UD(y-1, 0, 1), to: _UD(y-1, 11, 31), label: 'минулий рік' };
+    default:           return { from: _UD(y, m-1, 1), to: _UD(y, m, 0), label: 'минулий місяць' };
   }
 }
 
@@ -3048,6 +3249,7 @@ function _buildLegacyListsHtml(customersPool){
       <button class="prod-chip ${periodKey==='current_q' ? 'active' : ''}" onclick="setLegacyTopPeriod('current_q')">Поточний квартал</button>
       <button class="prod-chip ${periodKey==='ytd' ? 'active' : ''}" onclick="setLegacyTopPeriod('ytd')">З початку року</button>
       <button class="prod-chip ${periodKey==='last_year' ? 'active' : ''}" onclick="setLegacyTopPeriod('last_year')">Минулий рік</button>
+      ${window.gperChipNote(periodKey, "setGlobalPeriod(window._globalPeriod)")}
     </div>`;
 
   // Dormant з фільтром днів
