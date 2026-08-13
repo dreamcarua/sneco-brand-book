@@ -72,6 +72,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .gper-select:focus{outline:2px solid #FEBF27;outline-offset:1px}
 .gper-select.gper-on{border-color:#FEBF27;background-color:#FFFBEF}
 .gper-hint{font-size:11px;color:var(--muted)}
+.gper-range{display:inline-flex;align-items:center;gap:5px}
+.gper-date{font:inherit;font-size:12px;color:var(--d);background:#fff;border:1.5px solid var(--line,#e2e2dd);
+  border-radius:7px;padding:5px 8px;cursor:pointer}
+.gper-date.gper-on{border-color:#FEBF27;background:#FFFBEF}
+.gper-dash{color:var(--muted);font-size:12px}
+.gper-apply{font:inherit;font-size:11.5px;font-weight:600;color:var(--d);background:#fff;
+  border:1.5px solid var(--line,#e2e2dd);border-radius:7px;padding:5px 10px;cursor:pointer}
+.gper-apply:hover{border-color:#FEBF27;background:#FFFBEF}
+@media (max-width:640px){.gper-range{width:100%;justify-content:center;flex-wrap:wrap}}
 .gper-reset{display:none;font:inherit;font-size:11px;color:var(--muted);background:transparent;
   border:1px solid var(--line,#e2e2dd);border-radius:6px;padding:4px 9px;cursor:pointer}
 .gper-reset:hover{color:var(--d);border-color:#bbb}
@@ -81,6 +90,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .gper-chip-note.warn{color:#8a5a12;background:#FFF4E5;border-color:#F5D9AC}
 .gper-chip-note a{color:inherit;text-decoration:underline;margin-left:6px}
 @media print{.gper-bar,.gper-chip-note{display:none}}
+/* v2.78.84 — розшифровка «Нові B2B» */
+.ov-kpi-click{cursor:pointer;transition:transform .12s ease,box-shadow .12s ease}
+.ov-kpi-click:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.08)}
+.ov-kpi-caret{font-size:13px;opacity:.5;vertical-align:middle}
+.new-drill{margin-top:14px;border:1px solid var(--line,#e2e2dd);border-radius:10px;overflow:hidden;background:#fff}
+.new-drill-head{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#FAFAF7;
+  border-bottom:1px solid var(--line,#e2e2dd);font-weight:700;font-size:13px}
+.new-drill-head span{font-weight:400;color:var(--muted);font-size:11.5px}
+.new-drill-head button{margin-left:auto;font:inherit;font-size:11.5px;font-weight:600;background:#fff;
+  border:1px solid var(--line,#e2e2dd);border-radius:6px;padding:4px 10px;cursor:pointer}
+.new-drill-note{padding:9px 14px;font-size:11.5px;line-height:1.55;color:#6b6b6b;background:#FFFDF6;
+  border-bottom:1px solid var(--line,#e2e2dd)}
+.new-drill-scroll{max-height:420px;overflow:auto}
+.new-drill-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.new-drill-tbl th{position:sticky;top:0;background:#fff;text-align:left;padding:8px 10px;
+  border-bottom:1px solid var(--line,#e2e2dd);font-size:11px;text-transform:uppercase;
+  letter-spacing:.04em;color:var(--muted);z-index:1}
+.new-drill-tbl td{padding:7px 10px;border-bottom:1px solid #f1f1ec}
+.new-drill-tbl tbody tr:hover{background:#FFFBEF}
+.new-drill-tbl .nd-i{color:#bbb;width:28px}
+.new-drill-tbl .nd-n,.new-drill-tbl tfoot td{text-align:right;white-space:nowrap}
+.new-drill-tbl .nd-d{white-space:nowrap;color:#666}
+.new-drill-tbl .nd-t{color:#777;font-size:11.5px}
+.new-drill-tbl tfoot td{background:#FAFAF7;font-weight:700;border-top:1px solid var(--line,#e2e2dd)}
+.new-drill-tbl a{color:var(--d);text-decoration:none;border-bottom:1px dotted #bbb}
+.new-drill-tbl a:hover{border-bottom-style:solid}
 .quick-pill{padding:5px 12px;background:var(--yf);color:#996600;font-size:11px;font-weight:600;border-radius:14px;cursor:pointer;border:1px solid transparent;transition:all .15s}
 .quick-pill:hover{background:var(--y);color:var(--d);border-color:var(--y)}
 
@@ -699,6 +734,12 @@ body.dash-locked{overflow:hidden}
     <span class="gper-label">📅 Період</span>
     <select id="globalPeriodSelect" class="gper-select" onchange="setGlobalPeriod(this.value)"
             title="Обери місяць або пресет — застосується до всіх блоків"></select>
+    <span class="gper-range">
+      <input type="date" id="gperFrom" class="gper-date" title="Довільний діапазон: від">
+      <span class="gper-dash">–</span>
+      <input type="date" id="gperTo" class="gper-date" title="Довільний діапазон: до">
+      <button type="button" class="gper-apply" onclick="applyGlobalRange()">Застосувати</button>
+    </span>
     <span class="gper-hint" id="globalPeriodHint"></span>
     <button type="button" class="gper-reset" id="globalPeriodReset"
             onclick="setGlobalPeriod('auto')" title="Повернути кожному блоку його власний період">✕ скинути</button>
@@ -722,7 +763,7 @@ body.dash-locked{overflow:hidden}
 </div>
 
 <div class="footer">
-  snEco Customer 360 v2.78.83 · 📅 НОВЕ: глобальний перемикач періоду вгорі — обери будь-який місяць за 24 міс або рік, і всі блоки перерахуються. Локальні перемикачі блоків лишились. · 🔧 Critical fixes: copySummary combined-aware · aov у metrics → Peer comparison працює · refresh button skip reset · AR aging bucket cleanup · keyboard "n" → openCrmModal · Google Sign-In exp fallback · CS period default 365 · 🎨 Topbar + Google OAuth + JWT 30 діб · Оновлення: щодня 06:00
+  snEco Customer 360 v2.78.84 · 📅 Глобальний період: місяць / рік / довільний діапазон дат — усі блоки перераховуються. Локальні перемикачі блоків лишились. · 🐞 ФІКС: KPI «Нові B2B» показував МИНУЛИЙ місяць через зсув часового поясу. Тепер клікабельний — покаже поіменний список. · 🔧 Critical fixes: copySummary combined-aware · aov у metrics → Peer comparison працює · refresh button skip reset · AR aging bucket cleanup · keyboard "n" → openCrmModal · Google Sign-In exp fallback · CS period default 365 · 🎨 Topbar + Google OAuth + JWT 30 діб · Оновлення: щодня 06:00
 </div>
 
 <script>
@@ -898,7 +939,19 @@ function _syncGlobalPeriodUI(){
   const hint = document.getElementById('globalPeriodHint');
   const rst  = document.getElementById('globalPeriodReset');
   const on   = window.isGlobalPeriodOn();
-  if (sel) { sel.value = window._globalPeriod || 'auto'; sel.classList.toggle('gper-on', on); }
+  const isRange = typeof window._globalPeriod === 'string' && window._globalPeriod.startsWith('range:');
+  if (sel) {
+    // Довільний діапазон не має свого <option> — показуємо «auto», підсвітку дають поля дат
+    sel.value = isRange ? 'auto' : (window._globalPeriod || 'auto');
+    sel.classList.toggle('gper-on', on && !isRange);
+  }
+  if (isRange) {
+    const [f, t] = window._globalPeriod.slice(6).split('..');
+    const fi = document.getElementById('gperFrom'), ti = document.getElementById('gperTo');
+    if (fi && !fi.value) fi.value = f;
+    if (ti && !ti.value) ti.value = t;
+  }
+  document.querySelectorAll('.gper-date').forEach(el => el.classList.toggle('gper-on', isRange));
   if (rst) rst.classList.toggle('show', on);
   if (hint) {
     if (!on) { hint.textContent = 'кожен блок має власний перемикач'; return; }
@@ -914,6 +967,15 @@ if (document.readyState === 'loading') {
 } else {
   setTimeout(() => _buildGlobalPeriodOptions(), 0);
 }
+
+// Довільний діапазон дат (Поліна: «як у Sales»)
+window.applyGlobalRange = function(){
+  const f = document.getElementById('gperFrom')?.value;
+  const t = document.getElementById('gperTo')?.value;
+  if (!f || !t) { alert('Вкажи обидві дати — «від» і «до».'); return; }
+  if (f > t)    { alert('Дата «від» пізніша за «до».'); return; }
+  setGlobalPeriod(`range:${f}..${t}`);
+};
 
 window.setGlobalPeriod = function(key){
   window._globalPeriod = key || 'auto';
@@ -1606,6 +1668,62 @@ window.setOverviewFilter = function(f){
   renderOverview();
 };
 
+// v2.78.84 (Поліна): розшифровка KPI «Нові B2B» — хто саме і звідки прийшов
+let _newDrillOpen = false;
+window.toggleNewDrill = function(){ _newDrillOpen = !_newDrillOpen; renderOverview(); };
+
+function _buildNewDrillHtml(kpis){
+  const rows = kpis.newList || [];
+  const period = `${kpis.newFrom} — ${kpis.newTo}`;
+  if (!rows.length) {
+    return `<div class="new-drill"><div class="new-drill-head">🆕 Нові B2B · ${escapeHtml(kpis.newLabel||'')} <span>${period}</span></div>
+      <div class="ov-mover-empty">За цей період нових B2B-клієнтів немає.</div></div>`;
+  }
+  const totalRev = rows.reduce((a,r) => a + r.rev, 0);
+  const body = rows.map((r,i) => `
+    <tr>
+      <td class="nd-i">${i+1}</td>
+      <td><a href="javascript:void(0)" onclick="openCustomerByName('${escapeHtml(r.name).replace(/'/g,"\\'")}')">${escapeHtml(r.name)}</a></td>
+      <td class="nd-d">${r.first}</td>
+      <td class="nd-n">${r.orders}</td>
+      <td class="nd-n">${nfm(r.rev)} ₴</td>
+      <td class="nd-t">${escapeHtml(r.src || r.tags || '—')}</td>
+    </tr>`).join('');
+  return `
+    <div class="new-drill">
+      <div class="new-drill-head">
+        🆕 Хто саме · ${escapeHtml(kpis.newLabel || '')} <span>${period}</span>
+        <button type="button" onclick="copyNewList()">⧉ копіювати</button>
+      </div>
+      <div class="new-drill-note">
+        «Новий» = <b>перше в історії відвантаження</b> потрапило в цей період. Роздріб (інтернет-магазин, маркетплейси)
+        та архівні контрагенти виключені. ⚠ Історія в базі — з 01.01.2023: якщо клієнт замовляв до 2023 і потім мовчав,
+        він порахується як новий.
+      </div>
+      <div class="new-drill-scroll">
+        <table class="new-drill-tbl">
+          <thead><tr><th></th><th>Клієнт</th><th>Перше замовл.</th><th>Замовл.</th><th>Виручка</th><th>Джерело / теги</th></tr></thead>
+          <tbody>${body}</tbody>
+          <tfoot><tr><td></td><td><b>Разом ${rows.length}</b></td><td></td><td></td><td><b>${nfm(totalRev)} ₴</b></td><td></td></tr></tfoot>
+        </table>
+      </div>
+    </div>`;
+}
+
+window.copyNewList = function(){
+  const k = calcPortfolioKPIs(allCounterparties);
+  const txt = ['Клієнт\tПерше замовлення\tЗамовлень\tВиручка, грн\tДжерело/теги']
+    .concat((k.newList||[]).map(r => [r.name, r.first, r.orders, r.rev, r.src || r.tags || ''].join('\t')))
+    .join('\n');
+  navigator.clipboard?.writeText(txt);
+};
+
+// Відкрити картку клієнта за назвою (з drill-таблиці)
+window.openCustomerByName = function(name){
+  const c = allCounterparties.find(x => x.name === name);
+  if (c) { renderCustomerView(c); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+};
+
 // v2.74.2: heatmap cell drill-down — клік на cell показує список клієнтів цього сегменту×health
 let heatmapDrillKey = null;   // 'VIP-good', 'Mid-warn', 'SMB-bad' etc.
 window.openHeatmapDrill = function(tier, health){
@@ -1792,11 +1910,25 @@ function calcPortfolioKPIs(allCounterparties){
   const pool = excludeRetailAndArchived(allCounterparties);
 
   const today = new Date();
-  const curMonthStart = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().slice(0,10);
+  // v2.78.84 🐞 ФІКС: було new Date(y,m,1).toISOString() = локальна північ → у Києві (UTC+3)
+  // це давало 31.07 замість 01.08, тобто .slice(0,7)='2026-07'. KPI «Нові ЦЬОГО місяця»
+  // насправді рахував МИНУЛИЙ місяць (24 замість 5). Тепер — рядком, без часових поясів.
+  const curMonthYMSafe = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
   const cutoff30 = new Date(Date.now() - 30*86400000).toISOString().slice(0,10);
 
+  // v2.78.84: «нові» рахуються за ГЛОБАЛЬНИЙ період, якщо він увімкнений
+  let newFrom = curMonthYMSafe + '-01', newTo = curMonthYMSafe + '-31';
+  let newLabel = 'цього міс';
+  if (window.isGlobalPeriodOn && window.isGlobalPeriodOn()) {
+    const gr = window.globalPeriodRange();
+    newFrom = gr.from.toISOString().slice(0,10);
+    newTo   = gr.to.toISOString().slice(0,10);
+    newLabel = gr.label;
+  }
+
   let activeCount = 0;     // ordered у last 30d
-  let newThisMonth = 0;    // перше замовлення цього місяця
+  let newThisMonth = 0;    // перше замовлення у періоді
+  const newList = [];      // v2.78.84: хто саме — для розшифровки під KPI
   let totalRevCur = 0;
   let totalRevPrev = 0;
   let healthSum = 0, healthCount = 0;
@@ -1806,10 +1938,19 @@ function calcPortfolioKPIs(allCounterparties){
     const m = c.__metrics;
     if (!m) return;
     if (m.lastOrder && m.lastOrder.slice(0,10) >= cutoff30) activeCount++;
-    // New this month: first order дата у byMonth — мінімальна
-    if (m.byMonth) {
-      const firstM = Object.keys(m.byMonth).sort()[0];
-      if (firstM && firstM === curMonthStart.slice(0,7)) newThisMonth++;
+    // v2.78.84: «новий» = ПЕРШЕ В ІСТОРІЇ відвантаження припадає на обраний період.
+    // Дата — з m.firstOrder (точна, до дня), а не з місячного зрізу byMonth.
+    const fo = (m.firstOrder || '').slice(0,10);
+    if (fo && fo >= newFrom && fo <= newTo) {
+      newThisMonth++;
+      newList.push({
+        name: c.name || '—',
+        first: fo,
+        orders: m.ordersCount || 0,
+        rev: Math.round(m.totalShipped || 0),
+        tags: (c.tags || '').slice(0, 60),
+        src: c.acquisition_source || '',
+      });
     }
     totalRevCur += m.monthRev;
     totalRevPrev += m.prevMonthRev;
@@ -1852,8 +1993,10 @@ function calcPortfolioKPIs(allCounterparties){
   const avgHealth = healthCount > 0 ? Math.round(healthSum / healthCount) : 0;
 
   // v2.77.4: + poolSize для KPI sub-line "з 8392" → "з 3500 B2B" (без роздрібу/архівних)
+  newList.sort((a,b) => b.rev - a.rev);
   return { activeCount, newThisMonth, totalRevCur, totalRevPrev, revDelta, avgHealth, criticalCount,
-           poolSize: pool.length, revLabel, revPrevLabel };
+           poolSize: pool.length, revLabel, revPrevLabel,
+           newLabel, newFrom, newTo, newList };
 }
 
 // ============================================================================
@@ -2437,10 +2580,10 @@ function _buildOverviewHtml(){
             <div class="ov-kpi-val">${nf(kpis.activeCount)}</div>
             <div class="ov-kpi-sub">з ${nf(kpis.poolSize || totalAll)} B2B · замовл &lt; 30д · без роздрібу</div>
           </div>
-          <div class="ov-kpi green">
-            <div class="ov-kpi-lbl">🆕 Нові цього міс B2B</div>
-            <div class="ov-kpi-val">${nf(kpis.newThisMonth)}</div>
-            <div class="ov-kpi-sub">перше замовл · без роздрібу/архівних</div>
+          <div class="ov-kpi green ov-kpi-click" onclick="toggleNewDrill()" title="Клікни — покаже поіменний список">
+            <div class="ov-kpi-lbl">🆕 Нові B2B (${kpis.newLabel || 'цього міс'})</div>
+            <div class="ov-kpi-val">${nf(kpis.newThisMonth)} <span class="ov-kpi-caret">${_newDrillOpen ? '▴' : '▾'}</span></div>
+            <div class="ov-kpi-sub">перше в історії замовлення · без роздрібу/архівних</div>
           </div>
           <div class="ov-kpi ${kpis.revDelta !== null && kpis.revDelta >= 0 ? 'green' : 'red'}">
             <div class="ov-kpi-lbl">💰 Revenue (${kpis.revLabel || 'поточний міс'})</div>
@@ -2460,6 +2603,7 @@ function _buildOverviewHtml(){
             <div class="ov-kpi-sub">health &lt; 40</div>
           </div>
         </div>
+        ${_newDrillOpen ? _buildNewDrillHtml(kpis) : ''}
       </div>
 
       ${concentration.share > 50 ? `
