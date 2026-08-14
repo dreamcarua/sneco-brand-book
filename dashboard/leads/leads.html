@@ -436,7 +436,7 @@ tr:hover td{background:#FEFCF7}
 .ms{font-size:11.5px;font-weight:700;color:var(--green)}
 .ms.no{color:var(--mut);font-weight:400}
 .empty{text-align:center;padding:56px 20px;color:var(--mut)}
-.msg{font-size:13px;color:#444;margin-top:5px;max-width:420px}
+.msg{font-size:13px;color:#333;max-width:340px;white-space:pre-wrap;word-break:break-word;line-height:1.45}
 .nt{width:210px;min-width:180px;border:1.5px solid var(--ln);border-radius:7px;padding:7px 9px;font:inherit;font-size:13px;background:#fff;resize:vertical}
 .nt:focus{outline:none;border-color:var(--y);background:#FFFEF9}
 .ntst{font-size:11px;color:var(--green);height:13px;margin-top:2px}
@@ -520,14 +520,14 @@ function render(){
   });
   var box=document.getElementById('tablebox');
   if(!rows.length){box.innerHTML='<div class="empty">Лідів не знайдено.<br><span style="font-size:13px">Заявки з лендингу <b>/dystrybyutor/</b> зʼявляться тут автоматично.</span></div>';return;}
-  var h='<table><thead><tr><th>Дата</th><th>Хто</th><th>Контакти</th><th class="hide-m">Заявка</th><th class="hide-m">Джерело / UTM</th><th>МС</th><th>Статус</th><th>Коментар менеджера</th><th></th></tr></thead><tbody>';
+  var h='<table><thead><tr><th>Дата</th><th>Хто</th><th>Контакти</th><th>Коментар клієнта</th><th class="hide-m">Джерело / UTM</th><th>МС</th><th>Статус</th><th>Нотатка менеджера</th><th></th></tr></thead><tbody>';
   rows.forEach(function(l){
     var nm=l.company||l.name||'—';
     h+='<tr>'
      +'<td style="white-space:nowrap;font-size:13px">'+dt(l.created_at)+'</td>'
      +'<td><div class="who">'+esc(nm)+'</div>'+(l.company&&l.name?'<div class="meta">'+esc(l.name)+'</div>':'')+'</td>'
      +'<td><a class="mail" href="mailto:'+esc(l.email)+'">'+esc(l.email)+'</a>'+(l.phone?'<div class="meta"><a class="mail" href="tel:'+esc(l.phone)+'">'+esc(l.phone)+'</a></div>':'')+'</td>'
-     +'<td class="hide-m"><div class="msg">'+esc((l.message||'').slice(0,180))+'</div></td>'
+     +'<td><div class="msg">'+(l.message?esc(l.message):'<span style="color:#bbb">—</span>')+'</div></td>'
      +'<td class="hide-m"><span class="tag src">'+esc(l.source||'—')+'</span>'+(l.utm_source?'<div class="meta">'+esc(l.utm_source)+' / '+esc(l.utm_medium||'-')+' / '+esc(l.utm_campaign||'-')+'</div>':'')+'</td>'
      +'<td>'+(l.ms_counterparty_id?'<span class="ms">✓</span>':'<span class="ms no">—</span>')+'</td>'
      +'<td><select class="st" data-id="'+l.id+'">'+Object.keys(ST).map(function(k){return '<option value="'+k+'"'+((l.status||'new')===k?' selected':'')+'>'+ST[k]+'</option>';}).join('')+'</select></td>'
