@@ -437,6 +437,12 @@ tr:hover td{background:#FEFCF7}
 .ms.no{color:var(--mut);font-weight:400}
 .empty{text-align:center;padding:56px 20px;color:var(--mut)}
 .msg{font-size:13px;color:#444;margin-top:5px;max-width:420px}
+.nt{width:210px;min-width:180px;border:1.5px solid var(--ln);border-radius:7px;padding:7px 9px;font:inherit;font-size:13px;background:#fff;resize:vertical}
+.nt:focus{outline:none;border-color:var(--y);background:#FFFEF9}
+.ntst{font-size:11px;color:var(--green);height:13px;margin-top:2px}
+.del{background:none;border:1.5px solid var(--ln);border-radius:6px;color:var(--mut);cursor:pointer;font-size:13px;padding:5px 9px;line-height:1}
+.del:hover{border-color:var(--red);color:var(--red);background:#FFF5F5}
+.del:disabled{opacity:.4;cursor:wait}
 @media(max-width:1100px){.kpis{grid-template-columns:repeat(2,1fr)}.hide-m{display:none}}
 </style>
 
@@ -470,6 +476,7 @@ tr:hover td{background:#FEFCF7}
     <select id="f-source"><option value="">Усі джерела</option></select>
     <input id="f-q" placeholder="Пошук: імʼя, компанія, email, телефон…" style="min-width:260px">
     <div class="sp"></div>
+    <button class="btn gh" id="purge" title="Видалити тестові записи (example.com, smoke-*)">🧹 Тестові</button>
     <button class="btn gh" id="csv">↓ CSV</button>
     <button class="btn" id="reload">Оновити</button>
   </div>
@@ -513,7 +520,7 @@ function render(){
   });
   var box=document.getElementById('tablebox');
   if(!rows.length){box.innerHTML='<div class="empty">Лідів не знайдено.<br><span style="font-size:13px">Заявки з лендингу <b>/dystrybyutor/</b> зʼявляться тут автоматично.</span></div>';return;}
-  var h='<table><thead><tr><th>Дата</th><th>Хто</th><th>Контакти</th><th class="hide-m">Заявка</th><th class="hide-m">Джерело / UTM</th><th>МойСклад</th><th>Статус</th></tr></thead><tbody>';
+  var h='<table><thead><tr><th>Дата</th><th>Хто</th><th>Контакти</th><th class="hide-m">Заявка</th><th class="hide-m">Джерело / UTM</th><th>МС</th><th>Статус</th><th>Коментар менеджера</th><th></th></tr></thead><tbody>';
   rows.forEach(function(l){
     var nm=l.company||l.name||'—';
     h+='<tr>'
@@ -522,11 +529,44 @@ function render(){
      +'<td><a class="mail" href="mailto:'+esc(l.email)+'">'+esc(l.email)+'</a>'+(l.phone?'<div class="meta"><a class="mail" href="tel:'+esc(l.phone)+'">'+esc(l.phone)+'</a></div>':'')+'</td>'
      +'<td class="hide-m"><div class="msg">'+esc((l.message||'').slice(0,180))+'</div></td>'
      +'<td class="hide-m"><span class="tag src">'+esc(l.source||'—')+'</span>'+(l.utm_source?'<div class="meta">'+esc(l.utm_source)+' / '+esc(l.utm_medium||'-')+' / '+esc(l.utm_campaign||'-')+'</div>':'')+'</td>'
-     +'<td>'+(l.ms_counterparty_id?'<span class="ms">✓ створено</span>':'<span class="ms no">—</span>')+'</td>'
+     +'<td>'+(l.ms_counterparty_id?'<span class="ms">✓</span>':'<span class="ms no">—</span>')+'</td>'
      +'<td><select class="st" data-id="'+l.id+'">'+Object.keys(ST).map(function(k){return '<option value="'+k+'"'+((l.status||'new')===k?' selected':'')+'>'+ST[k]+'</option>';}).join('')+'</select></td>'
+     +'<td><textarea class="nt" data-id="'+l.id+'" rows="2" placeholder="Нотатка: домовленості, наступний крок…">'+esc(l.internal_notes||'')+'</textarea><div class="ntst" data-for="'+l.id+'"></div></td>'
+     +'<td><button class="del" data-id="'+l.id+'" title="Видалити лід">✕</button></td>'
      +'</tr>';
   });
   box.innerHTML=h+'</tbody></table>';
+  // нотатки — зберігаються при втраті фокусу (blur) або Ctrl+Enter
+  box.querySelectorAll('.nt').forEach(function(ta){
+    var orig=ta.value;
+    async function save(){
+      if(ta.value===orig) return;
+      var id=ta.dataset.id, st=box.querySelector('.ntst[data-for="'+id+'"]');
+      st.textContent='збереження…';
+      try{
+        await api('/api/leads/update',{id:parseInt(id),notes:ta.value});
+        orig=ta.value;
+        var L=LEADS.find(function(x){return String(x.id)===String(id);});if(L)L.internal_notes=ta.value;
+        st.textContent='✓ збережено'; setTimeout(function(){st.textContent='';},1800);
+      }catch(e){ st.textContent='✕ помилка'; }
+    }
+    ta.addEventListener('blur',save);
+    ta.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){ta.blur();}});
+  });
+  // видалення
+  box.querySelectorAll('.del').forEach(function(b){
+    b.addEventListener('click',async function(){
+      var id=this.dataset.id;
+      var L=LEADS.find(function(x){return String(x.id)===String(id);});
+      if(!confirm('Видалити лід'+(L?' «'+(L.company||L.name||L.email)+'»':'')+'?\n\nДію не можна скасувати.')) return;
+      this.disabled=true;
+      try{
+        await api('/api/leads/delete',{id:parseInt(id)});
+        LEADS=LEADS.filter(function(x){return String(x.id)!==String(id);});
+        kpis();render();
+      }catch(e){alert('Не вдалося видалити: '+e.message);this.disabled=false;}
+    });
+  });
   box.querySelectorAll('.st').forEach(function(sel){
     sel.addEventListener('change',async function(){
       var id=this.dataset.id,v=this.value,el=this;el.disabled=true;
@@ -556,6 +596,16 @@ async function load(){
 ['f-status','f-source'].forEach(function(id){document.getElementById(id).addEventListener('change',render);});
 document.getElementById('f-q').addEventListener('input',render);
 document.getElementById('reload').addEventListener('click',load);
+document.getElementById('purge').addEventListener('click',async function(){
+  if(!confirm('Видалити всі ТЕСТОВІ ліди?\n\n(email на @example.com, @test.*, smoke-*, джерела test/unittest)\nСправжні заявки не зачіпаються.')) return;
+  this.disabled=true;
+  try{
+    var r=await api('/api/leads/delete',{purge_test:true});
+    alert('Видалено тестових: '+(r.deleted!=null?r.deleted:'?'));
+    await load();
+  }catch(e){alert('Помилка: '+e.message);}
+  this.disabled=false;
+});
 document.getElementById('csv').addEventListener('click',function(){
   var cols=['created_at','status','source','name','company','email','phone','message','utm_source','utm_medium','utm_campaign','ms_counterparty_id'];
   var csv=[cols.join(',')].concat(LEADS.map(function(l){return cols.map(function(c){return '"'+String(l[c]==null?'':l[c]).replace(/"/g,'""')+'"';}).join(',');})).join('\n');
