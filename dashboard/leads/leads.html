@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>snEco · Ліди з сайту</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD" crossorigin="anonymous"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --y:#FEBF27;--g:#96C11F;--d:#1E1E1E;--bg:#F4F4EF;--card:#fff;
+  --muted:#6b6b6b;--border:#E5E5DC;--red:#dc2626;--blue:#3B82F6;
+  --orange:#F97316;--purple:#7209B7;
+  --yf:rgba(254,191,39,.13);--gf:rgba(150,193,31,.12);--rf:rgba(232,64,64,.10);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--d);font-size:14px;min-height:100vh}
+
+/* ─── TOPBAR ─── */
+.topbar{background:var(--d);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.3);gap:12px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-box{width:32px;height:32px;background:var(--y);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:var(--d);letter-spacing:-0.5px}
+.logo-img{height:24px;display:block;flex-shrink:0}
+@media(max-width:760px){.logo-text,.logo-sub{display:none}}
+@media(max-width:520px){.logo-img{height:20px}}
+.logo-text{color:#fff;font-size:15px;font-weight:700;letter-spacing:-.3px}
+.logo-sub{color:rgba(255,255,255,.4);font-size:11px;margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
+/* v2.76.0 — Unified nav menu across all dashboards */
+.nav-menu{display:flex;align-items:center;gap:2px;margin-left:18px;padding-left:18px;border-left:1px solid rgba(255,255,255,.12)}
+.nav-link{color:rgba(255,255,255,.65);text-decoration:none;font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:7px;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.nav-link:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-link.active{background:rgba(254,191,39,.18);color:#FEBF27}
+.nav-toggle{display:none;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:6px;margin-left:8px}
+@media(max-width:1280px){
+  .nav-menu{position:fixed;top:56px;left:0;right:0;background:#1E1E1E;flex-direction:column;align-items:stretch;padding:8px 16px;gap:0;margin:0;border-left:none;border-bottom:1px solid rgba(255,255,255,.1);transform:translateY(-110%);transition:transform .25s;z-index:180;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+  .nav-menu.open{transform:translateY(0)}
+  .nav-link{padding:11px 12px;border-radius:6px}
+  .nav-toggle{display:inline-block}
+}
+.badge{padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:600;white-space:nowrap}
+@media(max-width:900px){.badge{padding:2px 7px;font-size:10px}#lastBootBadge{display:none}}
+@media(max-width:520px){#lastUpdate{display:none}}
+.badge-green{background:rgba(150,193,31,.2);color:var(--g);border:1px solid rgba(150,193,31,.3)}
+.badge-gray{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1)}
+
+/* ─── LAYOUT ─── */
+.wrap{padding:20px 24px;max-width:1400px;margin:0 auto}
+.empty-hero{padding:80px 20px;text-align:center;color:var(--muted)}
+.empty-hero .eh-icon{font-size:60px;margin-bottom:14px;opacity:.5}
+.empty-hero .eh-title{font-size:18px;font-weight:700;color:var(--d);margin-bottom:6px}
+.empty-hero .eh-sub{font-size:13px;line-height:1.5}
+.sec{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:24px 0 12px;display:flex;align-items:center;gap:8px}
+.sec::after{content:'';flex:1;height:1px;background:var(--border)}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media(max-width:960px){.g4{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}}
+@media(max-width:620px){.g4,.g3,.g2{grid-template-columns:1fr}.topbar{padding:0 12px;height:48px}.wrap{padding:12px 10px}}
+
+/* ─── HERO HEADER ─── */
+.fin-header{background:linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%);color:#fff;border-radius:14px;padding:24px 28px;margin-bottom:20px;position:relative;overflow:hidden}
+.fin-header::after{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle, rgba(150,193,31,0.18) 0%, transparent 70%);pointer-events:none}
+.fin-title{font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;line-height:1.2}
+.fin-sub{font-size:13px;color:rgba(255,255,255,.75)}
+
+/* ─── PERIOD SELECTOR + DIAGNOSTIC STRIP (v3.0) ─── */
+.period-bar{background:#fff;border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;position:sticky;top:56px;z-index:150;box-shadow:0 1px 0 rgba(0,0,0,.02)}
+.period-bar-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-right:2px}
+.period-chips{display:flex;gap:4px;background:#F1F1EB;padding:3px;border-radius:9px;flex-wrap:wrap}
+.period-chip{padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;color:#555;cursor:pointer;border:none;background:transparent;transition:all .15s ease;white-space:nowrap}
+.period-chip:hover{background:rgba(254,191,39,.18);color:var(--d)}
+.period-chip.active{background:var(--d);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.period-chip.active:hover{background:var(--d);color:#fff}
+.period-custom{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.period-custom input[type=date]{padding:5px 8px;border-radius:7px;border:1px solid var(--border);font-size:12px;font-family:inherit;color:var(--d);background:#fafafa}
+.period-custom input[type=date]:focus{outline:none;border-color:var(--y);background:#fff}
+.granularity-toggle{display:flex;gap:3px;background:#F1F1EB;padding:3px;border-radius:8px;margin-left:auto}
+.granularity-toggle .gt-btn{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;color:#555;cursor:pointer;border:none;background:transparent}
+.granularity-toggle .gt-btn.active{background:#fff;color:var(--d);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.period-range-info{font-size:11px;color:var(--muted);padding:4px 10px;background:rgba(150,193,31,.08);border-radius:7px;font-weight:500;white-space:nowrap}
+@media(max-width:760px){.period-bar{padding:10px 12px;gap:8px}.period-chips{flex:1;justify-content:flex-start;overflow-x:auto}.granularity-toggle{margin-left:0;width:100%;justify-content:flex-start;margin-top:4px}}
+
+.diag-strip{background:#FFF9E5;border-bottom:1px solid #F5E6B3;padding:8px 24px;display:flex;align-items:center;gap:16px;font-size:11.5px;flex-wrap:wrap}
+.diag-strip.ok{background:rgba(150,193,31,.08);border-color:rgba(150,193,31,.25)}
+.diag-strip.warn{background:#FFF9E5;border-color:#F5E6B3}
+.diag-strip.err{background:rgba(232,64,64,.05);border-color:rgba(232,64,64,.18)}
+.diag-item{display:flex;align-items:center;gap:5px;color:#555;font-weight:500}
+.diag-item strong{color:var(--d);font-weight:700}
+.diag-item.empty{color:var(--red)}
+.diag-item.empty strong{color:var(--red)}
+.diag-divider{color:#ccc;font-weight:300}
+.diag-action{margin-left:auto;font-size:11px;color:#1d5fa6;text-decoration:none;font-weight:600;padding:3px 9px;background:rgba(59,130,246,.08);border-radius:5px;cursor:pointer;border:none;font-family:inherit}
+.diag-action:hover{background:rgba(59,130,246,.16)}
+@media(max-width:760px){.diag-strip{padding:8px 12px}.diag-divider{display:none}.diag-action{margin-left:0}}
+
+/* ─── KPI CARDS ─── */
+.kpi{background:var(--card);border-radius:12px;padding:16px 18px;border:1px solid var(--border);position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px}
+.kpi.cy::after{background:var(--y)}
+.kpi.cg::after{background:var(--g)}
+.kpi.cr::after{background:var(--red)}
+.kpi.cb::after{background:var(--blue)}
+.kpi.co::after{background:var(--orange)}
+.kpi.cp::after{background:var(--purple)}
+.kpi-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:6px}
+.kpi-val{font-size:22px;font-weight:800;color:var(--d);line-height:1.1}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:6px}
+.kpi-delta{display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;margin-top:6px}
+.kpi-delta.up{background:rgba(150,193,31,.15);color:#4a7000}
+.kpi-delta.down{background:rgba(232,64,64,.12);color:#a00}
+.kpi-delta.flat{background:rgba(138,138,138,.13);color:#666}
+
+/* ─── CHART CARDS ─── */
+.cc{background:var(--card);border-radius:12px;padding:18px 20px;border:1px solid var(--border)}
+.cc-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.cc-title{font-size:14px;font-weight:700;color:var(--d)}
+.cc-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.chart-h220{height:220px;position:relative}
+.chart-h280{height:280px;position:relative}
+.chart-h320{height:320px;position:relative}
+
+/* ─── INSIGHTS ─── */
+.insight{padding:14px 18px;border-radius:10px;font-size:13px;line-height:1.55;display:flex;align-items:flex-start;gap:10px}
+.insight.green{background:rgba(150,193,31,.08);color:#4a7000;border-left:3px solid var(--g)}
+.insight.yellow{background:rgba(254,191,39,.08);color:#996600;border-left:3px solid var(--y)}
+.insight.red{background:rgba(232,64,64,.06);color:#a00;border-left:3px solid var(--red)}
+.insight.blue{background:rgba(59,130,246,.07);color:#1d5fa6;border-left:3px solid var(--blue)}
+.insight-icon{font-size:18px;flex-shrink:0;margin-top:-2px}
+.insights-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:620px){.insights-grid{grid-template-columns:1fr}}
+
+/* ─── DATA TABLE ─── */
+.dt{width:100%;border-collapse:collapse;font-size:13px}
+.dt th{text-align:left;padding:8px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:2px solid var(--border)}
+.dt td{padding:8px 12px;border-bottom:1px solid var(--border)}
+.dt tr:last-child td{border:none}
+.dt tr:hover td{background:#FAFAF5}
+.rank{font-weight:800;color:var(--red);font-size:13px;width:28px}
+.rank.green{color:#4a7000}
+
+/* ─── BUCKETS ─── */
+.bucket-pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700}
+.bucket-pill.b0{background:rgba(150,193,31,.18);color:#4a7000}
+.bucket-pill.b30{background:rgba(254,191,39,.18);color:#996600}
+.bucket-pill.b60{background:rgba(249,115,22,.18);color:#c2410c}
+.bucket-pill.b90{background:rgba(232,64,64,.15);color:#a00}
+
+/* ─── SPLIT SUMMARY (overdue vs within-term) ─── */
+.split-summary{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px}
+.split-summary .ss-item{display:flex;align-items:center;gap:8px;flex:1;min-width:160px}
+.split-summary .ss-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.split-summary .ss-dot.overdue{background:var(--red)}
+.split-summary .ss-dot.ok{background:var(--g)}
+.split-summary .ss-label{color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;font-size:10px}
+.split-summary .ss-val{font-weight:800;color:var(--d);font-size:14px;line-height:1.1}
+.split-summary .ss-pct{font-size:11px;color:var(--muted);margin-left:4px}
+
+/* ─── QUICK ACTIONS ─── */
+.act-btn{padding:6px 12px;border-radius:7px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:600;color:var(--d);cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .15s;text-decoration:none}
+.act-btn:hover{border-color:var(--y);background:var(--yf)}
+.act-btn.tel{border-color:rgba(150,193,31,.35);color:#4a7000}
+.act-btn.tel:hover{background:rgba(150,193,31,.12)}
+.act-btn.mail{border-color:rgba(59,130,246,.35);color:#1d5fa6}
+.act-btn.mail:hover{background:rgba(59,130,246,.08)}
+
+/* ─── CARD HEADERS WITH STATUS ─── */
+.cc.alert{border-left:3px solid var(--red)}
+.cc.ok{border-left:3px solid var(--g)}
+.cc-title-icon{display:inline-flex;align-items:center;gap:6px}
+.cc-title-tag{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-left:6px;vertical-align:middle}
+.cc-title-tag.red{background:rgba(232,64,64,.13);color:#a00}
+.cc-title-tag.green{background:rgba(150,193,31,.15);color:#4a7000}
+
+/* ─── PAYMENT TIMELINE ─── */
+.pay-tl{padding:6px 0}
+.pay-tl-item{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid var(--border);align-items:center}
+.pay-tl-item:last-child{border:none}
+.pay-tl-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.pay-tl-icon.inb{background:rgba(150,193,31,.18);color:#4a7000}
+.pay-tl-icon.outb{background:rgba(232,64,64,.13);color:var(--red)}
+.pay-tl-date{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:600;width:80px;flex-shrink:0;white-space:nowrap}
+.pay-tl-body{flex:1;min-width:0}
+.pay-tl-title{font-size:13px;font-weight:600;color:var(--d);line-height:1.35}
+.pay-tl-meta{font-size:11px;color:var(--muted);margin-top:1px}
+.pay-tl-amount{font-size:14px;font-weight:800;text-align:right;white-space:nowrap}
+.pay-tl-amount.pos{color:#4a7000}
+.pay-tl-amount.neg{color:var(--red)}
+
+/* ─── EMPTY STATE ─── */
+.empty-state{padding:36px 20px;text-align:center;color:var(--muted)}
+.empty-state .es-icon{font-size:30px;margin-bottom:8px}
+.empty-state .es-title{font-weight:600;color:#666;margin-bottom:5px;font-size:13px}
+.empty-state .es-sub{font-size:12px}
+.empty-state.hero{padding:48px 20px}
+.empty-state.hero .es-icon{font-size:42px;margin-bottom:10px}
+.empty-state.hero .es-title{font-size:15px;color:#4a7000}
+.empty-state.dashed{border:1px dashed var(--border);border-radius:10px;background:#FAFAF5}
+
+/* ─── LOADER ─── */
+.loader{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--y);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* v3.0.3: animated loader для empty-hero */
+.loader-big{width:64px;height:64px;border:5px solid #eee;border-top-color:var(--y);border-right-color:var(--g);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
+.loader-dots{display:inline-flex;gap:6px;justify-content:center;margin-top:10px}
+.loader-dots span{width:8px;height:8px;border-radius:50%;background:var(--y);animation:bounce 1.2s ease-in-out infinite}
+.loader-dots span:nth-child(2){background:var(--g);animation-delay:.15s}
+.loader-dots span:nth-child(3){background:var(--blue);animation-delay:.30s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-8px);opacity:1}}
+
+/* ─── FOOTER ─── */
+.footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:20px}
+
+/* === OTP gate === */
+#dashauth-overlay{position:fixed;inset:0;background:#1E1E1E;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+#dashauth-overlay.is-hidden{display:none}
+.dashauth-card{background:#fff;width:100%;max-width:440px;border-radius:14px;padding:36px 30px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.dashauth-logo{font-size:24px;font-weight:900;color:#FEBF27;margin-bottom:6px;letter-spacing:-0.5px;text-align:center}
+.dashauth-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#888;text-align:center;margin-bottom:24px}
+.dashauth-icon{font-size:36px;text-align:center;margin-bottom:16px}
+.dashauth-h1{font-size:18px;font-weight:800;text-align:center;color:#1E1E1E;margin-bottom:6px}
+.dashauth-desc{font-size:13px;color:#666;text-align:center;line-height:1.55;margin-bottom:20px}
+.dashauth-input{width:100%;padding:12px 14px;border:2px solid #E5E5DC;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
+.dashauth-input:focus{border-color:#FEBF27}
+.dashauth-input.code{font-family:'SF Mono',Menlo,Consolas,monospace;letter-spacing:.4em;text-align:center;font-size:18px}
+.dashauth-btn{width:100%;padding:13px;background:#1E1E1E;color:#fff;border:0;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;margin-top:14px;font-family:inherit;transition:background .15s}
+.dashauth-btn:hover{background:#000}
+.dashauth-btn:disabled{opacity:.5;cursor:not-allowed}
+.dashauth-msg{font-size:12.5px;line-height:1.5;margin-top:12px;text-align:center;min-height:18px}
+.dashauth-msg.is-error{color:#DC2626}
+.dashauth-msg a{color:#FEBF27;font-weight:600;text-decoration:underline}
+.dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
+.dashauth-back:hover{color:#FEBF27}
+/* v2.77.1: top:115px — нижче period-bar (sticky top:56px, висота ~55px) щоб не overlap'ило granularity toggle */
+.dashauth-session{position:fixed;top:115px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-family:-apple-system,sans-serif;font-weight:600;display:flex;align-items:center;gap:8px}
+@media(max-width:760px){.dashauth-session{top:auto;bottom:12px;right:12px;left:12px;justify-content:center}}
+.dashauth-session button{background:none;border:0;color:#96C11F;cursor:pointer;font-size:14px;padding:0;line-height:1}
+body.dash-locked{overflow:hidden}
+</style>
+<script>
+// v2.78.91 UX: global 401 handler — JWT expired → friendly redirect screen
+(function(){
+  const _origFetch = window.fetch;
+  window.fetch = async function(...args) {
+    const r = await _origFetch.apply(this, args);
+    if (r.status === 401 && args[0] && typeof args[0] === 'string' && args[0].includes('sneco-auth')) {
+      // Show session expired overlay
+      // v2.78.116: ONLY show overlay коли native login form НЕ показано
+      // Native form має body.dash-locked + #dashauth-overlay visible
+      // Якщо вони уже showing — skip (native form handles login)
+      const _nativeLogin = document.body?.classList?.contains('dash-locked') ||
+                            document.getElementById('dashauth-overlay');
+      if (!_nativeLogin) {
+        window._snAuthBlock = 'leads-dashboard';
+        if (window.snEco?.handle401) {
+          window.snEco.handle401('leads-dashboard');
+        }
+      }
+    }
+    return r;
+  };
+})();
+</script>
+  <script src="../_shared/helpers.js"></script>
+</head>
+<body class="dash-locked">
+
+<!-- ===== OTP GATE OVERLAY ===== -->
+<script src="../auth-google.js"></script>
+<div id="dashauth-overlay">
+  <div class="dashauth-card">
+    <div class="dashauth-logo">snEco</div>
+    <div class="dashauth-sub">Ліди з сайту · Confidential</div>
+    <div id="dashauth-stage"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const WORKER = 'https://sneco-auth.vg-ab6.workers.dev';
+  const BLOCK = 'leads-dashboard';
+  const STORAGE_KEY = 'snEco-jwt-' + BLOCK;
+  const overlay = document.getElementById('dashauth-overlay');
+  const stage = document.getElementById('dashauth-stage');
+  let email = '';
+
+  function unlock(token, em, exp){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({token, email:em, exp})); } catch(e){}
+    document.body.classList.remove('dash-locked');
+    overlay.classList.add('is-hidden');
+    showSessionBadge(em, exp);
+    if (typeof window.bootLeads === 'function') window.bootLeads(token);
+  }
+  function showSessionBadge(em, exp){
+    const b = document.createElement('div');
+    b.className = 'dashauth-session';
+    const totalMins = Math.max(0, Math.floor((exp*1000 - Date.now())/60000));
+    const timeLabel = totalMins >= 60
+      ? Math.floor(totalMins/60) + 'h ' + (totalMins%60 ? (totalMins%60) + 'm' : '')
+      : totalMins + 'min';
+    b.innerHTML = '✓ ' + em + ' · ' + timeLabel.trim() + ' <button title="Lock">🔒</button>';
+    b.querySelector('button').onclick = () => { localStorage.removeItem(STORAGE_KEY); location.reload(); };
+    document.body.appendChild(b);
+  }
+  async function verifyExisting(){
+    let s; try { s = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null'); } catch(e){}
+    if (!s || !s.token || !s.exp || s.exp*1000 < Date.now()) return null;
+    try {
+      const r = await fetch(WORKER+'/api/session/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({token: s.token, block: BLOCK})});
+      const j = await r.json();
+      return j.ok ? s : null;
+    } catch(e) { return null; }
+  }
+  function renderEmail(){
+    stage.innerHTML = `
+      <div class="dashauth-icon">🛒</div>
+      <div class="dashauth-h1">Введіть email</div>
+      <div class="dashauth-desc">Ліди з сайту — заявки дистриб’юторів, статуси, UTM-джерела. Якщо ваш email у whitelist — на нього надійде 6-значний код. Авторизація через Google (швидко) або OTP-код. Сесія діє 30 днів.</div>
+      <div id="google-signin-btn" style="display:flex;justify-content:center;margin:18px 0 8px"></div>
+      <div style="font-size:11px;color:#777;text-align:center;margin:8px 0 4px">— або через email-код —</div>
+      <input class="dashauth-input" type="email" id="auth-em" placeholder="ім'я@sneco.ua" autocomplete="email" autofocus>
+      <button class="dashauth-btn" id="auth-send">Надіслати код</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="../" class="dashauth-back">← Каталог дашбордів</a>
+    `;
+    // v2.78.35 (Богдан): Google Sign-In primary, OTP fallback
+    if (window.SnecoAuth) {
+      const gBtn = document.getElementById('google-signin-btn');
+      window.SnecoAuth.signInWithGoogle(BLOCK, gBtn,
+        (j) => unlock(j.token, j.email, j.exp),
+        (errMsg) => {
+          const msgEl = document.getElementById('auth-msg');
+          if (msgEl) { msgEl.textContent = errMsg; msgEl.className = 'dashauth-msg is-error'; }
+        }
+      );
+    }
+
+    const em = document.getElementById('auth-em');
+    const send = document.getElementById('auth-send');
+    const msg = document.getElementById('auth-msg');
+    em.addEventListener('keydown', e=>{ if(e.key==='Enter') send.click(); });
+    send.onclick = async () => {
+      const v = em.value.trim();
+      if (!v || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { msg.textContent='Введіть правильний email.'; msg.className='dashauth-msg is-error'; return; }
+      send.disabled = true; send.textContent = 'Надсилаємо...'; msg.textContent='';
+      try {
+        const r = await fetch(WORKER+'/api/otp/request', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email:v, block: BLOCK})});
+        if (!r.ok) {
+          const j = await r.json().catch(()=>({}));
+          if (j.error === 'not_in_whitelist') {
+            msg.innerHTML = `❌ Цього email немає у whitelist. <a href="mailto:vg@sneco.ua?subject=Leads%20Dashboard%20whitelist">✉ Запит до vg@sneco.ua</a>`;
+          } else {
+            msg.textContent = 'Помилка: ' + (j.error || r.status);
+          }
+          msg.className='dashauth-msg is-error';
+          send.disabled=false; send.textContent='Надіслати код'; return;
+        }
+        email = v;
+        renderCode();
+      } catch(e) {
+        msg.textContent = 'Помилка мережі: ' + e.message;
+        msg.className='dashauth-msg is-error';
+        send.disabled=false; send.textContent='Надіслати код';
+      }
+    };
+  }
+  function renderCode(){
+    stage.innerHTML = `
+      <div class="dashauth-icon">🔢</div>
+      <div class="dashauth-h1">Введіть код з листа</div>
+      <div class="dashauth-desc">${email}<br>Код надіслано — перевірте пошту (включно зі спамом).</div>
+      <input class="dashauth-input code" type="text" id="auth-code" inputmode="numeric" maxlength="6" placeholder="••••••" autofocus>
+      <button class="dashauth-btn" id="auth-verify">Підтвердити</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="#" class="dashauth-back" id="auth-back">← Інший email</a>
+    `;
+    const code = document.getElementById('auth-code');
+    const verify = document.getElementById('auth-verify');
+    const msg = document.getElementById('auth-msg');
+    code.addEventListener('keydown', e=>{ if(e.key==='Enter') verify.click(); });
+    document.getElementById('auth-back').onclick = e=>{ e.preventDefault(); renderEmail(); };
+    verify.onclick = async () => {
+      const c = code.value.trim();
+      if (!/^\d{6}$/.test(c)) { msg.textContent='Код — 6 цифр.'; msg.className='dashauth-msg is-error'; return; }
+      verify.disabled=true; verify.textContent='Перевіряємо...'; msg.textContent='';
+      try {
+        const r = await fetch(WORKER+'/api/otp/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, block: BLOCK, code: c})});
+        const j = await r.json();
+        if (!r.ok) { msg.textContent = 'Невірний або застарілий код.'; msg.className='dashauth-msg is-error'; verify.disabled=false; verify.textContent='Підтвердити'; return; }
+        unlock(j.token, j.email, j.exp);
+      } catch(e) {
+        msg.textContent = 'Помилка: ' + e.message; msg.className='dashauth-msg is-error';
+        verify.disabled=false; verify.textContent='Підтвердити';
+      }
+    };
+  }
+
+  (async()=>{
+    const sess = await verifyExisting();
+    if (sess) { unlock(sess.token, sess.email, sess.exp); return; }
+    renderEmail();
+  })();
+})();
+</script>
+<!-- ===== END OTP GATE ===== -->
+<style>
+:root{--y:#FEBB30;--d:#1F1C1C;--d2:#272422;--ln:rgba(30,30,30,.12);--mut:rgba(30,30,30,.62);--green:#96C11F;--red:#D64545}
+body{margin:0;background:#F7F5F0;color:#1E1E1E;font-family:'Qanelas',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.5}
+.wrap{max-width:1440px;margin:0 auto;padding:0 24px}
+.top{background:var(--d);color:#fff;padding:16px 0}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.top h1{font-size:20px;font-weight:800;margin:0}
+.top .sub{font-size:12px;color:rgba(255,255,255,.6)}
+.nav a{color:rgba(255,255,255,.72);text-decoration:none;font-size:13px;margin-left:16px}
+.nav a:hover{color:var(--y)}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:22px 0}
+.k{background:#fff;border:1px solid var(--ln);border-radius:10px;padding:16px}
+.k .n{font-size:30px;font-weight:800;line-height:1}
+.k .l{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);margin-top:5px}
+.k.acc{background:var(--y);border-color:var(--y)}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.bar select,.bar input{border:1.5px solid var(--ln);border-radius:8px;padding:9px 12px;font:inherit;font-size:14px;background:#fff}
+.bar .sp{flex:1}
+.btn{background:var(--y);border:0;border-radius:8px;padding:9px 16px;font:inherit;font-weight:700;font-size:14px;cursor:pointer}
+.btn:hover{background:#ffc94f}
+.btn.gh{background:#fff;border:1.5px solid var(--ln)}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--ln);border-radius:10px;overflow:hidden;font-size:14px}
+th{background:#FAF8F3;text-align:left;padding:11px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);font-weight:700;white-space:nowrap}
+td{padding:11px 12px;border-top:1px solid var(--ln);vertical-align:top}
+tr:hover td{background:#FEFCF7}
+.who{font-weight:700}
+.mail{color:#0a58ca;text-decoration:none;font-size:13px}
+.meta{font-size:12px;color:var(--mut);margin-top:3px}
+.st{border:1.5px solid var(--ln);border-radius:7px;padding:6px 8px;font:inherit;font-size:13px;background:#fff;cursor:pointer}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:rgba(30,30,30,.07);color:var(--mut);white-space:nowrap}
+.tag.src{background:rgba(254,187,48,.22);color:#7a5a00}
+.ms{font-size:11.5px;font-weight:700;color:var(--green)}
+.ms.no{color:var(--mut);font-weight:400}
+.empty{text-align:center;padding:56px 20px;color:var(--mut)}
+.msg{font-size:13px;color:#444;margin-top:5px;max-width:420px}
+@media(max-width:1100px){.kpis{grid-template-columns:repeat(2,1fr)}.hide-m{display:none}}
+</style>
+
+<div class="top"><div class="wrap">
+  <div><h1>📥 Ліди з сайту</h1><div class="sub" id="upd">завантаження…</div></div>
+  <div class="nav">
+    <a href="../customer-360/customer-360.html">Customer 360</a>
+    <a href="../finance/finance.html">Finance</a>
+    <a href="../dashboard.html">Sales</a>
+    <a href="https://brand.sneco.ua/">Brand Bible</a>
+  </div>
+</div></div>
+
+<div class="wrap">
+  <div class="kpis">
+    <div class="k acc"><div class="n" id="k-new">0</div><div class="l">Нових · не оброблені</div></div>
+    <div class="k"><div class="n" id="k-7">0</div><div class="l">За 7 днів</div></div>
+    <div class="k"><div class="n" id="k-30">0</div><div class="l">За 30 днів</div></div>
+    <div class="k"><div class="n" id="k-work">0</div><div class="l">В роботі</div></div>
+    <div class="k"><div class="n" id="k-won">0</div><div class="l">Успішні</div></div>
+  </div>
+
+  <div class="bar">
+    <select id="f-status">
+      <option value="">Усі статуси</option>
+      <option value="new">Нові</option><option value="contacted">Зв'язались</option>
+      <option value="qualified">Кваліфіковані</option><option value="opportunity">Можливість</option>
+      <option value="sample-sent">Зразки надіслані</option><option value="won">Успішні</option>
+      <option value="lost">Втрачені</option><option value="duplicate">Дублікат</option><option value="spam">Спам</option>
+    </select>
+    <select id="f-source"><option value="">Усі джерела</option></select>
+    <input id="f-q" placeholder="Пошук: імʼя, компанія, email, телефон…" style="min-width:260px">
+    <div class="sp"></div>
+    <button class="btn gh" id="csv">↓ CSV</button>
+    <button class="btn" id="reload">Оновити</button>
+  </div>
+
+  <div id="tablebox"></div>
+  <div style="height:40px"></div>
+</div>
+
+<script>
+var WORKER='https://sneco-auth.vg-ab6.workers.dev', TOKEN=null, LEADS=[];
+var ST={'new':'Новий','contacted':"Зв'язались",'qualified':'Кваліфікований','opportunity':'Можливість','sample-sent':'Зразки надіслані','won':'Успішний','lost':'Втрачений','duplicate':'Дублікат','spam':'Спам'};
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function dt(v){if(!v)return '';var d=new Date(typeof v==='number'?v*1000:v);if(isNaN(d))return esc(v);
+ return d.toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+d.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});}
+function ts(v){if(!v)return 0;var d=new Date(typeof v==='number'?v*1000:v);return isNaN(d)?0:d.getTime();}
+
+async function api(path,body){
+  var r=await fetch(WORKER+path,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},body:JSON.stringify(body||{})});
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  return r.json();
+}
+
+function kpis(){
+  var now=Date.now(), d7=now-7*864e5, d30=now-30*864e5;
+  var f=function(fn){return LEADS.filter(fn).length;};
+  document.getElementById('k-new').textContent=f(function(l){return (l.status||'new')==='new';});
+  document.getElementById('k-7').textContent=f(function(l){return ts(l.created_at)>d7;});
+  document.getElementById('k-30').textContent=f(function(l){return ts(l.created_at)>d30;});
+  document.getElementById('k-work').textContent=f(function(l){return ['contacted','qualified','opportunity','sample-sent'].indexOf(l.status)>=0;});
+  document.getElementById('k-won').textContent=f(function(l){return l.status==='won';});
+}
+
+function render(){
+  var q=(document.getElementById('f-q').value||'').toLowerCase().trim();
+  var st=document.getElementById('f-status').value, sr=document.getElementById('f-source').value;
+  var rows=LEADS.filter(function(l){
+    if(st && (l.status||'new')!==st) return false;
+    if(sr && l.source!==sr) return false;
+    if(q){var hay=[l.name,l.company,l.email,l.phone,l.message].join(' ').toLowerCase();if(hay.indexOf(q)<0)return false;}
+    return true;
+  });
+  var box=document.getElementById('tablebox');
+  if(!rows.length){box.innerHTML='<div class="empty">Лідів не знайдено.<br><span style="font-size:13px">Заявки з лендингу <b>/dystrybyutor/</b> зʼявляться тут автоматично.</span></div>';return;}
+  var h='<table><thead><tr><th>Дата</th><th>Хто</th><th>Контакти</th><th class="hide-m">Заявка</th><th class="hide-m">Джерело / UTM</th><th>МойСклад</th><th>Статус</th></tr></thead><tbody>';
+  rows.forEach(function(l){
+    var nm=l.company||l.name||'—';
+    h+='<tr>'
+     +'<td style="white-space:nowrap;font-size:13px">'+dt(l.created_at)+'</td>'
+     +'<td><div class="who">'+esc(nm)+'</div>'+(l.company&&l.name?'<div class="meta">'+esc(l.name)+'</div>':'')+'</td>'
+     +'<td><a class="mail" href="mailto:'+esc(l.email)+'">'+esc(l.email)+'</a>'+(l.phone?'<div class="meta"><a class="mail" href="tel:'+esc(l.phone)+'">'+esc(l.phone)+'</a></div>':'')+'</td>'
+     +'<td class="hide-m"><div class="msg">'+esc((l.message||'').slice(0,180))+'</div></td>'
+     +'<td class="hide-m"><span class="tag src">'+esc(l.source||'—')+'</span>'+(l.utm_source?'<div class="meta">'+esc(l.utm_source)+' / '+esc(l.utm_medium||'-')+' / '+esc(l.utm_campaign||'-')+'</div>':'')+'</td>'
+     +'<td>'+(l.ms_counterparty_id?'<span class="ms">✓ створено</span>':'<span class="ms no">—</span>')+'</td>'
+     +'<td><select class="st" data-id="'+l.id+'">'+Object.keys(ST).map(function(k){return '<option value="'+k+'"'+((l.status||'new')===k?' selected':'')+'>'+ST[k]+'</option>';}).join('')+'</select></td>'
+     +'</tr>';
+  });
+  box.innerHTML=h+'</tbody></table>';
+  box.querySelectorAll('.st').forEach(function(sel){
+    sel.addEventListener('change',async function(){
+      var id=this.dataset.id,v=this.value,el=this;el.disabled=true;
+      try{await api('/api/leads/update',{id:parseInt(id),status:v});
+        var L=LEADS.find(function(x){return String(x.id)===String(id);});if(L)L.status=v;kpis();
+      }catch(e){alert('Не вдалося оновити статус: '+e.message);}
+      el.disabled=false;
+    });
+  });
+}
+
+async function load(){
+  try{
+    var d=await api('/api/leads/list',{limit:2000});
+    LEADS=d.leads||[];
+    var srcs=[...new Set(LEADS.map(function(l){return l.source;}).filter(Boolean))].sort();
+    var sel=document.getElementById('f-source'),cur=sel.value;
+    sel.innerHTML='<option value="">Усі джерела</option>'+srcs.map(function(s){return '<option value="'+esc(s)+'">'+esc(s)+'</option>';}).join('');
+    sel.value=cur;
+    document.getElementById('upd').textContent='Усього '+LEADS.length+' · оновлено '+new Date().toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
+    kpis();render();
+  }catch(e){
+    document.getElementById('tablebox').innerHTML='<div class="empty">Помилка завантаження: '+esc(e.message)+'</div>';
+  }
+}
+
+['f-status','f-source'].forEach(function(id){document.getElementById(id).addEventListener('change',render);});
+document.getElementById('f-q').addEventListener('input',render);
+document.getElementById('reload').addEventListener('click',load);
+document.getElementById('csv').addEventListener('click',function(){
+  var cols=['created_at','status','source','name','company','email','phone','message','utm_source','utm_medium','utm_campaign','ms_counterparty_id'];
+  var csv=[cols.join(',')].concat(LEADS.map(function(l){return cols.map(function(c){return '"'+String(l[c]==null?'':l[c]).replace(/"/g,'""')+'"';}).join(',');})).join('\n');
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(["﻿"+csv],{type:'text/csv;charset=utf-8'}));
+  a.download='sneco-leads-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+});
+
+window.bootLeads=function(token){TOKEN=token;load();};
+</script>
+</body>
+</html>
