@@ -137,7 +137,12 @@ td.num, th.num{text-align:right; font-variant-numeric:tabular-nums}
 .scorebar b{font-variant-numeric:tabular-nums}
 /* detail */
 tr.drow td{background:var(--page); padding:0; border-bottom:1px solid var(--baseline)}
-.detail{padding:18px 20px; display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px}
+.detail{padding:18px 20px; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr)); gap:16px; position:sticky; left:0; max-width:calc(100vw - 60px); box-sizing:border-box}
+@media (max-width:760px){ .detail{max-width:calc(100vw - 40px); padding:12px 10px; gap:12px} .mini{grid-template-columns:112px 1fr 26px} .kv{grid-template-columns:96px 1fr} }
+.dhead{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:6px}
+.dhead h4{margin:0}
+.dl-btn{background:var(--s1); color:#fff; border:none; border-radius:8px; padding:7px 13px; font-size:12px; font-weight:650; cursor:pointer; font-family:inherit; white-space:nowrap}
+.dl-btn:hover{filter:brightness(1.1)}
 .dcol h4{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 6px; font-weight:650}
 .dcol{background:var(--surface); border:1px solid var(--ring); border-radius:10px; padding:14px 16px}
 .dcol.full{grid-column:1/-1}
@@ -711,11 +716,94 @@ function kvRow(box, k, v, isLink) {
   box.append(vv);
 }
 
+/* ===== Досьє компанії одним файлом ===== */
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+function dossierHtml(c){
+  const kv=(k,v)=> v?`<tr><td class="k">${esc(k)}</td><td>${v}</td></tr>`:'';
+  const link=u=>u?`<a href="${esc(u.startsWith('http')?u:'https://'+u)}">${esc(u)}</a>`:'';
+  const RU={low:'низький',medium:'середній',high:'високий',unknown:'невідомо'};
+  const CU={high:'висока',medium:'середня',low:'низька'};
+  const critRows=Object.keys(c.scores).map(k=>`<tr><td>${esc(DATA.crit[k])}</td><td class="sc">${esc(c.scores[k].s)}</td><td class="why">${esc(c.scores[k].w)}</td></tr>`).join('');
+  const points=(c.points||[]).map(p=>`<li>${esc(p)}</li>`).join('');
+  const people=(c.people||[]).map(p=>`<li><b>${esc(p.n)}</b>${p.r?' — '+esc(p.r):''}</li>`).join('');
+  const checks=(c.checks||[]).map(ch=>{const L={confirmed:'✔ підтверджено',refuted:'✖ спростовано',unverifiable:'? не перевіряється'}[ch.v]||ch.v;
+    return `<div class="chk"><span class="vb v-${esc(ch.v)}">${L}</span> ${esc(ch.claim)}${ch.corr?`<div class="corr">→ ${esc(ch.corr)}</div>`:''}${ch.src?`<div class="corr">Джерело: ${esc(ch.src)}</div>`:''}</div>`;}).join('');
+  const adjust=(c.adjust&&c.adjust.length)?`<div class="callout"><b>Скориговано після верифікації:</b><br>${c.adjust.map(a=>'• '+esc(a)).join('<br>')}</div>`:'';
+  const srcs=(c.sources||[]).map(s=>/^https?:\/\//.test(s)?`<div>${link(s)}</div>`:`<div>${esc(s)}</div>`).join('');
+  const money=m=>m==null?'':(m>=1000?(m/1000).toFixed(2).replace('.',',')+' млрд грн':String(Math.round(m*10)/10).replace('.',',')+' млн грн');
+  return `<!DOCTYPE html><html lang="uk"><head><meta charset="UTF-8"><meta name="robots" content="noindex,nofollow"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>snEco · Досьє: ${esc(c.name)}</title><style>
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#1a1a1a;background:#fff;margin:0;padding:28px 26px;font-size:14px;line-height:1.5;max-width:860px;margin:0 auto}
+.top{border-bottom:3px solid #FEBB30;padding-bottom:12px;margin-bottom:16px}
+.brand{font-weight:800;font-size:13px;letter-spacing:.04em;color:#555}
+h1{font-size:21px;margin:4px 0 4px}
+.meta{color:#666;font-size:13px}
+.badges{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+.badge{border:1px solid #ddd;border-radius:16px;padding:3px 11px;font-size:12px;font-weight:600;color:#333}
+.badge.acc{background:#2a78d6;border-color:#2a78d6;color:#fff}
+h2{font-size:14px;margin:20px 0 8px;text-transform:uppercase;letter-spacing:.05em;color:#444;border-bottom:1px solid #eee;padding-bottom:4px}
+table.kvt{border-collapse:collapse;width:100%;font-size:13.5px}
+table.kvt td{padding:4px 8px;vertical-align:top;border-bottom:1px solid #f2f2ef}
+table.kvt td.k{color:#888;white-space:nowrap;width:150px}
+table.crit{border-collapse:collapse;width:100%;font-size:12.5px}
+table.crit td{padding:5px 8px;border-bottom:1px solid #f2f2ef;vertical-align:top}
+table.crit td.sc{font-weight:700;text-align:center;width:34px}
+table.crit td.why{color:#555;font-size:12px}
+ul{margin:6px 0;padding-left:20px} li{margin:4px 0}
+.callout{border-left:3px solid #fab219;background:#fdf6e3;padding:9px 12px;border-radius:6px;font-size:13px;margin:8px 0}
+.chk{border-top:1px solid #f0f0ec;padding:7px 0;font-size:13px}
+.vb{font-weight:700;font-size:11px;padding:1px 8px;border-radius:10px;margin-right:6px}
+.v-confirmed{color:#0a7a0a;background:#eaf6ea}.v-refuted{color:#c03;background:#fdeaea}.v-unverifiable{color:#777;background:#f2f2ef}
+.corr{color:#666;font-size:12px;margin-top:3px}
+a{color:#2a78d6;text-decoration:none;word-break:break-all}
+.sum{font-size:13.5px}
+footer{margin-top:26px;border-top:1px solid #eee;padding-top:10px;font-size:11px;color:#999}
+@media print{body{padding:0}a{color:#000}}
+</style></head><body>
+<div class="top"><div class="brand">snEco · ДОСЬЄ ДИСТРИБУТОРА · Конфіденційно</div>
+<h1>${esc(c.name)}</h1>
+<div class="meta">${esc(c.region)}${c.city?' · '+esc(c.city):''} · станом на ${esc(DATA.meta.date)}</div>
+<div class="badges"><span class="badge acc">Композит ${esc(c.score.toFixed(2))} / 10 · Tier ${esc(c.tier)}</span><span class="badge">Хвиля ${esc(c.wave)}</span><span class="badge">Ризик: ${esc(RU[c.risk])}</span><span class="badge">Дані: ${esc(CU[c.conf])}</span><span class="badge">${c.group==='sheet'?'З CRM-таблиці':'Новий кандидат'}</span></div></div>
+<h2>Резюме</h2><div class="sum">${esc(c.summary||'—')}</div>${adjust}
+<h2>Реквізити і контакти</h2><table class="kvt">
+${kv('Юрособа',esc(c.legal))}${kv('ЄДРПОУ',esc(c.edrpou))}${kv('Засновано',esc(c.founded))}${kv('Адреса/місто',esc(c.city))}
+${kv('Сайт',link(c.website))}${kv('Соцмережі',esc(c.social))}${kv('Телефони',esc((c.phones||[]).join(' · ')))}${kv('Email',esc((c.emails||[]).join(', ')))}</table>
+${people?`<h2>Ключові особи</h2><ul>${people}</ul>`:''}
+<h2>Бізнес і масштаб</h2><table class="kvt">
+${kv('Виручка',esc(money(c.rev))+(c.rev_y?' ('+esc(c.rev_y)+')':''))}${kv('Динаміка',esc(c.trend))}${kv('Працівники',esc(c.emp))}
+${kv('Покриття ТТ',c.tt!=null?esc(c.tt.toLocaleString('uk-UA')):'')}${kv('ТП / СВ',(c.tp!=null||c.sv!=null)?esc((c.tp??'—')+' / '+(c.sv??'—')):'')}
+${kv('Сер. замовлення',esc(c.order_kg))}${kv('Мережі',c.chains==null?'':(c.chains?'так':'ні'))}${kv('Опис покриття',esc(c.cov))}
+${kv('Портфель',esc((c.portfolio||[]).join(', ')))}${kv('Категорії',esc((c.cats||[]).join(', ')))}${kv('Власне вир-во',esc(c.own_prod))}</table>
+<h2>Ризики</h2><table class="kvt">${kv('Рівень',esc(RU[c.risk]))}${kv('Податки',esc(c.risk_tax))}${kv('Суди',esc(c.risk_court))}${kv('Інше',esc(c.risk_other))}</table>
+<h2>Скоринг за 10 критеріями</h2><table class="crit">${critRows}</table>
+<h2>План першого контакту</h2><table class="kvt">${kv('ЛПР / до кого йти',esc(c.dm))}${kv('Кут заходу',esc(c.angle))}${kv('Перший крок',esc(c.first))}</table>
+${points?`<h2>Talking points</h2><ul>${points}</ul>`:''}
+${checks?`<h2>Верифікація фактів (${(c.checks||[]).length})</h2>${checks}`:''}
+${srcs?`<h2>Джерела</h2>${srcs}`:''}
+<footer>Згенеровано з дашборда «snEco · Скоринг дистрибуторів UA» · ${esc(DATA.meta.date)} · дані з відкритих джерел і CRM · перед контрактом — повна платна перевірка контрагента (YouControl/Vkursi)</footer>
+</body></html>`;
+}
+function downloadDossier(c){
+  const safe=c.name.replace(/[«»"'\\/\\:*?<>|]/g,'').replace(/\s+/g,'_').slice(0,60);
+  const blob=new Blob(['﻿'+dossierHtml(c)],{type:'text/html;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`snEco_досьє_${safe}_${DATA.meta.date.replace(/\./g,'-')}.html`;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},1500);
+}
+
 function buildDetail(c) {
   const wrap = el('div','detail');
 
   const sm = el('div','dcol full');
-  sm.append(el('h4','','Резюме'));
+  const dh = el('div','dhead');
+  dh.append(el('h4','','Резюме'));
+  const dlb = el('button','dl-btn','⬇ Досьє файлом');
+  dlb.type = 'button';
+  dlb.addEventListener('click', ev => { ev.stopPropagation(); downloadDossier(c); });
+  dh.append(dlb);
+  sm.append(dh);
   sm.append(el('div','', c.summary || '—'));
   if (c.adjust.length) {
     const co = el('div','callout');
