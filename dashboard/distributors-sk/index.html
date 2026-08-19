@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>snEco · Distribútori SK · Скоринг</title>
+<style>
+:root{
+  color-scheme: light;
+  --page:#f9f9f7; --surface:#fcfcfb;
+  --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --baseline:#c3c2b7; --ring:rgba(11,11,11,0.10);
+  --s1:#2a78d6; --s1-soft:rgba(42,120,214,.10);
+  --s2:#eb6834; --s2-soft:rgba(235,104,52,.10);
+  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --crit:#d03b3b;
+  --good-text:#006300;
+  --tierA:#1baf7a; --chip:#f0efec;
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --page:#0d0d0d; --surface:#1a1a19;
+  --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --baseline:#383835; --ring:rgba(255,255,255,0.10);
+  --s1:#3987e5; --s1-soft:rgba(57,135,229,.14);
+  --s2:#d95926; --s2-soft:rgba(217,89,38,.14);
+  --good-text:#0ca30c; --chip:#262624;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --page:#0d0d0d; --surface:#1a1a19;
+    --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --baseline:#383835; --ring:rgba(255,255,255,0.10);
+    --s1:#3987e5; --s1-soft:rgba(57,135,229,.14);
+    --s2:#d95926; --s2-soft:rgba(217,89,38,.14);
+    --good-text:#0ca30c; --chip:#262624;
+  }
+}
+*{box-sizing:border-box; margin:0; padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif; background:var(--page); color:var(--ink); font-size:14px; line-height:1.45; padding:24px 20px 60px}
+.wrap{max-width:1180px; margin:0 auto}
+a{color:var(--s1); text-decoration:none} a:hover{text-decoration:underline}
+h1{font-size:24px; font-weight:700; letter-spacing:-.01em}
+h2{font-size:17px; font-weight:650; margin:0 0 4px}
+.sub{color:var(--ink2); font-size:13px}
+.small{font-size:12px; color:var(--ink2)}
+.mut{color:var(--muted)}
+.card{background:var(--surface); border:1px solid var(--ring); border-radius:12px; padding:18px 20px; margin-top:16px}
+header.top{display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap}
+.brand{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
+.brand .logo{font-weight:800; font-size:22px; letter-spacing:-.02em}
+.brand .logo em{font-style:normal; color:var(--s1)}
+.theme-btn{border:1px solid var(--ring); background:var(--surface); color:var(--ink2); border-radius:8px; padding:6px 12px; cursor:pointer; font-size:12px}
+.theme-btn:hover{color:var(--ink)}
+/* KPI */
+.kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin-top:16px}
+.tile{background:var(--surface); border:1px solid var(--ring); border-radius:12px; padding:14px 16px}
+.tile .lbl{font-size:12px; color:var(--ink2)}
+.tile .val{font-size:30px; font-weight:650; margin-top:2px}
+.tile .note{font-size:11.5px; color:var(--muted); margin-top:2px}
+/* waves */
+.wave-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(255px,1fr)); gap:12px; margin-top:12px}
+.wave{border:1px solid var(--ring); border-radius:10px; padding:12px 14px; background:var(--surface)}
+.wave h3{font-size:13.5px; margin-bottom:2px}
+.wave .desc{font-size:12px; color:var(--ink2); margin:6px 0 8px}
+.wchip{display:flex; align-items:center; gap:8px; padding:4px 0; font-size:12.5px; cursor:pointer; border-radius:6px}
+.wchip:hover{background:var(--chip)}
+.wchip .sc{font-variant-numeric:tabular-nums; font-weight:650; min-width:34px; color:var(--ink)}
+.wchip .nm{flex:1; color:var(--ink2)}
+.wchip:hover .nm{color:var(--ink)}
+.top3{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px; margin-top:12px}
+.act{border:1px solid var(--ring); border-left:3px solid var(--s1); border-radius:10px; padding:12px 14px; background:var(--surface)}
+.act b{font-size:13.5px}
+.act p{font-size:12.5px; color:var(--ink2); margin-top:4px}
+/* chart */
+.legend{display:flex; gap:16px; align-items:center; font-size:12px; color:var(--ink2); margin:8px 0 4px; flex-wrap:wrap}
+.key{display:inline-flex; align-items:center; gap:6px}
+.key .sw{width:12px; height:12px; border-radius:3px}
+.axis{position:relative; height:16px; margin-left:var(--pad,240px); margin-right:44px; font-size:10.5px; color:var(--muted)}
+.axis span{position:absolute; transform:translateX(-50%)}
+.chart{position:relative}
+.bars{position:relative}
+.gridlines{position:absolute; top:0; bottom:0; left:var(--pad,240px); right:44px; pointer-events:none}
+.gridlines i{position:absolute; top:0; bottom:0; width:1px; background:var(--grid)}
+.gridlines i.zero{background:var(--baseline)}
+.brow{display:flex; align-items:center; min-height:24px; cursor:pointer; border-radius:6px}
+.brow:hover,.brow:focus-visible{background:var(--chip); outline:none}
+.brow .bl{width:var(--pad,240px); padding-right:10px; font-size:12px; color:var(--ink2); text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex-shrink:0}
+.brow:hover .bl{color:var(--ink)}
+.brow .track{flex:1; position:relative; height:18px; margin:2px 0}
+.brow .bar{height:100%; border-radius:0 4px 4px 0; min-width:2px}
+.brow:hover .bar{filter:brightness(1.08)}
+.brow .bv{width:44px; padding-left:8px; font-size:12px; font-weight:650; font-variant-numeric:tabular-nums; flex-shrink:0}
+/* weights chart */
+.wb .bar{background:var(--s1)}
+/* tooltip */
+#tip{position:fixed; z-index:50; background:var(--surface); border:1px solid var(--ring); border-radius:8px; padding:8px 11px; font-size:12px; box-shadow:0 6px 20px rgba(0,0,0,.14); pointer-events:none; display:none; max-width:300px}
+#tip .t-val{font-size:15px; font-weight:700}
+#tip .t-row{display:flex; align-items:center; gap:6px; margin-top:2px; color:var(--ink2)}
+#tip .t-key{width:10px; height:3px; border-radius:2px; display:inline-block}
+/* badges */
+.badge{display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; border:1px solid var(--ring); white-space:nowrap}
+.b-risk-low{color:var(--good-text)} .b-risk-low .dot{background:var(--good)}
+.b-risk-medium{color:var(--ink2)} .b-risk-medium .dot{background:var(--warn)}
+.b-risk-high{color:var(--crit)} .b-risk-high .dot{background:var(--crit)}
+.b-risk-unknown{color:var(--muted)} .b-risk-unknown .dot{background:var(--muted)}
+.dot{width:7px; height:7px; border-radius:50%; display:inline-block}
+.tier{display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:6px; font-weight:700; font-size:12px; border:1px solid var(--ring)}
+.tier-A{background:var(--s1); color:#fff; border-color:transparent}
+.tier-B{background:var(--s1-soft); color:var(--s1)}
+.tier-C{background:var(--chip); color:var(--ink2)}
+.tier-D{background:transparent; color:var(--muted)}
+.gsrc{font-size:10.5px; font-weight:650; letter-spacing:.03em; padding:2px 7px; border-radius:5px}
+.g-sheet{background:var(--s2-soft); color:var(--s2)}
+.g-new{background:var(--s1-soft); color:var(--s1)}
+/* filters */
+.filters{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:14px 0 10px}
+.filters input[type=search], .filters select{background:var(--surface); color:var(--ink); border:1px solid var(--ring); border-radius:8px; padding:7px 10px; font-size:12.5px; font-family:inherit}
+.filters input[type=search]{min-width:200px}
+.fcount{font-size:12px; color:var(--muted); margin-left:auto}
+/* table */
+.twrap{overflow-x:auto; margin-top:4px}
+table.main{width:100%; border-collapse:collapse; font-size:12.8px}
+table.main th{position:sticky; top:0; background:var(--surface); text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); font-weight:600; padding:8px 8px; border-bottom:1px solid var(--baseline); cursor:pointer; user-select:none; white-space:nowrap}
+table.main th:hover{color:var(--ink)}
+table.main th .arr{font-size:9px}
+table.main td{padding:8px 8px; border-bottom:1px solid var(--grid); vertical-align:middle}
+tr.rrow{cursor:pointer}
+tr.rrow:hover td{background:var(--chip)}
+td.num, th.num{text-align:right; font-variant-numeric:tabular-nums}
+.namecell b{font-size:13px}
+.namecell .small{margin-top:1px}
+.scorebar{display:flex; align-items:center; gap:8px; min-width:120px}
+.scorebar .tr2{flex:1; height:8px; background:var(--chip); border-radius:0 3px 3px 0; position:relative; overflow:hidden}
+.scorebar .fl{height:100%; border-radius:0 3px 3px 0}
+.scorebar b{font-variant-numeric:tabular-nums}
+/* detail */
+tr.drow td{background:var(--page); padding:0; border-bottom:1px solid var(--baseline)}
+.detail{padding:18px 20px; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr)); gap:16px; position:sticky; left:0; max-width:calc(100vw - 60px); box-sizing:border-box}
+@media (max-width:760px){ .detail{max-width:calc(100vw - 40px); padding:12px 10px; gap:12px} .mini{grid-template-columns:112px 1fr 26px} .kv{grid-template-columns:96px 1fr} }
+.dhead{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:6px}
+.dhead h4{margin:0}
+.dl-btn{background:var(--s1); color:#fff; border:none; border-radius:8px; padding:7px 13px; font-size:12px; font-weight:650; cursor:pointer; font-family:inherit; white-space:nowrap}
+.dl-btn:hover{filter:brightness(1.1)}
+.people-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(min(255px,100%),1fr)); gap:10px; margin-top:10px}
+.person{border:1px solid var(--ring); border-radius:8px; padding:9px 11px; font-size:12.5px; background:var(--surface)}
+.p-l1{display:flex; align-items:center; gap:7px; flex-wrap:wrap}
+.p-li{background:#0a66c2; color:#fff; font-size:10px; font-weight:700; border-radius:4px; padding:1.5px 6px; text-decoration:none; line-height:1.3}
+.p-li:hover{text-decoration:none; filter:brightness(1.15)}
+.dcol h4{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 6px; font-weight:650}
+.dcol{background:var(--surface); border:1px solid var(--ring); border-radius:10px; padding:14px 16px}
+.dcol.full{grid-column:1/-1}
+.kv{display:grid; grid-template-columns:118px 1fr; gap:3px 10px; font-size:12.5px}
+.kv .k{color:var(--muted)}
+.kv .v{color:var(--ink)}
+.chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px}
+.chips span{background:var(--chip); border-radius:6px; padding:2px 8px; font-size:11.5px; color:var(--ink2)}
+.mini{display:grid; grid-template-columns:158px 1fr 30px; gap:4px 8px; align-items:center; font-size:12px}
+.mini .mt{height:7px; background:var(--chip); border-radius:0 3px 3px 0; overflow:hidden}
+.mini .mf{height:100%; background:var(--s1); border-radius:0 3px 3px 0}
+.mini .ms{font-weight:650; font-variant-numeric:tabular-nums; text-align:right}
+.mini .why{grid-column:1/-1; font-size:11px; color:var(--muted); margin:-2px 0 4px; display:none}
+.mini.showwhy .why{display:block}
+.whybtn{font-size:11px; color:var(--s1); background:none; border:none; cursor:pointer; padding:2px 0; font-family:inherit}
+.tp li{margin:5px 0 5px 16px; font-size:12.5px; color:var(--ink2)}
+.callout{border-left:3px solid var(--warn); background:var(--chip); border-radius:6px; padding:9px 12px; font-size:12px; color:var(--ink2); margin-top:8px}
+.vcheck{border-top:1px solid var(--grid); padding:7px 0; font-size:12px}
+.vcheck:first-of-type{border-top:none}
+.vc-b{font-weight:650; font-size:11px; padding:1px 7px; border-radius:10px; display:inline-block; margin-right:6px}
+.vc-confirmed{color:var(--good-text); background:rgba(12,163,12,.10)}
+.vc-refuted{color:var(--crit); background:rgba(208,59,59,.10)}
+.vc-unverifiable{color:var(--muted); background:var(--chip)}
+.srcs a{display:block; font-size:11.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin:3px 0}
+/* verify tiles */
+.vtiles{display:flex; gap:12px; flex-wrap:wrap; margin-top:10px}
+.vt{flex:1; min-width:150px; border:1px solid var(--ring); border-radius:10px; padding:10px 14px; background:var(--surface)}
+.vt .n{font-size:24px; font-weight:650}
+/* methodology */
+details.meth{margin-top:8px; border:1px solid var(--ring); border-radius:10px; background:var(--surface)}
+details.meth summary{cursor:pointer; padding:12px 16px; font-weight:600; font-size:13.5px; list-style:none}
+details.meth summary::-webkit-details-marker{display:none}
+details.meth summary:before{content:'▸ '; color:var(--muted)}
+details.meth[open] summary:before{content:'▾ '}
+details.meth .inner{padding:4px 16px 16px}
+table.rub{width:100%; border-collapse:collapse; font-size:12.3px}
+table.rub td{padding:6px 8px; border-bottom:1px solid var(--grid); vertical-align:top}
+table.rub td:first-child{white-space:nowrap; font-weight:600}
+table.rub td:nth-child(2){white-space:nowrap; color:var(--s1); font-weight:650}
+.pool-list{columns:3 260px; column-gap:24px; font-size:12px; color:var(--ink2); margin-top:8px}
+.pool-list div{break-inside:avoid; padding:2px 0}
+footer{margin-top:28px; font-size:11.5px; color:var(--muted); line-height:1.6}
+@media (max-width:760px){ .brow .bl{width:150px} .axis{margin-left:150px} .gridlines{left:150px} body{padding:14px 10px 40px} }
+</style>
+
+<style>
+/* === OTP gate (canonical snEco pattern) === */
+#dashauth-overlay{position:fixed;inset:0;background:#1E1E1E;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+#dashauth-overlay.is-hidden{display:none}
+.dashauth-card{background:#fff;width:100%;max-width:440px;border-radius:14px;padding:36px 30px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.dashauth-logo{font-size:24px;font-weight:900;color:#FEBF27;margin-bottom:6px;letter-spacing:-0.5px;text-align:center}
+.dashauth-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#888;text-align:center;margin-bottom:24px}
+.dashauth-icon{font-size:36px;text-align:center;margin-bottom:16px}
+.dashauth-h1{font-size:18px;font-weight:800;text-align:center;color:#1E1E1E;margin-bottom:6px}
+.dashauth-desc{font-size:13px;color:#666;text-align:center;line-height:1.55;margin-bottom:20px}
+.dashauth-input{width:100%;padding:12px 14px;border:2px solid #E5E5DC;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s;box-sizing:border-box}
+.dashauth-input:focus{border-color:#FEBF27}
+.dashauth-input.code{font-family:'SF Mono',Menlo,Consolas,monospace;letter-spacing:.4em;text-align:center;font-size:18px}
+.dashauth-btn{width:100%;padding:13px;background:#1E1E1E;color:#fff;border:0;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;margin-top:14px;font-family:inherit;transition:background .15s}
+.dashauth-btn:hover{background:#000}
+.dashauth-btn:disabled{opacity:.5;cursor:not-allowed}
+.dashauth-msg{font-size:12.5px;line-height:1.5;margin-top:12px;text-align:center;min-height:18px}
+.dashauth-msg.is-error{color:#DC2626}
+.dashauth-msg a{color:#FEBF27;font-weight:600;text-decoration:underline}
+.dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
+.dashauth-back:hover{color:#FEBF27}
+.dashauth-session{position:fixed;top:12px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-family:-apple-system,sans-serif;font-weight:600;display:flex;align-items:center;gap:8px}
+@media(max-width:760px){.dashauth-session{top:auto;bottom:12px;right:12px;left:12px;justify-content:center}}
+.dashauth-session button{background:none;border:0;color:#96C11F;cursor:pointer;font-size:14px;padding:0;line-height:1}
+body.dash-locked{overflow:hidden}
+.load-hero{padding:70px 20px;text-align:center;color:var(--muted)}
+.load-hero .sp{display:inline-block;width:44px;height:44px;border:4px solid var(--grid);border-top-color:var(--s1);border-radius:50%;animation:dspin .8s linear infinite;margin-bottom:14px}
+@keyframes dspin{to{transform:rotate(360deg)}}
+</style>
+
+<script>
+// v2.78.91 UX: global 401 handler — JWT expired → friendly redirect screen
+(function(){
+  const _origFetch = window.fetch;
+  window.fetch = async function(...args) {
+    const r = await _origFetch.apply(this, args);
+    if (r.status === 401 && args[0] && typeof args[0] === 'string' && args[0].includes('sneco-auth')) {
+      const _nativeLogin = document.body?.classList?.contains('dash-locked') ||
+                            document.getElementById('dashauth-overlay');
+      if (!_nativeLogin) {
+        window._snAuthBlock = 'dashboard';
+        if (window.snEco?.handle401) { window.snEco.handle401('dashboard'); }
+      }
+    }
+    return r;
+  };
+})();
+</script>
+<script src="../_shared/helpers.js"></script>
+
+</head>
+<body class="dash-locked">
+
+<!-- ===== OTP GATE OVERLAY ===== -->
+<script src="../auth-google.js"></script>
+<div id="dashauth-overlay">
+  <div class="dashauth-card">
+    <div class="dashauth-logo">snEco</div>
+    <div class="dashauth-sub">Distribútori SK · Скоринг · Confidential</div>
+    <div id="dashauth-stage"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const WORKER = 'https://sneco-auth.vg-ab6.workers.dev';
+  const BLOCK = 'dashboard';
+  const STORAGE_KEY = 'snEco-jwt-' + BLOCK;
+  const overlay = document.getElementById('dashauth-overlay');
+  const stage = document.getElementById('dashauth-stage');
+  let email = '';
+
+  function unlock(token, em, exp){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({token, email:em, exp})); } catch(e){}
+    document.body.classList.remove('dash-locked');
+    overlay.classList.add('is-hidden');
+    showSessionBadge(em, exp);
+    if (typeof window.bootDistributors === 'function') window.bootDistributors(token);
+  }
+  function showSessionBadge(em, exp){
+    const b = document.createElement('div');
+    b.className = 'dashauth-session';
+    const totalMins = Math.max(0, Math.floor((exp*1000 - Date.now())/60000));
+    const timeLabel = totalMins >= 60
+      ? Math.floor(totalMins/60) + 'h ' + (totalMins%60 ? (totalMins%60) + 'm' : '')
+      : totalMins + 'min';
+    b.innerHTML = '✓ ' + em + ' · ' + timeLabel.trim() + ' <button title="Lock">🔒</button>';
+    b.querySelector('button').onclick = () => { localStorage.removeItem(STORAGE_KEY); location.reload(); };
+    document.body.appendChild(b);
+  }
+  async function verifyExisting(){
+    let s; try { s = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null'); } catch(e){}
+    if (!s || !s.token || !s.exp || s.exp*1000 < Date.now()) return null;
+    try {
+      const r = await fetch(WORKER+'/api/session/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({token: s.token, block: BLOCK})});
+      const j = await r.json();
+      return j.ok ? s : null;
+    } catch(e) { return null; }
+  }
+  function renderEmail(){
+    stage.innerHTML = `
+      <div class="dashauth-icon">🎯</div>
+      <div class="dashauth-h1">Введіть email</div>
+      <div class="dashauth-desc">Скоринг 24 дистрибуторів Словаччини: рейтинг, профілі, контакти, плани заходу. Доступ — whitelist блоку Sales Dashboard. Авторизація через Google (швидко) або OTP-код. Сесія діє 30 днів.</div>
+      <div id="google-signin-btn" style="display:flex;justify-content:center;margin:18px 0 8px"></div>
+      <div style="font-size:11px;color:#777;text-align:center;margin:8px 0 4px">— або через email-код —</div>
+      <input class="dashauth-input" type="email" id="auth-em" placeholder="ім'я@sneco.ua" autocomplete="email" autofocus>
+      <button class="dashauth-btn" id="auth-send">Надіслати код</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="../" class="dashauth-back">← Каталог дашбордів</a>
+    `;
+    if (window.SnecoAuth) {
+      const gBtn = document.getElementById('google-signin-btn');
+      window.SnecoAuth.signInWithGoogle(BLOCK, gBtn,
+        (j) => unlock(j.token, j.email, j.exp),
+        (errMsg) => {
+          const msgEl = document.getElementById('auth-msg');
+          if (msgEl) { msgEl.textContent = errMsg; msgEl.className = 'dashauth-msg is-error'; }
+        }
+      );
+    }
+    const em = document.getElementById('auth-em');
+    const send = document.getElementById('auth-send');
+    const msg = document.getElementById('auth-msg');
+    em.addEventListener('keydown', e=>{ if(e.key==='Enter') send.click(); });
+    send.onclick = async () => {
+      const v = em.value.trim();
+      if (!v || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { msg.textContent='Введіть правильний email.'; msg.className='dashauth-msg is-error'; return; }
+      send.disabled = true; send.textContent = 'Надсилаємо...'; msg.textContent='';
+      try {
+        const r = await fetch(WORKER+'/api/otp/request', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email:v, block: BLOCK})});
+        if (!r.ok) {
+          const j = await r.json().catch(()=>({}));
+          if (j.error === 'not_in_whitelist') {
+            msg.innerHTML = `❌ Цього email немає у whitelist. <a href="mailto:vg@sneco.ua?subject=Distributors%20SK%20Dashboard%20whitelist">✉ Запит до vg@sneco.ua</a>`;
+          } else {
+            msg.textContent = 'Помилка: ' + (j.error || r.status);
+          }
+          msg.className='dashauth-msg is-error';
+          send.disabled=false; send.textContent='Надіслати код'; return;
+        }
+        email = v;
+        renderCode();
+      } catch(e) {
+        msg.textContent = 'Помилка мережі: ' + e.message;
+        msg.className='dashauth-msg is-error';
+        send.disabled=false; send.textContent='Надіслати код';
+      }
+    };
+  }
+  function renderCode(){
+    stage.innerHTML = `
+      <div class="dashauth-icon">🔢</div>
+      <div class="dashauth-h1">Введіть код з листа</div>
+      <div class="dashauth-desc">${email}<br>Код надіслано — перевірте пошту (включно зі спамом).</div>
+      <input class="dashauth-input code" type="text" id="auth-code" inputmode="numeric" maxlength="6" placeholder="••••••" autofocus>
+      <button class="dashauth-btn" id="auth-verify">Підтвердити</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="#" class="dashauth-back" id="auth-back">← Інший email</a>
+    `;
+    const code = document.getElementById('auth-code');
+    const verify = document.getElementById('auth-verify');
+    const msg = document.getElementById('auth-msg');
+    code.addEventListener('keydown', e=>{ if(e.key==='Enter') verify.click(); });
+    document.getElementById('auth-back').onclick = e=>{ e.preventDefault(); renderEmail(); };
+    verify.onclick = async () => {
+      const c = code.value.trim();
+      if (!/^\d{6}$/.test(c)) { msg.textContent='Код — 6 цифр.'; msg.className='dashauth-msg is-error'; return; }
+      verify.disabled=true; verify.textContent='Перевіряємо...'; msg.textContent='';
+      try {
+        const r = await fetch(WORKER+'/api/otp/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, block: BLOCK, code: c})});
+        const j = await r.json();
+        if (!r.ok) { msg.textContent = 'Невірний або застарілий код.'; msg.className='dashauth-msg is-error'; verify.disabled=false; verify.textContent='Підтвердити'; return; }
+        unlock(j.token, j.email, j.exp);
+      } catch(e) {
+        msg.textContent = 'Помилка: ' + e.message; msg.className='dashauth-msg is-error';
+        verify.disabled=false; verify.textContent='Підтвердити';
+      }
+    };
+  }
+
+  (async()=>{
+    const sess = await verifyExisting();
+    if (sess) { unlock(sess.token, sess.email, sess.exp); return; }
+    renderEmail();
+  })();
+})();
+</script>
+<!-- ===== END OTP GATE ===== -->
+
+<div class="wrap">
+
+<header class="top">
+  <div>
+    <div class="brand"><span class="logo">sn<em>Eco</em></span><h1>· Скоринг дистрибуторів · Словаччина</h1></div>
+    <div class="sub" id="subline"></div>
+  </div>
+  <button class="theme-btn" id="themeBtn" type="button">◐ Тема</button>
+</header>
+
+<div class="load-hero" id="loadHero"><div class="sp"></div><div>Завантаження даних…</div></div>
+<div class="kpis" id="kpis"></div>
+
+<section class="card">
+  <h2>Пріоритет зусиль: до кого стукатися першими</h2>
+  <div class="sub">Порядок хвиль ≠ порядок рейтингу. Логіка: спершу — домашній Схід (завод у Мисліні/Гуменному = «domáci výrobca», найкоротший цикл), паралельно — пітчі до національних гігантів (цикл 2–4 місяці, тому старт одразу), далі — канальні спеціалісти (gastro, premium/bio), ризикові — у моніторинг.</div>
+  <div class="top3" id="top3"></div>
+  <div class="wave-grid" id="waves"></div>
+</section>
+
+<section class="card chart-card">
+  <h2>Топ-12 за композитним балом</h2>
+  <div class="sub">Зважена оцінка за 10 критеріями (0–10). Повний рейтинг усіх 27 — у таблиці нижче.</div>
+  <div class="legend" id="rankLegend"></div>
+  <div class="chart" id="rankChart"></div>
+</section>
+
+<section class="card">
+  <h2>Повний рейтинг — 27 компаній</h2>
+  <div class="sub">Клік по рядку — повний профіль: реквізити, фінанси, ризики, скоринг, план заходу, верифікація. Клік по заголовку колонки — сортування.</div>
+  <div class="filters" id="filters">
+    <input type="search" id="fSearch" placeholder="Пошук: назва, місто, бренд…" aria-label="Пошук">
+    <select id="fWave" aria-label="Хвиля"><option value="">Всі хвилі</option></select>
+    <select id="fTier" aria-label="Tier"><option value="">Всі tier</option></select>
+    <select id="fGroup" aria-label="Канал"><option value="">Всі канали</option><option value="siete">Мережі</option><option value="gastro">Gastro/HoReCa</option><option value="nez">Nezávislý trh</option><option value="premium">Premium/bio</option></select>
+    <select id="fRegion" aria-label="Область"><option value="">Всі kraje</option></select>
+    <select id="fRisk" aria-label="Ризик"><option value="">Будь-який ризик</option><option value="low">низький</option><option value="medium">середній</option><option value="high">високий</option><option value="unknown">невідомо</option></select>
+    <span class="fcount" id="fCount"></span>
+  </div>
+  <div class="twrap">
+    <table class="main" id="mainTable">
+      <thead><tr id="thead"></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Верифікація фактів (адверсарна перевірка)</h2>
+  <div class="sub">Незалежні агенти-скептики повторно перевіряли ключові твердження по топ-компаніях через реєстри та первинні джерела.</div>
+  <div class="vtiles" id="vtiles"></div>
+  <div id="refutedList" style="margin-top:12px"></div>
+</section>
+
+<section class="card">
+  <h2>Методологія</h2>
+  <div class="sub">Композит = Σ (бал критерію 0–10 × вага). Tier: A ≥ 8.00 · B 6.50–7.99 · C 5.00–6.49 · D &lt; 5.00.</div>
+  <div class="legend" style="margin-top:10px"><span class="key"><span class="sw" style="background:var(--s1)"></span>Вага критерію, %</span></div>
+  <div class="chart wb" id="weightChart"></div>
+  <details class="meth"><summary>Шкали-якорі критеріїв</summary><div class="inner"><table class="rub" id="rubric"></table></div></details>
+  <details class="meth"><summary id="poolSummary">Повний пул знайдених кандидатів</summary><div class="inner"><div class="sub">Кандидати поза топ-20 — резерв для наступних хвиль пошуку.</div><div class="pool-list" id="poolList"></div></div></details>
+</section>
+
+<footer>
+  Дані: відкриті реєстри Словаччини (FinStat, ORSR, RegisterÚZ, FOAF) · сайти компаній · вакансії Profesia.sk · LinkedIn · 8 пошукових + 25 дослідницьких агентів з адверсарною верифікацією. Дата аналізу: 19.08.2026. Tržby — з відкритої звітності, EUR. Самозаявлені цифри покриття позначені у профілях. Перед контрактом — повна перевірка контрагента (FinStat Premium / Transparex). Формулювання якості: «IFS Food v8 audit successfully passed» (не «certified»).
+</footer>
+</div>
+
+<div id="tip" role="tooltip"></div>
+
+<script>
+// DATA завантажується після авторизації через /api/dashboard/blob (name=distributors)
+
+const RISK_UA = {low:'низький', medium:'середній', high:'високий', unknown:'невідомо'};
+const CONF_UA = {high:'висока', medium:'середня', low:'низька'};
+const WAVE_TITLES = {
+  1:'Хвиля 1 · Домашній регіон і швидкий старт', 2:'Хвиля 2 · Національні гіганти',
+  3:'Хвиля 3 · Канальні спеціалісти', 4:'Хвиля 4 · Моніторинг / ризик'};
+const WAVE_TIME = {1:'тиждень 1–2', 2:'старт одразу · цикл 2–4 міс', 3:'тиждень 4–10', 4:'резерв'};
+// Тексти з назвами компаній живуть у захищеному blob (DATA.wave_desc / DATA.top3), не в публічному HTML.
+const RUBRIC = {
+ c1:'≥2500 ТТ=10 · 1500–2499=8 · 800–1499=6 · 300–799=4 · <300=2',
+ c2:'ТП ≥40=10 · 25–39=8 · 12–24=6 · 5–11=4 · <5=2 · бонус +1 за ≥3 СВ',
+ c3:'снеки/кондитерка — ядро=10 · кондитерка+бакалія=7–8 · широкий мікс=5–6 · непрофіль=2–3',
+ c4:'≥200 млн грн, ріст, без боргів=10 · 50–200 млн=7–8 · 10–50 млн / мало даних=5 · борги/збитки=2–3',
+ c5:'замовлення ≥300 кг=9–10 · 200–299=7–8 · 100–199=5–6 · 50–99=3–4',
+ c6:'преміум/healthy бренди=9–10 · середній+=7 · дешевий мас-маркет=3–4',
+ c7:'явно шукають снеки=9–10 · відкриті=7 · невідомо=5 · «не цікаво»=2–3',
+ c8:'базовий бал області (Київ=10, Львів=9, Дніпро/Одеса=8 …) +1 за кожну додаткову область',
+ c9:'≥15 років=10 · 10–14=8 · 5–9=6 · 2–4=4 · <2=2',
+ c10:'без конкурентів, дистрибуція=core → 10 · суміжні снеки=6–7 · прямий конфлікт=2–3'};
+
+const CH_MAP = [[['siet','sieť','reťaz','coop','tesco','billa','kaufland','cba','terno','fresh','maloobchod'],'мережі'],
+                [['gastro','horeca','reštaur','restaur','hotel','jedál'],'gastro'],
+                [['nezávisl','nezavisl','veľkoobchod','velkoobchod','rozvoz','predajn','cash'],'nezáv. trh'],
+                [['bio','zdrav','premium','prémi','delikat','fitness','keto'],'premium']];
+function chanShort(c){
+  const hay = ((c.channels||[]).join(' ')+' '+(c.chains||'')+' '+(c.cats||[]).join(' ')).toLowerCase();
+  const out = CH_MAP.filter(function(e){ return e[0].some(function(w){ return hay.indexOf(w) >= 0; }); }).map(function(e){ return e[1]; });
+  return out.length ? out.join(' · ') : '—';
+}
+const $ = s => document.querySelector(s);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined && text !== null && text !== '') e.textContent = text; return e; };
+
+
+const WORKER_URL = 'https://sneco-auth.vg-ab6.workers.dev';
+let DATA = null, TOKEN = null;
+
+window.bootDistributors = async function(token){
+  TOKEN = token;
+  try {
+    const r = await fetch(WORKER_URL + '/api/dashboard/blob', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ name: 'distributors-sk' })
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    DATA = await r.json();
+    const lh = document.getElementById('loadHero');
+    if (lh) lh.remove();
+    renderAll();
+  } catch(e) {
+    const lh = document.getElementById('loadHero');
+    if (lh) lh.innerHTML = '<div style="font-size:15px;font-weight:600">Не вдалося завантажити дані</div><div style="margin-top:6px;font-size:13px">' + String(e.message).replace(/[<>&]/g,'') + ' · <a href="#" onclick="location.reload();return false">спробувати ще раз</a></div>';
+  }
+};
+
+function renderAll(){
+/* theme toggle (in-memory only) */
+let theme = null;
+$('#themeBtn').addEventListener('click', () => {
+  const cur = theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  theme = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+});
+
+/* subline */
+$('#subline').textContent = `${DATA.meta.total} дистрибуторів SK · всі канали: nezávislý trh · siete · gastro · оцінка за 10 зваженими критеріями · ${DATA.meta.date}`;
+
+/* KPI */
+const kpis = [
+  ['Проаналізовано компаній', DATA.meta.total, 'глибоке дослідження + верифікація'],
+  ['Tier A (бал ≥ 8.0)', DATA.meta.tierA, 'пріоритетні цілі'],
+  ['Пул кандидатів', DATA.meta.pool_size, 'знайдено скаутингом по 8 напрямках'],
+  ['Контактів знайдено', DATA.meta.people, 'ЛПР, закупівлі, місточки, LinkedIn'],
+  ['Верифікаційних перевірок', DATA.meta.checks, `${DATA.verify_counts.refuted} спростовано → скоринг скориговано`],
+];
+kpis.forEach(([l, v, n]) => {
+  const t = el('div','tile');
+  t.append(el('div','lbl',l), el('div','val',String(v)), el('div','note',n));
+  $('#kpis').append(t);
+});
+
+/* top-3 immediate actions — з захищеного blob */
+const TOP3 = DATA.top3 || [];
+const WAVE_DESC = DATA.wave_desc || {};
+TOP3.forEach(([t, p]) => { const a = el('div','act'); const b = el('b','',t); a.append(b, el('p','',p)); $('#top3').append(a); });
+
+/* waves */
+const wavesBox = $('#waves');
+[1,2,3,4].forEach(w => {
+  const card = el('div','wave');
+  const h = el('h3','',WAVE_TITLES[w]);
+  const tm = el('span','small mut',' · '+WAVE_TIME[w]); h.append(tm);
+  card.append(h, el('div','desc',WAVE_DESC[w]));
+  DATA.companies.filter(c => c.wave === w).sort((a,b) => w <= 2 ? a.wave_order - b.wave_order : b.score - a.score).forEach(c => {
+    const row = el('div','wchip');
+    row.append(el('span','sc',c.score.toFixed(2)), el('span','nm',c.name.replace(/ \(.*\)$/,'')));
+
+    row.addEventListener('click', () => jumpTo(c.rank));
+    card.append(row);
+  });
+  wavesBox.append(card);
+});
+
+/* tooltip helpers */
+const tip = $('#tip');
+function showTip(html_rows, x, y) {
+  tip.replaceChildren(...html_rows);
+  tip.style.display = 'block';
+  const r = tip.getBoundingClientRect();
+  let left = x + 14, top = y + 14;
+  if (left + r.width > innerWidth - 8) left = x - r.width - 14;
+  if (top + r.height > innerHeight - 8) top = y - r.height - 14;
+  tip.style.left = left + 'px'; tip.style.top = top + 'px';
+}
+function hideTip(){ tip.style.display = 'none'; }
+
+/* rank chart top-12 */
+(function rankChart(){
+  const leg = $('#rankLegend');
+  [['Композитний бал 0–10','var(--s1)']].forEach(([t,c]) => {
+    const k = el('span','key'); const sw = el('span','sw'); sw.style.background = c; k.append(sw, el('span','',t)); leg.append(k);
+  });
+  const box = $('#rankChart');
+  const axis = el('div','axis');
+  for (let v = 0; v <= 10; v += 2) { const s = el('span','',String(v)); s.style.left = (v*10)+'%'; axis.append(s); }
+  const bars = el('div','bars');
+  const grid = el('div','gridlines');
+  for (let v = 0; v <= 10; v += 2) { const i = el('i', v===0 ? 'zero' : ''); i.style.left = (v*10)+'%'; grid.append(i); }
+  bars.append(grid);
+  DATA.companies.slice(0, 12).forEach(c => {
+    const row = el('div','brow'); row.tabIndex = 0;
+    row.append(el('span','bl',c.name.replace(/ \(.*\)$/,'')));
+    const track = el('div','track');
+    const bar = el('div','bar');
+    bar.style.width = (c.score*10)+'%';
+    bar.style.background = 'var(--s1)';
+    track.append(bar); row.append(track);
+    row.append(el('span','bv',c.score.toFixed(2)));
+    const rows = () => {
+      const v = el('div','t-val', c.score.toFixed(2)+' / 10');
+      const r1 = el('div','t-row'); const k = el('span','t-key'); k.style.background = 'var(--s1)';
+      r1.append(k, el('span','', c.name));
+      const r2 = el('div','t-row',''); r2.append(el('span','', `Tier ${c.tier} · ${c.region_s} · ризик ${RISK_UA[c.risk]}`));
+      return [v, r1, r2];
+    };
+    row.addEventListener('pointermove', e => showTip(rows(), e.clientX, e.clientY));
+    row.addEventListener('pointerleave', hideTip);
+    row.addEventListener('focus', () => { const r = row.getBoundingClientRect(); showTip(rows(), r.left + r.width/2, r.top); });
+    row.addEventListener('blur', hideTip);
+    row.addEventListener('click', () => jumpTo(c.rank));
+    bars.append(row);
+  });
+  box.append(axis, bars);
+})();
+
+/* weights chart */
+(function weightChart(){
+  const box = $('#weightChart');
+  const axis = el('div','axis');
+  for (let v = 0; v <= 15; v += 5) { const s = el('span','',v+'%'); s.style.left = (v/15*100)+'%'; axis.append(s); }
+  const bars = el('div','bars');
+  const grid = el('div','gridlines');
+  for (let v = 0; v <= 15; v += 5) { const i = el('i', v===0 ? 'zero' : ''); i.style.left = (v/15*100)+'%'; grid.append(i); }
+  bars.append(grid);
+  Object.keys(DATA.weights).forEach(k => {
+    const w = DATA.weights[k]*100;
+    const row = el('div','brow'); row.tabIndex = 0;
+    row.append(el('span','bl',DATA.crit[k]));
+    const track = el('div','track'); const bar = el('div','bar');
+    bar.style.width = (w/15*100)+'%'; track.append(bar); row.append(track);
+    row.append(el('span','bv',w.toFixed(0)+'%'));
+    const rows = () => [el('div','t-val', w+'%'), el('div','t-row', `${k.toUpperCase()} · ${DATA.crit[k]}`), el('div','t-row', RUBRIC[k])];
+    row.addEventListener('pointermove', e => showTip(rows(), e.clientX, e.clientY));
+    row.addEventListener('pointerleave', hideTip);
+    row.addEventListener('focus', () => { const r = row.getBoundingClientRect(); showTip(rows(), r.left + r.width/2, r.top); });
+    row.addEventListener('blur', hideTip);
+    bars.append(row);
+  });
+  box.append(axis, bars);
+})();
+
+/* rubric table */
+Object.keys(RUBRIC).forEach(k => {
+  const tr = el('tr');
+  tr.append(el('td','',`${k.toUpperCase()} · ${DATA.crit[k]}`), el('td','',Math.round(DATA.weights[k]*100)+'%'), el('td','',RUBRIC[k]));
+  $('#rubric').append(tr);
+});
+
+/* pool */
+$('#poolSummary').textContent = `Повний пул знайдених кандидатів (${DATA.pool.length})`;
+DATA.pool.forEach(p => { $('#poolList').append(el('div','',`${p.name} — ${p.region}`)); });
+
+/* verify section */
+(function verify(){
+  const vt = $('#vtiles');
+  [['Підтверджено', DATA.verify_counts.confirmed, 'var(--good)'], ['Спростовано / уточнено', DATA.verify_counts.refuted, 'var(--crit)'], ['Не перевіряється відкрито', DATA.verify_counts.unverifiable, 'var(--muted)']].forEach(([l, n, c]) => {
+    const t = el('div','vt'); const nn = el('div','n', String(n)); nn.style.color = c;
+    t.append(nn, el('div','small', l)); vt.append(t);
+  });
+  const rl = $('#refutedList');
+  rl.append(el('h2','', 'Ключові корекції'));
+  DATA.companies.forEach(c => {
+    c.checks.filter(ch => ch.v === 'refuted').forEach(ch => {
+      const d = el('div','vcheck');
+      const b = el('span','vc-b vc-refuted','✖ спростовано');
+      const name = el('b','', c.name + ': ');
+      d.append(b, name, el('span','', ch.claim));
+      if (ch.corr) d.append(el('div','small mut', '→ ' + ch.corr));
+      rl.append(d);
+    });
+  });
+})();
+
+/* ============ TABLE ============ */
+const COLS = [
+  ['rank','#','num'], ['name','Компанія',''], ['region_s','Kraj',''], ['ch_s','Канали',''],
+  ['wave','Хвиля','num'], ['tier','Tier',''], ['score','Композит','num'], ['risk','Ризик',''], ['conf','Дані','']
+];
+let sortKey = 'rank', sortDir = 1, openRank = null;
+const thead = $('#thead');
+COLS.forEach(([key, label, cls]) => {
+  const th = el('th', cls, label);
+  const arr = el('span','arr',''); th.append(arr);
+  th.addEventListener('click', () => {
+    if (sortKey === key) sortDir *= -1; else { sortKey = key; sortDir = key === 'rank' || key === 'wave' ? 1 : -1; }
+    renderTable();
+  });
+  thead.append(th);
+});
+
+/* filters */
+const fS = $('#fSearch'), fW = $('#fWave'), fT = $('#fTier'), fG = $('#fGroup'), fR = $('#fRegion'), fK = $('#fRisk');
+[1,2,3,4].forEach(w => { const o = el('option','',`Хвиля ${w}`); o.value = w; fW.append(o); });
+['A','B','C','D'].forEach(t => { const o = el('option','',`Tier ${t}`); o.value = t; fT.append(o); });
+[...new Set(DATA.companies.map(c => c.region_s))].sort((a,b) => a.localeCompare(b,'uk')).forEach(r => { const o = el('option','',r); o.value = r; fR.append(o); });
+[fS, fW, fT, fG, fR, fK].forEach(f => f.addEventListener('input', renderTable));
+
+function matches(c) {
+  const q = fS.value.trim().toLowerCase();
+  if (q) {
+    const hay = [c.name, c.legal, c.ico, c.city, c.region, c.portfolio.join(' '), c.cats.join(' '), (c.people||[]).map(p=>p.n).join(' ')].join(' ').toLowerCase();
+    if (!hay.includes(q)) return false;
+  }
+  if (fW.value && String(c.wave) !== fW.value) return false;
+  if (fT.value && c.tier !== fT.value) return false;
+  if (fG.value) {
+    const hay = ((c.channels||[]).join(' ') + ' ' + (c.chains||'') + ' ' + (c.cats||[]).join(' ')).toLowerCase();
+    const M = {siete:['siet','sieť','reťaz','coop','tesco','billa','kaufland','cba','terno','fresh','maloobchod'],
+               gastro:['gastro','horeca','reštaur','restaur','hotel','jedál'],
+               nez:['nezávisl','nezavisl','veľkoobchod','velkoobchod','rozvoz','predajn','cash'],
+               premium:['bio','zdrav','premium','prémi','delikat','fitness','keto']};
+    if (!M[fG.value].some(w => hay.includes(w))) return false;
+  }
+  if (fR.value && c.region_s !== fR.value) return false;
+  if (fK.value && c.risk !== fK.value) return false;
+  return true;
+}
+
+function riskBadge(risk) {
+  const b = el('span','badge b-risk-'+risk);
+  b.append(el('span','dot'), el('span','', RISK_UA[risk]));
+  return b;
+}
+
+function fmtMoney(m) { return m == null ? '—' : (m >= 1000 ? (m/1000).toFixed(2).replace('.',',') + ' млрд €' : String(Math.round(m*10)/10).replace('.',',') + ' млн €'); }
+function fmtNum(n) { return n == null ? '—' : n.toLocaleString('uk-UA'); }
+
+function kvRow(box, k, v, isLink) {
+  if (v === undefined || v === null || v === '' ) return;
+  box.append(el('span','k',k));
+  const vv = el('span','v');
+  if (isLink && typeof v === 'string' && v) {
+    const url = v.startsWith('http') ? v : 'https://' + v.replace(/^\/*/,'');
+    const a = el('a','',v.replace(/^https?:\/\//,''));
+    a.href = url; a.target = '_blank'; a.rel = 'noopener';
+    vv.append(a);
+  } else vv.textContent = v;
+  box.append(vv);
+}
+
+/* ===== Досьє компанії одним файлом ===== */
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+function dossierHtml(c){
+  const kv=(k,v)=> v?`<tr><td class="k">${esc(k)}</td><td>${v}</td></tr>`:'';
+  const link=u=>u?`<a href="${esc(u.startsWith('http')?u:'https://'+u)}">${esc(u)}</a>`:'';
+  const RU={low:'низький',medium:'середній',high:'високий',unknown:'невідомо'};
+  const CU={high:'висока',medium:'середня',low:'низька'};
+  const critRows=Object.keys(c.scores).map(k=>`<tr><td>${esc(DATA.crit[k])}</td><td class="sc">${esc(c.scores[k].s)}</td><td class="why">${esc(c.scores[k].w)}</td></tr>`).join('');
+  const points=(c.points||[]).map(p=>`<li>${esc(p)}</li>`).join('');
+  const people=(c.people||[]).map(p=>`<li><b>${esc(p.n)}</b>${p.r?' — '+esc(p.r):''}${p.li?` · <a href="${esc(p.li)}">LinkedIn</a>`:''}${p.ct?`<br><span style="color:#555">${esc(p.ct)}</span>`:''}${p.how?`<br><span style="color:#888;font-size:12px">${esc(p.how)}</span>`:''}</li>`).join('');
+  const checks=(c.checks||[]).map(ch=>{const L={confirmed:'✔ підтверджено',refuted:'✖ спростовано',unverifiable:'? не перевіряється'}[ch.v]||ch.v;
+    return `<div class="chk"><span class="vb v-${esc(ch.v)}">${L}</span> ${esc(ch.claim)}${ch.corr?`<div class="corr">→ ${esc(ch.corr)}</div>`:''}${ch.src?`<div class="corr">Джерело: ${esc(ch.src)}</div>`:''}</div>`;}).join('');
+  const adjust=(c.adjust&&c.adjust.length)?`<div class="callout"><b>Скориговано після верифікації:</b><br>${c.adjust.map(a=>'• '+esc(a)).join('<br>')}</div>`:'';
+  const srcs=(c.sources||[]).map(s=>/^https?:\/\//.test(s)?`<div>${link(s)}</div>`:`<div>${esc(s)}</div>`).join('');
+  const money=m=>m==null?'':(m>=1000?(m/1000).toFixed(2).replace('.',',')+' млрд грн':String(Math.round(m*10)/10).replace('.',',')+' млн грн');
+  return `<!DOCTYPE html><html lang="uk"><head><meta charset="UTF-8"><meta name="robots" content="noindex,nofollow"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>snEco · Досьє: ${esc(c.name)}</title><style>
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#1a1a1a;background:#fff;margin:0;padding:28px 26px;font-size:14px;line-height:1.5;max-width:860px;margin:0 auto}
+.top{border-bottom:3px solid #FEBB30;padding-bottom:12px;margin-bottom:16px}
+.brand{font-weight:800;font-size:13px;letter-spacing:.04em;color:#555}
+h1{font-size:21px;margin:4px 0 4px}
+.meta{color:#666;font-size:13px}
+.badges{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+.badge{border:1px solid #ddd;border-radius:16px;padding:3px 11px;font-size:12px;font-weight:600;color:#333}
+.badge.acc{background:#2a78d6;border-color:#2a78d6;color:#fff}
+h2{font-size:14px;margin:20px 0 8px;text-transform:uppercase;letter-spacing:.05em;color:#444;border-bottom:1px solid #eee;padding-bottom:4px}
+table.kvt{border-collapse:collapse;width:100%;font-size:13.5px}
+table.kvt td{padding:4px 8px;vertical-align:top;border-bottom:1px solid #f2f2ef}
+table.kvt td.k{color:#888;white-space:nowrap;width:150px}
+table.crit{border-collapse:collapse;width:100%;font-size:12.5px}
+table.crit td{padding:5px 8px;border-bottom:1px solid #f2f2ef;vertical-align:top}
+table.crit td.sc{font-weight:700;text-align:center;width:34px}
+table.crit td.why{color:#555;font-size:12px}
+ul{margin:6px 0;padding-left:20px} li{margin:4px 0}
+.callout{border-left:3px solid #fab219;background:#fdf6e3;padding:9px 12px;border-radius:6px;font-size:13px;margin:8px 0}
+.chk{border-top:1px solid #f0f0ec;padding:7px 0;font-size:13px}
+.vb{font-weight:700;font-size:11px;padding:1px 8px;border-radius:10px;margin-right:6px}
+.v-confirmed{color:#0a7a0a;background:#eaf6ea}.v-refuted{color:#c03;background:#fdeaea}.v-unverifiable{color:#777;background:#f2f2ef}
+.corr{color:#666;font-size:12px;margin-top:3px}
+a{color:#2a78d6;text-decoration:none;word-break:break-all}
+.sum{font-size:13.5px}
+footer{margin-top:26px;border-top:1px solid #eee;padding-top:10px;font-size:11px;color:#999}
+@media print{body{padding:0}a{color:#000}}
+</style></head><body>
+<div class="top"><div class="brand">snEco · DOSSIER: SK DISTRIBÚTOR · Конфіденційно</div>
+<h1>${esc(c.name)}</h1>
+<div class="meta">${esc(c.region)}${c.city?' · '+esc(c.city):''} · станом на ${esc(DATA.meta.date)}</div>
+<div class="badges"><span class="badge acc">Композит ${esc(c.score.toFixed(2))} / 10 · Tier ${esc(c.tier)}</span><span class="badge">Хвиля ${esc(c.wave)}</span><span class="badge">Ризик: ${esc(RU[c.risk])}</span><span class="badge">Дані: ${esc(CU[c.conf])}</span></div></div>
+<h2>Резюме</h2><div class="sum">${esc(c.summary||'—')}</div>${adjust}
+<h2>Реквізити і контакти</h2><table class="kvt">
+${kv('Юрособа',esc(c.legal))}${kv('IČO',esc(c.ico))}${kv('Засновано',esc(c.founded))}${kv('Адреса/місто',esc(c.city))}
+${kv('Сайт',link(c.website))}${kv('Соцмережі',esc(c.social))}${kv('Телефони',esc((c.phones||[]).join(' · ')))}${kv('Email',esc((c.emails||[]).join(', ')))}</table>
+${people?`<h2>Люди і виходи на ЛПР (${(c.people||[]).length})</h2>${c.dm?`<div class="callout"><b>Ланцюжок виходу:</b> ${esc(c.dm)}</div>`:''}${c.linkedin_page?`<div style="font-size:13px;margin:4px 0 8px">LinkedIn компанії: ${link(c.linkedin_page)}</div>`:''}<ul>${people}</ul>`:''}
+<h2>Бізнес і масштаб</h2><table class="kvt">
+${kv('Tržby',esc(money(c.rev))+(c.rev_y?' ('+esc(c.rev_y)+')':''))}${kv('Динаміка',esc(c.trend))}${kv('Працівники',esc(c.emp))}
+${kv('Клієнти (точки)',c.clients!=null?esc(c.clients.toLocaleString('uk-UA')):'')}${kv('Obch. zástupcovia',c.reps!=null?esc(c.reps):'')}${kv('Автопарк',c.fleet!=null?esc(c.fleet):'')}
+${kv('Канали',esc((c.channels||[]).join(' · ')))}${kv('Доступ у мережі',esc(c.chains))}${kv('CZ-присутність',esc(c.cz))}${kv('Опис покриття',esc(c.cov))}
+${kv('Портфель',esc((c.portfolio||[]).join(', ')))}${kv('Категорії',esc((c.cats||[]).join(', ')))}${kv('Власне вир-во',esc(c.own_prod))}</table>
+<h2>Ризики</h2><table class="kvt">${kv('Рівень',esc(RU[c.risk]))}${kv('Dlhy',esc(c.risk_debts))}${kv('Súdy/exekúcie',esc(c.risk_court))}${kv('Інше',esc(c.risk_other))}</table>
+<h2>Скоринг за 10 критеріями</h2><table class="crit">${critRows}</table>
+<h2>План першого контакту</h2><table class="kvt">${kv('ЛПР / до кого йти',esc(c.dm))}${kv('Кут заходу',esc(c.angle))}${kv('Перший крок',esc(c.first))}</table>
+${points?`<h2>Talking points</h2><ul>${points}</ul>`:''}
+${checks?`<h2>Верифікація фактів (${(c.checks||[]).length})</h2>${checks}`:''}
+${c.sk_intro?`<h2>Готовий vstupný text po slovensky</h2><div class="callout">${esc(c.sk_intro)}</div>`:''}
+${srcs?`<h2>Джерела</h2>${srcs}`:''}
+<footer>Згенеровано з дашборда «snEco · Скоринг дистрибуторів UA» · ${esc(DATA.meta.date)} · дані з відкритих джерел і CRM · перед контрактом — повна платна перевірка контрагента (YouControl/Vkursi)</footer>
+</body></html>`;
+}
+function downloadDossier(c){
+  const safe=c.name.replace(/[«»"'\\/\\:*?<>|]/g,'').replace(/\s+/g,'_').slice(0,60);
+  const blob=new Blob(['﻿'+dossierHtml(c)],{type:'text/html;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`snEco_dossier_SK_${safe}_${DATA.meta.date.replace(/\./g,'-')}.html`;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},1500);
+}
+
+function buildDetail(c) {
+  const wrap = el('div','detail');
+
+  const sm = el('div','dcol full');
+  const dh = el('div','dhead');
+  dh.append(el('h4','','Резюме'));
+  const dlb = el('button','dl-btn','⬇ Досьє файлом');
+  dlb.type = 'button';
+  dlb.addEventListener('click', ev => { ev.stopPropagation(); downloadDossier(c); });
+  dh.append(dlb);
+  sm.append(dh);
+  sm.append(el('div','', c.summary || '—'));
+  if (c.adjust.length) {
+    const co = el('div','callout');
+    co.append(el('b','','Скориговано після верифікації: '));
+    c.adjust.forEach(a => co.append(el('div','','• ' + a)));
+    sm.append(co);
+  }
+  wrap.append(sm);
+
+  const d1 = el('div','dcol');
+  d1.append(el('h4','','Реквізити і контакти'));
+  const kv1 = el('div','kv');
+  kvRow(kv1,'Юрособа', c.legal || '—');
+  kvRow(kv1,'IČO', c.ico || '—');
+  kvRow(kv1,'LinkedIn компанії', c.linkedin_page || null, true);
+  kvRow(kv1,'Засновано', c.founded ? String(c.founded) : '—');
+  kvRow(kv1,'Місто', c.city || '—');
+  kvRow(kv1,'Сайт', c.website || null, true);
+  kvRow(kv1,'Соцмережі', c.social || null);
+  kvRow(kv1,'Телефони', c.phones.length ? c.phones.join(' · ') : '—');
+  kvRow(kv1,'Email', c.emails.length ? c.emails.join(', ') : '—');
+  d1.append(kv1);
+
+  wrap.append(d1);
+
+  if ((c.people || []).length) {
+    const dp = el('div','dcol full');
+    const dph = el('div','dhead');
+    dph.append(el('h4','', `Люди і виходи на ЛПР (${c.people.length})`));
+    const links = el('div','small');
+    if (c.linkedin_page) { const a = el('a','','LinkedIn компанії'); a.href = c.linkedin_page; a.target='_blank'; a.rel='noopener'; links.append(a); }
+    if (c.social) { if (links.childNodes.length) links.append(document.createTextNode(' · ')); links.append(el('span','mut', c.social.slice(0,90))); }
+    dph.append(links);
+    dp.append(dph);
+    if (c.dm) { const co = el('div','callout'); co.style.borderLeftColor = 'var(--s1)'; const b = el('b','','Ланцюжок виходу: '); co.append(b, el('span','', c.dm)); dp.append(co); }
+    const pg = el('div','people-grid');
+    c.people.forEach(p => {
+      const row = el('div','person');
+      const l1 = el('div','p-l1');
+      l1.append(el('b','', p.n));
+      if (p.li) { const a = el('a','p-li','in'); a.href = p.li; a.target='_blank'; a.rel='noopener'; a.title='LinkedIn-профіль'; l1.append(a); }
+      row.append(l1);
+      if (p.r) row.append(el('div','small', p.r));
+      if (p.ct) row.append(el('div','small', p.ct));
+      if (p.how) row.append(el('div','small mut', p.how));
+      pg.append(row);
+    });
+    dp.append(pg);
+    wrap.append(dp);
+  }
+
+  const d2 = el('div','dcol');
+  d2.append(el('h4','','Бізнес і масштаб'));
+  const kv2 = el('div','kv');
+  kvRow(kv2,'Tržby', c.rev != null ? fmtMoney(c.rev) + (c.rev_y ? ` (${c.rev_y})` : '') : '—');
+  kvRow(kv2,'Працівники', fmtNum(c.emp));
+  kvRow(kv2,'Клієнти (точки)', c.clients != null ? fmtNum(c.clients) : '—');
+  kvRow(kv2,'Obch. zástupcovia', c.reps != null ? fmtNum(c.reps) : '—');
+  kvRow(kv2,'Автопарк', c.fleet != null ? fmtNum(c.fleet) : '—');
+  kvRow(kv2,'Канали', (c.channels||[]).join(' · ') || '—');
+  kvRow(kv2,'Доступ у мережі', c.chains || '—');
+  kvRow(kv2,'CZ-присутність', c.cz || '—');
+  d2.append(kv2);
+  if (c.trend) { { const h = el('h4','','Динаміка'); h.style.marginTop='10px'; d2.append(h); } d2.append(el('div','small', c.trend)); }
+  if (c.cov) { { const h = el('h4','','Покриття'); h.style.marginTop='10px'; d2.append(h); } d2.append(el('div','small', c.cov)); }
+  if (c.portfolio.length) {
+    { const h = el('h4','','Портфель'); h.style.marginTop='10px'; d2.append(h); }
+    const ch = el('div','chips'); c.portfolio.forEach(p => ch.append(el('span','',p))); d2.append(ch);
+  }
+  wrap.append(d2);
+
+  const d3 = el('div','dcol');
+  d3.append(el('h4','','Скоринг за критеріями'));
+  const mini = el('div','mini');
+  Object.keys(c.scores).forEach(k => {
+    mini.append(el('span','', DATA.crit[k]));
+    const t = el('div','mt'); const f = el('div','mf'); f.style.width = (c.scores[k].s*10)+'%'; t.append(f); mini.append(t);
+    mini.append(el('span','ms', String(c.scores[k].s)));
+    const why = el('div','why', c.scores[k].w); mini.append(why);
+  });
+  d3.append(mini);
+  const wb = el('button','whybtn','Показати обґрунтування балів ▸');
+  wb.addEventListener('click', () => { mini.classList.toggle('showwhy'); wb.textContent = mini.classList.contains('showwhy') ? 'Сховати обґрунтування ▾' : 'Показати обґрунтування балів ▸'; });
+  d3.append(wb);
+  { const h = el('h4','','Ризики'); h.style.marginTop='10px'; d3.append(h); }
+  const rb = el('div',''); rb.append(riskBadge(c.risk)); d3.append(rb);
+  if (c.risk_debts) d3.append(el('div','small', 'Dlhy: ' + c.risk_debts));
+  if (c.risk_court) d3.append(el('div','small', 'Súdy/exekúcie: ' + c.risk_court));
+  if (c.risk_other) d3.append(el('div','small', c.risk_other));
+  wrap.append(d3);
+
+  const d4 = el('div','dcol full');
+  d4.append(el('h4','','Як заходити — план першого контакту'));
+  const kv4 = el('div','kv');
+  kvRow(kv4,'ЛПР', c.dm || '—');
+  kvRow(kv4,'Кут заходу', c.angle || '—');
+  kvRow(kv4,'Перший крок', c.first || '—');
+  d4.append(kv4);
+  if (c.points.length) {
+    { const h = el('h4','','Talking points'); h.style.marginTop='10px'; d4.append(h); }
+    const ul = el('ul','tp'); c.points.forEach(p => ul.append(el('li','',p))); d4.append(ul);
+  }
+  if (c.sk_intro) {
+    { const h = el('h4','','Готовий вступ словацькою (для першого листа)'); h.style.marginTop='10px'; d4.append(h); }
+    const box = el('div','callout'); box.style.borderLeftColor = 'var(--s1)';
+    box.append(el('div','', c.sk_intro));
+    const cpb = el('button','dl-btn','⧉ Копіювати'); cpb.type='button'; cpb.style.marginTop='8px'; cpb.style.fontSize='11px';
+    cpb.addEventListener('click', ev => { ev.stopPropagation(); if (navigator.clipboard) navigator.clipboard.writeText(c.sk_intro); cpb.textContent='✓ Скопійовано'; setTimeout(()=>{cpb.textContent='⧉ Копіювати';},1500); });
+    box.append(cpb); d4.append(box);
+  }
+  wrap.append(d4);
+
+  if (c.checks.length) {
+    const d5 = el('div','dcol full');
+    d5.append(el('h4','',`Верифікація (${c.checks.length})`));
+    c.checks.forEach(ch => {
+      const v = el('div','vcheck');
+      const lbl = {confirmed:'✔ підтверджено', refuted:'✖ спростовано', unverifiable:'? не перевіряється'}[ch.v];
+      v.append(el('span','vc-b vc-'+ch.v, lbl), el('span','', ch.claim));
+      if (ch.corr) v.append(el('div','small mut','→ ' + ch.corr));
+      d5.append(v);
+    });
+    wrap.append(d5);
+  }
+
+  if (c.sources.length) {
+    const d6 = el('div','dcol full srcs');
+    d6.append(el('h4','','Джерела'));
+    c.sources.forEach(s => {
+      if (!/^https?:\/\//.test(s)) { d6.append(el('div','small mut', s)); return; }
+      const a = el('a','',s); a.href = s; a.target = '_blank'; a.rel = 'noopener'; d6.append(a);
+    });
+    wrap.append(d6);
+  }
+  return wrap;
+}
+
+function renderTable() {
+  const tbody = $('#tbody');
+  tbody.replaceChildren();
+  let list = DATA.companies.filter(matches);
+  list.sort((a, b) => {
+    let va = a[sortKey], vb = b[sortKey];
+    if (typeof va === 'string') return va.localeCompare(vb,'uk') * sortDir;
+    return ((va ?? -1) - (vb ?? -1)) * sortDir;
+  });
+  $('#fCount').textContent = `${list.length} із ${DATA.companies.length}`;
+  thead.querySelectorAll('th').forEach((th, i) => {
+    th.querySelector('.arr').textContent = COLS[i][0] === sortKey ? (sortDir === 1 ? ' ▲' : ' ▼') : '';
+  });
+  list.forEach(c => {
+    const tr = el('tr','rrow'); tr.tabIndex = 0; tr.dataset.rank = c.rank;
+    const td1 = el('td','num', String(c.rank));
+    const td2 = el('td','namecell');
+    const nb = el('b','', c.name); td2.append(nb);
+    td2.append(el('div','small', [c.city.split('(')[0].trim(), c.ico ? 'IČO ' + c.ico.split(' ')[0] : ''].filter(Boolean).join(' · ')));
+    const td3 = el('td','', c.region_s);
+    const td4 = el('td','small'); td4.textContent = chanShort(c);
+    const td5 = el('td','num', String(c.wave));
+    const td6 = el('td'); td6.append(el('span','tier tier-' + c.tier, c.tier));
+    const td7 = el('td');
+    const sb = el('div','scorebar');
+    const t = el('div','tr2'); const f = el('div','fl');
+    f.style.width = (c.score*10) + '%'; f.style.background = 'var(--s1)';
+    t.append(f); sb.append(t, el('b','', c.score.toFixed(2))); td7.append(sb);
+    const td8 = el('td'); td8.append(riskBadge(c.risk));
+    const td9 = el('td','small', CONF_UA[c.conf]);
+    tr.append(td1, td2, td3, td4, td5, td6, td7, td8, td9);
+    tr.addEventListener('click', () => toggleDetail(tr, c));
+    tr.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleDetail(tr, c); } });
+    tbody.append(tr);
+    if (openRank === c.rank) {
+      const dtr = el('tr','drow'); const dtd = el('td'); dtd.colSpan = COLS.length;
+      dtd.append(buildDetail(c)); dtr.append(dtd); tbody.append(dtr);
+    }
+  });
+}
+
+function toggleDetail(tr, c) {
+  openRank = openRank === c.rank ? null : c.rank;
+  renderTable();
+  if (openRank === c.rank) {
+    const row = document.querySelector(`tr[data-rank="${c.rank}"]`);
+    if (row) row.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+}
+
+function jumpTo(rank) {
+  [fS, fG, fR, fK].forEach(f => f.value = '');
+  fW.value = ''; fT.value = '';
+  openRank = rank;
+  renderTable();
+  const row = document.querySelector(`tr[data-rank="${rank}"]`);
+  if (row) row.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+renderTable();
+} // end renderAll
+</script>
+</body>
+</html>
