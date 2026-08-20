@@ -1,0 +1,2811 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>snEco · HR Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD" crossorigin="anonymous"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --y:#FEBF27;--g:#96C11F;--d:#1E1E1E;--bg:#F4F4EF;--card:#fff;
+  --muted:#6b6b6b;--border:#E5E5DC;--red:#DC2626;--blue:#3B82F6;
+  --orange:#F97316;--purple:#7209B7;--teal:#0D9488;--pink:#DB2777;
+  --yf:rgba(254,191,39,.13);--gf:rgba(150,193,31,.12);--rf:rgba(220,38,38,.09);
+  --bf:rgba(59,130,246,.10);--of:rgba(249,115,22,.10);--pf:rgba(114,9,183,.09);
+  --shadow:0 1px 3px rgba(0,0,0,.06);--shadow-lg:0 12px 40px rgba(0,0,0,.16);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--d);font-size:14px;min-height:100vh;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit}
+a{color:inherit}
+
+/* ─── TOPBAR ─── */
+.topbar{background:var(--d);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.3);gap:12px}
+.logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.logo-box{width:32px;height:32px;background:var(--y);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:var(--d)}
+.logo-text{color:#fff;font-size:15px;font-weight:700;letter-spacing:-.3px}
+.logo-sub{color:rgba(255,255,255,.4);font-size:11px;margin-top:1px}
+@media(max-width:820px){.logo-text,.logo-sub{display:none}}
+.topbar-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.nav-menu{display:flex;align-items:center;gap:2px;margin-left:18px;padding-left:18px;border-left:1px solid rgba(255,255,255,.12)}
+.nav-link{color:rgba(255,255,255,.65);text-decoration:none;font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:7px;transition:all .15s;white-space:nowrap}
+.nav-link:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-link.active{background:rgba(254,191,39,.18);color:var(--y)}
+.nav-toggle{display:none;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:6px}
+@media(max-width:1280px){
+  .nav-menu{position:fixed;top:56px;left:0;right:0;background:#1E1E1E;flex-direction:column;align-items:stretch;padding:8px 16px;gap:0;margin:0;border-left:none;transform:translateY(-115%);transition:transform .25s;z-index:180;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+  .nav-menu.open{transform:translateY(0)}
+  .nav-link{padding:11px 12px}
+  .nav-toggle{display:inline-block}
+}
+.badge{padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:600;white-space:nowrap}
+.badge-green{background:rgba(150,193,31,.2);color:var(--g);border:1px solid rgba(150,193,31,.3)}
+.badge-gray{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1)}
+.badge-lock{background:rgba(254,191,39,.15);color:var(--y);border:1px solid rgba(254,191,39,.3)}
+@media(max-width:900px){#roleBadge{display:none}}
+
+/* ─── TABS ─── */
+.tabbar{background:var(--d);padding:0 20px;display:flex;gap:2px;overflow-x:auto;position:sticky;top:56px;z-index:190;border-top:1px solid rgba(255,255,255,.07);scrollbar-width:none}
+.tabbar::-webkit-scrollbar{display:none}
+.tabbtn{background:none;border:0;color:rgba(255,255,255,.55);font-size:13px;font-weight:600;padding:11px 14px 10px;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;transition:all .15s;display:flex;align-items:center;gap:6px}
+.tabbtn:hover{color:#fff}
+.tabbtn.active{color:var(--y);border-bottom-color:var(--y)}
+.tabbtn .tcount{background:rgba(255,255,255,.12);border-radius:9px;padding:1px 6px;font-size:10.5px;font-weight:700}
+.tabbtn.active .tcount{background:rgba(254,191,39,.22);color:var(--y)}
+@media(max-width:620px){.tabbar{padding:0 8px;top:48px}.tabbtn{padding:10px 9px;font-size:12px}}
+
+/* ─── FILTER BAR ─── */
+.filterbar{background:#fff;border-bottom:1px solid var(--border);padding:9px 20px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;position:sticky;top:99px;z-index:150}
+@media(max-width:620px){.filterbar{top:88px;padding:8px 10px}}
+.fb-lbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted)}
+.fsel,.finput{padding:6px 9px;border-radius:7px;border:1px solid var(--border);font-size:12.5px;background:#fafaf7;color:var(--d);max-width:190px}
+.fsel:focus,.finput:focus{outline:none;border-color:var(--y);background:#fff}
+.fsearch{flex:1;min-width:150px;max-width:280px}
+.period-chips{display:flex;gap:3px;background:#F1F1EB;padding:3px;border-radius:9px}
+.period-chip{padding:5px 10px;border-radius:7px;font-size:11.5px;font-weight:600;color:#555;cursor:pointer;border:none;background:transparent;transition:all .15s;white-space:nowrap}
+.period-chip:hover{background:var(--yf)}
+.period-chip.active{background:var(--d);color:#fff}
+.fb-spacer{flex:1}
+.fb-info{font-size:11px;color:var(--muted);background:var(--gf);padding:4px 9px;border-radius:7px;font-weight:600;white-space:nowrap}
+
+/* ─── BUTTONS ─── */
+.btn{padding:7px 13px;border-radius:8px;border:1px solid var(--border);background:#fff;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;color:var(--d)}
+.btn:hover{background:#faf9f4;border-color:#d5d5c8}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--d);color:#fff;border-color:var(--d)}
+.btn-primary:hover{background:#000;color:#fff}
+.btn-y{background:var(--y);border-color:var(--y);color:var(--d)}
+.btn-y:hover{background:#f5b31a;border-color:#f5b31a}
+.btn-danger{color:var(--red);border-color:rgba(220,38,38,.3);background:#fff}
+.btn-danger:hover{background:var(--rf)}
+.btn-sm{padding:4px 9px;font-size:11.5px;border-radius:6px}
+.btn-icon{padding:6px 8px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* ─── LAYOUT ─── */
+.wrap{padding:18px 20px 60px;max-width:1560px;margin:0 auto}
+@media(max-width:620px){.wrap{padding:12px 10px 50px}}
+.tabpane{display:none}
+.tabpane.active{display:block;animation:fadeIn .22s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.sec{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:22px 0 11px;display:flex;align-items:center;gap:9px}
+.sec:first-child{margin-top:0}
+.sec::after{content:'';flex:1;height:1px;background:var(--border)}
+.sec .sec-act{text-transform:none;letter-spacing:0}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+.g23{display:grid;grid-template-columns:2fr 1fr;gap:13px}
+@media(max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}.g23{grid-template-columns:1fr}}
+@media(max-width:900px){.g3{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}}
+@media(max-width:640px){.g4,.g3{grid-template-columns:1fr}}
+
+/* ─── KPI ─── */
+.kpi{background:var(--card);border-radius:12px;padding:14px 16px;border:1px solid var(--border);position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--y)}
+.kpi.cg::after{background:var(--g)}.kpi.cr::after{background:var(--red)}.kpi.cb::after{background:var(--blue)}
+.kpi.co::after{background:var(--orange)}.kpi.cp::after{background:var(--purple)}.kpi.ct::after{background:var(--teal)}
+.kpi-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.kpi-val{font-size:23px;font-weight:800;line-height:1.05;letter-spacing:-.5px}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.35}
+.kpi-delta{display:inline-block;padding:2px 7px;border-radius:8px;font-size:10.5px;font-weight:700;margin-top:5px}
+.kpi-delta.up{background:var(--gf);color:#4a7000}
+.kpi-delta.down{background:var(--rf);color:#a01818}
+.kpi-delta.flat{background:rgba(138,138,138,.13);color:#666}
+.kpi.clickable{cursor:pointer}
+.kpi.clickable:hover{border-color:var(--y);box-shadow:0 3px 12px rgba(254,191,39,.2)}
+
+/* ─── CARDS ─── */
+.cc{background:var(--card);border-radius:12px;padding:16px 18px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.cc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.cc-title{font-size:13.5px;font-weight:700}
+.cc-sub{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4}
+.chart-h200{height:200px;position:relative}
+.chart-h240{height:240px;position:relative}
+.chart-h300{height:300px;position:relative}
+.hint{font-size:11px;color:var(--muted);line-height:1.45;background:var(--yf);border-left:3px solid var(--y);padding:8px 11px;border-radius:0 7px 7px 0;margin-top:10px}
+.hint.info{background:var(--bf);border-color:var(--blue)}
+.hint.warn{background:var(--of);border-color:var(--orange)}
+
+/* ─── TABLES ─── */
+.tbl-wrap{background:var(--card);border-radius:12px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow)}
+.tbl-scroll{overflow-x:auto}
+.tbl-scroll.tall{max-height:72vh;overflow-y:auto}
+table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+table.tbl th{background:#FAFAF5;text-align:left;padding:9px 11px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0;z-index:2}
+table.tbl th.sortable{cursor:pointer;user-select:none}
+table.tbl th.sortable:hover{color:var(--d)}
+table.tbl th .sarr{opacity:.35;font-size:9px}
+table.tbl th.sorted .sarr{opacity:1;color:var(--y)}
+table.tbl td{padding:9px 11px;border-bottom:1px solid #F0F0E8;vertical-align:middle}
+table.tbl tbody tr:hover{background:#FCFCF7}
+table.tbl tbody tr.rowclick{cursor:pointer}
+table.tbl td.num{text-align:right;font-variant-numeric:tabular-nums}
+table.tbl tfoot td{font-weight:700;background:#FAFAF5;border-top:2px solid var(--border)}
+.tbl-empty{padding:40px 20px;text-align:center;color:var(--muted)}
+
+/* ─── CHIPS / PILLS ─── */
+.chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:700;white-space:nowrap;line-height:1.6}
+.chip-g{background:var(--gf);color:#4a7000}
+.chip-r{background:var(--rf);color:#a01818}
+.chip-y{background:var(--yf);color:#8a6200}
+.chip-b{background:var(--bf);color:#1d4ed8}
+.chip-o{background:var(--of);color:#9a4a10}
+.chip-p{background:var(--pf);color:#5b0791}
+.chip-gray{background:rgba(120,120,120,.11);color:#5a5a5a}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+
+/* ─── AVATAR ─── */
+.av{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;letter-spacing:-.3px}
+.av-lg{width:52px;height:52px;font-size:18px}
+.person{display:flex;align-items:center;gap:9px;min-width:0}
+.person-nm{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.person-sub{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ─── EMPTY STATE ─── */
+.empty{padding:52px 20px;text-align:center}
+.empty .e-ic{font-size:50px;opacity:.45;margin-bottom:12px}
+.empty .e-t{font-size:16px;font-weight:700;margin-bottom:5px}
+.empty .e-s{font-size:12.5px;color:var(--muted);line-height:1.55;max-width:440px;margin:0 auto 16px}
+</style>
+<style>
+/* ─── KANBAN ─── */
+.kb-wrap{overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch}
+.kb{display:flex;gap:11px;min-height:420px;align-items:flex-start}
+.kb-col{background:#EDEDE5;border-radius:11px;width:246px;min-width:246px;display:flex;flex-direction:column;max-height:calc(100vh - 250px)}
+.kb-col.over{background:var(--yf);box-shadow:inset 0 0 0 2px var(--y)}
+.kb-col.terminal{background:#E8E8E0}
+.kb-head{padding:9px 11px 7px;display:flex;align-items:center;justify-content:space-between;gap:6px;border-bottom:1px solid rgba(0,0,0,.055);position:sticky;top:0;background:inherit;border-radius:11px 11px 0 0;z-index:1}
+.kb-title{font-size:11.5px;font-weight:700;display:flex;align-items:center;gap:6px}
+.kb-cnt{background:rgba(0,0,0,.09);border-radius:9px;padding:1px 7px;font-size:10.5px;font-weight:700}
+.kb-body{padding:8px;display:flex;flex-direction:column;gap:7px;overflow-y:auto;flex:1;min-height:70px}
+.kb-card{background:#fff;border-radius:9px;padding:9px 10px;box-shadow:0 1px 3px rgba(0,0,0,.09);cursor:grab;border-left:3px solid var(--border);transition:box-shadow .15s,transform .1s}
+.kb-card:hover{box-shadow:0 3px 10px rgba(0,0,0,.14)}
+.kb-card:active{cursor:grabbing}
+.kb-card.dragging{opacity:.4;transform:rotate(1.5deg)}
+.kb-card.stale{border-left-color:var(--orange)}
+.kb-card.hot{border-left-color:var(--g)}
+.kbc-top{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.kbc-nm{font-size:12.5px;font-weight:700;line-height:1.25;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kbc-pos{font-size:11px;color:var(--muted);margin-bottom:6px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.kbc-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.kbc-days{font-size:10px;color:var(--muted);margin-left:auto;white-space:nowrap}
+.kbc-days.warn{color:var(--orange);font-weight:700}
+.stars{font-size:10px;letter-spacing:-1px;color:var(--y)}
+.kb-empty{font-size:11px;color:#999;text-align:center;padding:16px 8px;border:1.5px dashed rgba(0,0,0,.1);border-radius:8px}
+.kb-add{margin:0 8px 8px;padding:7px;border:1.5px dashed rgba(0,0,0,.15);border-radius:8px;background:none;font-size:11.5px;color:var(--muted);cursor:pointer;font-weight:600}
+.kb-add:hover{border-color:var(--y);color:var(--d);background:rgba(255,255,255,.5)}
+
+/* ─── FUNNEL ─── */
+.funnel{display:flex;flex-direction:column;gap:5px}
+.fn-row{display:flex;align-items:center;gap:10px}
+.fn-lbl{width:150px;font-size:12px;font-weight:600;flex-shrink:0;text-align:right}
+.fn-bar-wrap{flex:1;background:#F1F1EB;border-radius:6px;height:28px;position:relative;overflow:hidden}
+.fn-bar{height:100%;border-radius:6px;display:flex;align-items:center;padding:0 9px;color:#fff;font-size:11.5px;font-weight:700;transition:width .5s ease;min-width:3px}
+.fn-conv{width:74px;font-size:11px;color:var(--muted);flex-shrink:0;font-weight:600;text-align:left}
+@media(max-width:700px){.fn-lbl{width:96px;font-size:11px}.fn-conv{width:52px;font-size:10px}}
+
+/* ─── DRAWER ─── */
+.drawer-back{position:fixed;inset:0;background:rgba(20,20,18,.45);z-index:900;opacity:0;pointer-events:none;transition:opacity .22s;backdrop-filter:blur(2px)}
+.drawer-back.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:560px;max-width:100vw;background:var(--bg);z-index:901;transform:translateX(102%);transition:transform .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;box-shadow:var(--shadow-lg)}
+.drawer{visibility:hidden;transition:transform .28s cubic-bezier(.4,0,.2,1),visibility 0s linear .28s}
+.drawer.open{transform:none;visibility:visible;transition-delay:0s}
+.dr-head{background:var(--d);color:#fff;padding:14px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-shrink:0}
+.dr-title{font-size:16px;font-weight:800;line-height:1.2}
+.dr-sub{font-size:11.5px;color:rgba(255,255,255,.55);margin-top:3px}
+.dr-x{background:rgba(255,255,255,.1);border:0;color:#fff;width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:15px;flex-shrink:0;line-height:1}
+.dr-x:hover{background:rgba(255,255,255,.2)}
+.dr-tabs{display:flex;gap:2px;background:var(--d);padding:0 14px;flex-shrink:0;overflow-x:auto}
+.dr-tab{background:none;border:0;color:rgba(255,255,255,.5);font-size:12px;font-weight:600;padding:8px 11px;cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap}
+.dr-tab.active{color:var(--y);border-bottom-color:var(--y)}
+.dr-body{padding:16px 18px;overflow-y:auto;flex:1}
+.dr-foot{padding:11px 18px;border-top:1px solid var(--border);background:#fff;display:flex;gap:8px;align-items:center;flex-shrink:0}
+.dr-foot .sp{flex:1}
+@media(max-width:620px){.drawer{width:100vw}.dr-body{padding:14px}}
+
+/* ─── FORMS ─── */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.fgrid .full{grid-column:1/-1}
+@media(max-width:560px){.fgrid{grid-template-columns:1fr}}
+.fld label{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px}
+.fld label .req{color:var(--red)}
+.fld input,.fld select,.fld textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:#fff;color:var(--d);transition:border-color .15s}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--y);box-shadow:0 0 0 3px var(--yf)}
+.fld input.err,.fld select.err{border-color:var(--red);box-shadow:0 0 0 3px var(--rf)}
+.fld textarea{min-height:70px;resize:vertical;line-height:1.5}
+.fld .fhelp{font-size:10.5px;color:var(--muted);margin-top:3px;line-height:1.35}
+.fld .ferr{font-size:10.5px;color:var(--red);margin-top:3px;font-weight:600}
+.fld-money{position:relative}
+.fld-money .cur{position:absolute;right:9px;top:29px;font-size:11px;color:var(--muted);font-weight:700;pointer-events:none}
+.fsec{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin:18px 0 9px;padding-bottom:5px;border-bottom:1px solid var(--border);grid-column:1/-1}
+.fsec:first-child{margin-top:0}
+.fsec.lock::after{content:' 🔒';font-size:10px}
+
+/* ─── PROFILE VIEW ─── */
+.prof-hero{display:flex;gap:13px;align-items:center;margin-bottom:14px}
+.prof-nm{font-size:17px;font-weight:800;line-height:1.2}
+.prof-pos{font-size:12.5px;color:var(--muted);margin-top:3px}
+.kv{display:grid;grid-template-columns:130px 1fr;gap:7px 12px;font-size:12.5px;align-items:baseline}
+.kv dt{color:var(--muted);font-size:11.5px}
+.kv dd{font-weight:600;word-break:break-word}
+.tl{position:relative;padding-left:18px;margin-top:6px}
+.tl::before{content:'';position:absolute;left:5px;top:5px;bottom:5px;width:2px;background:var(--border)}
+.tl-i{position:relative;padding:0 0 13px 0}
+.tl-i::before{content:'';position:absolute;left:-17px;top:4px;width:9px;height:9px;border-radius:50%;background:var(--y);border:2px solid var(--bg)}
+.tl-t{font-size:12.5px;font-weight:600}
+.tl-d{font-size:11px;color:var(--muted)}
+
+/* ─── MODAL ─── */
+.modal-back{position:fixed;inset:0;background:rgba(20,20,18,.5);z-index:950;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px)}
+.modal-back.open{display:flex}
+.modal{background:var(--bg);border-radius:14px;width:100%;max-width:760px;max-height:88vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);overflow:hidden}
+.modal.narrow{max-width:440px}
+.md-head{background:var(--d);color:#fff;padding:13px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.md-title{font-size:15px;font-weight:800}
+.md-body{padding:16px 18px;overflow-y:auto}
+.md-foot{padding:11px 18px;border-top:1px solid var(--border);background:#fff;display:flex;gap:8px;justify-content:flex-end}
+
+/* ─── TOAST ─── */
+#toasts{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:1200;display:flex;flex-direction:column;gap:7px;align-items:center;pointer-events:none}
+.toast{background:var(--d);color:#fff;padding:9px 15px;border-radius:9px;font-size:12.5px;font-weight:600;box-shadow:var(--shadow-lg);animation:tin .25s ease;max-width:90vw}
+.toast.ok{background:#2C5E1A}
+.toast.err{background:#8B1A1A}
+@keyframes tin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ─── MISC ─── */
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(0,0,0,.15);border-top-color:var(--d);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.loading-bar{position:fixed;top:0;left:0;height:2.5px;background:var(--y);z-index:9998;transition:width .3s;width:0}
+.bar-mini{height:6px;background:#F1F1EB;border-radius:4px;overflow:hidden;min-width:52px}
+.bar-mini>i{display:block;height:100%;border-radius:4px;background:var(--g)}
+.mono{font-variant-numeric:tabular-nums;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:12px}
+.nowrap{white-space:nowrap}
+.muted{color:var(--muted)}
+.tright{text-align:right}
+.hidden{display:none!important}
+.widget-list{display:flex;flex-direction:column;gap:7px}
+.wl-item{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;background:#FAFAF5;font-size:12.5px;cursor:pointer;border:1px solid transparent}
+.wl-item:hover{border-color:var(--border);background:#fff}
+.wl-item .wl-r{margin-left:auto;font-size:11px;font-weight:700;white-space:nowrap}
+.dz{border:2px dashed var(--border);border-radius:11px;padding:26px 18px;text-align:center;cursor:pointer;transition:all .15s;background:#fff}
+.dz:hover,.dz.over{border-color:var(--y);background:var(--yf)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:9px}
+.legend i{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:4px}
+@media print{.topbar,.tabbar,.filterbar,.btn,.drawer,.drawer-back{display:none!important}}
+
+/* ─── OTP GATE ─── */
+/* === OTP gate === */
+#dashauth-overlay{position:fixed;inset:0;background:#1E1E1E;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+#dashauth-overlay.is-hidden{display:none}
+.dashauth-card{background:#fff;width:100%;max-width:440px;border-radius:14px;padding:36px 30px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.dashauth-logo{font-size:24px;font-weight:900;color:#FEBF27;margin-bottom:6px;letter-spacing:-0.5px;text-align:center}
+.dashauth-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#888;text-align:center;margin-bottom:24px}
+.dashauth-icon{font-size:36px;text-align:center;margin-bottom:16px}
+.dashauth-h1{font-size:18px;font-weight:800;text-align:center;color:#1E1E1E;margin-bottom:6px}
+.dashauth-desc{font-size:13px;color:#666;text-align:center;line-height:1.55;margin-bottom:20px}
+.dashauth-input{width:100%;padding:12px 14px;border:2px solid #E5E5DC;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
+.dashauth-input:focus{border-color:#FEBF27}
+.dashauth-input.code{font-family:'SF Mono',Menlo,Consolas,monospace;letter-spacing:.4em;text-align:center;font-size:18px}
+.dashauth-btn{width:100%;padding:13px;background:#1E1E1E;color:#fff;border:0;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;margin-top:14px;font-family:inherit;transition:background .15s}
+.dashauth-btn:hover{background:#000}
+.dashauth-btn:disabled{opacity:.5;cursor:not-allowed}
+.dashauth-msg{font-size:12.5px;line-height:1.5;margin-top:12px;text-align:center;min-height:18px}
+.dashauth-msg.is-error{color:#DC2626}
+.dashauth-msg a{color:#FEBF27;font-weight:600;text-decoration:underline}
+.dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
+.dashauth-back:hover{color:#FEBF27}
+/* v2.77.1: top:115px — нижче period-bar (sticky top:56px, висота ~55px) щоб не overlap'ило granularity toggle */
+.dashauth-session{position:fixed;top:115px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-family:-apple-system,sans-serif;font-weight:600;display:flex;align-items:center;gap:8px}
+@media(max-width:760px){.dashauth-session{top:auto;bottom:12px;right:12px;left:12px;justify-content:center}}
+.dashauth-session button{background:none;border:0;color:#96C11F;cursor:pointer;font-size:14px;padding:0;line-height:1}
+body.dash-locked{overflow:hidden}
+/* сесійний бейдж — унизу праворуч, щоб не перекривав панель фільтрів */
+.dashauth-session{top:auto!important;bottom:14px!important;right:14px!important;left:auto!important;z-index:10000;box-shadow:0 4px 16px rgba(0,0,0,.18);background:#fff!important;border-color:rgba(150,193,31,.5)!important;pointer-events:none;opacity:.92}
+.dashauth-session:hover{opacity:1}
+.dashauth-session button{pointer-events:auto;cursor:pointer}
+@media(max-width:760px){.dashauth-session{left:14px!important;justify-content:center}}
+
+/* фікс: drawer/модалка за межами вʼюпорта не мають створювати горизонтальний скрол */
+html{overflow-x:clip}
+body{overflow-x:clip}
+</style>
+<script>
+// v2.78.91 UX: global 401 handler — JWT expired → friendly redirect screen
+(function(){
+  const _origFetch = window.fetch;
+  window.fetch = async function(...args) {
+    const r = await _origFetch.apply(this, args);
+    if (r.status === 401 && args[0] && typeof args[0] === 'string' && args[0].includes('sneco-auth')) {
+      // Show session expired overlay
+      // v2.78.116: ONLY show overlay коли native login form НЕ показано
+      // Native form має body.dash-locked + #dashauth-overlay visible
+      // Якщо вони уже showing — skip (native form handles login)
+      const _nativeLogin = document.body?.classList?.contains('dash-locked') ||
+                            document.getElementById('dashauth-overlay');
+      if (!_nativeLogin) {
+        window._snAuthBlock = 'hr-dashboard';
+        if (window.snEco?.handle401) {
+          window.snEco.handle401('hr-dashboard');
+        }
+      }
+    }
+    return r;
+  };
+})();
+</script>
+  <script src="../_shared/helpers.js"></script>
+</head>
+<body class="dash-locked">
+
+<!-- ===== OTP GATE OVERLAY ===== -->
+<script src="../auth-google.js"></script>
+<div id="dashauth-overlay">
+  <div class="dashauth-card">
+    <div class="dashauth-logo">snEco</div>
+    <div class="dashauth-sub">HR Dashboard · Confidential</div>
+    <div id="dashauth-stage"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const WORKER = 'https://sneco-auth.vg-ab6.workers.dev';
+  const BLOCK = 'hr-dashboard';
+  const STORAGE_KEY = 'snEco-jwt-' + BLOCK;
+  const overlay = document.getElementById('dashauth-overlay');
+  const stage = document.getElementById('dashauth-stage');
+  let email = '';
+
+  function unlock(token, em, exp){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({token, email:em, exp})); } catch(e){}
+    document.body.classList.remove('dash-locked');
+    overlay.classList.add('is-hidden');
+    showSessionBadge(em, exp);
+    if (typeof window.bootHR === 'function') window.bootHR(token, em);
+  }
+  function showSessionBadge(em, exp){
+    const b = document.createElement('div');
+    b.className = 'dashauth-session';
+    const totalMins = Math.max(0, Math.floor((exp*1000 - Date.now())/60000));
+    const timeLabel = totalMins >= 60
+      ? Math.floor(totalMins/60) + 'h ' + (totalMins%60 ? (totalMins%60) + 'm' : '')
+      : totalMins + 'min';
+    b.innerHTML = '✓ ' + em + ' · ' + timeLabel.trim() + ' <button title="Lock">🔒</button>';
+    b.querySelector('button').onclick = () => { localStorage.removeItem(STORAGE_KEY); location.reload(); };
+    document.body.appendChild(b);
+  }
+  async function verifyExisting(){
+    let s; try { s = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null'); } catch(e){}
+    if (!s || !s.token || !s.exp || s.exp*1000 < Date.now()) return null;
+    try {
+      const r = await fetch(WORKER+'/api/session/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({token: s.token, block: BLOCK})});
+      const j = await r.json();
+      return j.ok ? s : null;
+    } catch(e) { return null; }
+  }
+  function renderEmail(){
+    stage.innerHTML = `
+      <div class="dashauth-icon">👥</div>
+      <div class="dashauth-h1">Введіть email</div>
+      <div class="dashauth-desc">HR-дашборд: люди, рекрутинг, вакансії, плинність. Дані конфіденційні. Якщо ваш email у whitelist — авторизація через Google (швидко) або 6-значний код на пошту. Сесія діє 30 днів.</div>
+      <div id="google-signin-btn" style="display:flex;justify-content:center;margin:18px 0 8px"></div>
+      <div style="font-size:11px;color:#777;text-align:center;margin:8px 0 4px">— або через email-код —</div>
+      <input class="dashauth-input" type="email" id="auth-em" placeholder="ім'я@sneco.ua" autocomplete="email" autofocus>
+      <button class="dashauth-btn" id="auth-send">Надіслати код</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="../" class="dashauth-back">← Каталог дашбордів</a>
+    `;
+    // v2.78.35 (Богдан): Google Sign-In primary, OTP fallback
+    if (window.SnecoAuth) {
+      const gBtn = document.getElementById('google-signin-btn');
+      window.SnecoAuth.signInWithGoogle(BLOCK, gBtn,
+        (j) => unlock(j.token, j.email, j.exp),
+        (errMsg) => {
+          const msgEl = document.getElementById('auth-msg');
+          if (msgEl) { msgEl.textContent = errMsg; msgEl.className = 'dashauth-msg is-error'; }
+        }
+      );
+    }
+
+    const em = document.getElementById('auth-em');
+    const send = document.getElementById('auth-send');
+    const msg = document.getElementById('auth-msg');
+    em.addEventListener('keydown', e=>{ if(e.key==='Enter') send.click(); });
+    send.onclick = async () => {
+      const v = em.value.trim();
+      if (!v || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { msg.textContent='Введіть правильний email.'; msg.className='dashauth-msg is-error'; return; }
+      send.disabled = true; send.textContent = 'Надсилаємо...'; msg.textContent='';
+      try {
+        const r = await fetch(WORKER+'/api/otp/request', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email:v, block: BLOCK})});
+        if (!r.ok) {
+          const j = await r.json().catch(()=>({}));
+          if (j.error === 'not_in_whitelist') {
+            msg.innerHTML = `❌ Цього email немає у whitelist. <a href="mailto:vg@sneco.ua?subject=HR%20Dashboard%20whitelist">✉ Запит до vg@sneco.ua</a>`;
+          } else {
+            msg.textContent = 'Помилка: ' + (j.error || r.status);
+          }
+          msg.className='dashauth-msg is-error';
+          send.disabled=false; send.textContent='Надіслати код'; return;
+        }
+        email = v;
+        renderCode();
+      } catch(e) {
+        msg.textContent = 'Помилка мережі: ' + e.message;
+        msg.className='dashauth-msg is-error';
+        send.disabled=false; send.textContent='Надіслати код';
+      }
+    };
+  }
+  function renderCode(){
+    stage.innerHTML = `
+      <div class="dashauth-icon">🔢</div>
+      <div class="dashauth-h1">Введіть код з листа</div>
+      <div class="dashauth-desc">${email}<br>Код надіслано — перевірте пошту (включно зі спамом).</div>
+      <input class="dashauth-input code" type="text" id="auth-code" inputmode="numeric" maxlength="6" placeholder="••••••" autofocus>
+      <button class="dashauth-btn" id="auth-verify">Підтвердити</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="#" class="dashauth-back" id="auth-back">← Інший email</a>
+    `;
+    const code = document.getElementById('auth-code');
+    const verify = document.getElementById('auth-verify');
+    const msg = document.getElementById('auth-msg');
+    code.addEventListener('keydown', e=>{ if(e.key==='Enter') verify.click(); });
+    document.getElementById('auth-back').onclick = e=>{ e.preventDefault(); renderEmail(); };
+    verify.onclick = async () => {
+      const c = code.value.trim();
+      if (!/^\d{6}$/.test(c)) { msg.textContent='Код — 6 цифр.'; msg.className='dashauth-msg is-error'; return; }
+      verify.disabled=true; verify.textContent='Перевіряємо...'; msg.textContent='';
+      try {
+        const r = await fetch(WORKER+'/api/otp/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, block: BLOCK, code: c})});
+        const j = await r.json();
+        if (!r.ok) { msg.textContent = 'Невірний або застарілий код.'; msg.className='dashauth-msg is-error'; verify.disabled=false; verify.textContent='Підтвердити'; return; }
+        unlock(j.token, j.email, j.exp);
+      } catch(e) {
+        msg.textContent = 'Помилка: ' + e.message; msg.className='dashauth-msg is-error';
+        verify.disabled=false; verify.textContent='Підтвердити';
+      }
+    };
+  }
+
+  (async()=>{
+    const sess = await verifyExisting();
+    if (sess) { unlock(sess.token, sess.email, sess.exp); return; }
+    renderEmail();
+  })();
+})();
+</script>
+<!-- ===== END OTP GATE ===== -->
+<div class="loading-bar" id="loadBar"></div>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;min-width:0">
+    <div class="logo">
+      <div class="logo-box">sn</div>
+      <div><div class="logo-text">snEco</div><div class="logo-sub">HR Dashboard</div></div>
+    </div>
+    <nav class="nav-menu" id="navMenu">
+      <a class="nav-link" href="../">📊 Каталог</a>
+      <a class="nav-link" href="../dashboard.html">📈 Sales</a>
+      <a class="nav-link" href="../inventory/">📦 Склад</a>
+      <a class="nav-link" href="../production/">🏭 Виробництво</a>
+      <a class="nav-link" href="../finance/">💰 Фінанси</a>
+      <a class="nav-link active" href="./">👥 HR</a>
+      <a class="nav-link" href="../ask/">🤖 AI-асистент</a>
+    </nav>
+  </div>
+  <div class="topbar-right">
+    <span class="badge badge-lock" id="roleBadge">…</span>
+    <span class="badge badge-gray" id="cntBadge">…</span>
+    <button class="nav-toggle" onclick="document.getElementById('navMenu').classList.toggle('open')">☰</button>
+  </div>
+</div>
+
+<div class="tabbar" id="tabbar">
+  <button class="tabbtn active" data-tab="overview">📊 Огляд</button>
+  <button class="tabbtn" data-tab="candidates">🎯 Кандидати <span class="tcount" id="tcCand">0</span></button>
+  <button class="tabbtn" data-tab="channels">📡 Канали</button>
+  <button class="tabbtn" data-tab="vacancies">📌 Вакансії <span class="tcount" id="tcVac">0</span></button>
+  <button class="tabbtn" data-tab="employees">🧑‍💼 Співробітники <span class="tcount" id="tcEmp">0</span></button>
+  <button class="tabbtn" data-tab="payroll" id="tabPayroll">💰 Фонд оплати</button>
+  <button class="tabbtn" data-tab="turnover">🚪 Плинність</button>
+</div>
+
+<div class="filterbar">
+  <span class="fb-lbl">Період</span>
+  <div class="period-chips" id="periodChips">
+    <button class="period-chip" data-p="3m">3 міс</button>
+    <button class="period-chip" data-p="6m">6 міс</button>
+    <button class="period-chip active" data-p="12m">12 міс</button>
+    <button class="period-chip" data-p="ytd">YTD</button>
+    <button class="period-chip" data-p="all">Весь час</button>
+  </div>
+  <input type="date" class="finput" id="fFrom" title="Період з">
+  <input type="date" class="finput" id="fTo" title="Період по">
+  <select class="fsel" id="fCompany"><option value="">Усі компанії</option></select>
+  <select class="fsel" id="fDept"><option value="">Усі підрозділи</option></select>
+  <input type="search" class="finput fsearch" id="fSearch" placeholder="🔍 Пошук по імені, посаді…">
+  <span class="fb-spacer"></span>
+  <span class="fb-info" id="fbInfo">—</span>
+  <button class="btn btn-sm" onclick="openDictEditor()" title="Довідники: підрозділи, посади, канали">⚙️</button>
+  <button class="btn btn-sm" onclick="openAudit()" title="Журнал змін">🕘</button>
+  <button class="btn btn-sm" id="btnRefresh" title="Оновити дані">↻</button>
+</div>
+
+<div class="wrap">
+
+<!-- ══════════ 1. ОГЛЯД ══════════ -->
+<div class="tabpane active" id="pane-overview">
+  <div class="g4" id="kpiRow"></div>
+
+  <div id="ovBody">
+  <div class="sec">Динаміка команди</div>
+  <div class="g2">
+    <div class="cc">
+      <div class="cc-head"><div><div class="cc-title">Чисельність по місяцях</div><div class="cc-sub">Активні співробітники на кінець місяця</div></div></div>
+      <div class="chart-h240"><canvas id="chHeadcount"></canvas></div>
+    </div>
+    <div class="cc">
+      <div class="cc-head"><div><div class="cc-title">Найм vs звільнення</div><div class="cc-sub">Скільки прийшло і пішло щомісяця</div></div></div>
+      <div class="chart-h240"><canvas id="chFlow"></canvas></div>
+    </div>
+  </div>
+
+  <div class="sec">Рекрутинг</div>
+  <div class="g23">
+    <div class="cc">
+      <div class="cc-head"><div><div class="cc-title">Воронка найму</div><div class="cc-sub">Скільки кандидатів дійшло до кожного етапу за період</div></div></div>
+      <div class="funnel" id="funnelMain"></div>
+    </div>
+    <div class="cc">
+      <div class="cc-head"><div><div class="cc-title">Команда по підрозділах</div><div class="cc-sub">Активні співробітники</div></div></div>
+      <div class="chart-h240"><canvas id="chDept"></canvas></div>
+    </div>
+  </div>
+
+  <div class="sec">Потребує уваги</div>
+  <div class="g4">
+    <div class="cc"><div class="cc-head"><div class="cc-title">🎂 Дні народження</div></div><div class="widget-list" id="wBirthdays"></div></div>
+    <div class="cc"><div class="cc-head"><div class="cc-title">🌱 Випробувальний</div></div><div class="widget-list" id="wProbation"></div></div>
+    <div class="cc"><div class="cc-head"><div class="cc-title">🔥 Вакансії з простроченням</div></div><div class="widget-list" id="wVacAging"></div></div>
+    <div class="cc"><div class="cc-head"><div class="cc-title">⏳ Кандидати без руху</div></div><div class="widget-list" id="wStale"></div></div>
+  </div>
+  </div><!-- /ovBody -->
+</div>
+
+<!-- ══════════ 2. КАНДИДАТИ ══════════ -->
+<div class="tabpane" id="pane-candidates">
+  <div class="sec">Воронка кандидатів
+    <span class="sec-act" style="margin-left:auto;display:flex;gap:7px">
+      <select class="fsel" id="kbVacFilter"><option value="">Усі вакансії</option></select>
+      <select class="fsel" id="kbSrcFilter"><option value="">Усі джерела</option></select>
+      <label class="btn btn-sm" style="font-weight:600"><input type="checkbox" id="kbShowClosed" style="margin-right:5px;vertical-align:-1px">Показати відмови</label>
+      <button class="btn btn-sm" onclick="openImport('candidate')">⬆ Імпорт</button>
+      <button class="btn btn-sm" onclick="exportCSV('candidates')">⬇ CSV</button>
+      <button class="btn btn-sm btn-y" onclick="openForm('candidate')">+ Кандидат</button>
+    </span>
+  </div>
+  <div class="g4" id="candKpi" style="margin-bottom:14px"></div>
+  <div class="kb-wrap"><div class="kb" id="kanban"></div></div>
+  <div class="hint">На компʼютері — перетягніть картку між колонками; на телефоні відкрийте картку кандидата й оберіть етап зі списку. Дати етапів проставляються автоматично. Помаранчева смужка зліва — кандидат без руху 7+ днів.</div>
+</div>
+
+<!-- ══════════ 3. КАНАЛИ ══════════ -->
+<div class="tabpane" id="pane-channels">
+  <div class="sec">Ефективність каналів рекрутингу
+    <span class="sec-act" style="margin-left:auto;display:flex;gap:7px">
+      <button class="btn btn-sm" onclick="openCostEditor()">💵 Витрати на канали</button>
+      <button class="btn btn-sm" onclick="exportCSV('channels')">⬇ CSV</button>
+    </span>
+  </div>
+  <div class="g4" id="chanKpi" style="margin-bottom:14px"></div>
+  <div class="tbl-wrap"><div class="tbl-scroll"><table class="tbl" id="tblChannels"></table></div></div>
+  <div class="g2" style="margin-top:13px">
+    <div class="cc">
+      <div class="cc-head"><div><div class="cc-title">Найнято по каналах</div><div class="cc-sub">За обраний період</div></div></div>
+      <div class="chart-h240"><canvas id="chSrcHired"></canvas></div>
+    </div>
+    <div class="cc">
+      <div class="cc-head"><div><div class="cc-title">Конверсія кандидат → найм</div><div class="cc-sub">Відсоток кандидатів каналу, які вийшли на роботу</div></div></div>
+      <div class="chart-h240"><canvas id="chSrcConv"></canvas></div>
+    </div>
+  </div>
+  <div class="hint info"><strong>Cost per Hire</strong> = витрати на канал за період ÷ кількість найнятих з цього каналу. Витрати вносяться вручну кнопкою «Витрати на канали» (публікації вакансій, підписки, послуги агенцій).</div>
+</div>
+
+<!-- ══════════ 4. ВАКАНСІЇ ══════════ -->
+<div class="tabpane" id="pane-vacancies">
+  <div class="sec">Вакансії
+    <span class="sec-act" style="margin-left:auto;display:flex;gap:7px">
+      <select class="fsel" id="vacStatusFilter">
+        <option value="active">Активні (open + on_hold)</option>
+        <option value="">Усі</option>
+        <option value="open">Відкриті</option>
+        <option value="on_hold">На паузі</option>
+        <option value="closed">Закриті</option>
+        <option value="cancelled">Скасовані</option>
+      </select>
+      <button class="btn btn-sm" onclick="exportCSV('vacancies')">⬇ CSV</button>
+      <button class="btn btn-sm btn-y" onclick="openForm('vacancy')">+ Вакансія</button>
+    </span>
+  </div>
+  <div class="g4" id="vacKpi" style="margin-bottom:14px"></div>
+  <div class="tbl-wrap"><div class="tbl-scroll tall"><table class="tbl" id="tblVacancies"></table></div></div>
+</div>
+
+<!-- ══════════ 5. СПІВРОБІТНИКИ ══════════ -->
+<div class="tabpane" id="pane-employees">
+  <div class="sec">Співробітники
+    <span class="sec-act" style="margin-left:auto;display:flex;gap:7px">
+      <select class="fsel" id="empStatusFilter">
+        <option value="active">Працюють</option>
+        <option value="">Усі</option>
+        <option value="on_leave">У відпустці/декреті</option>
+        <option value="terminated">Звільнені</option>
+      </select>
+      <button class="btn btn-sm" id="btnEmpView">▦ Картки</button>
+      <button class="btn btn-sm" onclick="openImport('employee')">⬆ Імпорт</button>
+      <button class="btn btn-sm" onclick="exportCSV('employees')">⬇ CSV</button>
+      <button class="btn btn-sm btn-y" onclick="openForm('employee')">+ Співробітник</button>
+    </span>
+  </div>
+  <div class="g4" id="empKpi" style="margin-bottom:14px"></div>
+  <div id="empTableWrap" class="tbl-wrap"><div class="tbl-scroll tall"><table class="tbl" id="tblEmployees"></table></div></div>
+  <div id="empCardsWrap" class="hidden"><div class="g4" id="empCards"></div></div>
+</div>
+
+<!-- ══════════ 6. ФОНД ОПЛАТИ ══════════ -->
+<div class="tabpane" id="pane-payroll">
+  <div id="payrollLocked" class="cc hidden">
+    <div class="empty">
+      <div class="e-ic">🔒</div>
+      <div class="e-t">Розділ доступний обмеженому колу</div>
+      <div class="e-s">Дані про зарплати, бонуси та фонд оплати праці бачать лише користувачі зі списком доступу <code>hr-payroll</code>. Ваш акаунт до нього не входить.<br>Запит на доступ — до vg@sneco.ua.</div>
+    </div>
+  </div>
+  <div id="payrollBody">
+    <div class="sec">Фонд оплати праці
+      <span class="sec-act" style="margin-left:auto;display:flex;gap:7px">
+        <select class="fsel" id="payCurrency" title="Валюта відображення"></select>
+        <button class="btn btn-sm" onclick="openFxEditor()">💱 Курси</button>
+        <button class="btn btn-sm" onclick="openPayrollEditor()">✏️ Нарахування за місяць</button>
+        <button class="btn btn-sm" onclick="openPlanEditor()">🎯 План</button>
+        <button class="btn btn-sm" onclick="exportCSV('payroll')">⬇ CSV</button>
+      </span>
+    </div>
+    <div class="g4" id="payKpi"></div>
+    <div class="g2" style="margin-top:13px">
+      <div class="cc">
+        <div class="cc-head"><div><div class="cc-title">Динаміка фонду оплати праці</div><div class="cc-sub">Факт (база + бонуси + понаднормові) проти плану</div></div></div>
+        <div class="chart-h300"><canvas id="chPayTrend"></canvas></div>
+      </div>
+      <div class="cc">
+        <div class="cc-head"><div><div class="cc-title">Фонд по підрозділах</div><div class="cc-sub">Останній місяць з даними</div></div></div>
+        <div class="chart-h300"><canvas id="chPayDept"></canvas></div>
+      </div>
+    </div>
+    <div class="sec">Зарплати по посадах і вилки (salary bands)
+      <span class="sec-act" style="margin-left:auto"><button class="btn btn-sm" onclick="openForm('band')">+ Вилка</button></span>
+    </div>
+    <div class="tbl-wrap"><div class="tbl-scroll"><table class="tbl" id="tblBands"></table></div></div>
+    <div class="sec">Зарплати за посадами <span class="sec-act" style="margin-left:auto;font-weight:600;text-transform:none;color:var(--muted)">середня і медіанна по кожній посаді</span></div>
+    <div class="tbl-wrap"><div class="tbl-scroll"><table class="tbl" id="tblByPosition"></table></div></div>
+    <div class="sec">Поточні зарплати співробітників</div>
+    <div class="tbl-wrap"><div class="tbl-scroll tall"><table class="tbl" id="tblSalaries"></table></div></div>
+    <div class="hint warn">Суми — <strong>брутто</strong> (нарахування до утримань), як їх внесли вручну. Фонд = оклад + бонус + понаднормові + інше. <strong>ЄСВ роботодавця (22%) у фонд НЕ входить</strong> — його можна вносити окремою колонкою «Податки» у редакторі нарахувань, вона показується окремим рядком і не подвоює фонд.</div>
+  </div>
+</div>
+
+<!-- ══════════ 7. ПЛИННІСТЬ ══════════ -->
+<div class="tabpane" id="pane-turnover">
+  <div class="sec">Плинність і звільнення
+    <span class="sec-act" style="margin-left:auto"><button class="btn btn-sm" onclick="exportCSV('exits')">⬇ CSV</button></span>
+  </div>
+  <div class="g4" id="turnKpi"></div>
+  <div class="g2" style="margin-top:13px">
+    <div class="cc">
+      <div class="cc-head"><div><div class="cc-title">Плинність по місяцях</div><div class="cc-sub">Звільнення ÷ середня чисельність місяця × 100%</div></div></div>
+      <div class="chart-h240"><canvas id="chTurnTrend"></canvas></div>
+    </div>
+    <div class="cc">
+      <div class="cc-head"><div><div class="cc-title">Добровільні vs вимушені</div><div class="cc-sub">Хто пішов сам, а кого звільнили</div></div></div>
+      <div class="chart-h240"><canvas id="chTurnType"></canvas></div>
+    </div>
+  </div>
+  <div class="g3" style="margin-top:13px">
+    <div class="cc">
+      <div class="cc-head"><div><div class="cc-title">Звільнення по підрозділах</div></div></div>
+      <div class="chart-h240"><canvas id="chTurnDept"></canvas></div>
+    </div>
+    <div class="cc">
+      <div class="cc-head"><div><div class="cc-title">Звільнення по посадах</div></div></div>
+      <div class="chart-h240"><canvas id="chTurnPos"></canvas></div>
+    </div>
+    <div class="cc">
+      <div class="cc-head"><div><div class="cc-title">Стаж на момент звільнення</div><div class="cc-sub">Скільки людина пропрацювала до виходу</div></div></div>
+      <div class="chart-h240"><canvas id="chTenure"></canvas></div>
+    </div>
+  </div>
+  <div class="sec">Причини звільнення</div>
+  <div class="g23">
+    <div class="cc"><div class="chart-h240"><canvas id="chReasons"></canvas></div></div>
+    <div class="cc">
+      <div class="cc-head"><div class="cc-title">Останні звільнення</div></div>
+      <div class="widget-list" id="wExits"></div>
+    </div>
+  </div>
+  <div class="hint info"><strong>Формула:</strong> середня чисельність = (на початок періоду + на кінець) ÷ 2; плинність % = звільнені за період ÷ середня чисельність × 100. Показник «за період» залежить від його довжини, тому поруч наводиться <strong>річний еквівалент</strong> (× 365 ÷ днів періоду) — саме з ним порівнюють галузеву норму: для харчового виробництва 15–25% річних, понад 30% сигналізує про системну проблему. У чисельність включені співробітники у відпустці/декреті.</div>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- ══════════ DRAWER ══════════ -->
+<div class="drawer-back" id="drawerBack" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true">
+  <div class="dr-head">
+    <div><div class="dr-title" id="drTitle">—</div><div class="dr-sub" id="drSub"></div></div>
+    <button class="dr-x" onclick="closeDrawer()" aria-label="Закрити">✕</button>
+  </div>
+  <div class="dr-tabs" id="drTabs"></div>
+  <div class="dr-body" id="drBody"></div>
+  <div class="dr-foot" id="drFoot"></div>
+</aside>
+
+<!-- ══════════ MODAL ══════════ -->
+<div class="modal-back" id="modalBack">
+  <div class="modal" id="modal">
+    <div class="md-head"><div class="md-title" id="mdTitle">—</div><button class="dr-x" onclick="closeModal()">✕</button></div>
+    <div class="md-body" id="mdBody"></div>
+    <div class="md-foot" id="mdFoot"></div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   snEco · HR Dashboard — core (v2.79.0)
+   ═══════════════════════════════════════════════════════════════════════════ */
+const API = 'https://sneco-auth.vg-ab6.workers.dev';
+const BLOCK_HR = 'hr-dashboard';
+const STAGES = [
+  { k:'new',            l:'Новий',              c:'#94A3B8', short:'Нові' },
+  { k:'screening',      l:'Скринінг',           c:'#3B82F6', short:'Скринінг' },
+  { k:'hr_interview',   l:'Співбесіда HR',      c:'#0D9488', short:'Співбесіда HR' },
+  { k:'mgr_interview',  l:'Співбесіда керівн.', c:'#7209B7', short:'Співбесіда керівника' },
+  { k:'offer',          l:'Офер надіслано',     c:'#F97316', short:'Офер' },
+  { k:'offer_accepted', l:'Офер прийнято',      c:'#FEBF27', short:'Офер прийнято' },
+  { k:'hired',          l:'Вийшов на роботу',   c:'#96C11F', short:'Найнято' },
+  { k:'offer_declined', l:'Офер відхилено',     c:'#DC2626', short:'Офер не прийнято',  terminal:true },
+  { k:'rejected',       l:'Відмова',            c:'#78716C', short:'Відмова',           terminal:true },
+];
+const STAGE_MAP = Object.fromEntries(STAGES.map(s=>[s.k,s]));
+const FUNNEL_ORDER = ['new','screening','hr_interview','mgr_interview','offer','offer_accepted','hired'];
+const STAGE_DATE = { screening:'screening_date', hr_interview:'hr_interview_date', mgr_interview:'mgr_interview_date', offer:'offer_sent_date', offer_accepted:'offer_date', hired:'start_date' };
+const EMP_STATUS_L = { active:'Працює', terminated:'Звільнений', on_leave:'Відпустка/декрет' };
+const VAC_STATUS_L = { open:'Відкрита', on_hold:'На паузі', closed:'Закрита', cancelled:'Скасована' };
+const PRIORITY_L  = { low:'Низький', normal:'Звичайний', high:'Високий', critical:'Критичний' };
+const TERM_TYPE_L = { voluntary:'За власним бажанням', involuntary:'З ініціативи компанії' };
+const PROB_L      = { pending:'Триває', passed:'Пройдено', failed:'Не пройдено' };
+const PALETTE = ['#96C11F','#FEBF27','#3B82F6','#7209B7','#F97316','#0D9488','#DB2777','#DC2626','#64748B','#84CC16','#0EA5E9','#A855F7'];
+
+const S = {
+  token:null, me:{ email:'', isAdmin:false, canPayroll:false },
+  dict:{}, employees:[], vacancies:[], candidates:[], payroll:[], plans:[], bands:[], sourceCosts:[],
+  fx:{ UAH:1 }, payCur:'UAH',
+  f:{ from:'', to:'', company:'', dept:'', q:'' },
+  tab:'overview', empView:'table', charts:{}, sort:{},
+};
+
+/* ── утиліти ─────────────────────────────────────────────────────────────── */
+const $  = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+const esc = s => String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// локальна дата користувача (CET/CEST або Київ) — не UTC, інакше вночі «сьогодні» = вчора
+const todayISO = ()=>{ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+const isoAdd = (iso,d)=>{ const t=new Date(iso+'T00:00:00Z'); t.setUTCDate(t.getUTCDate()+d); return t.toISOString().slice(0,10); };
+const monthsBack = n => { const t=new Date(); t.setDate(1); t.setMonth(t.getMonth()-n); return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-01`; };
+const dmy = iso => iso && /^\d{4}-\d{2}-\d{2}$/.test(iso) ? iso.slice(8,10)+'.'+iso.slice(5,7)+'.'+iso.slice(0,4) : '—';
+const periodOf = iso => iso ? iso.slice(0,7) : '';
+const MONTH_UA = ['січ','лют','бер','кві','тра','чер','лип','сер','вер','жов','лис','гру'];
+const periodLabel = p => p ? MONTH_UA[+p.slice(5,7)-1] + ' ' + p.slice(2,4) : '';
+const daysBetween = (a,b)=> (!a||!b) ? null : Math.round((new Date(b+'T00:00:00Z')-new Date(a+'T00:00:00Z'))/864e5);
+const daysSince   = iso => iso ? daysBetween(iso, todayISO()) : null;
+const nf  = new Intl.NumberFormat('uk-UA');
+const nf1 = new Intl.NumberFormat('uk-UA',{minimumFractionDigits:1,maximumFractionDigits:1});
+const num = v => nf.format(Math.round(v||0));
+const pct = (v,d=1)=> (v===null||v===undefined||!isFinite(v)) ? '—' : (d?nf1.format(v):Math.round(v))+'%';
+const money = (kop,cur)=> num((kop||0)/100) + ' ' + curSym(cur||'UAH');
+const curSym = c => ({UAH:'₴',EUR:'€',USD:'$',PLN:'zł'}[c]||c);
+const initials = n => String(n||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
+const hashColor = s => PALETTE[Math.abs([...String(s||'')].reduce((a,c)=>a*31+c.charCodeAt(0)|0,7))%PALETTE.length];
+const median = arr => { if(!arr.length) return 0; const a=[...arr].sort((x,y)=>x-y); const m=a.length>>1; return a.length%2?a[m]:(a[m-1]+a[m])/2; };
+const uniq = a => [...new Set(a.filter(Boolean))];
+const norm = s => String(s||'').toLowerCase().replace(/['’ʼ"]/g,'');
+
+function toast(msg, kind='') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + kind; el.textContent = msg;
+  $('#toasts').appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),300); }, kind==='err'?4200:2400);
+}
+let _loadN = 0;
+function loading(on){
+  _loadN = Math.max(0, _loadN + (on?1:-1));
+  const b = $('#loadBar');
+  b.style.width = _loadN ? '70%' : '100%';
+  if (!_loadN) setTimeout(()=>{ b.style.width='0'; }, 260);
+}
+
+/* ── API ─────────────────────────────────────────────────────────────────── */
+async function api(path, body={}) {
+  loading(true);
+  try {
+    const r = await fetch(API + path, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + S.token },
+      body: JSON.stringify(body),
+    });
+    const j = await r.json().catch(()=>({ error:'bad_json' }));
+    if (!r.ok) { j.__status = r.status; throw j; }
+    return j;
+  } finally { loading(false); }
+}
+function apiErr(e){
+  const M = {
+    unauthorized:'Немає доступу — увійдіть заново', forbidden_payroll:'Розділ зарплат недоступний вашому акаунту',
+    validation_failed:'Перевірте заповнені поля', duplicate:'Такий запис уже існує', not_found:'Запис не знайдено',
+    already_hired:'Цього кандидата вже оформлено співробітником', bad_entity:'Внутрішня помилка типу даних',
+  };
+  return M[e?.error] || ('Помилка: ' + (e?.error || 'мережа'));
+}
+
+/* ── дані/довідники ──────────────────────────────────────────────────────── */
+const dictOf = kind => (S.dict[kind]||[]).map(d=>d.value);
+function dictMeta(kind, value){ const d=(S.dict[kind]||[]).find(x=>x.value===value); try{ return d&&d.meta?JSON.parse(d.meta):{}; }catch(e){ return {}; } }
+const empById  = id => S.employees.find(e=>e.id===id);
+const vacById  = id => S.vacancies.find(v=>v.id===id);
+const candById = id => S.candidates.find(c=>c.id===id);
+
+/* ── FX (курси для зведеного фонду) ──────────────────────────────────────── */
+function loadFx(){
+  const fx = { UAH:1 };
+  (S.dict.fx_rate||[]).forEach(d=>{ const m=(()=>{try{return JSON.parse(d.meta||'{}')}catch(e){return {}}})(); if(m.rate>0) fx[d.value]=+m.rate; });
+  S.fx = fx;
+}
+function toCur(kop, from, to){
+  from = from||'UAH'; to = to||S.payCur;
+  if (from===to) return kop;
+  const rf = S.fx[from], rt = S.fx[to];
+  if (!rf || !rt) return null;           // курс не заданий → чесно повертаємо null
+  return kop * rf / rt;
+}
+function sumCur(rows, getKop, getCur){
+  let total = 0, missing = new Set();
+  for (const r of rows){
+    const v = toCur(getKop(r), getCur(r), S.payCur);
+    if (v === null) missing.add(getCur(r)||'?'); else total += v;
+  }
+  return { total, missing:[...missing] };
+}
+
+/* ── ФІЛЬТРИ ─────────────────────────────────────────────────────────────── */
+function inFilter(o){
+  if (S.f.company && o.company !== S.f.company) return false;
+  if (S.f.dept && o.department !== S.f.dept) return false;
+  return true;
+}
+function matchQ(o, ...fields){
+  if (!S.f.q) return true;
+  const q = norm(S.f.q);
+  return fields.some(f => norm(o[f]).includes(q));
+}
+// ВАЖЛИВО: fXxx() — база для АНАЛІТИКИ (KPI, графіки, плинність) — сюди пошук НЕ входить,
+// інакше «turnover по Іванах». Пошук застосовується лише до списків через sXxx().
+const fEmployees  = ()=> S.employees.filter(inFilter);
+const fVacancies  = ()=> S.vacancies.filter(inFilter);
+const fCandidates = ()=> S.candidates.filter(inFilter);
+const sEmployees  = ()=> fEmployees().filter(e=>matchQ(e,'full_name','position','department','email','emp_code'));
+const sVacancies  = ()=> fVacancies().filter(v=>matchQ(v,'title','department','manager'));
+const sCandidates = ()=> fCandidates().filter(c=>matchQ(c,'full_name','position','source','email'));
+
+/* ── АНАЛІТИКА ───────────────────────────────────────────────────────────── */
+// чисельність на дату (кінець дня)
+function headcountAt(iso, list){
+  return (list||fEmployees()).filter(e =>
+    e.hire_date && e.hire_date <= iso && (!e.termination_date || e.termination_date > iso)
+  ).length;
+}
+// перелік місяців у періоді
+function monthsInRange(from, to){
+  const out = []; if (!from||!to) return out;
+  let y = +from.slice(0,4), m = +from.slice(5,7);
+  const ey = +to.slice(0,4), em = +to.slice(5,7);
+  let guard = 0;
+  while ((y < ey || (y===ey && m<=em)) && guard++ < 400){
+    out.push(String(y)+'-'+String(m).padStart(2,'0'));
+    m++; if (m>12){ m=1; y++; }
+  }
+  return out;
+}
+const monthEnd = p => { const y=+p.slice(0,4), m=+p.slice(5,7); return new Date(Date.UTC(y, m, 0)).toISOString().slice(0,10); };
+const monthStart = p => p + '-01';
+
+// плинність за довільний період: (звільнені) / ((N_поч+N_кін)/2) * 100
+function turnover(from, to, list){
+  const emp = list || fEmployees();
+  const nStart = headcountAt(isoAdd(from,-1), emp);
+  const nEnd   = headcountAt(to, emp);
+  const avg = (nStart + nEnd) / 2;
+  const exits = emp.filter(e=>e.termination_date && e.termination_date>=from && e.termination_date<=to).length;
+  const rate = avg>0 ? exits/avg*100 : null;
+  // річний еквівалент — саме до нього застосовуються галузеві норми (15–25%)
+  const days = Math.max(1, (daysBetween(from,to)||0)+1);
+  const annual = rate===null ? null : rate * 365 / days;
+  return { nStart, nEnd, avg, exits, rate, annual, days };
+}
+// Time to Hire: дата прийняття офферу − дата першого контакту
+function timeToHire(c){
+  const end = c.offer_date || c.start_date;
+  return (c.first_contact_date && end) ? daysBetween(c.first_contact_date, end) : null;
+}
+function avgTimeToHire(from, to, cands){
+  const arr = (cands||fCandidates())
+    .filter(c => ['offer_accepted','hired'].includes(c.stage))
+    .filter(c => { const d = c.offer_date || c.start_date; return d && d>=from && d<=to; })
+    .map(timeToHire).filter(v=>v!==null && v>=0);
+  return { avg: arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : null, n:arr.length, median: arr.length?median(arr):null };
+}
+// чи дійшов кандидат до етапу (за датою етапу або за поточним індексом)
+// Максимальний етап, якого кандидат реально досяг. Рахуємо один раз — це гарантує,
+// що воронка монотонна (кожен наступний етап ≤ попереднього) навіть для відмов.
+function maxStageIndex(c){
+  let mx = 0; // 'new' — усі
+  FUNNEL_ORDER.forEach((k,i)=>{ const df = STAGE_DATE[k]; if (df && c[df]) mx = Math.max(mx, i); });
+  const cur = FUNNEL_ORDER.indexOf(c.stage);
+  if (cur >= 0) mx = Math.max(mx, cur);
+  // відхилив оффер → оффер він точно отримував
+  if (c.stage === 'offer_declined') mx = Math.max(mx, FUNNEL_ORDER.indexOf('offer'));
+  return mx;
+}
+function reachedStage(c, stage){
+  const tgt = FUNNEL_ORDER.indexOf(stage);
+  if (tgt < 0) return c.stage === stage;
+  return maxStageIndex(c) >= tgt;
+}
+// найбільш специфічна вилка для посади (компанія+підрозділ > підрозділ > загальна)
+function bandFor(e){
+  const cands = S.bands.filter(b=>b.position===e.position
+    && (!b.department || b.department===e.department)
+    && (!b.company || b.company===e.company));
+  if (!cands.length) return null;
+  return cands.sort((a,b)=>((b.department?2:0)+(b.company?1:0))-((a.department?2:0)+(a.company?1:0)))[0];
+}
+// дата, коли кандидат «увійшов» у період — беремо перший контакт або створення
+const candEntryDate = c => c.first_contact_date || (c.created_at ? new Date(c.created_at*1000).toISOString().slice(0,10) : null);
+function candsInPeriod(from, to, list){
+  return (list||fCandidates()).filter(c=>{ const d=candEntryDate(c); return d && d>=from && d<=to; });
+}
+function funnelData(from, to){
+  const pool = candsInPeriod(from, to);
+  return FUNNEL_ORDER.map(k=>({ stage:k, label:STAGE_MAP[k].short, color:STAGE_MAP[k].c, n: pool.filter(c=>reachedStage(c,k)).length }));
+}
+// статистика по каналах
+function channelStats(from, to){
+  const pool = candsInPeriod(from, to);
+  const srcs = uniq([...pool.map(c=>c.source), ...S.sourceCosts.filter(sc=>sc.period>=periodOf(from)&&sc.period<=periodOf(to)).map(sc=>sc.source)]);
+  return srcs.map(src=>{
+    const cs = pool.filter(c=>c.source===src);
+    const interviews = cs.filter(c=>reachedStage(c,'hr_interview')).length;
+    const offers = cs.filter(c=>reachedStage(c,'offer')).length;
+    const hired  = cs.filter(c=>c.stage==='hired').length;
+    const costRows = S.sourceCosts.filter(sc=>sc.source===src && sc.period>=periodOf(from) && sc.period<=periodOf(to));
+    const costByCur = {};
+    costRows.forEach(sc=>{ costByCur[sc.currency||'UAH'] = (costByCur[sc.currency||'UAH']||0) + (sc.cost_kop||0); });
+    const tth = cs.map(timeToHire).filter(v=>v!==null&&v>=0);
+    return { src, candidates:cs.length, interviews, offers, hired, costByCur,
+             conv: cs.length ? hired/cs.length*100 : null,
+             tth: tth.length ? tth.reduce((a,b)=>a+b,0)/tth.length : null };
+  }).sort((a,b)=> b.hired-a.hired || b.candidates-a.candidates);
+}
+// стаж (років) на момент звільнення або зараз
+function tenureYears(e, at){
+  const end = at || e.termination_date || todayISO();
+  const d = daysBetween(e.hire_date, end);
+  return d===null ? null : d/365.25;
+}
+
+/* ── ПЕРІОД ──────────────────────────────────────────────────────────────── */
+function setPeriod(kind){
+  const t = todayISO();
+  if (kind==='3m')  { S.f.from = monthsBack(2);  S.f.to = t; }
+  if (kind==='6m')  { S.f.from = monthsBack(5);  S.f.to = t; }
+  if (kind==='12m') { S.f.from = monthsBack(11); S.f.to = t; }
+  if (kind==='ytd') { S.f.from = t.slice(0,4)+'-01-01'; S.f.to = t; }
+  if (kind==='all') {
+    const dates = [...S.employees.map(e=>e.hire_date), ...S.candidates.map(candEntryDate), ...S.vacancies.map(v=>v.open_date)].filter(Boolean).sort();
+    S.f.from = dates[0] || monthsBack(23); S.f.to = t;
+  }
+  $('#fFrom').value = S.f.from; $('#fTo').value = S.f.to;
+  $$('#periodChips .period-chip').forEach(b=>b.classList.toggle('active', b.dataset.p===kind));
+}
+
+/* ── CHART.JS ────────────────────────────────────────────────────────────── */
+function chart(id, cfg){
+  const el = document.getElementById(id); if (!el) return;
+  if (S.charts[id]) { S.charts[id].destroy(); delete S.charts[id]; }
+  Chart.defaults.font.family = "-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif";
+  Chart.defaults.font.size = 11;
+  Chart.defaults.color = '#6b6b6b';
+  cfg.options = Object.assign({ responsive:true, maintainAspectRatio:false, animation:{ duration:420 } }, cfg.options||{});
+  S.charts[id] = new Chart(el, cfg);
+}
+const gridX = { grid:{ display:false }, ticks:{ maxRotation:0, autoSkipPadding:8 } };
+const gridY = { grid:{ color:'rgba(0,0,0,.055)' }, border:{ display:false }, beginAtZero:true };
+function emptyChart(id, msg){
+  if (S.charts[id]) { S.charts[id].destroy(); delete S.charts[id]; }
+  const el = document.getElementById(id); if (!el) return;
+  const p = el.parentElement;
+  p.querySelectorAll('.chart-ph').forEach(x=>x.remove());
+  const d = document.createElement('div');
+  d.className = 'chart-ph';
+  d.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:#9a9a90;font-size:12px;padding:16px;line-height:1.5';
+  d.textContent = msg;
+  p.appendChild(d);
+}
+function clearPh(id){ const el=document.getElementById(id); if(el) el.parentElement.querySelectorAll('.chart-ph').forEach(x=>x.remove()); }
+
+/* ── KPI helper ──────────────────────────────────────────────────────────── */
+function kpi({ lbl, val, sub, delta, color='', click }){
+  const d = delta;
+  const dHtml = d ? `<div class="kpi-delta ${d.dir}">${d.text}</div>` : '';
+  return `<div class="kpi ${color}${click?' clickable':''}"${click?` onclick="${click}"`:''}>
+    <div class="kpi-lbl">${lbl}</div>
+    <div class="kpi-val">${val}</div>
+    ${sub?`<div class="kpi-sub">${sub}</div>`:''}${dHtml}
+  </div>`;
+}
+function delta(cur, prev, opts={}){
+  if (prev===null||prev===undefined||cur===null||cur===undefined) return null;
+  const diff = cur - prev;
+  if (Math.abs(diff) < (opts.eps ?? 0.05)) return { dir:'flat', text:'без змін' };
+  const good = opts.lowerIsBetter ? diff<0 : diff>0;
+  const s = (diff>0?'+':'') + (opts.fmt ? opts.fmt(diff) : num(diff));
+  return { dir: good?'up':'down', text: s + (opts.suffix||'') };
+}
+</script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   RENDER — вкладки
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* універсальна сортована таблиця */
+function renderTable(sel, cols, rows, opts={}){
+  const el = $(sel); if (!el) return;
+  const tid = sel.replace(/\W/g,'');
+  const st = S.sort[tid] || (opts.defaultSort ? { k:opts.defaultSort, dir:opts.defaultDir||'desc' } : null);
+  let data = [...rows];
+  if (st){
+    const col = cols.find(c=>c.k===st.k);
+    data.sort((a,b)=>{
+      let x = col && col.sortVal ? col.sortVal(a) : a[st.k];
+      let y = col && col.sortVal ? col.sortVal(b) : b[st.k];
+      if (x===null||x===undefined) x = st.dir==='asc' ? Infinity : -Infinity;
+      if (y===null||y===undefined) y = st.dir==='asc' ? Infinity : -Infinity;
+      if (typeof x === 'string' || typeof y === 'string') return st.dir==='asc' ? String(x).localeCompare(String(y),'uk') : String(y).localeCompare(String(x),'uk');
+      return st.dir==='asc' ? x-y : y-x;
+    });
+  }
+  const head = '<thead><tr>' + cols.map(c=>
+    `<th class="${c.num?'num tright':''} ${c.sortable!==false?'sortable':''} ${st&&st.k===c.k?'sorted':''}" ${c.sortable!==false?`data-sk="${c.k}"`:''} ${c.w?`style="width:${c.w}"`:''}>${c.l}${c.sortable!==false?` <span class="sarr">${st&&st.k===c.k?(st.dir==='asc'?'▲':'▼'):'⇅'}</span>`:''}</th>`
+  ).join('') + '</tr></thead>';
+  const body = data.length
+    ? '<tbody>' + data.map(r=>{
+        const click = opts.onRow ? ` class="rowclick" data-id="${r.id}"` : '';
+        return `<tr${click}>` + cols.map(c=>`<td class="${c.num?'num':''}">${c.fmt?c.fmt(r):esc(r[c.k]??'—')}</td>`).join('') + '</tr>';
+      }).join('') + '</tbody>'
+    : `<tbody><tr><td colspan="${cols.length}"><div class="tbl-empty">${opts.empty||'Немає даних'}</div></td></tr></tbody>`;
+  const foot = opts.foot ? `<tfoot><tr>${opts.foot(data)}</tr></tfoot>` : '';
+  el.innerHTML = head + body + foot;
+  $$('th.sortable', el).forEach(th=>th.onclick = ()=>{
+    const k = th.dataset.sk;
+    const cur = S.sort[tid];
+    S.sort[tid] = { k, dir: cur && cur.k===k && cur.dir==='desc' ? 'asc' : 'desc' };
+    renderTable(sel, cols, rows, opts);
+  });
+  if (opts.onRow) $$('tr.rowclick', el).forEach(tr=>tr.onclick = ()=>opts.onRow(+tr.dataset.id));
+}
+
+function renderAll(){
+  const emps = fEmployees();
+  $('#tcEmp').textContent  = emps.filter(e=>e.status==='active').length;
+  $('#tcVac').textContent  = fVacancies().filter(v=>v.status==='open').length;
+  $('#tcCand').textContent = fCandidates().filter(c=>!STAGE_MAP[c.stage]?.terminal && c.stage!=='hired').length;
+  $('#fbInfo').classList.toggle('searching', !!S.f.q);
+  $('#cntBadge').textContent = `${emps.filter(e=>e.status==='active').length} у команді`;
+  $('#fbInfo').innerHTML = `${dmy(S.f.from)} — ${dmy(S.f.to)}` + (S.f.q ? ` · 🔍 «${esc(S.f.q)}» <span class="muted">(лише списки)</span>` : '');
+  ({ overview:renderOverview, candidates:renderCandidates, channels:renderChannels,
+     vacancies:renderVacancies, employees:renderEmployees, payroll:renderPayroll, turnover:renderTurnover })[S.tab]();
+}
+
+/* ══════════ 1 · ОГЛЯД ══════════ */
+function renderOverview(){
+  const { from, to } = S.f;
+  const firstRun = !S.employees.length && !S.candidates.length && !S.vacancies.length;
+  $('#ovBody').classList.toggle('hidden', firstRun);
+  if (firstRun) return renderFirstRun();
+  const emps = fEmployees();
+  const active = emps.filter(e=>e.status==='active');
+  const hiredIn = emps.filter(e=>e.hire_date && e.hire_date>=from && e.hire_date<=to);
+  const exitsIn = emps.filter(e=>e.termination_date && e.termination_date>=from && e.termination_date<=to);
+  const t = turnover(from, to, emps);
+  // попередній період тієї ж довжини
+  const len = Math.max(1, daysBetween(from,to)||30);
+  const pFrom = isoAdd(from, -len-1), pTo = isoAdd(from,-1);
+  const tPrev = turnover(pFrom, pTo, emps);
+  const hiredPrev = emps.filter(e=>e.hire_date && e.hire_date>=pFrom && e.hire_date<=pTo).length;
+
+  const openVac = fVacancies().filter(v=>v.status==='open');
+  const tth = avgTimeToHire(from, to);
+  const tthPrev = avgTimeToHire(pFrom, pTo);
+  const probDone = emps.filter(e=>e.probation_result==='passed'||e.probation_result==='failed');
+  const probPass = probDone.length ? probDone.filter(e=>e.probation_result==='passed').length/probDone.length*100 : null;
+  const newThisMonth = emps.filter(e=>e.hire_date && e.hire_date>=todayISO().slice(0,7)+'-01').length;
+  const prevMonthP = (()=>{ const d=new Date(); d.setUTCDate(1); d.setUTCMonth(d.getUTCMonth()-1); return d.toISOString().slice(0,7); })();
+  const prevMonthHires = emps.filter(e=>periodOf(e.hire_date)===prevMonthP).length;
+
+  $('#kpiRow').innerHTML = [
+    kpi({ lbl:'👥 Працівників', val:num(active.length), sub:`${emps.length} карток усього · ${uniq(active.map(e=>e.department)).length} підрозділів`, color:'cg', click:"go('employees')" }),
+    kpi({ lbl:'🟢 Нових цього місяця', val:num(newThisMonth), sub:`За обраний період: ${num(hiredIn.length)}`, delta:delta(newThisMonth, prevMonthHires, {suffix:' vs минулий місяць'}), color:'' }),
+    kpi({ lbl:'🔴 Звільнено за період', val:num(exitsIn.length), sub: exitsIn.length ? `${exitsIn.filter(e=>e.termination_type==='voluntary').length} за власним бажанням` : 'Жодного звільнення 👏', delta:delta(exitsIn.length, tPrev.exits, {lowerIsBetter:true, suffix:' vs попер.'}), color:'cr' }),
+    kpi({ lbl:'📊 Плинність за період', val: t.rate===null?'—':pct(t.rate), sub:`≈ ${t.annual===null?'—':pct(t.annual)} річних · середня чисельність ${nf1.format(t.avg)} · ${t.exits} звільнень`, delta: t.rate!==null&&tPrev.rate!==null ? delta(t.rate, tPrev.rate,{lowerIsBetter:true, fmt:v=>nf1.format(v), suffix:' п.п.'}) : null, color: t.annual>30?'cr':t.annual>25?'co':'cg', click:"go('turnover')" }),
+    kpi({ lbl:'📌 Відкриті вакансії', val:num(openVac.length), sub: openVac.length ? `${openVac.filter(v=>v.target_date && v.target_date<todayISO()).length} прострочено` : 'Усі закриті', color:'cb', click:"go('vacancies')" }),
+    kpi({ lbl:'⏱ Час найму', val: tth.avg===null?'—':Math.round(tth.avg)+' дн', sub: tth.n ? `Медіана ${Math.round(tth.median)} дн · ${tth.n} найм.` : 'Немає закритих наймів у періоді', delta: tth.avg!==null&&tthPrev.avg!==null?delta(tth.avg,tthPrev.avg,{lowerIsBetter:true,fmt:v=>Math.round(v),suffix:' дн'}):null, color:'cp' }),
+    kpi({ lbl:'💼 Найнято за період', val:num(hiredIn.length), sub:`За датою прийняття у картках · з них через воронку: ${fCandidates().filter(c=>c.stage==='hired'&&c.start_date&&c.start_date>=from&&c.start_date<=to).length}`, color:'ct', click:"go('candidates')" }),
+    kpi({ lbl:'🌱 Пройшли випробувальний', val: probPass===null?'—':pct(probPass,0), sub: probDone.length ? `${probDone.filter(e=>e.probation_result==='passed').length} з ${probDone.length} · за весь час, не за період` : 'Немає завершених випробувальних', color:'cg' }),
+  ].join('');
+
+  // графіки
+  const months = monthsInRange(from.slice(0,7)+'-01', to).slice(-24);
+  if (!emps.length){
+    emptyChart('chHeadcount','Ще немає жодного співробітника.\nДодайте першого у вкладці «Співробітники».');
+    emptyChart('chFlow','Немає даних про найм і звільнення');
+    emptyChart('chDept','Немає даних');
+  } else {
+    clearPh('chHeadcount'); clearPh('chFlow'); clearPh('chDept');
+    chart('chHeadcount', { type:'line', data:{ labels:months.map(periodLabel), datasets:[{
+      label:'Чисельність', data:months.map(p=>headcountAt(monthEnd(p), emps)),
+      borderColor:'#96C11F', backgroundColor:'rgba(150,193,31,.14)', fill:true, tension:.32, borderWidth:2.4, pointRadius:2.5 }]},
+      options:{ plugins:{ legend:{ display:false } }, scales:{ x:gridX, y:gridY } } });
+
+    chart('chFlow', { type:'bar', data:{ labels:months.map(periodLabel), datasets:[
+      { label:'Найнято', data:months.map(p=>emps.filter(e=>periodOf(e.hire_date)===p).length), backgroundColor:'#96C11F', borderRadius:4 },
+      { label:'Звільнено', data:months.map(p=>-emps.filter(e=>periodOf(e.termination_date)===p).length), backgroundColor:'#DC2626', borderRadius:4 },
+    ]}, options:{ plugins:{ legend:{ position:'bottom', labels:{ boxWidth:11, usePointStyle:true, pointStyle:'circle' } },
+      tooltip:{ callbacks:{ label: c=>c.dataset.label+': '+Math.abs(c.parsed.y) } } },
+      scales:{ x:Object.assign({stacked:true},gridX), y:Object.assign({stacked:true},gridY,{ticks:{callback:v=>Number.isInteger(v)?Math.abs(v):null, precision:0, stepSize:1}}) } } });
+
+    const byDept = {};
+    active.forEach(e=>{ const d = e.department||'Без підрозділу'; byDept[d]=(byDept[d]||0)+1; });
+    const dEntries = Object.entries(byDept).sort((a,b)=>b[1]-a[1]);
+    chart('chDept', { type:'doughnut', data:{ labels:dEntries.map(x=>x[0]), datasets:[{ data:dEntries.map(x=>x[1]), backgroundColor:dEntries.map((x,i)=>PALETTE[i%PALETTE.length]), borderWidth:2, borderColor:'#fff' }]},
+      options:{ cutout:'58%', plugins:{ legend:{ position:'right', labels:{ boxWidth:10, font:{size:10.5}, usePointStyle:true, pointStyle:'circle' } } } } });
+  }
+
+  // воронка
+  const fd = funnelData(from, to);
+  const max = Math.max(1, fd[0].n);
+  $('#funnelMain').innerHTML = fd.every(x=>!x.n)
+    ? `<div class="tbl-empty">Немає кандидатів за період.<br><button class="btn btn-sm btn-y" style="margin-top:10px" onclick="openForm('candidate')">+ Додати кандидата</button></div>`
+    : fd.map((x,i)=>{
+        const prev = i? fd[i-1].n : null;
+        const conv = prev ? (prev? x.n/prev*100 : null) : null;
+        return `<div class="fn-row">
+          <div class="fn-lbl">${esc(x.label)}</div>
+          <div class="fn-bar-wrap"><div class="fn-bar" style="width:${Math.max(2,x.n/max*100)}%;background:${x.color}">${x.n||''}</div></div>
+          <div class="fn-conv">${conv===null?'':(prev? '→ '+pct(conv,0) : '')}</div>
+        </div>`;
+      }).join('');
+
+  // віджети
+  const mm = todayISO().slice(5,7);
+  const bdays = active.filter(e=>e.birth_date && e.birth_date.slice(5,7)===mm)
+    .sort((a,b)=>a.birth_date.slice(8,10).localeCompare(b.birth_date.slice(8,10)));
+  $('#wBirthdays').innerHTML = bdays.length ? bdays.slice(0,6).map(e=>wlItem(e,`${e.birth_date.slice(8,10)}.${mm}`)).join('') : ph('Цього місяця немає');
+
+  const soon = active.filter(e=>e.probation_end && e.probation_result!=='passed' && e.probation_result!=='failed' && e.probation_end<=isoAdd(todayISO(),21))
+    .sort((a,b)=>a.probation_end.localeCompare(b.probation_end));
+  $('#wProbation').innerHTML = soon.length ? soon.slice(0,6).map(e=>{
+    const d = daysSince(e.probation_end);
+    return wlItem(e, d>0? `<span style="color:var(--red)">прострочено ${d} дн</span>` : `через ${-d} дн`);
+  }).join('') : ph('Немає найближчих');
+
+  const aging = openVac.filter(v=>v.target_date && v.target_date<todayISO())
+    .sort((a,b)=>a.target_date.localeCompare(b.target_date));
+  $('#wVacAging').innerHTML = aging.length ? aging.slice(0,6).map(v=>
+    `<div class="wl-item" onclick="openVacancy(${v.id})"><span style="font-size:16px">📌</span><div style="min-width:0"><div class="person-nm">${esc(v.title)}</div><div class="person-sub">${esc(v.department||'')}</div></div><span class="wl-r" style="color:var(--red)">+${daysSince(v.target_date)} дн</span></div>`
+  ).join('') : ph('Усе в графіку 👌');
+
+  const stale = fCandidates().filter(c=>!STAGE_MAP[c.stage]?.terminal && c.stage!=='hired')
+    .map(c=>({ c, d: Math.floor((Date.now()/1000 - (c.stage_changed_at||0))/86400) }))
+    .filter(x=>x.d>=7).sort((a,b)=>b.d-a.d);
+  $('#wStale').innerHTML = stale.length ? stale.slice(0,6).map(x=>
+    `<div class="wl-item" onclick="openCandidate(${x.c.id})"><div class="av" style="background:${hashColor(x.c.full_name)};width:24px;height:24px;font-size:9.5px">${initials(x.c.full_name)}</div><div style="min-width:0"><div class="person-nm">${esc(x.c.full_name)}</div><div class="person-sub">${esc(STAGE_MAP[x.c.stage]?.l||'')}</div></div><span class="wl-r" style="color:var(--orange)">${x.d} дн</span></div>`
+  ).join('') : ph('Усі кандидати рухаються 👌');
+}
+function renderFirstRun(){
+  $('#kpiRow').innerHTML = `<div class="cc" style="grid-column:1/-1;padding:0;overflow:hidden">
+    <div style="background:linear-gradient(135deg,#1E1E1E,#2f2f2b);color:#fff;padding:26px 28px">
+      <div style="font-size:22px;font-weight:800;letter-spacing:-.5px">👋 Вітаємо в HR-дашборді snEco</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.7);margin-top:6px;line-height:1.55;max-width:640px">
+        База поки порожня. Три кроки — і дашборд оживе. Усі дані зберігаються у захищеній базі snEco, зарплати бачать лише користувачі зі спеціальним доступом.</div>
+    </div>
+    <div class="g3" style="padding:20px;gap:14px">
+      <div class="cc" style="box-shadow:none">
+        <div style="font-size:26px;margin-bottom:6px">1️⃣</div>
+        <div class="cc-title">Заведіть команду</div>
+        <div class="cc-sub" style="margin-bottom:12px">Імпортуйте список з Excel/CSV або додайте людей вручну. Підрозділи й посади створюються просто під час вводу.</div>
+        <button class="btn btn-y" onclick="openImport('employee')">⬆ Імпорт з файлу</button>
+        <button class="btn" onclick="openForm('employee')" style="margin-left:6px">+ Вручну</button>
+      </div>
+      <div class="cc" style="box-shadow:none">
+        <div style="font-size:26px;margin-bottom:6px">2️⃣</div>
+        <div class="cc-title">Відкрийте вакансію</div>
+        <div class="cc-sub" style="margin-bottom:12px">Вакансія — «кошик» для кандидатів. Далі кандидати рухаються канбаном, а дати етапів проставляються самі.</div>
+        <button class="btn btn-y" onclick="openForm('vacancy')">+ Вакансія</button>
+      </div>
+      <div class="cc" style="box-shadow:none">
+        <div style="font-size:26px;margin-bottom:6px">3️⃣</div>
+        <div class="cc-title">Заповніть довідники</div>
+        <div class="cc-sub" style="margin-bottom:12px">Підрозділи, посади, канали пошуку, причини звільнення — щоб усі писали однаково і статистика збиралась коректно.</div>
+        <button class="btn" onclick="openDictEditor()">⚙️ Довідники</button>
+      </div>
+    </div></div>`;
+}
+const ph = t => `<div style="font-size:11.5px;color:#9a9a90;padding:12px 4px;text-align:center">${t}</div>`;
+const wlItem = (e, right) => `<div class="wl-item" onclick="openEmployee(${e.id})"><div class="av" style="background:${hashColor(e.full_name)};width:24px;height:24px;font-size:9.5px">${initials(e.full_name)}</div><div style="min-width:0"><div class="person-nm">${esc(e.full_name)}</div><div class="person-sub">${esc(e.position||e.department||'')}</div></div><span class="wl-r">${right}</span></div>`;
+
+/* ══════════ 2 · КАНДИДАТИ (Kanban) ══════════ */
+function renderCandidates(){
+  const showClosed = $('#kbShowClosed').checked;
+  const vf = $('#kbVacFilter').value, sf = $('#kbSrcFilter').value;
+  let pool = sCandidates();
+  if (vf) pool = pool.filter(c=>String(c.vacancy_id||'')===vf);
+  if (sf) pool = pool.filter(c=>c.source===sf);
+
+  const act = pool.filter(c=>!STAGE_MAP[c.stage]?.terminal);
+  const { from, to } = S.f;
+  const tth = avgTimeToHire(from, to, pool);
+  const inP = candsInPeriod(from, to, pool);
+  $('#candKpi').innerHTML = [
+    kpi({ lbl:'В роботі', val:num(act.filter(c=>c.stage!=='hired').length), sub:'Активні кандидати у воронці', color:'cb' }),
+    kpi({ lbl:'Нових за період', val:num(inP.length), sub:`${dmy(from)} — ${dmy(to)}`, color:'' }),
+    kpi({ lbl:'Найнято за період', val:num(inP.filter(c=>c.stage==='hired').length), sub: inP.length? 'Конверсія '+pct(inP.filter(c=>c.stage==='hired').length/inP.length*100,0):'—', color:'cg' }),
+    kpi({ lbl:'Time to Hire', val: tth.avg===null?'—':Math.round(tth.avg)+' дн', sub: tth.n?`по ${tth.n} наймах`:'немає даних', color:'cp' }),
+  ].join('');
+
+  const cols = STAGES.filter(s=>showClosed || !s.terminal);
+  $('#kanban').innerHTML = cols.map(s=>{
+    const items = pool.filter(c=>c.stage===s.k)
+      .sort((a,b)=>(b.stage_changed_at||0)-(a.stage_changed_at||0));
+    return `<div class="kb-col${s.terminal?' terminal':''}" data-stage="${s.k}">
+      <div class="kb-head">
+        <div class="kb-title"><span class="dot" style="background:${s.c}"></span>${esc(s.l)}</div>
+        <span class="kb-cnt">${items.length}</span>
+      </div>
+      <div class="kb-body" data-stage="${s.k}">
+        ${items.map(kbCard).join('') || '<div class="kb-empty">Порожньо<br><span style="font-size:10px">перетягніть картку сюди</span></div>'}
+      </div>
+      ${s.k==='new' ? `<button class="kb-add" onclick="openForm('candidate')">+ Додати кандидата</button>` : ''}
+    </div>`;
+  }).join('');
+  bindKanban();
+}
+function kbCard(c){
+  const days = Math.floor((Date.now()/1000 - (c.stage_changed_at||0))/86400);
+  const vac = vacById(c.vacancy_id);
+  const stale = days>=7 && !STAGE_MAP[c.stage]?.terminal && c.stage!=='hired';
+  const src = c.source ? `<span class="chip chip-gray">${esc(c.source)}</span>` : '';
+  const stars = c.rating ? `<span class="stars" title="Оцінка ${c.rating}/5">${'★'.repeat(c.rating)}${'☆'.repeat(5-c.rating)}</span>` : '';
+  return `<div class="kb-card${stale?' stale':''}" draggable="true" data-id="${c.id}" onclick="openCandidate(${c.id})">
+    <div class="kbc-top">
+      <div class="av" style="background:${hashColor(c.full_name)};width:24px;height:24px;font-size:9.5px">${initials(c.full_name)}</div>
+      <div class="kbc-nm">${esc(c.full_name)}</div>
+    </div>
+    <div class="kbc-pos">${esc(vac ? vac.title : (c.position||'Без вакансії'))}</div>
+    <div class="kbc-meta">${src}${stars}<span class="kbc-days${stale?' warn':''}">${days}д</span></div>
+  </div>`;
+}
+function bindKanban(){
+  let dragId = null;
+  $$('.kb-card').forEach(card=>{
+    card.addEventListener('dragstart', e=>{ dragId = +card.dataset.id; card.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; try{e.dataTransfer.setData('text/plain',String(dragId));}catch(_){} });
+    card.addEventListener('dragend', ()=>{ card.classList.remove('dragging'); dragId=null; $$('.kb-col').forEach(c=>c.classList.remove('over')); });
+  });
+  $$('.kb-body').forEach(body=>{
+    const col = body.closest('.kb-col');
+    body.addEventListener('dragover', e=>{ e.preventDefault(); e.dataTransfer.dropEffect='move'; col.classList.add('over'); });
+    body.addEventListener('dragleave', ()=>col.classList.remove('over'));
+    body.addEventListener('drop', async e=>{
+      e.preventDefault(); col.classList.remove('over');
+      const id = dragId || +e.dataTransfer.getData('text/plain');
+      const to = body.dataset.stage;
+      if (!id || !to) return;
+      await moveStage(id, to);
+    });
+  });
+}
+async function moveStage(id, to){
+  const c = candById(id); if (!c || c.stage===to) return;
+  let reason = null;
+  if ((to==='rejected'||to==='offer_declined')) {
+    reason = await askReason(to==='rejected'?'Причина відмови':'Чому не прийняв оффер');
+    if (reason === null) return;
+  }
+  const prev = { ...c };
+  Object.assign(c, { stage:to, stage_changed_at: Math.floor(Date.now()/1000) });
+  renderCandidates();
+  try {
+    const r = await api('/api/hr/stage', { id, to_stage:to, reject_reason:reason||undefined });
+    Object.assign(c, r.row);
+    toast(`${c.full_name} → ${STAGE_MAP[to].l}`, 'ok');
+    if (to==='hired') offerHire(c);
+    renderCandidates();
+  } catch(e){ Object.assign(c, prev); renderCandidates(); toast(apiErr(e),'err'); }
+}
+
+/* ══════════ 3 · КАНАЛИ ══════════ */
+function renderChannels(){
+  const { from, to } = S.f;
+  const st = channelStats(from, to);
+  const tot = st.reduce((a,s)=>({ c:a.c+s.candidates, i:a.i+s.interviews, h:a.h+s.hired }), {c:0,i:0,h:0});
+  const best = [...st].filter(s=>s.hired>0).sort((a,b)=>b.hired-a.hired)[0];
+  const costTotal = {};
+  st.forEach(s=>Object.entries(s.costByCur).forEach(([c,v])=>costTotal[c]=(costTotal[c]||0)+v));
+  const costStr = Object.keys(costTotal).length ? Object.entries(costTotal).map(([c,v])=>money(v,c)).join(' + ') : '—';
+
+  $('#chanKpi').innerHTML = [
+    kpi({ lbl:'Кандидатів за період', val:num(tot.c), sub:`${uniq(st.filter(s=>s.candidates).map(s=>s.src)).length} активних каналів`, color:'cb' }),
+    kpi({ lbl:'Дійшли до співбесіди', val:num(tot.i), sub: tot.c? pct(tot.i/tot.c*100,0)+' від усіх кандидатів':'—', color:'cp' }),
+    kpi({ lbl:'Найнято', val:num(tot.h), sub: tot.c? 'Загальна конверсія '+pct(tot.h/tot.c*100,1):'—', color:'cg' }),
+    kpi({ lbl:'Витрати на канали', val:costStr, sub: best? `Найрезультативніший: ${esc(best.src)}` : 'Внесіть витрати для розрахунку Cost/Hire', color:'co' }),
+  ].join('');
+
+  renderTable('#tblChannels', [
+    { k:'src', l:'Джерело', fmt:r=>`<strong>${esc(r.src)}</strong>` },
+    { k:'candidates', l:'Кандидати', num:true, fmt:r=>num(r.candidates) },
+    { k:'interviews', l:'Співбесіди', num:true, fmt:r=>num(r.interviews) },
+    { k:'offers', l:'Офери', num:true, fmt:r=>num(r.offers) },
+    { k:'hired', l:'Найнято', num:true, fmt:r=>r.hired?`<span class="chip chip-g">${r.hired}</span>`:'0' },
+    { k:'conv', l:'Конверсія', num:true, fmt:r=>r.conv===null?'—':pct(r.conv,1), sortVal:r=>r.conv },
+    { k:'tth', l:'Time to Hire', num:true, fmt:r=>r.tth===null?'—':Math.round(r.tth)+' дн', sortVal:r=>r.tth },
+    { k:'cost', l:'Витрати', num:true, sortable:false, fmt:r=>Object.keys(r.costByCur).length?Object.entries(r.costByCur).map(([c,v])=>money(v,c)).join('<br>'):'—' },
+    { k:'cph', l:'Cost / Hire', num:true, sortable:false, fmt:r=>{
+        if (!r.hired || !Object.keys(r.costByCur).length) return '—';
+        return Object.entries(r.costByCur).map(([c,v])=>`<strong>${money(Math.round(v/r.hired),c)}</strong>`).join('<br>');
+      } },
+  ], st, { defaultSort:'hired', empty:'Немає кандидатів за обраний період. Джерело вказується у картці кандидата.' });
+
+  const withData = st.filter(s=>s.candidates>0);
+  if (!withData.length){ emptyChart('chSrcHired','Немає даних по каналах'); emptyChart('chSrcConv','Немає даних по каналах'); return; }
+  clearPh('chSrcHired'); clearPh('chSrcConv');
+  chart('chSrcHired', { type:'bar', data:{ labels:withData.map(s=>s.src), datasets:[
+    { label:'Кандидати', data:withData.map(s=>s.candidates), backgroundColor:'#CBD5E1', borderRadius:4 },
+    { label:'Найнято', data:withData.map(s=>s.hired), backgroundColor:'#96C11F', borderRadius:4 },
+  ]}, options:{ plugins:{ legend:{ position:'bottom', labels:{ boxWidth:11, usePointStyle:true, pointStyle:'circle' } } }, scales:{ x:gridX, y:gridY } } });
+  chart('chSrcConv', { type:'bar', indexAxis:'y', data:{ labels:withData.map(s=>s.src), datasets:[{ label:'Конверсія, %', data:withData.map(s=>s.conv||0), backgroundColor:withData.map((s,i)=>PALETTE[i%PALETTE.length]), borderRadius:4 }]},
+    options:{ indexAxis:'y', plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:c=>pct(c.parsed.x,1) } } }, scales:{ x:Object.assign({},gridY,{ticks:{callback:v=>v+'%'}}), y:{ grid:{display:false} } } } });
+}
+
+/* ══════════ 4 · ВАКАНСІЇ ══════════ */
+function vacPipeline(v){
+  const cs = S.candidates.filter(c=>c.vacancy_id===v.id);
+  return { cands:cs.length, interviews:cs.filter(c=>reachedStage(c,'hr_interview')).length,
+           offers:cs.filter(c=>reachedStage(c,'offer')).length, hired:cs.filter(c=>c.stage==='hired').length };
+}
+function renderVacancies(){
+  const sf = $('#vacStatusFilter').value;
+  let list = sVacancies();
+  if (sf==='active') list = list.filter(v=>['open','on_hold'].includes(v.status));
+  else if (sf) list = list.filter(v=>v.status===sf);
+
+  const open = list.filter(v=>v.status==='open');
+  const overdue = open.filter(v=>v.target_date && v.target_date<todayISO());
+  const closedIn = fVacancies().filter(v=>v.close_date && v.close_date>=S.f.from && v.close_date<=S.f.to);
+  const ttf = closedIn.map(v=>daysBetween(v.open_date, v.close_date)).filter(x=>x!==null&&x>=0);
+  const needed = open.reduce((a,v)=>a+(v.headcount||1),0);
+
+  $('#vacKpi').innerHTML = [
+    kpi({ lbl:'Відкриті вакансії', val:num(open.length), sub:`Потрібно людей: ${num(needed)}`, color:'cb' }),
+    kpi({ lbl:'Прострочені', val:num(overdue.length), sub: overdue.length? 'Планова дата закриття минула':'Усі в графіку 👌', color: overdue.length?'cr':'cg' }),
+    kpi({ lbl:'Закрито за період', val:num(closedIn.length), sub:`${dmy(S.f.from)} — ${dmy(S.f.to)}`, color:'cg' }),
+    kpi({ lbl:'Середній час закриття', val: ttf.length? Math.round(ttf.reduce((a,b)=>a+b,0)/ttf.length)+' дн':'—', sub: ttf.length? `Медіана ${Math.round(median(ttf))} дн`:'Немає закритих вакансій', color:'cp' }),
+  ].join('');
+
+  renderTable('#tblVacancies', [
+    { k:'title', l:'Посада', fmt:v=>`<strong>${esc(v.title)}</strong>${v.headcount>1?` <span class="chip chip-gray">×${v.headcount}</span>`:''}` },
+    { k:'department', l:'Підрозділ', fmt:v=>esc(v.department||'—') },
+    { k:'company', l:'Компанія', fmt:v=>v.company?`<span class="chip chip-gray">${esc(v.company)}</span>`:'—' },
+    { k:'manager', l:'Керівник', fmt:v=>esc(v.manager||'—') },
+    { k:'open_date', l:'Відкрито', fmt:v=>dmy(v.open_date) },
+    { k:'target_date', l:'План закриття', fmt:v=>{
+        if (!v.target_date) return '—';
+        const late = v.status==='open' && v.target_date<todayISO();
+        return `<span${late?' style="color:var(--red);font-weight:700"':''}>${dmy(v.target_date)}</span>`; } },
+    { k:'days', l:'Днів відкрито', num:true, sortVal:v=>daysBetween(v.open_date, v.close_date||todayISO())??-1,
+      fmt:v=>{ const d = daysBetween(v.open_date, v.close_date||todayISO()); return d===null?'—':`<span class="mono">${d}</span>`; } },
+    { k:'p_cands', l:'Канд.', num:true, sortVal:v=>vacPipeline(v).cands, fmt:v=>`<span class="mono">${vacPipeline(v).cands}</span>` },
+    { k:'p_int', l:'Співбес.', num:true, sortVal:v=>vacPipeline(v).interviews, fmt:v=>`<span class="mono">${vacPipeline(v).interviews}</span>` },
+    { k:'p_off', l:'Офери', num:true, sortVal:v=>vacPipeline(v).offers, fmt:v=>`<span class="mono">${vacPipeline(v).offers}</span>` },
+    { k:'p_hired', l:'Найнято', num:true, sortVal:v=>vacPipeline(v).hired, fmt:v=>{ const h=vacPipeline(v).hired; return h?`<span class="chip chip-g">${h}</span>`:'0'; } },
+    { k:'source', l:'Джерело', fmt:v=>v.source?`<span class="chip chip-gray">${esc(v.source)}</span>`:'—' },
+    { k:'priority', l:'Пріоритет', fmt:v=>{ const m={low:'chip-gray',normal:'chip-b',high:'chip-o',critical:'chip-r'};
+        return `<span class="chip ${m[v.priority]||'chip-gray'}">${PRIORITY_L[v.priority]||v.priority||'—'}</span>`; } },
+    { k:'status', l:'Статус', fmt:v=>{ const m={open:'chip-g',on_hold:'chip-y',closed:'chip-gray',cancelled:'chip-r'};
+        return `<span class="chip ${m[v.status]||'chip-gray'}">${VAC_STATUS_L[v.status]||v.status}</span>`; } },
+  ], list, { defaultSort:'open_date', onRow:openVacancy,
+    empty:'Немає вакансій. <button class="btn btn-sm btn-y" style="margin-top:10px" onclick="openForm(\'vacancy\')">+ Створити вакансію</button>' });
+}
+
+/* ══════════ 5 · СПІВРОБІТНИКИ ══════════ */
+function renderEmployees(){
+  const sf = $('#empStatusFilter').value;
+  let list = sEmployees();
+  if (sf) list = list.filter(e=>e.status===sf);
+  const active = fEmployees().filter(e=>e.status==='active');
+  const avgTen = active.map(e=>tenureYears(e)).filter(v=>v!==null);
+  const fmtInfo = {};
+  active.forEach(e=>{ const k=e.work_format||'—'; fmtInfo[k]=(fmtInfo[k]||0)+1; });
+  const topFmt = Object.entries(fmtInfo).sort((a,b)=>b[1]-a[1])[0];
+
+  $('#empKpi').innerHTML = [
+    kpi({ lbl:'Працюють', val:num(active.length), sub:`${uniq(active.map(e=>e.department)).length} підрозділів · ${uniq(active.map(e=>e.position)).length} посад`, color:'cg' }),
+    kpi({ lbl:'Середній стаж', val: avgTen.length? nf1.format(avgTen.reduce((a,b)=>a+b,0)/avgTen.length)+' р.':'—', sub: avgTen.length? `Медіана ${nf1.format(median(avgTen))} р.`:'Заповніть дати прийняття', color:'cb' }),
+    kpi({ lbl:'На випробувальному', val:num(active.filter(e=>e.probation_end && e.probation_end>=todayISO() && e.probation_result!=='passed').length), sub:'Активні випробувальні строки', color:'co' }),
+    kpi({ lbl:'Формат роботи', val: topFmt? esc(topFmt[0]):'—', sub: topFmt? `${topFmt[1]} з ${active.length} співробітників`:'Не вказано', color:'cp' }),
+  ].join('');
+
+  const cols = [
+    { k:'full_name', l:'Співробітник', fmt:e=>`<div class="person"><div class="av" style="background:${hashColor(e.full_name)}">${initials(e.full_name)}</div><div style="min-width:0"><div class="person-nm">${esc(e.full_name)}</div><div class="person-sub">${esc(e.position||'—')}</div></div></div>` },
+    { k:'emp_code', l:'ID', fmt:e=>e.emp_code?`<span class="mono">${esc(e.emp_code)}</span>`:'—' },
+    { k:'department', l:'Підрозділ', fmt:e=>esc(e.department||'—') },
+    { k:'company', l:'Компанія', fmt:e=>e.company?`<span class="chip chip-gray">${esc(e.company)}</span>`:'—' },
+    { k:'manager_id', l:'Керівник', fmt:e=>{ const m=empById(e.manager_id); return m?esc(m.full_name):'—'; }, sortVal:e=>empById(e.manager_id)?.full_name||'' },
+    { k:'work_format', l:'Формат', fmt:e=>esc(e.work_format||'—') },
+    { k:'hire_date', l:'Прийнято', fmt:e=>dmy(e.hire_date) },
+    { k:'tenure', l:'Стаж', num:true, sortVal:e=>tenureYears(e)??-1, fmt:e=>{ const t=tenureYears(e); return t===null?'—':nf1.format(t)+' р.'; } },
+    { k:'status', l:'Статус', fmt:e=>{ const m={active:'chip-g',terminated:'chip-r',on_leave:'chip-y'};
+        return `<span class="chip ${m[e.status]||'chip-gray'}">${EMP_STATUS_L[e.status]||e.status}</span>`; } },
+  ];
+  if (S.me.canPayroll) cols.splice(8, 0, { k:'salary_kop', l:'Зарплата 🔒', num:true, fmt:e=>e.salary_kop?money(e.salary_kop,e.currency):'—' });
+
+  renderTable('#tblEmployees', cols, list, { defaultSort:'full_name', defaultDir:'asc', onRow:openEmployee,
+    empty:'Ще немає співробітників. <button class="btn btn-sm btn-y" style="margin-top:10px" onclick="openForm(\'employee\')">+ Додати першого</button> або <button class="btn btn-sm" style="margin-top:10px" onclick="openImport(\'employee\')">⬆ імпортувати з файлу</button>' });
+
+  $('#empCards').innerHTML = list.map(e=>`
+    <div class="cc" style="cursor:pointer" onclick="openEmployee(${e.id})">
+      <div class="prof-hero" style="margin-bottom:9px">
+        <div class="av av-lg" style="background:${hashColor(e.full_name)}">${initials(e.full_name)}</div>
+        <div style="min-width:0"><div class="prof-nm" style="font-size:14.5px">${esc(e.full_name)}</div><div class="prof-pos" style="font-size:11.5px">${esc(e.position||'—')}</div></div>
+      </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        ${e.department?`<span class="chip chip-b">${esc(e.department)}</span>`:''}
+        ${e.company?`<span class="chip chip-gray">${esc(e.company)}</span>`:''}
+        <span class="chip ${e.status==='active'?'chip-g':e.status==='terminated'?'chip-r':'chip-y'}">${EMP_STATUS_L[e.status]||e.status}</span>
+      </div>
+      <div class="kpi-sub" style="margin-top:9px">${e.hire_date?`З ${dmy(e.hire_date)} · стаж ${nf1.format(tenureYears(e)||0)} р.`:'Дата прийняття не вказана'}</div>
+    </div>`).join('') || `<div class="cc"><div class="empty"><div class="e-ic">🧑‍💼</div><div class="e-t">Немає співробітників</div></div></div>`;
+}
+
+/* ══════════ 7 · ПЛИННІСТЬ ══════════ */
+function renderTurnover(){
+  const { from, to } = S.f;
+  const emps = fEmployees();
+  const exits = emps.filter(e=>e.termination_date && e.termination_date>=from && e.termination_date<=to);
+  const t = turnover(from, to, emps);
+  const vol = exits.filter(e=>e.termination_type==='voluntary').length;
+  const inv = exits.filter(e=>e.termination_type==='involuntary').length;
+  const tenures = exits.map(e=>tenureYears(e)).filter(v=>v!==null);
+  const early = exits.filter(e=>{ const t2=tenureYears(e); return t2!==null && t2<1; }).length;
+
+  $('#turnKpi').innerHTML = [
+    kpi({ lbl:'Плинність за період', val: t.rate===null?'—':pct(t.rate), sub:`${t.exits} звільнень ÷ середня чисельність ${nf1.format(t.avg)} · <strong>≈${t.annual===null?'—':pct(t.annual)} річних</strong>`, color: t.annual>30?'cr':t.annual>25?'co':'cg' }),
+    kpi({ lbl:'Звільнень', val:num(exits.length), sub:`Добровільно ${vol} · З ініціативи компанії ${inv}`, color:'cr' }),
+    kpi({ lbl:'Пішли до 1 року', val:num(early), sub: exits.length? pct(early/exits.length*100,0)+' від усіх звільнень — індикатор помилок найму':'—', color:'co' }),
+    kpi({ lbl:'Середній стаж на виході', val: tenures.length? nf1.format(tenures.reduce((a,b)=>a+b,0)/tenures.length)+' р.':'—', sub: tenures.length? `Медіана ${nf1.format(median(tenures))} р.`:'Немає звільнень у періоді', color:'cp' }),
+  ].join('');
+
+  const months = monthsInRange(from.slice(0,7)+'-01', to).slice(-24);
+  if (!exits.length && !emps.length){
+    ['chTurnTrend','chTurnType','chTurnDept','chTurnPos','chTenure','chReasons'].forEach(id=>emptyChart(id,'Немає даних про звільнення за період'));
+    $('#wExits').innerHTML = ph('Немає звільнень 👏');
+    return;
+  }
+  ['chTurnTrend','chTurnType','chTurnDept','chTurnPos','chTenure','chReasons'].forEach(clearPh);
+
+  chart('chTurnTrend', { data:{ labels:months.map(periodLabel), datasets:[
+      { type:'bar', label:'Звільнень', data:months.map(p=>emps.filter(e=>periodOf(e.termination_date)===p).length), backgroundColor:'rgba(220,38,38,.65)', borderRadius:4, yAxisID:'y' },
+      { type:'line', label:'Плинність, %', data:months.map(p=>{ const r=turnover(monthStart(p), monthEnd(p), emps); return r.rate===null?null:+r.rate.toFixed(2); }), borderColor:'#F97316', backgroundColor:'#F97316', tension:.3, borderWidth:2.2, pointRadius:2.5, yAxisID:'y1' },
+    ]}, options:{ plugins:{ legend:{ position:'bottom', labels:{ boxWidth:11, usePointStyle:true, pointStyle:'circle' } } },
+      scales:{ x:gridX, y:Object.assign({},gridY,{ position:'left', ticks:{precision:0} }), y1:{ position:'right', beginAtZero:true, grid:{display:false}, ticks:{ callback:v=>v+'%' } } } } });
+
+  if (!exits.length){ emptyChart('chTurnType','Жодного звільнення за період 👏'); } else chart('chTurnType', { type:'doughnut', data:{ labels:['За власним бажанням','З ініціативи компанії','Не вказано'], datasets:[{ data:[vol, inv, exits.length-vol-inv], backgroundColor:['#F97316','#DC2626','#CBD5E1'], borderWidth:2, borderColor:'#fff' }]},
+    options:{ cutout:'56%', plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, usePointStyle:true, pointStyle:'circle', font:{size:10.5} } } } } });
+
+  const byDept = {};
+  exits.forEach(e=>{ const d=e.department||'Без підрозділу'; byDept[d]=(byDept[d]||0)+1; });
+  const de = Object.entries(byDept).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  if (de.length) chart('chTurnDept', { type:'bar', indexAxis:'y', data:{ labels:de.map(x=>x[0]), datasets:[{ data:de.map(x=>x[1]), backgroundColor:'#DC2626', borderRadius:4 }]},
+    options:{ indexAxis:'y', plugins:{ legend:{display:false} }, scales:{ x:Object.assign({},gridY,{ticks:{precision:0}}), y:{grid:{display:false}} } } });
+  else emptyChart('chTurnDept','Немає звільнень у періоді');
+
+  const byPos = {};
+  exits.forEach(e=>{ const p=e.position||'Без посади'; byPos[p]=(byPos[p]||0)+1; });
+  const pe = Object.entries(byPos).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  if (pe.length) chart('chTurnPos', { type:'bar', indexAxis:'y', data:{ labels:pe.map(x=>x[0]), datasets:[{ data:pe.map(x=>x[1]), backgroundColor:'#F97316', borderRadius:4 }]},
+    options:{ indexAxis:'y', plugins:{ legend:{display:false} }, scales:{ x:Object.assign({},gridY,{ticks:{precision:0}}), y:{grid:{display:false}} } } });
+  else emptyChart('chTurnPos','Немає звільнень у періоді');
+
+  const buckets = [ ['<3 міс',0,.25], ['3–6 міс',.25,.5], ['6–12 міс',.5,1], ['1–2 роки',1,2], ['2–3 роки',2,3], ['3+ роки',3,99] ];
+  const bd = buckets.map(([l,a,b])=>tenures.filter(t2=>t2>=a&&t2<b).length);
+  if (tenures.length) chart('chTenure', { type:'bar', data:{ labels:buckets.map(b=>b[0]), datasets:[{ data:bd, backgroundColor:buckets.map((b,i)=>i<3?'#F97316':'#96C11F'), borderRadius:4 }]},
+    options:{ plugins:{ legend:{display:false} }, scales:{ x:gridX, y:Object.assign({},gridY,{ticks:{precision:0}}) } } });
+  else emptyChart('chTenure','Немає даних про стаж (заповніть дати прийняття)');
+
+  const byReason = {};
+  exits.forEach(e=>{ const r=e.termination_reason||'Не вказано'; byReason[r]=(byReason[r]||0)+1; });
+  const re = Object.entries(byReason).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  if (re.length) chart('chReasons', { type:'bar', indexAxis:'y', data:{ labels:re.map(x=>x[0]), datasets:[{ data:re.map(x=>x[1]), backgroundColor:re.map((x,i)=>PALETTE[i%PALETTE.length]), borderRadius:4 }]},
+    options:{ indexAxis:'y', plugins:{ legend:{display:false} }, scales:{ x:Object.assign({},gridY,{ticks:{precision:0}}), y:{grid:{display:false}} } } });
+  else emptyChart('chReasons','Немає звільнень у періоді');
+
+  const last = [...exits].sort((a,b)=>b.termination_date.localeCompare(a.termination_date)).slice(0,8);
+  $('#wExits').innerHTML = last.length ? last.map(e=>
+    `<div class="wl-item" onclick="openEmployee(${e.id})"><div class="av" style="background:${hashColor(e.full_name)};width:24px;height:24px;font-size:9.5px">${initials(e.full_name)}</div><div style="min-width:0"><div class="person-nm">${esc(e.full_name)}</div><div class="person-sub">${esc(e.termination_reason||'Причина не вказана')}</div></div><span class="wl-r muted">${dmy(e.termination_date)}</span></div>`
+  ).join('') : ph('Немає звільнень 👏');
+}
+</script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   6 · ФОНД ОПЛАТИ ПРАЦІ  (доступ hr-payroll)
+   ═══════════════════════════════════════════════════════════════════════════ */
+function payRowTotal(r){ return (r.base_kop||0)+(r.bonus_kop||0)+(r.overtime_kop||0)+(r.other_kop||0); }
+
+function renderPayroll(){
+  if (!S.me.canPayroll){ $('#payrollLocked').classList.remove('hidden'); $('#payrollBody').classList.add('hidden'); return; }
+  $('#payrollLocked').classList.add('hidden'); $('#payrollBody').classList.remove('hidden');
+
+  const emps = fEmployees();
+  const empIds = new Set(emps.map(e=>e.id));
+  const rows = S.payroll.filter(r=>empIds.has(r.employee_id));
+  const months = monthsInRange(S.f.from.slice(0,7)+'-01', S.f.to).slice(-24);
+  const inPeriod = new Set(months);
+  const periodsWith = uniq(rows.map(r=>r.period)).filter(p=>inPeriod.has(p)).sort();
+  const lastP = periodsWith[periodsWith.length-1];
+  const anyPeriodsEver = uniq(rows.map(r=>r.period)).sort();
+
+  // фонд по місяцях
+  const fundBy = {};
+  const missCur = new Set();
+  months.forEach(p=>{
+    const rs = rows.filter(r=>r.period===p);
+    const { total, missing } = sumCur(rs, payRowTotal, r=>r.currency);
+    missing.forEach(m=>missCur.add(m));
+    fundBy[p] = rs.length ? total : null;
+  });
+  const planBy = {};
+  months.forEach(p=>{
+    const ps = S.plans.filter(x=>x.period===p && (!S.f.company||!x.company||x.company===S.f.company) && (!S.f.dept||!x.department||x.department===S.f.dept));
+    const { total } = sumCur(ps, x=>x.amount_kop, x=>x.currency);
+    planBy[p] = ps.length ? total : null;
+  });
+
+  const lastFund = lastP ? fundBy[lastP] ?? (()=>{ const { total } = sumCur(rows.filter(r=>r.period===lastP), payRowTotal, r=>r.currency); return total; })() : null;
+  const lastPlan = lastP ? planBy[lastP] : null;
+  const prevP = periodsWith[periodsWith.length-2];
+  const prevFund = prevP ? (()=>{ const { total } = sumCur(rows.filter(r=>r.period===prevP), payRowTotal, r=>r.currency); return total; })() : null;
+
+  // поточні оклади
+  const active = emps.filter(e=>e.status==='active');
+  const salaries = active.map(e=>toCur(e.salary_kop||0, e.currency, S.payCur)).filter(v=>v!==null && v>0);
+  const cur = S.payCur;
+  const taxLast = lastP ? sumCur(rows.filter(r=>r.period===lastP), r=>r.taxes_kop||0, r=>r.currency).total : 0;
+
+  $('#payKpi').innerHTML = [
+    kpi({ lbl:'Фонд оплати праці', val: lastFund===null?'—':money(lastFund,cur), sub: lastP? `За ${periodLabel(lastP)} · ${rows.filter(r=>r.period===lastP).length} співробітників` : (anyPeriodsEver.length? `Немає нарахувань у періоді (останні — ${periodLabel(anyPeriodsEver[anyPeriodsEver.length-1])})` : 'Нарахування ще не вносились'), delta: (lastFund!==null&&prevFund!==null)?delta(lastFund,prevFund,{fmt:v=>money(v,cur),eps:100}):null, color:'cg' }),
+    kpi({ lbl:'План vs факт', val: (lastPlan&&lastFund!==null)? pct(lastFund/lastPlan*100,0) : '—', sub: lastPlan? `План ${money(lastPlan,cur)}`:'План не заданий — кнопка «План»', color: (lastPlan&&lastFund>lastPlan)?'cr':'cb' }),
+    kpi({ lbl:'Середня зарплата', val: salaries.length? money(salaries.reduce((a,b)=>a+b,0)/salaries.length, cur):'—', sub:`По ${salaries.length} активних окладах`, color:'cp' }),
+    kpi({ lbl:'Медіанна зарплата', val: salaries.length? money(median(salaries), cur):'—', sub: salaries.length? `Розкид ${money(Math.min(...salaries),cur)} — ${money(Math.max(...salaries),cur)}`:'Внесіть оклади у картках', color:'ct' }),
+  ].join('');
+
+  if (taxLast > 0){
+    const th = document.createElement('div');
+    th.className = 'hint info'; th.style.marginTop = '10px';
+    th.innerHTML = `Податки/ЄСВ за ${periodLabel(lastP)}: <strong>${money(taxLast,cur)}</strong> — показано окремо, у фонд вище не входять. Разом з податками: <strong>${money((lastFund||0)+taxLast,cur)}</strong>.`;
+    $('#payKpi').after(th);
+  }
+  if (missCur.size) {
+    const w = document.createElement('div');
+    w.className = 'hint warn'; w.style.marginTop = '10px';
+    w.innerHTML = `Для валют <strong>${[...missCur].join(', ')}</strong> не заданий курс — ці суми не потрапили у зведений фонд. <button class="btn btn-sm" onclick="openFxEditor()">Задати курс</button>`;
+    $('#payKpi').after(w);
+  }
+
+  if (!rows.length){
+    emptyChart('chPayTrend','Немає місячних записів зарплат.\nНатисніть «Ввести зарплати» — форма підставить поточні оклади з карток співробітників.');
+    emptyChart('chPayDept','Немає даних');
+  } else {
+    clearPh('chPayTrend'); clearPh('chPayDept');
+    chart('chPayTrend', { data:{ labels:months.map(periodLabel), datasets:[
+        { type:'bar', label:'Факт', data:months.map(p=>fundBy[p]===null?null:fundBy[p]/100), backgroundColor:'#96C11F', borderRadius:4 },
+        { type:'line', label:'План', data:months.map(p=>planBy[p]===null?null:planBy[p]/100), borderColor:'#1E1E1E', borderDash:[5,4], borderWidth:2, pointRadius:2.5, tension:.2, backgroundColor:'#1E1E1E' },
+      ]}, options:{ plugins:{ legend:{ position:'bottom', labels:{boxWidth:11,usePointStyle:true,pointStyle:'circle'} },
+        tooltip:{ callbacks:{ label:c=>c.dataset.label+': '+num(c.parsed.y)+' '+curSym(cur) } } },
+        scales:{ x:gridX, y:Object.assign({},gridY,{ ticks:{ callback:v=>num(v) } }) } } });
+
+    const lastRows = rows.filter(r=>r.period===lastP);
+    const byDept = {};
+    lastRows.forEach(r=>{ const e=empById(r.employee_id); const d=(e&&e.department)||'Без підрозділу';
+      const v = toCur(payRowTotal(r), r.currency, cur); if (v!==null) byDept[d]=(byDept[d]||0)+v; });
+    const de = Object.entries(byDept).sort((a,b)=>b[1]-a[1]);
+    if (de.length) chart('chPayDept', { type:'bar', indexAxis:'y', data:{ labels:de.map(x=>x[0]), datasets:[{ data:de.map(x=>x[1]/100), backgroundColor:de.map((x,i)=>PALETTE[i%PALETTE.length]), borderRadius:4 }]},
+      options:{ indexAxis:'y', plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>num(c.parsed.x)+' '+curSym(cur) } } },
+        scales:{ x:Object.assign({},gridY,{ticks:{callback:v=>num(v)}}), y:{grid:{display:false}} } } });
+    else emptyChart('chPayDept','Немає даних за останній місяць');
+  }
+
+  // вилки
+  const bands = S.bands.filter(b=>(!S.f.company||!b.company||b.company===S.f.company)&&(!S.f.dept||!b.department||b.department===S.f.dept));
+  renderTable('#tblBands', [
+    { k:'position', l:'Посада', fmt:b=>`<strong>${esc(b.position)}</strong>` },
+    { k:'department', l:'Підрозділ', fmt:b=>esc(b.department||'усі') },
+    { k:'company', l:'Компанія', fmt:b=>esc(b.company||'усі') },
+    { k:'min_kop', l:'Мінімум', num:true, fmt:b=>money(b.min_kop,b.currency) },
+    { k:'mid_kop', l:'Середина', num:true, fmt:b=>`<strong>${money(b.mid_kop,b.currency)}</strong>` },
+    { k:'max_kop', l:'Максимум', num:true, fmt:b=>money(b.max_kop,b.currency) },
+    { k:'fit', l:'Люди у вилці', sortable:false, fmt:b=>{
+        const list = active.filter(e=>e.position===b.position && (!b.department||e.department===b.department) && (!b.company||e.company===b.company) && e.salary_kop>0)
+          .map(e=>({ e, s: toCur(e.salary_kop, e.currency, b.currency||'UAH') })).filter(x=>x.s!==null);
+        if (!list.length) return '<span class="muted">немає</span>';
+        const below=list.filter(x=>x.s<b.min_kop).length, above=list.filter(x=>x.s>b.max_kop).length;
+        const inb=list.length-below-above;
+        return `<span class="chip chip-g">${inb} у вилці</span> ${below?`<span class="chip chip-b">${below} нижче</span>`:''} ${above?`<span class="chip chip-o">${above} вище</span>`:''}`;
+      } },
+    { k:'act', l:'', sortable:false, fmt:b=>`<button class="btn btn-sm" onclick="event.stopPropagation();openForm('band',${b.id})">✏️</button>` },
+  ], bands, { defaultSort:'position', defaultDir:'asc', empty:'Вилки зарплат не задані. Вони показують, чи справедливо оплачується кожна посада.' });
+
+  // зарплати за посадами (пункт ТЗ VI)
+  const posMap = {};
+  active.filter(e=>e.salary_kop>0).forEach(e=>{
+    const v = toCur(e.salary_kop, e.currency, cur); if (v===null) return;
+    const k = e.position || 'Без посади';
+    (posMap[k] = posMap[k] || { position:k, list:[], bonus:0 }).list.push(v);
+    posMap[k].bonus += toCur(e.bonus_kop||0, e.currency, cur) || 0;
+  });
+  const posRows = Object.values(posMap).map(p=>({
+    position:p.position, n:p.list.length,
+    avg: p.list.reduce((a,b)=>a+b,0)/p.list.length, med: median(p.list),
+    min: Math.min(...p.list), max: Math.max(...p.list), bonus:p.bonus,
+    fund: p.list.reduce((a,b)=>a+b,0) + p.bonus,
+  })).sort((a,b)=>b.fund-a.fund);
+  renderTable('#tblByPosition', [
+    { k:'position', l:'Посада', fmt:r=>`<strong>${esc(r.position)}</strong>` },
+    { k:'n', l:'Людей', num:true, fmt:r=>num(r.n) },
+    { k:'avg', l:'Середня', num:true, fmt:r=>money(r.avg,cur) },
+    { k:'med', l:'Медіанна', num:true, fmt:r=>`<strong>${money(r.med,cur)}</strong>` },
+    { k:'min', l:'Мінімум', num:true, fmt:r=>money(r.min,cur) },
+    { k:'max', l:'Максимум', num:true, fmt:r=>money(r.max,cur) },
+    { k:'bonus', l:'Бонуси', num:true, fmt:r=>r.bonus?money(r.bonus,cur):'—' },
+    { k:'fund', l:'Фонд посади', num:true, fmt:r=>`<strong>${money(r.fund,cur)}</strong>` },
+  ], posRows, { defaultSort:'fund', empty:'Оклади не внесені — заповніть їх у картках співробітників або імпортом.' });
+
+  // поточні оклади
+  const salRows = active.filter(e=>e.salary_kop>0 || e.bonus_kop>0);
+  renderTable('#tblSalaries', [
+    { k:'full_name', l:'Співробітник', fmt:e=>`<div class="person"><div class="av" style="background:${hashColor(e.full_name)}">${initials(e.full_name)}</div><div style="min-width:0"><div class="person-nm">${esc(e.full_name)}</div><div class="person-sub">${esc(e.position||'—')}</div></div></div>` },
+    { k:'department', l:'Підрозділ', fmt:e=>esc(e.department||'—') },
+    { k:'salary_kop', l:'Оклад', num:true, fmt:e=>money(e.salary_kop,e.currency) },
+    { k:'bonus_kop', l:'Бонус', num:true, fmt:e=>e.bonus_kop?money(e.bonus_kop,e.currency):'—' },
+    { k:'total', l:'Разом', num:true, sortVal:e=>(e.salary_kop||0)+(e.bonus_kop||0), fmt:e=>`<strong>${money((e.salary_kop||0)+(e.bonus_kop||0),e.currency)}</strong>` },
+    { k:'compa', l:'Compa-ratio', num:true, sortable:false, fmt:e=>{
+        const b = bandFor(e);
+        if (!b || !b.mid_kop) return '<span class="muted">немає вилки</span>';
+        const sal = toCur(e.salary_kop, e.currency, b.currency||'UAH');
+        if (sal===null) return '<span class="muted" title="різні валюти, курс не заданий">курс?</span>';
+        const r = sal/b.mid_kop;
+        const cls = r<0.85?'chip-b':r>1.15?'chip-o':'chip-g';
+        return `<span class="chip ${cls}">${nf1.format(r*100)}%</span>`;
+      } },
+    { k:'act', l:'', sortable:false, fmt:e=>`<button class="btn btn-sm" onclick="event.stopPropagation();openEmployee(${e.id})">↗</button>` },
+  ], salRows, { defaultSort:'total', empty:'Оклади не внесені. Відкрийте картку співробітника → вкладка «Компенсація».' });
+}
+
+/* ── Редактор зарплат за місяць ─────────────────────────────────────────── */
+function openPayrollEditor(period){
+  if (!S.me.canPayroll) return toast('Немає доступу до зарплат','err');
+  const p = period || (uniq(S.payroll.map(r=>r.period)).sort().pop()) || todayISO().slice(0,7);
+  const active = fEmployees().filter(e=>e.status==='active' || e.status==='on_leave' || (e.termination_date && periodOf(e.termination_date)>=p));
+  const existing = Object.fromEntries(S.payroll.filter(r=>r.period===p).map(r=>[r.employee_id, r]));
+  modal(`Зарплати за місяць`, `
+    <div style="display:flex;gap:9px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+      <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted)">Місяць</label>
+      <input type="month" class="finput" id="peP" value="${p}" onchange="openPayrollEditor(this.value)">
+      <button class="btn btn-sm" onclick="peFillFromCards()" title="Заповнює лише порожні поля">↺ Підставити оклади з карток</button>
+      <span class="fb-spacer"></span>
+      <span class="fb-info" id="peTotal">—</span>
+    </div>
+    <div class="tbl-wrap"><div class="tbl-scroll" style="max-height:52vh"><table class="tbl">
+      <thead><tr><th>Співробітник</th><th class="tright">Оклад</th><th class="tright">Бонус</th><th class="tright">Понаднормові</th><th class="tright">Інше</th><th class="tright" title="ЄСВ/податки роботодавця — у фонд не входять, показуються окремо">Податки</th><th>Валюта</th><th class="tright">Разом</th></tr></thead>
+      <tbody>${active.map(e=>{
+        const r = existing[e.id] || {};
+        const v = k => (r[k] ?? (k==='base_kop' ? (e.salary_kop||0) : k==='bonus_kop' ? 0 : 0))/100;
+        return `<tr data-eid="${e.id}">
+          <td><div class="person"><div class="av" style="background:${hashColor(e.full_name)};width:24px;height:24px;font-size:9.5px">${initials(e.full_name)}</div><div style="min-width:0"><div class="person-nm">${esc(e.full_name)}</div><div class="person-sub">${esc(e.department||'')}</div></div></div></td>
+          <td><input type="number" step="0.01" min="0" class="pe-in" data-f="base_kop" value="${v('base_kop')||''}" style="width:100px;text-align:right;padding:5px 7px;border:1px solid var(--border);border-radius:6px"></td>
+          <td><input type="number" step="0.01" min="0" class="pe-in" data-f="bonus_kop" value="${(r.bonus_kop||0)/100||''}" style="width:90px;text-align:right;padding:5px 7px;border:1px solid var(--border);border-radius:6px"></td>
+          <td><input type="number" step="0.01" min="0" class="pe-in" data-f="overtime_kop" value="${(r.overtime_kop||0)/100||''}" style="width:90px;text-align:right;padding:5px 7px;border:1px solid var(--border);border-radius:6px"></td>
+          <td><input type="number" step="0.01" min="0" class="pe-in" data-f="other_kop" value="${(r.other_kop||0)/100||''}" style="width:90px;text-align:right;padding:5px 7px;border:1px solid var(--border);border-radius:6px"></td>
+          <td><input type="number" step="0.01" min="0" class="pe-in pe-tax" data-f="taxes_kop" value="${(r.taxes_kop||0)/100||''}" style="width:90px;text-align:right;padding:5px 7px;border:1px solid var(--border);border-radius:6px"></td>
+          <td><select class="pe-in" data-f="currency" style="padding:5px;border:1px solid var(--border);border-radius:6px">${['UAH','EUR','USD','PLN'].map(c=>`<option ${((r.currency||e.currency||'UAH')===c)?'selected':''}>${c}</option>`).join('')}</select></td>
+          <td class="num pe-sum">—</td>
+        </tr>`; }).join('') || '<tr><td colspan="8"><div class="tbl-empty">Немає активних співробітників</div></td></tr>'}
+      </tbody>
+    </table></div></div>
+    <div class="hint">Порожнє поле = 0. Записи зберігаються по парі «співробітник + місяць» — повторне збереження оновлює наявні. «Податки» (ЄСВ роботодавця) у суму «Разом» і у фонд не входять — показуються окремим рядком.</div>
+  `, [
+    { l:'Скасувати', cls:'btn', fn:closeModal },
+    { l:'💾 Зберегти місяць', cls:'btn btn-primary', fn:savePayrollMonth },
+  ], false);
+  const recalc = ()=>{
+    let tot = 0;
+    $$('#mdBody tbody tr[data-eid]').forEach(tr=>{
+      let s = 0;
+      $$('input.pe-in', tr).forEach(i=>{ if (i.classList.contains('pe-tax')) return; s += Math.round((+i.value||0)*100); });
+      const c = $('select.pe-in', tr).value;
+      $('.pe-sum', tr).textContent = s ? money(s, c) : '—';
+      const v = toCur(s, c, S.payCur); if (v!==null) tot += v;
+    });
+    $('#peTotal').textContent = 'Разом: ' + money(tot, S.payCur);
+  };
+  $$('#mdBody .pe-in').forEach(i=>i.addEventListener('input', recalc));
+  $$('#mdBody select.pe-in').forEach(i=>i.addEventListener('change', recalc));
+  recalc();
+}
+function peFillFromCards(){
+  const filled = $$('#mdBody input[data-f="base_kop"]').filter(i=>i.value).length;
+  if (filled && !confirm(`Заповнено ${filled} рядків. Підставити оклади з карток лише у ПОРОЖНІ поля?\n(введені вручну суми залишаться недоторканими)`)) return;
+  $$('#mdBody tbody tr[data-eid]').forEach(tr=>{
+    const e = empById(+tr.dataset.eid); if (!e) return;
+    const b = $('input[data-f="base_kop"]', tr); if (b && !b.value) b.value = (e.salary_kop||0)/100 || '';
+    const bo = $('input[data-f="bonus_kop"]', tr); if (bo && !bo.value && e.bonus_kop) bo.value = e.bonus_kop/100;
+    const c = $('select[data-f="currency"]', tr); if (c && e.currency) c.value = e.currency;
+  });
+  $$('#mdBody .pe-in')[0]?.dispatchEvent(new Event('input'));
+  toast('Підставлено оклади з карток');
+}
+async function savePayrollMonth(){
+  const period = $('#peP').value;
+  if (!/^\d{4}-\d{2}$/.test(period)) return toast('Оберіть місяць','err');
+  const rows = [];
+  const existing = new Set(S.payroll.filter(r=>r.period===period).map(r=>r.employee_id));
+  $$('#mdBody tbody tr[data-eid]').forEach(tr=>{
+    const eid = +tr.dataset.eid;
+    const o = { employee_id:eid, period };
+    let any = false;
+    $$('input.pe-in', tr).forEach(i=>{ const v=Math.round((+i.value||0)*100); o[i.dataset.f]=v; if(v) any=true; });
+    o.currency = $('select.pe-in', tr).value;
+    // зберігаємо і нулі — якщо запис за цей місяць уже існував (інакше стерте значення «воскресне»)
+    if (any || existing.has(eid)) rows.push(o);
+  });
+  if (!rows.length) return toast('Нічого зберігати — усі суми порожні','err');
+  try {
+    await api('/api/hr/import', { entity:'payroll', rows });
+    toast(`Збережено ${rows.length} записів за ${periodLabel(period)}`,'ok');
+    closeModal(); await reload();
+  } catch(e){ toast(apiErr(e),'err'); }
+}
+
+/* ── План фонду ─────────────────────────────────────────────────────────── */
+function openPlanEditor(){
+  if (!S.me.canPayroll) return toast('Немає доступу','err');
+  const p = todayISO().slice(0,7);
+  const depts = ['(усі підрозділи)', ...dictOf('department')];
+  modal('План фонду оплати праці', `
+    <div class="fgrid">
+      <div class="fld"><label>Місяць <span class="req">*</span></label><input type="month" id="plP" value="${p}"></div>
+      <div class="fld"><label>Компанія</label><select id="plC"><option value="">Усі</option>${dictOf('company').map(c=>`<option>${esc(c)}</option>`).join('')}</select></div>
+      <div class="fld"><label>Підрозділ</label><select id="plD"><option value="">Усі</option>${dictOf('department').map(c=>`<option>${esc(c)}</option>`).join('')}</select></div>
+      <div class="fld"><label>Валюта</label><select id="plCur">${['UAH','EUR','USD','PLN'].map(c=>`<option>${c}</option>`).join('')}</select></div>
+      <div class="fld full"><label>Планова сума <span class="req">*</span></label><input type="number" step="0.01" min="0" id="plA" placeholder="напр. 450000"><div class="fhelp">Сума у вибраній валюті. Порівнюється з фактом на графіку «План vs факт».</div></div>
+    </div>
+    <div class="sec" style="margin-top:16px">Уже задані плани</div>
+    <div class="tbl-wrap"><div class="tbl-scroll" style="max-height:30vh"><table class="tbl">
+      <thead><tr><th>Місяць</th><th>Компанія</th><th>Підрозділ</th><th class="tright">Сума</th><th></th></tr></thead>
+      <tbody>${S.plans.length? [...S.plans].sort((a,b)=>b.period.localeCompare(a.period)).slice(0,40).map(x=>
+        `<tr><td>${periodLabel(x.period)}</td><td>${esc(x.company||'усі')}</td><td>${esc(x.department||'усі')}</td><td class="num">${money(x.amount_kop,x.currency)}</td><td><button class="btn btn-sm btn-danger" onclick="delEntity('plan',${x.id},'план')">✕</button></td></tr>`
+      ).join('') : '<tr><td colspan="5"><div class="tbl-empty">Планів ще немає</div></td></tr>'}</tbody>
+    </table></div></div>
+  `, [
+    { l:'Закрити', cls:'btn', fn:closeModal },
+    { l:'💾 Зберегти план', cls:'btn btn-primary', fn: async ()=>{
+        const amount = Math.round((+$('#plA').value||0)*100);
+        if (!amount) return toast('Вкажіть суму','err');
+        try {
+          await api('/api/hr/save', { entity:'plan', data:{ period:$('#plP').value, company:$('#plC').value||null, department:$('#plD').value||null, currency:$('#plCur').value, amount_kop:amount } });
+          toast('План збережено','ok'); closeModal(); await reload();
+        } catch(e){ toast(apiErr(e),'err'); }
+      } },
+  ]);
+}
+
+/* ── Курси валют ────────────────────────────────────────────────────────── */
+function openFxEditor(){
+  const curs = ['EUR','USD','PLN'];
+  modal('Курси валют до гривні', `
+    <div class="hint info">Курси потрібні лише для <strong>зведеного</strong> фонду оплати праці, коли зарплати ведуться у різних валютах. Вводьте скільки гривень коштує 1 одиниця валюти.</div>
+    <div class="fgrid" style="margin-top:12px">
+      ${curs.map(c=>`<div class="fld"><label>1 ${c} = ? UAH</label><input type="number" step="0.0001" min="0" id="fx_${c}" value="${S.fx[c]||''}" placeholder="напр. ${c==='EUR'?'48.5':c==='USD'?'42.0':'11.5'}"></div>`).join('')}
+    </div>
+    <div class="hint">Курси зберігаються у спільному довіднику — їх бачить уся команда. Оновлюйте раз на місяць за курсом НБУ на дату нарахування.</div>
+  `, [
+    { l:'Скасувати', cls:'btn', fn:closeModal },
+    { l:'💾 Зберегти', cls:'btn btn-primary', fn: async ()=>{
+        try {
+          for (const c of curs){
+            const v = +$('#fx_'+c).value||0;
+            if (v>0) await api('/api/hr/save', { entity:'dict', data:{ kind:'fx_rate', value:c, meta:JSON.stringify({rate:v}), sort_order:10, active:1 } });
+          }
+          toast('Курси збережено','ok'); closeModal(); await reload();
+        } catch(e){ toast(apiErr(e),'err'); }
+      } },
+  ], true);
+}
+
+/* ── Витрати на канали рекрутингу ───────────────────────────────────────── */
+function openCostEditor(){
+  const p = todayISO().slice(0,7);
+  modal('Витрати на канали рекрутингу', `
+    <div class="fgrid">
+      <div class="fld"><label>Канал <span class="req">*</span></label><select id="scS">${dictOf('source').map(s=>`<option>${esc(s)}</option>`).join('')}</select></div>
+      <div class="fld"><label>Місяць <span class="req">*</span></label><input type="month" id="scP" value="${p}"></div>
+      <div class="fld"><label>Сума</label><input type="number" step="0.01" min="0" id="scA" placeholder="напр. 1200"></div>
+      <div class="fld"><label>Валюта</label><select id="scC">${['UAH','EUR','USD','PLN'].map(c=>`<option>${c}</option>`).join('')}</select></div>
+      <div class="fld full"><label>Коментар</label><input id="scN" placeholder="напр. пакет публікацій 10 вакансій"></div>
+    </div>
+    <div class="sec" style="margin-top:16px">Внесені витрати</div>
+    <div class="tbl-wrap"><div class="tbl-scroll" style="max-height:32vh"><table class="tbl">
+      <thead><tr><th>Місяць</th><th>Канал</th><th class="tright">Сума</th><th>Коментар</th><th></th></tr></thead>
+      <tbody>${S.sourceCosts.length? [...S.sourceCosts].sort((a,b)=>b.period.localeCompare(a.period)).slice(0,50).map(x=>
+        `<tr><td>${periodLabel(x.period)}</td><td>${esc(x.source)}</td><td class="num">${money(x.cost_kop,x.currency)}</td><td class="muted">${esc(x.note||'')}</td><td><button class="btn btn-sm btn-danger" onclick="delEntity('source_cost',${x.id},'витрату')">✕</button></td></tr>`
+      ).join('') : '<tr><td colspan="5"><div class="tbl-empty">Витрат ще немає</div></td></tr>'}</tbody>
+    </table></div></div>
+  `, [
+    { l:'Закрити', cls:'btn', fn:closeModal },
+    { l:'💾 Додати', cls:'btn btn-primary', fn: async ()=>{
+        const amount = Math.round((+$('#scA').value||0)*100);
+        if (!amount) return toast('Вкажіть суму','err');
+        try {
+          await api('/api/hr/save', { entity:'source_cost', data:{ source:$('#scS').value, period:$('#scP').value, cost_kop:amount, currency:$('#scC').value, note:$('#scN').value||null } });
+          toast('Витрату збережено','ok'); closeModal(); await reload();
+        } catch(e){ toast(apiErr(e),'err'); }
+      } },
+  ]);
+}
+</script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   ФОРМИ · DRAWER · МОДАЛКИ · ІМПОРТ/ЕКСПОРТ
+   ═══════════════════════════════════════════════════════════════════════════ */
+const F = {
+  employee: { title:'співробітника', icon:'🧑‍💼', fields:[
+    { s:'Основне' },
+    { k:'full_name', l:'ПІБ', t:'text', req:1, full:1, ph:'Прізвище Імʼя По батькові' },
+    { k:'emp_code', l:'Employee ID', t:'text', ph:'напр. SN-014', help:'Внутрішній табельний номер' },
+    { k:'position', l:'Посада', t:'dictfree', dict:'position' },
+    { k:'department', l:'Підрозділ', t:'dict', dict:'department' },
+    { k:'company', l:'Компанія', t:'dict', dict:'company' },
+    { k:'legal_entity', l:'Юрособа', t:'dict', dict:'legal_entity' },
+    { k:'manager_id', l:'Керівник', t:'emp' },
+    { s:'Умови роботи' },
+    { k:'hire_date', l:'Дата прийняття', t:'date', req:1 },
+    { k:'probation_end', l:'Кінець випробувального', t:'date' },
+    { k:'probation_result', l:'Результат випробувального', t:'select', opts:[['','—'],['pending','Триває'],['passed','Пройдено'],['failed','Не пройдено']] },
+    { k:'work_format', l:'Формат роботи', t:'dict', dict:'work_format' },
+    { k:'employment_type', l:'Тип зайнятості', t:'dict', dict:'employment_type' },
+    { k:'contract_type', l:'Працевлаштування', t:'dict', dict:'contract_type' },
+    { k:'status', l:'Статус', t:'select', opts:[['active','Працює'],['on_leave','Відпустка/декрет'],['terminated','Звільнений']] },
+    { k:'source', l:'Канал найму', t:'dict', dict:'source' },
+    { s:'Контакти' },
+    { k:'email', l:'Email', t:'email' },
+    { k:'phone', l:'Телефон', t:'text' },
+    { k:'birth_date', l:'Дата народження', t:'date' },
+    { k:'location', l:'Локація', t:'text', ph:'Мукачево / Гуменне / віддалено' },
+    { s:'Компенсація', lock:1, pay:1 },
+    { k:'salary_kop', l:'Оклад (місяць)', t:'money', pay:1 },
+    { k:'bonus_kop', l:'Бонус (місяць)', t:'money', pay:1 },
+    { k:'currency', l:'Валюта', t:'select', opts:[['UAH','UAH ₴'],['EUR','EUR €'],['USD','USD $'],['PLN','PLN zł']], pay:1 },
+    { s:'Звільнення' },
+    { k:'termination_date', l:'Дата звільнення', t:'date' },
+    { k:'termination_type', l:'Тип', t:'select', opts:[['','—'],['voluntary','За власним бажанням'],['involuntary','З ініціативи компанії']] },
+    { k:'termination_reason', l:'Причина', t:'dictfree', dict:'exit_reason', full:1 },
+    { k:'notes', l:'Нотатки', t:'textarea', full:1 },
+  ]},
+  candidate: { title:'кандидата', icon:'🎯', fields:[
+    { s:'Основне' },
+    { k:'full_name', l:'ПІБ', t:'text', req:1, full:1 },
+    { k:'vacancy_id', l:'Вакансія', t:'vac' },
+    { k:'position', l:'Посада (якщо без вакансії)', t:'dictfree', dict:'position' },
+    { k:'source', l:'Джерело', t:'dict', dict:'source', req:1 },
+    { k:'stage', l:'Етап', t:'select', opts:STAGES.map(s=>[s.k,s.l]) },
+    { k:'rating', l:'Оцінка', t:'select', opts:[['','—'],[1,'★☆☆☆☆'],[2,'★★☆☆☆'],[3,'★★★☆☆'],[4,'★★★★☆'],[5,'★★★★★']] },
+    { k:'owner_email', l:'Відповідальний', t:'email', ph:'hr@sneco.ua' },
+    { s:'Контакти' },
+    { k:'email', l:'Email', t:'email' },
+    { k:'phone', l:'Телефон', t:'text' },
+    { k:'linkedin', l:'LinkedIn / профіль', t:'text' },
+    { k:'cv_url', l:'Посилання на CV', t:'text', full:1, ph:'https://…' },
+    { s:'Дати воронки' },
+    { k:'first_contact_date', l:'Перший контакт', t:'date', help:'Від цієї дати рахується Time to Hire' },
+    { k:'screening_date', l:'Скринінг', t:'date' },
+    { k:'hr_interview_date', l:'Співбесіда HR', t:'date' },
+    { k:'mgr_interview_date', l:'Співбесіда керівника', t:'date' },
+    { k:'offer_sent_date', l:'Оффер надіслано', t:'date' },
+    { k:'offer_date', l:'Оффер прийнято', t:'date', help:'Кінцева точка Time to Hire' },
+    { k:'start_date', l:'Вихід на роботу', t:'date' },
+    { k:'closed_date', l:'Дата відмови', t:'date' },
+    { s:'Інше' },
+    { k:'expected_salary_kop', l:'Очікування по ЗП', t:'money', pay:1 },
+    { k:'currency', l:'Валюта', t:'select', opts:[['UAH','UAH ₴'],['EUR','EUR €'],['USD','USD $'],['PLN','PLN zł']], pay:1 },
+    { k:'reject_reason', l:'Причина відмови', t:'dictfree', dict:'reject_reason', full:1 },
+    { k:'notes', l:'Нотатки', t:'textarea', full:1, ph:'Враження зі співбесіди, сильні/слабкі сторони…' },
+  ]},
+  vacancy: { title:'вакансію', icon:'📌', fields:[
+    { s:'Основне' },
+    { k:'title', l:'Посада', t:'text', req:1, full:1 },
+    { k:'department', l:'Підрозділ', t:'dict', dict:'department' },
+    { k:'company', l:'Компанія', t:'dict', dict:'company' },
+    { k:'manager', l:'Керівник (ПІБ)', t:'text' },
+    { k:'headcount', l:'Кількість позицій', t:'number', ph:'1' },
+    { k:'priority', l:'Пріоритет', t:'select', opts:[['low','Низький'],['normal','Звичайний'],['high','Високий'],['critical','Критичний']] },
+    { k:'status', l:'Статус', t:'select', opts:[['open','Відкрита'],['on_hold','На паузі'],['closed','Закрита'],['cancelled','Скасована']] },
+    { k:'source', l:'Основний канал пошуку', t:'dict', dict:'source' },
+    { s:'Терміни' },
+    { k:'open_date', l:'Дата відкриття', t:'date', req:1 },
+    { k:'target_date', l:'Планова дата закриття', t:'date' },
+    { k:'close_date', l:'Фактична дата закриття', t:'date' },
+    { s:'Умови', lock:1, pay:1 },
+    { k:'salary_from_kop', l:'Вилка від', t:'money', pay:1 },
+    { k:'salary_to_kop', l:'Вилка до', t:'money', pay:1 },
+    { k:'currency', l:'Валюта', t:'select', opts:[['UAH','UAH ₴'],['EUR','EUR €'],['USD','USD $'],['PLN','PLN zł']], pay:1 },
+    { s:'Опис' },
+    { k:'requirements', l:'Вимоги / опис', t:'textarea', full:1 },
+    { k:'notes', l:'Нотатки', t:'textarea', full:1 },
+  ]},
+  band: { title:'вилку зарплат', icon:'💰', payrollOnly:1, fields:[
+    { k:'position', l:'Посада', t:'dictfree', dict:'position', req:1, full:1 },
+    { k:'department', l:'Підрозділ', t:'dict', dict:'department' },
+    { k:'company', l:'Компанія', t:'dict', dict:'company' },
+    { k:'min_kop', l:'Мінімум', t:'money' },
+    { k:'mid_kop', l:'Середина', t:'money' },
+    { k:'max_kop', l:'Максимум', t:'money' },
+    { k:'currency', l:'Валюта', t:'select', opts:[['UAH','UAH ₴'],['EUR','EUR €'],['USD','USD $'],['PLN','PLN zł']] },
+    { k:'note', l:'Коментар', t:'text', full:1 },
+  ]},
+};
+const ENTITY_TABLE = { employee:'employees', candidate:'candidates', vacancy:'vacancies', band:'bands' };
+// підказки для поля-довідника: власне довідник + усе, що вже введено в записах
+const DICT_SOURCES = {
+  company:      ()=>[...S.employees.map(e=>e.company), ...S.vacancies.map(v=>v.company)],
+  department:   ()=>[...S.employees.map(e=>e.department), ...S.vacancies.map(v=>v.department)],
+  position:     ()=>[...S.employees.map(e=>e.position), ...S.vacancies.map(v=>v.title), ...S.candidates.map(c=>c.position)],
+  source:       ()=>[...S.employees.map(e=>e.source), ...S.candidates.map(c=>c.source), ...S.sourceCosts.map(x=>x.source)],
+  legal_entity: ()=>S.employees.map(e=>e.legal_entity),
+  work_format:  ()=>S.employees.map(e=>e.work_format),
+  employment_type: ()=>S.employees.map(e=>e.employment_type),
+  contract_type:()=>S.employees.map(e=>e.contract_type),
+  exit_reason:  ()=>S.employees.map(e=>e.termination_reason),
+  reject_reason:()=>S.candidates.map(c=>c.reject_reason),
+};
+function dictSuggest(kind){
+  const extra = DICT_SOURCES[kind] ? DICT_SOURCES[kind]() : [];
+  return uniq([...dictOf(kind), ...extra]).sort((a,b)=>String(a).localeCompare(String(b),'uk'));
+}
+
+function fieldHtml(f, val){
+  if (f.s) return `<div class="fsec${f.lock?' lock':''}">${esc(f.s)}</div>`;
+  const id = 'f_' + f.k;
+  const v = val ?? '';
+  const req = f.req ? ' <span class="req">*</span>' : '';
+  let inp = '';
+  if (f.t==='textarea') inp = `<textarea id="${id}" placeholder="${esc(f.ph||'')}">${esc(v)}</textarea>`;
+  else if (f.t==='select') inp = `<select id="${id}">${f.opts.map(([k,l])=>`<option value="${esc(k)}"${String(k)===String(v)?' selected':''}>${esc(l)}</option>`).join('')}</select>`;
+  else if (f.t==='dict' || f.t==='dictfree'){
+    // Вільний ввід зі списком підказок: довідник + значення, які вже зустрічаються в даних.
+    // Це навмисно НЕ строгий select — інакше на порожній базі неможливо вказати підрозділ.
+    inp = `<input id="${id}" list="dl_${f.dict}" value="${esc(v)}" placeholder="${esc(f.ph||'оберіть зі списку або впишіть своє')}" autocomplete="off">
+           <datalist id="dl_${f.dict}">${dictSuggest(f.dict).map(o=>`<option value="${esc(o)}">`).join('')}</datalist>`;
+  }
+  else if (f.t==='emp'){
+    inp = `<select id="${id}"><option value="">—</option>${S.employees.filter(e=>e.status==='active').map(e=>`<option value="${e.id}"${String(e.id)===String(v)?' selected':''}>${esc(e.full_name)}${e.position?' · '+esc(e.position):''}</option>`).join('')}</select>`;
+  }
+  else if (f.t==='vac'){
+    inp = `<select id="${id}"><option value="">—</option>${S.vacancies.filter(x=>['open','on_hold'].includes(x.status)||String(x.id)===String(v)).map(x=>`<option value="${x.id}"${String(x.id)===String(v)?' selected':''}>${esc(x.title)}${x.department?' · '+esc(x.department):''}</option>`).join('')}</select>`;
+  }
+  else if (f.t==='money') inp = `<input type="number" step="0.01" min="0" id="${id}" value="${v===''?'':(+v/100)}" placeholder="0">`;
+  else if (f.t==='number') inp = `<input type="number" step="1" min="0" id="${id}" value="${esc(v)}" placeholder="${esc(f.ph||'')}">`;
+  else if (f.t==='date') inp = `<input type="date" id="${id}" value="${esc(v)}">`;
+  else if (f.t==='email') inp = `<input type="email" id="${id}" value="${esc(v)}" placeholder="${esc(f.ph||'')}">`;
+  else inp = `<input type="text" id="${id}" value="${esc(v)}" placeholder="${esc(f.ph||'')}">`;
+  return `<div class="fld${f.full?' full':''}"><label for="${id}">${esc(f.l)}${req}</label>${inp}
+    ${f.help?`<div class="fhelp">${esc(f.help)}</div>`:''}<div class="ferr" id="e_${f.k}"></div></div>`;
+}
+function readForm(entity){
+  const cfg = F[entity]; const out = {};
+  for (const f of cfg.fields){
+    if (f.s) continue;
+    if (f.pay && !S.me.canPayroll) continue;
+    const el = $('#f_'+f.k); if (!el) continue;
+    let v = el.value;
+    if (v==='' ) { out[f.k] = null; continue; }
+    if (f.t==='money') v = Math.round(parseFloat(v)*100);
+    else if (f.t==='number' || f.t==='emp' || f.t==='vac' || f.k==='rating') v = parseInt(v,10);
+    out[f.k] = v;
+  }
+  return out;
+}
+
+/* ── DRAWER infra ───────────────────────────────────────────────────────── */
+let DR = { entity:null, id:null, tab:0 };
+function openDrawer(){ $('#drawerBack').classList.add('open'); $('#drawer').classList.add('open'); }
+function closeDrawer(){ $('#drawerBack').classList.remove('open'); $('#drawer').classList.remove('open'); DR={entity:null,id:null,tab:0}; }
+document.addEventListener('keydown', e=>{ if (e.key==='Escape'){ if ($('#modalBack').classList.contains('open')) closeModal(); else closeDrawer(); } });
+
+function openForm(entity, id){
+  const cfg = F[entity];
+  if (cfg.payrollOnly && !S.me.canPayroll) return toast('Немає доступу до зарплатних даних','err');
+  const src = id ? ({ employee:empById, candidate:candById, vacancy:vacById, band:i=>S.bands.find(b=>b.id===i) })[entity](id) : {};
+  DR = { entity, id: id||null, tab:0 };
+  $('#drTitle').textContent = (id?'Редагувати ':'Новий ') + cfg.title;
+  $('#drSub').textContent = id ? (src.full_name || src.title || src.position || '') : cfg.icon + ' Заповніть поля та збережіть';
+  $('#drTabs').innerHTML = '';
+  const defaults = id ? src : ({
+    employee:{ status:'active', hire_date:todayISO(), currency:'UAH', probation_result:'pending', company:dictOf('company')[0]||'' },
+    candidate:{ stage:'new', first_contact_date:todayISO(), currency:'UAH' },
+    vacancy:{ status:'open', open_date:todayISO(), priority:'normal', headcount:1, currency:'UAH' },
+    band:{ currency:'UAH' },
+  })[entity];
+  $('#drBody').innerHTML = `<div class="fgrid">${cfg.fields.filter(f=>!(f.pay && !S.me.canPayroll)).map(f=>fieldHtml(f, defaults[f.k])).join('')}</div>`;
+  $('#drFoot').innerHTML = `
+    ${id?`<button class="btn btn-danger" onclick="delEntity('${entity}',${id})">🗑 Видалити</button>`:''}
+    <span class="sp"></span>
+    <button class="btn" onclick="closeDrawer()">Скасувати</button>
+    <button class="btn btn-primary" id="drSave">💾 Зберегти</button>`;
+  $('#drSave').onclick = ()=>saveForm(entity, id);
+  openDrawer();
+  setTimeout(()=>$('#drBody input,#drBody select')?.focus(), 120);
+}
+async function saveForm(entity, id){
+  const data = readForm(entity);
+  $$('#drBody .ferr').forEach(e=>e.textContent='');
+  $$('#drBody .err').forEach(e=>e.classList.remove('err'));
+  // клієнтська перевірка обовʼязкових — щоб не створювати картки без ПІБ/дати/джерела
+  const missing = F[entity].fields.filter(f=>!f.s && f.req && !(f.pay && !S.me.canPayroll))
+    .filter(f=>data[f.k]===null || data[f.k]===undefined || data[f.k]==='');
+  if (missing.length){
+    missing.forEach(f=>{ const e2=$('#e_'+f.k); if(e2) e2.textContent='обовʼязкове поле'; const i=$('#f_'+f.k); if(i) i.classList.add('err'); });
+    $('#f_'+missing[0].k)?.focus();
+    return toast('Заповніть: ' + missing.map(f=>f.l).join(', '), 'err');
+  }
+  const btn = $('#drSave'); btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Зберігаю…';
+  try {
+    const r = await api('/api/hr/save', { entity, id: id||undefined, data });
+    toast(id?'Збережено':'Створено','ok');
+    closeDrawer(); await reload();
+    if (id){ // повертаємось у картку, з якої прийшли
+      if (entity==='employee') openEmployee(id);
+      else if (entity==='candidate') openCandidate(id);
+      else if (entity==='vacancy') openVacancy(id);
+    } else if (entity==='candidate') go('candidates');
+  } catch(e){
+    if (e.error==='validation_failed' && e.fields){
+      const MSG = { required:'обовʼязкове поле', bad_date:'невірна дата', bad_period:'невірний місяць', bad_enum:'оберіть зі списку',
+        not_a_number:'має бути число', negative:'не може бути відʼємним', before_hire_date:'раніше дати прийняття',
+        before_open_date:'раніше дати відкриття', less_than_min:'менше за мінімум', too_big:'завелике значення' };
+      Object.entries(e.fields).forEach(([k,v])=>{
+        const err = $('#e_'+k); if (err) err.textContent = MSG[v]||v;
+        const inp = $('#f_'+k); if (inp) inp.classList.add('err');
+      });
+      toast('Перевірте підсвічені поля','err');
+    } else toast(apiErr(e),'err');
+  } finally { btn.disabled=false; btn.innerHTML='💾 Зберегти'; }
+}
+async function delEntity(entity, id, what){
+  if (!confirm(`Видалити ${what||'запис'}? Дію не можна скасувати (залишиться слід в журналі змін).`)) return;
+  try { await api('/api/hr/delete', { entity, id }); toast('Видалено','ok'); closeDrawer(); closeModal(); await reload(); }
+  catch(e){ toast(apiErr(e),'err'); }
+}
+
+/* ── Картка співробітника ───────────────────────────────────────────────── */
+function openEmployee(id){
+  const e = empById(id); if (!e) return;
+  DR = { entity:'employee', id, tab:0 };
+  const mgr = empById(e.manager_id);
+  const subs = S.employees.filter(x=>x.manager_id===id && x.status==='active');
+  $('#drTitle').textContent = e.full_name;
+  $('#drSub').textContent = [e.position, e.department, e.company].filter(Boolean).join(' · ');
+  const tabs = ['Профіль', S.me.canPayroll?'Компенсація':null, 'Історія'].filter(Boolean);
+  $('#drTabs').innerHTML = tabs.map((t,i)=>`<button class="dr-tab${i===0?' active':''}" onclick="empTab(${id},${i},this)">${t}</button>`).join('');
+  empTab(id, 0);
+  $('#drFoot').innerHTML = `<button class="btn btn-danger" onclick="delEntity('employee',${id},'співробітника')" title="Видалити картку назавжди">🗑</button>
+    <span class="sp"></span>
+    ${e.status!=='terminated' ? `<button class="btn" onclick="openTerminate(${id})">🚪 Звільнити</button>` : ''}
+    <button class="btn btn-primary" onclick="openForm('employee',${id})">✏️ Редагувати</button>`;
+  openDrawer();
+}
+function empTab(id, i, btn){
+  if (btn) $$('#drTabs .dr-tab').forEach(b=>b.classList.toggle('active', b===btn));
+  const e = empById(id); const b = $('#drBody');
+  const mgr = empById(e.manager_id);
+  const subs = S.employees.filter(x=>x.manager_id===id && x.status==='active');
+  if (i===0){
+    b.innerHTML = `
+      <div class="prof-hero">
+        <div class="av av-lg" style="background:${hashColor(e.full_name)}">${initials(e.full_name)}</div>
+        <div><div class="prof-nm">${esc(e.full_name)}</div><div class="prof-pos">${esc(e.position||'Посада не вказана')}</div>
+        <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap">
+          <span class="chip ${e.status==='active'?'chip-g':e.status==='terminated'?'chip-r':'chip-y'}">${EMP_STATUS_L[e.status]||e.status}</span>
+          ${e.department?`<span class="chip chip-b">${esc(e.department)}</span>`:''}
+          ${e.company?`<span class="chip chip-gray">${esc(e.company)}</span>`:''}
+        </div></div>
+      </div>
+      <dl class="kv">
+        <dt>Employee ID</dt><dd>${esc(e.emp_code||'—')}</dd>
+        <dt>Юрособа</dt><dd>${esc(e.legal_entity||'—')}</dd>
+        <dt>Керівник</dt><dd>${mgr?`<a href="#" onclick="openEmployee(${mgr.id});return false">${esc(mgr.full_name)}</a>`:'—'}</dd>
+        ${subs.length?`<dt>У підпорядкуванні</dt><dd>${subs.map(s=>`<a href="#" onclick="openEmployee(${s.id});return false">${esc(s.full_name)}</a>`).join(', ')}</dd>`:''}
+        <dt>Формат роботи</dt><dd>${esc(e.work_format||'—')}</dd>
+        <dt>Тип зайнятості</dt><dd>${esc(e.employment_type||'—')}</dd>
+        <dt>Працевлаштування</dt><dd>${esc(e.contract_type||'—')}</dd>
+        <dt>Локація</dt><dd>${esc(e.location||'—')}</dd>
+        <dt>Email</dt><dd>${e.email?`<a href="mailto:${esc(e.email)}">${esc(e.email)}</a>`:'—'}</dd>
+        <dt>Телефон</dt><dd>${e.phone?`<a href="tel:${esc(e.phone)}">${esc(e.phone)}</a>`:'—'}</dd>
+        <dt>Дата народження</dt><dd>${dmy(e.birth_date)}${e.birth_date?` <span class="muted">(${Math.floor((Date.now()-new Date(e.birth_date))/31557600000)} р.)</span>`:''}</dd>
+        <dt>Прийнято</dt><dd>${dmy(e.hire_date)}${e.hire_date?` <span class="muted">(стаж ${nf1.format(tenureYears(e)||0)} р.)</span>`:''}</dd>
+        <dt>Випробувальний</dt><dd>${e.probation_end?dmy(e.probation_end)+' · '+(PROB_L[e.probation_result]||'—'):'—'}</dd>
+        <dt>Канал найму</dt><dd>${esc(e.source||'—')}</dd>
+        ${e.termination_date?`<dt>Звільнено</dt><dd style="color:var(--red)">${dmy(e.termination_date)} · ${TERM_TYPE_L[e.termination_type]||''}<br>${esc(e.termination_reason||'')}</dd>`:''}
+      </dl>
+      ${e.notes?`<div class="hint" style="margin-top:14px">${esc(e.notes).replace(/\n/g,'<br>')}</div>`:''}`;
+  } else if (i===1 && S.me.canPayroll){
+    const rows = S.payroll.filter(r=>r.employee_id===id).sort((a,b)=>b.period.localeCompare(a.period)).slice(0,24);
+    const band = bandFor(e);
+    b.innerHTML = `
+      <dl class="kv">
+        <dt>Оклад</dt><dd style="font-size:16px">${money(e.salary_kop,e.currency)}</dd>
+        <dt>Бонус</dt><dd>${e.bonus_kop?money(e.bonus_kop,e.currency):'—'}</dd>
+        <dt>Разом на місяць</dt><dd><strong>${money((e.salary_kop||0)+(e.bonus_kop||0), e.currency)}</strong></dd>
+        ${band?`<dt>Вилка посади</dt><dd>${money(band.min_kop,band.currency)} — ${money(band.max_kop,band.currency)} <span class="muted">(середина ${money(band.mid_kop,band.currency)})</span></dd>
+        <dt>Compa-ratio</dt><dd>${(()=>{ if(!band.mid_kop) return '—'; const s=toCur(e.salary_kop,e.currency,band.currency||'UAH'); if(s===null) return '<span class="muted">курс не заданий</span>'; const r=s/band.mid_kop; return `<span class="chip ${r<0.85?'chip-b':r>1.15?'chip-o':'chip-g'}">${nf1.format(r*100)}%</span>`; })()}</dd>`:''}
+      </dl>
+      <div class="sec">Історія нарахувань</div>
+      ${rows.length? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Місяць</th><th class="tright">Оклад</th><th class="tright">Бонус</th><th class="tright">Понад.</th><th class="tright">Разом</th></tr></thead><tbody>
+        ${rows.map(r=>`<tr><td>${periodLabel(r.period)}</td><td class="num">${money(r.base_kop,r.currency)}</td><td class="num">${r.bonus_kop?money(r.bonus_kop,r.currency):'—'}</td><td class="num">${r.overtime_kop?money(r.overtime_kop,r.currency):'—'}</td><td class="num"><strong>${money(payRowTotal(r),r.currency)}</strong></td></tr>`).join('')}
+      </tbody></table></div>` : `<div class="tbl-empty">Нарахувань ще немає. <button class="btn btn-sm" onclick="closeDrawer();openPayrollEditor()">Ввести зарплати за місяць</button></div>`}`;
+  } else {
+    b.innerHTML = '<div class="tbl-empty"><span class="spin"></span> Завантаження…</div>';
+    api('/api/hr/audit', { entity:'employee', entity_id:id, limit:100 }).then(r=>{
+      const log = r.log||[];
+      b.innerHTML = log.length ? `<div class="tl">${log.map(l=>`
+        <div class="tl-i"><div class="tl-t">${auditLabel(l)}</div>
+        <div class="tl-d">${new Date(l.at*1000).toLocaleString('uk-UA')} · ${esc(l.actor_email||'')}</div></div>`).join('')}</div>`
+        : '<div class="tbl-empty">Історія порожня</div>';
+    }).catch(()=>{ b.innerHTML='<div class="tbl-empty">Не вдалося завантажити історію</div>'; });
+  }
+}
+function auditLabel(l){
+  const A = { create:'Створено запис', update:'Змінено', delete:'Видалено', stage:'Зміна етапу', import:'Імпорт' };
+  let d = '';
+  try {
+    const j = JSON.parse(l.diff||'{}');
+    if (l.action==='update') d = ': ' + Object.keys(j).slice(0,6).map(k=>`<code>${esc(k)}</code>`).join(', ');
+    if (l.action==='stage' && j.stage) d = `: ${STAGE_MAP[j.stage[0]]?.l||j.stage[0]} → <strong>${STAGE_MAP[j.stage[1]]?.l||j.stage[1]}</strong>`;
+  } catch(e){}
+  return (A[l.action]||l.action) + d;
+}
+
+/* ── Звільнення: одна атомарна дія ──────────────────────────────────────── */
+function openTerminate(id){
+  const e = empById(id); if (!e) return;
+  modal('Звільнення співробітника', `
+    <div class="hint warn">Картка <strong>${esc(e.full_name)}</strong> перейде у статус «Звільнений». Людина зникне з активної чисельності й потрапить у розрахунок плинності. Історія та нарахування зберігаються.</div>
+    <div class="fgrid" style="margin-top:12px">
+      <div class="fld"><label>Дата звільнення <span class="req">*</span></label><input type="date" id="tDate" value="${todayISO()}"></div>
+      <div class="fld"><label>Тип <span class="req">*</span></label><select id="tType">
+        <option value="voluntary">За власним бажанням</option>
+        <option value="involuntary">З ініціативи компанії</option></select></div>
+      <div class="fld full"><label>Причина</label><input id="tReason" list="dl_exit_reason" placeholder="оберіть або впишіть свою">
+        <datalist id="dl_exit_reason">${dictSuggest('exit_reason').map(o=>`<option value="${esc(o)}">`).join('')}</datalist></div>
+      <div class="fld full"><label>Коментар (у нотатки картки)</label><textarea id="tNote" placeholder="що сталося, чи готові взяти назад"></textarea></div>
+    </div>`, [
+    { l:'Скасувати', cls:'btn', fn:closeModal },
+    { l:'🚪 Звільнити', cls:'btn btn-danger', fn: async ()=>{
+        const d = $('#tDate').value;
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return toast('Вкажіть дату','err');
+        if (e.hire_date && d < e.hire_date) return toast('Дата звільнення раніша за дату прийняття','err');
+        const note = $('#tNote').value.trim();
+        try {
+          await api('/api/hr/save', { entity:'employee', id, data:{
+            status:'terminated', termination_date:d, termination_type:$('#tType').value,
+            termination_reason:$('#tReason').value||null,
+            notes: note ? ((e.notes? e.notes+'\n':'') + `[звільнення ${dmy(d)}] ` + note) : (e.notes||null) } });
+          toast('Співробітника звільнено','ok'); closeModal(); closeDrawer(); await reload();
+        } catch(err){ toast(apiErr(err),'err'); }
+      } },
+  ]);
+}
+
+/* ── Картка кандидата ───────────────────────────────────────────────────── */
+function openCandidate(id){
+  const c = candById(id); if (!c) return;
+  const v = vacById(c.vacancy_id);
+  $('#drTitle').textContent = c.full_name;
+  $('#drSub').textContent = [v?v.title:c.position, c.source].filter(Boolean).join(' · ');
+  $('#drTabs').innerHTML = '';
+  const tth = timeToHire(c);
+  const steps = FUNNEL_ORDER.map(k=>({ k, l:STAGE_MAP[k].l, d: k==='new' ? candEntryDate(c) : c[STAGE_DATE[k]], done: reachedStage(c,k) }));
+  $('#drBody').innerHTML = `
+    <div class="prof-hero">
+      <div class="av av-lg" style="background:${hashColor(c.full_name)}">${initials(c.full_name)}</div>
+      <div><div class="prof-nm">${esc(c.full_name)}</div>
+        <div class="prof-pos">${esc(v?v.title:(c.position||'Без вакансії'))}</div>
+        <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+          <span class="chip" style="background:${STAGE_MAP[c.stage].c}22;color:${STAGE_MAP[c.stage].c}">${STAGE_MAP[c.stage].l}</span>
+          ${c.source?`<span class="chip chip-gray">${esc(c.source)}</span>`:''}
+          ${c.rating?`<span class="stars" style="font-size:13px">${'★'.repeat(c.rating)}${'☆'.repeat(5-c.rating)}</span>`:''}
+        </div></div>
+    </div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
+      ${nextStage(c) ? `<button class="btn btn-y btn-sm" onclick="moveStage(${id},'${nextStage(c)}').then(()=>openCandidate(${id}))">→ ${esc(STAGE_MAP[nextStage(c)].l)}</button>` : ''}
+      ${!STAGE_MAP[c.stage].terminal ? `<button class="btn btn-sm btn-danger" onclick="moveStage(${id},'rejected').then(()=>openCandidate(${id}))">Відмова</button>` : ''}
+      <select class="fsel" style="max-width:210px" onchange="if(this.value)moveStage(${id},this.value).then(()=>openCandidate(${id}))">
+        <option value="">Інший етап…</option>
+        ${STAGES.filter(s=>s.k!==c.stage).map(s=>`<option value="${s.k}">${esc(s.l)}</option>`).join('')}
+      </select>
+    </div>
+    <dl class="kv">
+      <dt>Email</dt><dd>${c.email?`<a href="mailto:${esc(c.email)}">${esc(c.email)}</a>`:'—'}</dd>
+      <dt>Телефон</dt><dd>${c.phone?`<a href="tel:${esc(c.phone)}">${esc(c.phone)}</a>`:'—'}</dd>
+      <dt>CV / профіль</dt><dd>${c.cv_url?`<a href="${esc(c.cv_url)}" target="_blank" rel="noopener">Відкрити ↗</a>`:''} ${c.linkedin?`<a href="${esc(c.linkedin)}" target="_blank" rel="noopener">LinkedIn ↗</a>`:''}${!c.cv_url&&!c.linkedin?'—':''}</dd>
+      <dt>Відповідальний</dt><dd>${esc(c.owner_email||'—')}</dd>
+      ${S.me.canPayroll?`<dt>Очікування по ЗП</dt><dd>${c.expected_salary_kop?money(c.expected_salary_kop,c.currency):'—'}</dd>`:''}
+      <dt>Time to Hire</dt><dd>${tth===null?'—':`<strong>${tth} днів</strong> <span class="muted">(перший контакт → оффер)</span>`}</dd>
+      ${c.reject_reason?`<dt>Причина відмови</dt><dd style="color:var(--red)">${esc(c.reject_reason)}</dd>`:''}
+    </dl>
+    <div class="sec">Шлях по воронці</div>
+    <div class="tl">${steps.map(s=>`<div class="tl-i" style="${s.done?'':'opacity:.4'}">
+      <div class="tl-t">${esc(s.l)}</div><div class="tl-d">${s.d?dmy(s.d):(s.done?'дата не вказана':'—')}</div></div>`).join('')}</div>
+    ${c.notes?`<div class="hint" style="margin-top:12px">${esc(c.notes).replace(/\n/g,'<br>')}</div>`:''}
+    <div class="sec">Історія рухів</div><div id="candEvents"><span class="spin"></span></div>`;
+  api('/api/hr/candidate-events', { candidate_id:id }).then(r=>{
+    const el = $('#candEvents'); if (!el) return;
+    const ev = r.events||[];
+    el.innerHTML = ev.length ? `<div class="tl">${ev.slice().reverse().map(x=>`<div class="tl-i">
+      <div class="tl-t">${x.from_stage?`${esc(STAGE_MAP[x.from_stage]?.l||x.from_stage)} → `:''}<strong>${esc(STAGE_MAP[x.to_stage]?.l||x.to_stage)}</strong></div>
+      <div class="tl-d">${new Date(x.at*1000).toLocaleString('uk-UA')} · ${esc(x.actor_email||'')}${x.note?' · '+esc(x.note):''}</div></div>`).join('')}</div>`
+      : ph('Рухів ще не було');
+  }).catch(()=>{ const el=$('#candEvents'); if(el) el.innerHTML = ph('Не вдалося завантажити'); });
+  $('#drFoot').innerHTML = `<button class="btn btn-danger" onclick="delEntity('candidate',${id},'кандидата')">🗑</button>
+    <span class="sp"></span>
+    ${c.stage!=='hired' ? `<button class="btn btn-y" onclick="offerHire(candById(${id}))">✅ Оформити</button>`:''}
+    <button class="btn btn-primary" onclick="openForm('candidate',${id})">✏️ Редагувати</button>`;
+  openDrawer();
+}
+
+// наступний етап воронки для кандидата
+function nextStage(c){
+  const i = FUNNEL_ORDER.indexOf(c.stage);
+  if (i < 0 || i >= FUNNEL_ORDER.length-1) return null;
+  return FUNNEL_ORDER[i+1];
+}
+
+/* ── Картка вакансії ────────────────────────────────────────────────────── */
+function openVacancy(id){
+  const v = vacById(id); if (!v) return;
+  const cs = S.candidates.filter(c=>c.vacancy_id===id);
+  const p = vacPipeline(v);
+  const days = daysBetween(v.open_date, v.close_date||todayISO());
+  $('#drTitle').textContent = v.title;
+  $('#drSub').textContent = [v.department, v.company, VAC_STATUS_L[v.status]].filter(Boolean).join(' · ');
+  $('#drTabs').innerHTML = '';
+  const fd = FUNNEL_ORDER.map(k=>({ l:STAGE_MAP[k].short, c:STAGE_MAP[k].c, n:cs.filter(c=>reachedStage(c,k)).length }));
+  const mx = Math.max(1, fd[0].n);
+  $('#drBody').innerHTML = `
+    <dl class="kv">
+      <dt>Статус</dt><dd><span class="chip ${{open:'chip-g',on_hold:'chip-y',closed:'chip-gray',cancelled:'chip-r'}[v.status]||'chip-gray'}">${VAC_STATUS_L[v.status]}</span></dd>
+      <dt>Пріоритет</dt><dd>${PRIORITY_L[v.priority]||'—'}</dd>
+      <dt>Керівник</dt><dd>${esc(v.manager||'—')}</dd>
+      <dt>Позицій</dt><dd>${v.headcount||1}</dd>
+      <dt>Відкрито</dt><dd>${dmy(v.open_date)} <span class="muted">(${days} днів ${v.close_date?'до закриття':'відкрита'})</span></dd>
+      <dt>План закриття</dt><dd>${dmy(v.target_date)}${v.status==='open'&&v.target_date&&v.target_date<todayISO()?' <span class="chip chip-r">прострочено</span>':''}</dd>
+      <dt>Закрито</dt><dd>${dmy(v.close_date)}</dd>
+      <dt>Канал пошуку</dt><dd>${esc(v.source||'—')}</dd>
+      ${S.me.canPayroll&&(v.salary_from_kop||v.salary_to_kop)?`<dt>Вилка</dt><dd>${money(v.salary_from_kop,v.currency)} — ${money(v.salary_to_kop,v.currency)}</dd>`:''}
+    </dl>
+    <div class="sec">Воронка вакансії</div>
+    <div class="funnel">${fd.map(x=>`<div class="fn-row"><div class="fn-lbl" style="width:120px">${esc(x.l)}</div>
+      <div class="fn-bar-wrap" style="height:22px"><div class="fn-bar" style="width:${Math.max(2,x.n/mx*100)}%;background:${x.c}">${x.n||''}</div></div><div class="fn-conv"></div></div>`).join('')}</div>
+    <div class="sec">Кандидати (${cs.length})</div>
+    <div class="widget-list">${cs.length? cs.map(c=>`<div class="wl-item" onclick="openCandidate(${c.id})">
+      <div class="av" style="background:${hashColor(c.full_name)};width:24px;height:24px;font-size:9.5px">${initials(c.full_name)}</div>
+      <div style="min-width:0"><div class="person-nm">${esc(c.full_name)}</div><div class="person-sub">${esc(c.source||'')}</div></div>
+      <span class="wl-r" style="color:${STAGE_MAP[c.stage].c}">${esc(STAGE_MAP[c.stage].short)}</span></div>`).join('')
+      : ph('Кандидатів ще немає')}</div>
+    ${v.requirements?`<div class="sec">Вимоги</div><div class="hint">${esc(v.requirements).replace(/\n/g,'<br>')}</div>`:''}`;
+  $('#drFoot').innerHTML = `<button class="btn btn-danger" onclick="delEntity('vacancy',${id},'вакансію')">🗑</button>
+    <span class="sp"></span><button class="btn" onclick="openForm('candidate')">+ Кандидат</button>
+    <button class="btn btn-primary" onclick="openForm('vacancy',${id})">✏️ Редагувати</button>`;
+  openDrawer();
+}
+
+/* ── Оформлення кандидата у штат ────────────────────────────────────────── */
+function offerHire(c){
+  if (!c) return;
+  const v = vacById(c.vacancy_id);
+  modal('Оформити у штат', `
+    <div class="hint info">Створимо картку співробітника на основі кандидата <strong>${esc(c.full_name)}</strong>. Кандидат перейде на етап «Вийшов на роботу».</div>
+    <div class="fgrid" style="margin-top:12px">
+      <div class="fld"><label>Дата виходу <span class="req">*</span></label><input type="date" id="hDate" value="${c.start_date||todayISO()}"></div>
+      <div class="fld"><label>Кінець випробувального</label><input type="date" id="hProb" value="${isoAdd(c.start_date||todayISO(),90)}"></div>
+      <div class="fld"><label>Посада</label><input id="hPos" value="${esc(v?v.title:(c.position||''))}"></div>
+      <div class="fld"><label>Підрозділ</label><select id="hDept"><option value="">—</option>${dictOf('department').map(d=>`<option${d===(v?.department||c.department)?' selected':''}>${esc(d)}</option>`).join('')}</select></div>
+      <div class="fld"><label>Компанія</label><select id="hComp"><option value="">—</option>${dictOf('company').map(d=>`<option${d===(v?.company||c.company)?' selected':''}>${esc(d)}</option>`).join('')}</select></div>
+      ${S.me.canPayroll?`<div class="fld"><label>Оклад 🔒</label><input type="number" step="0.01" min="0" id="hSal" value="${c.expected_salary_kop?c.expected_salary_kop/100:''}" placeholder="0"></div>`:''}
+    </div>`, [
+    { l:'Скасувати', cls:'btn', fn:closeModal },
+    { l:'✅ Оформити', cls:'btn btn-primary', fn: async ()=>{
+        try {
+          const data = { hire_date:$('#hDate').value, probation_end:$('#hProb').value||null, position:$('#hPos').value||null,
+            department:$('#hDept').value||null, company:$('#hComp').value||null };
+          if (S.me.canPayroll && $('#hSal')?.value) data.salary_kop = Math.round(+$('#hSal').value*100);
+          const r = await api('/api/hr/hire', { candidate_id:c.id, data });
+          toast('Створено картку співробітника','ok'); closeModal(); closeDrawer(); await reload();
+          // якщо вакансію закрито повністю — пропонуємо змінити її статус, інакше «днів відкрито» росте вічно
+          if (v && v.status === 'open'){
+            const hiredN = S.candidates.filter(x=>x.vacancy_id===v.id && x.stage==='hired').length;
+            if (hiredN >= (v.headcount||1) && confirm(`Закрити вакансію «${v.title}»? Найнято ${hiredN} з ${v.headcount||1} позицій.`)){
+              try { await api('/api/hr/save', { entity:'vacancy', id:v.id, data:{ status:'closed', close_date: data.hire_date } }); await reload(); toast('Вакансію закрито','ok'); } catch(e2){}
+            }
+          }
+          openEmployee(r.employee_id);
+        } catch(e){ toast(apiErr(e),'err'); }
+      } },
+  ]);
+}
+function askReason(title){
+  return new Promise(res=>{
+    const list = dictOf('reject_reason');
+    modal(title, `<div class="fld"><label>Причина</label>
+      <select id="rrS">${list.map(r=>`<option>${esc(r)}</option>`).join('')}</select></div>
+      <div class="fld" style="margin-top:10px"><label>Уточнення (необовʼязково)</label><input id="rrN" placeholder="деталі"></div>`, [
+      { l:'Пропустити', cls:'btn', fn:()=>{ closeModal(); res(''); } },
+      { l:'Зберегти', cls:'btn btn-primary', fn:()=>{ const v=$('#rrS').value+($('#rrN').value?' — '+$('#rrN').value:''); closeModal(); res(v); } },
+    ], true, ()=>res(null));
+  });
+}
+</script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   МОДАЛКИ · ІМПОРТ · ЕКСПОРТ · BOOT
+   ═══════════════════════════════════════════════════════════════════════════ */
+let _modalOnClose = null;
+function modal(title, html, buttons, narrow, onClose){
+  $('#mdTitle').textContent = title;
+  $('#mdBody').innerHTML = html;
+  $('#modal').classList.toggle('narrow', !!narrow);
+  $('#mdFoot').innerHTML = '';
+  (buttons||[]).forEach((b,i)=>{
+    const el = document.createElement('button');
+    el.className = b.cls||'btn'; el.textContent = b.l; el.onclick = b.fn;
+    $('#mdFoot').appendChild(el);
+  });
+  _modalOnClose = onClose || null;
+  $('#modalBack').classList.add('open');
+}
+function closeModal(){
+  $('#modalBack').classList.remove('open');
+  const cb = _modalOnClose; _modalOnClose = null;
+  if (cb) cb();
+}
+$('#modalBack').addEventListener('click', e=>{ if (e.target === $('#modalBack')) closeModal(); });
+
+/* ── CSV ────────────────────────────────────────────────────────────────── */
+function csvCell(v){
+  const s = v===null||v===undefined ? '' : String(v);
+  return /[",;\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+}
+function downloadCSV(name, headers, rows){
+  const csv = '﻿' + [headers.map(csvCell).join(';'), ...rows.map(r=>r.map(csvCell).join(';'))].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv;charset=utf-8' }));
+  a.download = `sneco_hr_${name}_${todayISO()}.csv`;
+  a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 1500);
+  toast('Файл завантажено','ok');
+}
+function exportCSV(what){
+  const pay = S.me.canPayroll;
+  if (what==='employees'){
+    const h = ['ID','ПІБ','Посада','Підрозділ','Компанія','Юрособа','Керівник','Формат','Тип зайнятості','Працевлаштування','Email','Телефон','Дата народження','Прийнято','Випробувальний до','Результат випроб.','Статус','Стаж (років)','Звільнено','Тип звільнення','Причина','Канал найму'];
+    if (pay) h.push('Оклад','Бонус','Валюта');
+    downloadCSV('employees', h, fEmployees().map(e=>{
+      const r = [e.emp_code||'', e.full_name, e.position||'', e.department||'', e.company||'', e.legal_entity||'', empById(e.manager_id)?.full_name||'', e.work_format||'', e.employment_type||'', e.contract_type||'', e.email||'', e.phone||'', e.birth_date||'', e.hire_date||'', e.probation_end||'', PROB_L[e.probation_result]||'', EMP_STATUS_L[e.status]||e.status, tenureYears(e)===null?'':nf1.format(tenureYears(e)), e.termination_date||'', TERM_TYPE_L[e.termination_type]||'', e.termination_reason||'', e.source||''];
+      if (pay) r.push((e.salary_kop||0)/100, (e.bonus_kop||0)/100, e.currency||'');
+      return r;
+    }));
+  } else if (what==='candidates'){
+    const h = ['ПІБ','Вакансія','Посада','Джерело','Етап','Оцінка','Email','Телефон','Перший контакт','Скринінг','Співбесіда HR','Співбесіда керівника','Оффер надіслано','Оффер прийнято','Вихід','Time to Hire (дні)','Причина відмови','Відповідальний'];
+    if (pay) h.push('Очікування ЗП','Валюта');
+    downloadCSV('candidates', h, fCandidates().map(c=>{
+      const r = [c.full_name, vacById(c.vacancy_id)?.title||'', c.position||'', c.source||'', STAGE_MAP[c.stage]?.l||c.stage, c.rating||'', c.email||'', c.phone||'', c.first_contact_date||'', c.screening_date||'', c.hr_interview_date||'', c.mgr_interview_date||'', c.offer_sent_date||'', c.offer_date||'', c.start_date||'', timeToHire(c)??'', c.reject_reason||'', c.owner_email||''];
+      if (pay) r.push((c.expected_salary_kop||0)/100, c.currency||'');
+      return r;
+    }));
+  } else if (what==='vacancies'){
+    downloadCSV('vacancies', ['Посада','Підрозділ','Компанія','Керівник','Позицій','Пріоритет','Відкрито','План закриття','Закрито','Днів відкрито','Статус','Джерело','Кандидатів','Співбесід','Оферів','Найнято'],
+      fVacancies().map(v=>{ const p=vacPipeline(v); return [v.title, v.department||'', v.company||'', v.manager||'', v.headcount||1, PRIORITY_L[v.priority]||'', v.open_date||'', v.target_date||'', v.close_date||'', daysBetween(v.open_date, v.close_date||todayISO())??'', VAC_STATUS_L[v.status]||v.status, v.source||'', p.cands, p.interviews, p.offers, p.hired]; }));
+  } else if (what==='channels'){
+    const st = channelStats(S.f.from, S.f.to);
+    downloadCSV('channels', ['Джерело','Кандидати','Співбесіди','Офери','Найнято','Конверсія %','Time to Hire','Витрати','Валюта','Cost per Hire'],
+      st.map(s=>{ const c0=Object.entries(s.costByCur)[0]||['',0];
+        return [s.src, s.candidates, s.interviews, s.offers, s.hired, s.conv===null?'':nf1.format(s.conv), s.tth===null?'':Math.round(s.tth), (c0[1]||0)/100, c0[0]||'', s.hired&&c0[1]?Math.round(c0[1]/s.hired)/100:'']; }));
+  } else if (what==='exits'){
+    downloadCSV('exits', ['ПІБ','Посада','Підрозділ','Компанія','Прийнято','Звільнено','Стаж (років)','Тип','Причина'],
+      fEmployees().filter(e=>e.termination_date).map(e=>[e.full_name, e.position||'', e.department||'', e.company||'', e.hire_date||'', e.termination_date, tenureYears(e)===null?'':nf1.format(tenureYears(e)), TERM_TYPE_L[e.termination_type]||'', e.termination_reason||'']));
+  } else if (what==='payroll'){
+    if (!pay) return toast('Немає доступу','err');
+    downloadCSV('payroll', ['Місяць','Співробітник','Підрозділ','Компанія','Оклад','Бонус','Понаднормові','Інше','Податки','Разом','Валюта'],
+      S.payroll.map(r=>{ const e=empById(r.employee_id)||{};
+        return [r.period, e.full_name||'#'+r.employee_id, e.department||'', e.company||'', (r.base_kop||0)/100, (r.bonus_kop||0)/100, (r.overtime_kop||0)/100, (r.other_kop||0)/100, (r.taxes_kop||0)/100, payRowTotal(r)/100, r.currency||'']; }));
+  }
+}
+
+/* ── ІМПОРТ ─────────────────────────────────────────────────────────────── */
+const IMPORT_MAP = {
+  employee: [
+    { k:'full_name', l:'ПІБ *', aliases:['піб','пiб','ім\'я','имя','name','full name','фио','прізвище'] },
+    { k:'emp_code', l:'Employee ID', aliases:['id','код','табельний'] },
+    { k:'position', l:'Посада', aliases:['посада','position','должность'] },
+    { k:'department', l:'Підрозділ', aliases:['підрозділ','отдел','department','відділ'] },
+    { k:'company', l:'Компанія', aliases:['компанія','company','фірма'] },
+    { k:'legal_entity', l:'Юрособа', aliases:['юрособа','юр особа','legal'] },
+    { k:'work_format', l:'Формат роботи', aliases:['формат','work format'] },
+    { k:'employment_type', l:'Тип зайнятості', aliases:['зайнятість','employment'] },
+    { k:'contract_type', l:'Працевлаштування', aliases:['працевлаштування','оформлення','contract'] },
+    { k:'email', l:'Email', aliases:['email','пошта','e-mail'] },
+    { k:'phone', l:'Телефон', aliases:['телефон','phone','моб'] },
+    { k:'birth_date', l:'Дата народження', aliases:['народження','birth','др'] },
+    { k:'hire_date', l:'Дата прийняття', aliases:['прийняття','прийом','hire','дата приема','початок'] },
+    { k:'probation_end', l:'Кінець випробувального', aliases:['випробувальний','probation'] },
+    { k:'status', l:'Статус', aliases:['статус','status'] },
+    { k:'salary_kop', l:'Оклад 🔒', pay:1, aliases:['зарплата','оклад','salary','ставка'] },
+    { k:'bonus_kop', l:'Бонус 🔒', pay:1, aliases:['бонус','премія','bonus'] },
+    { k:'currency', l:'Валюта', pay:1, aliases:['валюта','currency'] },
+    { k:'termination_date', l:'Дата звільнення', aliases:['звільнення','звільнено','termination'] },
+    { k:'termination_reason', l:'Причина звільнення', aliases:['причина'] },
+    { k:'source', l:'Канал найму', aliases:['джерело','канал','source'] },
+    { k:'notes', l:'Нотатки', aliases:['нотатки','коментар','notes'] },
+  ],
+  candidate: [
+    { k:'full_name', l:'ПІБ *', aliases:['піб','ім\'я','name','кандидат'] },
+    { k:'position', l:'Посада', aliases:['посада','вакансія','position'] },
+    { k:'source', l:'Джерело', aliases:['джерело','канал','source'] },
+    { k:'stage', l:'Етап', aliases:['етап','статус','stage'] },
+    { k:'email', l:'Email', aliases:['email','пошта'] },
+    { k:'phone', l:'Телефон', aliases:['телефон','phone'] },
+    { k:'first_contact_date', l:'Перший контакт', aliases:['контакт','дата відгуку','first contact'] },
+    { k:'notes', l:'Нотатки', aliases:['нотатки','коментар'] },
+  ],
+};
+let IMP = { entity:null, rows:[], headers:[] };
+function openImport(entity){
+  IMP = { entity, rows:[], headers:[] };
+  const flds = IMPORT_MAP[entity].filter(f=>!f.pay || S.me.canPayroll);
+  modal('Імпорт з файлу', `
+    <div class="dz" id="impDz">
+      <div style="font-size:34px;margin-bottom:8px">📄</div>
+      <div style="font-weight:700;margin-bottom:4px">Перетягніть CSV-файл сюди або натисніть</div>
+      <div class="muted" style="font-size:12px">Excel: «Зберегти як» → CSV UTF-8. Перший рядок — назви колонок.</div>
+      <input type="file" id="impFile" accept=".csv,text/csv" style="display:none">
+    </div>
+    <div id="impStep2" class="hidden"></div>
+    <div class="hint" style="margin-top:12px">Підтримувані поля: ${flds.map(f=>esc(f.l)).join(', ')}. Дати — у форматі ДД.ММ.РРРР або РРРР-ММ-ДД.
+      <a href="#" onclick="downloadTemplate('${entity}');return false">⬇ Завантажити шаблон</a></div>
+  `, [{ l:'Скасувати', cls:'btn', fn:closeModal }]);
+  const dz = $('#impDz'), fi = $('#impFile');
+  dz.onclick = ()=>fi.click();
+  dz.ondragover = e=>{ e.preventDefault(); dz.classList.add('over'); };
+  dz.ondragleave = ()=>dz.classList.remove('over');
+  dz.ondrop = e=>{ e.preventDefault(); dz.classList.remove('over'); if (e.dataTransfer.files[0]) readCSV(e.dataTransfer.files[0]); };
+  fi.onchange = ()=>{ if (fi.files[0]) readCSV(fi.files[0]); };
+}
+function downloadTemplate(entity){
+  const flds = IMPORT_MAP[entity].filter(f=>!f.pay || S.me.canPayroll);
+  const sample = entity==='employee'
+    ? ['Петренко Іван','SN-001','Оператор лінії','Виробництво','snEco','','Офіс','Повна зайнятість','Трудовий договір','ivan@sneco.ua','+380671234567','15.04.1990','01.03.2024','01.06.2024','active','25000','0','UAH','','','Work.ua','']
+    : ['Ковальчук Олена','Маркетолог','LinkedIn','new','olena@mail.com','+380501234567','05.08.2026',''];
+  downloadCSV('template_'+entity, flds.map(f=>f.l.replace(' 🔒','')), [sample.slice(0, flds.length)]);
+}
+function parseCSV(text){
+  const rows = []; let row = [], cell = '', q = false;
+  const delim = (text.split('\n')[0].match(/;/g)||[]).length >= (text.split('\n')[0].match(/,/g)||[]).length ? ';' : ',';
+  text = text.replace(/^﻿/,'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+  for (let i=0;i<text.length;i++){
+    const c = text[i];
+    if (q){ if (c==='"'){ if (text[i+1]==='"'){ cell+='"'; i++; } else q=false; } else cell+=c; }
+    else if (c==='"') q = true;
+    else if (c===delim){ row.push(cell); cell=''; }
+    else if (c==='\n'){ row.push(cell); rows.push(row); row=[]; cell=''; }
+    else cell += c;
+  }
+  if (cell || row.length){ row.push(cell); rows.push(row); }
+  return rows.filter(r=>r.some(c=>String(c).trim()));
+}
+function normDate(v){
+  v = String(v||'').trim(); if (!v) return null;
+  let m = v.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})$/);
+  if (m) return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+  m = v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (m) return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+  return v;
+}
+function readCSV(file){
+  const fr = new FileReader();
+  fr.onload = ()=>{
+    const rows = parseCSV(fr.result);
+    if (rows.length < 2) return toast('Файл порожній або лише заголовок','err');
+    IMP.headers = rows[0].map(h=>String(h).trim());
+    IMP.rows = rows.slice(1);
+    renderImportStep2();
+  };
+  fr.readAsText(file, 'utf-8');
+}
+function renderImportStep2(){
+  const flds = IMPORT_MAP[IMP.entity].filter(f=>!f.pay || S.me.canPayroll);
+  const guess = h => { const n = norm(h); return flds.find(f=>f.aliases.some(a=>n===norm(a)) )?.k || flds.find(f=>f.aliases.some(a=>n.includes(norm(a))))?.k || ''; };
+  $('#impDz').classList.add('hidden');
+  const el = $('#impStep2'); el.classList.remove('hidden');
+  el.innerHTML = `
+    <div class="sec">Крок 2 · Зіставте колонки <span class="sec-act" style="margin-left:auto;font-weight:600;text-transform:none">Знайдено рядків: ${IMP.rows.length}</span></div>
+    <div class="tbl-wrap"><div class="tbl-scroll" style="max-height:34vh"><table class="tbl">
+      <thead><tr><th>Колонка у файлі</th><th>Приклад</th><th>Поле в системі</th></tr></thead>
+      <tbody>${IMP.headers.map((h,i)=>`<tr>
+        <td><strong>${esc(h)}</strong></td>
+        <td class="muted">${esc(String(IMP.rows[0][i]||'').slice(0,40))}</td>
+        <td><select class="imp-map" data-i="${i}" style="padding:5px;border:1px solid var(--border);border-radius:6px;width:100%">
+          <option value="">— не імпортувати —</option>
+          ${flds.map(f=>`<option value="${f.k}"${guess(h)===f.k?' selected':''}>${esc(f.l)}</option>`).join('')}
+        </select></td></tr>`).join('')}</tbody>
+    </table></div></div>
+    <div id="impPreview" style="margin-top:12px"></div>`;
+  $('#mdFoot').innerHTML = '';
+  [{ l:'← Інший файл', cls:'btn', fn:()=>openImport(IMP.entity) },
+   { l:'Перевірити', cls:'btn', fn:previewImport },
+   { l:'⬆ Імпортувати', cls:'btn btn-primary', fn:doImport }].forEach(b=>{
+    const x=document.createElement('button'); x.className=b.cls; x.textContent=b.l; x.onclick=b.fn; $('#mdFoot').appendChild(x);
+  });
+  previewImport();
+}
+function buildImportRows(){
+  const map = {};
+  $$('.imp-map').forEach(s=>{ if (s.value) map[+s.dataset.i] = s.value; });
+  const DATE_F = ['birth_date','hire_date','probation_end','termination_date','first_contact_date'];
+  const MONEY_F = ['salary_kop','bonus_kop'];
+  return IMP.rows.map(r=>{
+    const o = {};
+    Object.entries(map).forEach(([i,k])=>{
+      let v = String(r[i]??'').trim();
+      if (!v) return;
+      if (DATE_F.includes(k)) v = normDate(v);
+      else if (MONEY_F.includes(k)) v = Math.round(parseFloat(v.replace(/\s/g,'').replace(',','.'))*100) || 0;
+      else if (k==='status') v = /звіл|terminated|уволен/i.test(v) ? 'terminated' : /відпуст|декрет|leave/i.test(v) ? 'on_leave' : 'active';
+      else if (k==='stage') { const f = STAGES.find(s=>norm(s.l)===norm(v)||s.k===v); v = f?f.k:'new'; }
+      o[k] = v;
+    });
+    return o;
+  }).filter(o=>o.full_name);
+}
+function previewImport(){
+  const rows = buildImportRows();
+  // дублікати: за Employee ID або за парою ПІБ+дата прийняття
+  let dup = 0;
+  if (IMP.entity==='employee'){
+    const codes = new Set(S.employees.map(e=>e.emp_code).filter(Boolean));
+    const names = new Set(S.employees.map(e=>norm(e.full_name)+'|'+(e.hire_date||'')));
+    dup = rows.filter(r=>(r.emp_code && codes.has(r.emp_code)) || names.has(norm(r.full_name)+'|'+(r.hire_date||''))).length;
+  } else if (IMP.entity==='candidate'){
+    const names = new Set(S.candidates.map(c=>norm(c.full_name)));
+    dup = rows.filter(r=>names.has(norm(r.full_name))).length;
+  }
+  const bad = rows.filter(r=>Object.entries(r).some(([k,v])=>['birth_date','hire_date','probation_end','termination_date','first_contact_date'].includes(k) && v && !/^\d{4}-\d{2}-\d{2}$/.test(v)));
+  $('#impPreview').innerHTML = `
+    <div class="hint ${bad.length?'warn':'info'}">
+      Готово до імпорту: <strong>${rows.length}</strong> ${rows.length===1?'запис':'записів'}.
+      ${bad.length?`⚠ У ${bad.length} рядках дати у незрозумілому форматі — вони не збережуться. Приведіть до ДД.ММ.РРРР.`:'Формат дат коректний.'}
+      ${IMP.rows.length-rows.length>0?`<br>${IMP.rows.length-rows.length} рядків без ПІБ буде пропущено.`:''}
+    </div>
+    ${dup?`<div class="hint warn">⚠ <strong>${dup}</strong> ${dup===1?'запис схожий':'записів схожі'} на вже наявні у базі (той самий Employee ID або ПІБ+дата прийняття). Імпорт створить <strong>дублікати</strong> — перевірте файл або приберіть ці рядки.</div>`:''}`;
+}
+async function doImport(){
+  const rows = buildImportRows();
+  if (!rows.length) return toast('Немає що імпортувати','err');
+  if (rows.length > 500) return toast('Максимум 500 рядків за раз','err');
+  try {
+    const r = await api('/api/hr/import', { entity:IMP.entity, rows });
+    toast(`Імпортовано ${r.imported} записів${r.failed?.length?`, пропущено ${r.failed.length}`:''}`, 'ok');
+    closeModal(); await reload();
+  } catch(e){ toast(apiErr(e),'err'); }
+}
+
+/* ── Довідники ──────────────────────────────────────────────────────────── */
+const DICT_KINDS = [
+  ['company','Компанії'], ['legal_entity','Юридичні особи'], ['department','Підрозділи'],
+  ['position','Посади'], ['source','Канали пошуку'], ['work_format','Формати роботи'],
+  ['employment_type','Типи зайнятості'], ['contract_type','Форми оформлення'],
+  ['exit_reason','Причини звільнення'], ['reject_reason','Причини відмови кандидату'],
+];
+let DICT_TAB = 'department';
+function openDictEditor(kind){
+  DICT_TAB = kind || DICT_TAB;
+  const vals = (S.dict[DICT_TAB]||[]).slice().sort((a,b)=>(a.sort_order-b.sort_order)||String(a.value).localeCompare(String(b.value),'uk'));
+  const used = (DICT_SOURCES[DICT_TAB] ? uniq(DICT_SOURCES[DICT_TAB]()) : []).filter(v=>!vals.some(d=>d.value===v));
+  modal('Довідники', `
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px">
+      ${DICT_KINDS.map(([k,l])=>`<button class="btn btn-sm${k===DICT_TAB?' btn-primary':''}" onclick="openDictEditor('${k}')">${esc(l)}</button>`).join('')}
+    </div>
+    <div class="fgrid">
+      <div class="fld full"><label>Додати значення</label>
+        <div style="display:flex;gap:7px"><input id="dcV" placeholder="напр. Пакувальний цех" style="flex:1">
+        <button class="btn btn-y" onclick="addDict()">+ Додати</button></div>
+        <div class="fhelp">Значення підказуються у формах. Вписати своє прямо у формі теж можна — довідник лише прискорює ввід і тримає однакові назви.</div></div>
+    </div>
+    <div class="sec" style="margin-top:14px">${esc((DICT_KINDS.find(x=>x[0]===DICT_TAB)||[])[1]||'')} · ${vals.length}</div>
+    <div class="tbl-wrap"><div class="tbl-scroll" style="max-height:34vh"><table class="tbl">
+      <thead><tr><th>Значення</th><th class="tright">Використань</th><th></th></tr></thead><tbody>
+      ${vals.length? vals.map(d=>{
+        const n = DICT_SOURCES[DICT_TAB] ? DICT_SOURCES[DICT_TAB]().filter(x=>x===d.value).length : 0;
+        return `<tr><td><strong>${esc(d.value)}</strong></td><td class="num">${n||'—'}</td>
+          <td><button class="btn btn-sm btn-danger" onclick="delEntity('dict',${d.id},'значення «'+${JSON.stringify(d.value)}+'»')">✕</button></td></tr>`;
+      }).join('') : '<tr><td colspan="3"><div class="tbl-empty">Порожньо — додайте перше значення</div></td></tr>'}
+      </tbody></table></div></div>
+    ${used.length? `<div class="hint warn" style="margin-top:12px">Ці значення вже зустрічаються у даних, але їх немає у довіднику:
+      ${used.slice(0,20).map(v=>`<button class="btn btn-sm" style="margin:3px 3px 0 0" onclick="addDict(${JSON.stringify(v).replace(/"/g,'&quot;')})">+ ${esc(v)}</button>`).join('')}</div>`:''}
+  `, [{ l:'Закрити', cls:'btn', fn:()=>{ closeModal(); renderAll(); } }]);
+}
+async function addDict(value){
+  const v = (value !== undefined ? value : $('#dcV').value).trim();
+  if (!v) return toast('Введіть значення','err');
+  try {
+    await api('/api/hr/save', { entity:'dict', data:{ kind:DICT_TAB, value:v, sort_order:100, active:1 } });
+    await reload(); openDictEditor(DICT_TAB); toast('Додано','ok');
+  } catch(e){ toast(e.error==='duplicate'?'Таке значення вже є':apiErr(e),'err'); }
+}
+
+/* ── Журнал змін ────────────────────────────────────────────────────────── */
+async function openAudit(){
+  modal('Журнал змін', '<div class="tbl-empty"><span class="spin"></span> Завантаження…</div>', [{ l:'Закрити', cls:'btn', fn:closeModal }]);
+  try {
+    const r = await api('/api/hr/audit', { limit:300 });
+    const E = { employee:'Співробітник', candidate:'Кандидат', vacancy:'Вакансія', payroll:'Зарплата', band:'Вилка', plan:'План', source_cost:'Витрати', dict:'Довідник' };
+    $('#mdBody').innerHTML = r.log.length ? `<div class="tbl-wrap"><div class="tbl-scroll" style="max-height:60vh"><table class="tbl">
+      <thead><tr><th>Коли</th><th>Обʼєкт</th><th>Дія</th><th>Хто</th></tr></thead><tbody>
+      ${r.log.map(l=>`<tr><td class="nowrap muted">${new Date(l.at*1000).toLocaleString('uk-UA')}</td>
+        <td>${esc(E[l.entity]||l.entity)}${l.entity_id?` <span class="muted">#${l.entity_id}</span>`:''}</td>
+        <td>${auditLabel(l)}</td><td class="muted">${esc(l.actor_email||'')}</td></tr>`).join('')}
+      </tbody></table></div></div>` : '<div class="tbl-empty">Журнал порожній</div>';
+  } catch(e){ $('#mdBody').innerHTML = '<div class="tbl-empty">Не вдалося завантажити</div>'; }
+}
+
+/* ── НАВІГАЦІЯ ──────────────────────────────────────────────────────────── */
+function go(tab){
+  S.tab = tab;
+  $$('.tabbtn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  $$('.tabpane').forEach(p=>p.classList.toggle('active', p.id==='pane-'+tab));
+  location.hash = tab;
+  renderAll();
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+/* ── ЗАВАНТАЖЕННЯ ───────────────────────────────────────────────────────── */
+async function reload(){
+  const d = await api('/api/hr/bootstrap', {});
+  S.me = d.me || S.me;
+  S.dict = {};
+  (d.dict||[]).forEach(x=>{ (S.dict[x.kind] = S.dict[x.kind]||[]).push(x); });
+  S.employees = d.employees||[]; S.vacancies = d.vacancies||[]; S.candidates = d.candidates||[];
+  S.payroll = d.payroll||[]; S.plans = d.plans||[]; S.bands = d.bands||[]; S.sourceCosts = d.source_costs||[];
+  loadFx();
+  syncFilterOptions();
+  renderAll();
+}
+function syncFilterOptions(){
+  const companies = uniq([...dictOf('company'), ...S.employees.map(e=>e.company)]);
+  const depts = uniq([...dictOf('department'), ...S.employees.map(e=>e.department)]);
+  const fill = (sel, list, cur, all) => {
+    const el = $(sel);
+    el.innerHTML = `<option value="">${all}</option>` + list.map(x=>`<option${x===cur?' selected':''}>${esc(x)}</option>`).join('');
+    el.value = list.includes(cur) ? cur : '';
+  };
+  fill('#fCompany', companies, S.f.company, 'Усі компанії');
+  fill('#fDept', depts, S.f.dept, 'Усі підрозділи');
+  S.f.company = $('#fCompany').value; S.f.dept = $('#fDept').value;
+  const vf = $('#kbVacFilter'), cvf = vf.value;
+  vf.innerHTML = '<option value="">Усі вакансії</option>' + S.vacancies.map(v=>`<option value="${v.id}"${String(v.id)===cvf?' selected':''}>${esc(v.title)}</option>`).join('');
+  const sf = $('#kbSrcFilter'), csf = sf.value;
+  const srcs = uniq([...dictOf('source'), ...S.candidates.map(c=>c.source)]);
+  sf.innerHTML = '<option value="">Усі джерела</option>' + srcs.map(s=>`<option${s===csf?' selected':''}>${esc(s)}</option>`).join('');
+  const pc = $('#payCurrency');
+  if (pc && !pc.options.length){
+    pc.innerHTML = ['UAH','EUR','USD','PLN'].map(c=>`<option${c===S.payCur?' selected':''}>${c}</option>`).join('');
+  }
+  $('#roleBadge').textContent = S.me.canPayroll ? '🔓 Повний доступ' : '🔒 Доступ без сум ЗП';
+  $('#tabPayroll').style.opacity = S.me.canPayroll ? '1' : '.55';
+}
+
+let _searchT;
+window.bootHR = async function(token, email){
+  S.token = token;
+  setPeriod('12m');
+  // події
+  $$('.tabbtn').forEach(b=>b.onclick = ()=>go(b.dataset.tab));
+  $$('#periodChips .period-chip').forEach(b=>b.onclick = ()=>{ setPeriod(b.dataset.p); renderAll(); });
+  $('#fFrom').onchange = ()=>{ S.f.from = $('#fFrom').value; $$('#periodChips .period-chip').forEach(x=>x.classList.remove('active')); renderAll(); };
+  $('#fTo').onchange   = ()=>{ S.f.to   = $('#fTo').value;   $$('#periodChips .period-chip').forEach(x=>x.classList.remove('active')); renderAll(); };
+  $('#fCompany').onchange = ()=>{ S.f.company = $('#fCompany').value; renderAll(); };
+  $('#fDept').onchange    = ()=>{ S.f.dept = $('#fDept').value; renderAll(); };
+  $('#fSearch').oninput = ()=>{ clearTimeout(_searchT); _searchT = setTimeout(()=>{ S.f.q = $('#fSearch').value; renderAll(); }, 220); };
+  $('#btnRefresh').onclick = async ()=>{ try{ await reload(); toast('Дані оновлено','ok'); }catch(e){ toast(apiErr(e),'err'); } };
+  $('#empStatusFilter').onchange = renderEmployees;
+  $('#vacStatusFilter').onchange = renderVacancies;
+  $('#kbVacFilter').onchange = renderCandidates;
+  $('#kbSrcFilter').onchange = renderCandidates;
+  $('#kbShowClosed').onchange = renderCandidates;
+  $('#payCurrency').onchange = ()=>{ S.payCur = $('#payCurrency').value; renderPayroll(); };
+  $('#btnEmpView').onclick = ()=>{
+    S.empView = S.empView==='table' ? 'cards' : 'table';
+    $('#empTableWrap').classList.toggle('hidden', S.empView!=='table');
+    $('#empCardsWrap').classList.toggle('hidden', S.empView!=='cards');
+    $('#btnEmpView').textContent = S.empView==='table' ? '▦ Картки' : '☰ Таблиця';
+  };
+  try {
+    await reload();
+    const h = (location.hash||'').replace('#','');
+    if (['overview','candidates','channels','vacancies','employees','payroll','turnover'].includes(h)) go(h);
+  } catch(e){
+    toast(apiErr(e), 'err');
+    $('#kpiRow').innerHTML = `<div class="cc" style="grid-column:1/-1"><div class="empty"><div class="e-ic">⚠️</div>
+      <div class="e-t">Не вдалося завантажити дані</div><div class="e-s">${esc(apiErr(e))}. Спробуйте оновити сторінку або вийдіть і увійдіть заново.</div>
+      <button class="btn btn-primary" onclick="location.reload()">↻ Перезавантажити</button></div></div>`;
+  }
+};
+</script>
+</body>
+</html>
