@@ -330,6 +330,52 @@ body.dash-locked{overflow:hidden}
 /* фікс: drawer/модалка за межами вʼюпорта не мають створювати горизонтальний скрол */
 html{overflow-x:clip}
 body{overflow-x:clip}
+
+/* ─── ІНСТРУКЦІЯ ─── */
+.doc{display:grid;grid-template-columns:230px 1fr;gap:22px;align-items:start}
+@media(max-width:900px){.doc{grid-template-columns:1fr}}
+.doc-toc{position:sticky;top:150px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;box-shadow:var(--shadow)}
+@media(max-width:900px){.doc-toc{position:static;top:auto}}
+.doc-toc a{display:block;padding:6px 9px;border-radius:7px;font-size:12.5px;color:var(--muted);text-decoration:none;font-weight:600;line-height:1.35}
+.doc-toc a:hover{background:var(--yf);color:var(--d)}
+.doc-toc a.on{background:var(--d);color:#fff}
+.doc-main{min-width:0}
+.doc-hero{background:linear-gradient(135deg,#1E1E1E,#37342f);color:#fff;border-radius:14px;padding:24px 28px;margin-bottom:18px}
+.doc-hero h1{font-size:23px;font-weight:800;letter-spacing:-.5px;margin-bottom:7px}
+.doc-hero p{font-size:13.5px;color:rgba(255,255,255,.78);line-height:1.6;max-width:720px}
+.doc-hero .meta{margin-top:12px;display:flex;gap:7px;flex-wrap:wrap}
+.doc-hero .meta span{background:rgba(255,255,255,.12);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.doc-sec{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:14px;box-shadow:var(--shadow);scroll-margin-top:160px}
+.doc-sec h2{font-size:17px;font-weight:800;letter-spacing:-.3px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.doc-sec .lead{font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.5}
+.doc-sec h3{font-size:13.5px;font-weight:700;margin:16px 0 7px}
+.doc-sec p{font-size:13.5px;line-height:1.65;margin-bottom:9px}
+.doc-sec ul,.doc-sec ol{margin:0 0 10px 19px;font-size:13.5px;line-height:1.65}
+.doc-sec li{margin-bottom:5px}
+.doc-sec code{background:#F1F1EB;padding:1px 6px;border-radius:5px;font-size:12px;font-family:'SF Mono',Menlo,Consolas,monospace}
+.doc-sec table{width:100%;border-collapse:collapse;font-size:12.5px;margin:6px 0 12px}
+.doc-sec table th{text-align:left;padding:8px 10px;background:#FAFAF5;border-bottom:1px solid var(--border);font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700}
+.doc-sec table td{padding:8px 10px;border-bottom:1px solid #F0F0E8;vertical-align:top;line-height:1.5}
+.doc-steps{counter-reset:st;list-style:none;margin-left:0}
+.doc-steps>li{counter-increment:st;position:relative;padding:0 0 12px 34px;font-size:13.5px;line-height:1.6}
+.doc-steps>li::before{content:counter(st);position:absolute;left:0;top:0;width:23px;height:23px;border-radius:50%;background:var(--y);color:var(--d);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center}
+.doc-note{border-left:3px solid var(--y);background:var(--yf);padding:10px 13px;border-radius:0 8px 8px 0;font-size:12.5px;line-height:1.55;margin:10px 0}
+.doc-note.warn{border-color:var(--orange);background:var(--of)}
+.doc-note.bad{border-color:var(--red);background:var(--rf)}
+.doc-note.ok{border-color:var(--g);background:var(--gf)}
+.doc-kbd{background:#fff;border:1px solid var(--border);border-bottom-width:2px;border-radius:5px;padding:1px 6px;font-size:11.5px;font-weight:700}
+.doc-tabs-list{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:760px){.doc-tabs-list{grid-template-columns:1fr}}
+.doc-tab-card{border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:#FCFCF7}
+.doc-tab-card .t{font-size:13.5px;font-weight:700;margin-bottom:4px}
+.doc-tab-card .d{font-size:12.5px;color:var(--muted);line-height:1.5}
+.doc-tab-card .d b{color:var(--d)}
+.doc-ver{border-left:2px solid var(--border);padding-left:14px;margin-left:4px}
+.doc-ver .v{position:relative;padding-bottom:14px}
+.doc-ver .v::before{content:'';position:absolute;left:-19px;top:5px;width:8px;height:8px;border-radius:50%;background:var(--y);border:2px solid var(--card)}
+.doc-ver .vh{font-size:13px;font-weight:700}
+.doc-ver .vd{font-size:11.5px;color:var(--muted);margin-bottom:4px}
+.doc-ver ul{margin-left:17px;font-size:12.5px}
 </style>
 <script>
 // v2.78.91 UX: global 401 handler — JWT expired → friendly redirect screen
@@ -530,6 +576,7 @@ body{overflow-x:clip}
   <button class="tabbtn" data-tab="employees">🧑‍💼 Співробітники <span class="tcount" id="tcEmp">0</span></button>
   <button class="tabbtn" data-tab="payroll" id="tabPayroll">💰 Фонд оплати</button>
   <button class="tabbtn" data-tab="turnover">🚪 Плинність</button>
+  <button class="tabbtn" data-tab="guide">📖 Інструкція</button>
 </div>
 
 <div class="filterbar">
@@ -758,6 +805,227 @@ body{overflow-x:clip}
   <div class="hint info"><strong>Формула:</strong> середня чисельність = (на початок періоду + на кінець) ÷ 2; плинність % = звільнені за період ÷ середня чисельність × 100. Показник «за період» залежить від його довжини, тому поруч наводиться <strong>річний еквівалент</strong> (× 365 ÷ днів періоду) — саме з ним порівнюють галузеву норму: для харчового виробництва 15–25% річних, понад 30% сигналізує про системну проблему. У чисельність включені співробітники у відпустці/декреті.</div>
 </div>
 
+<!-- ══════════ 8. ІНСТРУКЦІЯ ══════════ -->
+<div class="tabpane" id="pane-guide">
+<div class="doc">
+  <nav class="doc-toc" id="docToc">
+    <a href="#g-what">Що це таке</a>
+    <a href="#g-start">Швидкий старт</a>
+    <a href="#g-tabs">Вкладки — що де</a>
+    <a href="#g-how">Як зробити (рецепти)</a>
+    <a href="#g-metrics">Як рахуються показники</a>
+    <a href="#g-rules">Правила ведення даних</a>
+    <a href="#g-access">Доступи і безпека</a>
+    <a href="#g-faq">Якщо щось не так</a>
+    <a href="#g-tech">Для адміністратора</a>
+    <a href="#g-changelog">Історія змін</a>
+  </nav>
+
+  <div class="doc-main">
+    <div class="doc-hero">
+      <h1>📖 Інструкція до HR-дашборда</h1>
+      <p>Усе, що треба знати, щоб вести людей, вакансії й кандидатів у цьому інструменті. Написано для тих, хто працює з ним щодня — HR, операційний директор, керівники підрозділів.</p>
+      <div class="meta"><span id="gVer">версія —</span><span id="gDate">оновлено —</span><span>Мова: українська</span></div>
+    </div>
+
+    <section class="doc-sec" id="g-what">
+      <h2>🧭 Що це таке</h2>
+      <div class="lead">Одне місце замість десятка Excel-файлів.</div>
+      <p>HR-дашборд зберігає дані про команду: картки співробітників, кандидатів у воронці найму, вакансії, зарплати й статистику плинності. Дані живуть у захищеній базі snEco, а не у файлі на компʼютері — тому їх видно з будь-якого пристрою і вони не губляться.</p>
+      <p><strong>Головна відмінність від інших дашбордів snEco</strong> (Продажі, Склад, Фінанси): ті показують дані, які автоматично приходять із МойСклад. Тут автоматичного джерела немає — <strong>дані вносить людина</strong>. Дашборд натомість сам рахує метрики: плинність, час найму, вартість найму, фонд оплати праці.</p>
+      <div class="doc-note">Просте правило: <strong>що внесли — те й порахується</strong>. Якщо не заповнити дату першого контакту з кандидатом, дашборд не зможе показати час найму. Якщо не вказати джерело — кандидат зникне зі звіту по каналах.</div>
+    </section>
+
+    <section class="doc-sec" id="g-start">
+      <h2>🚀 Швидкий старт</h2>
+      <div class="lead">Перші 30 хвилин у новому дашборді.</div>
+      <ol class="doc-steps">
+        <li><strong>Увійдіть.</strong> Відкрийте <code>brand.sneco.ua/dashboard/hr/</code> → кнопка «Увійти через Google» (найшвидше) або введіть робочий email і отримайте 6-значний код на пошту. Сесія тримається 30 днів.</li>
+        <li><strong>Заповніть довідники.</strong> Кнопка <span class="doc-kbd">⚙️</span> у панелі фільтрів згори. Додайте свої підрозділи, посади й канали пошуку. Це не обовʼязково — вписати назву можна прямо у формі — але з довідником усі пишуть однаково, і статистика не розпадається на «Виробництво», «виробництво» і «Вироб.».</li>
+        <li><strong>Заведіть команду.</strong> Вкладка «Співробітники» → <span class="doc-kbd">⬆ Імпорт</span>, якщо є список в Excel (кнопка «Завантажити шаблон» покаже потрібні колонки), або <span class="doc-kbd">+ Співробітник</span> по одному.</li>
+        <li><strong>Відкрийте першу вакансію</strong> і додайте кандидатів — далі просто перетягуйте їхні картки колонками.</li>
+      </ol>
+      <div class="doc-note ok">Мінімум, з якого вже є користь: ПІБ + посада + підрозділ + дата прийняття для кожного співробітника. Решту можна дозаповнювати поступово.</div>
+    </section>
+
+    <section class="doc-sec" id="g-tabs">
+      <h2>🗂 Вкладки — що де</h2>
+      <div class="lead">Вісім розділів. Фільтри згори (період, компанія, підрозділ, пошук) діють одразу на всіх.</div>
+      <div class="doc-tabs-list">
+        <div class="doc-tab-card"><div class="t">📊 Огляд</div><div class="d">Головна панель: 8 показників (чисельність, найм, звільнення, плинність, відкриті вакансії, час найму, випробувальний) + графіки динаміки + воронка найму. Внизу — блок <b>«Потребує уваги»</b>: дні народження цього місяця, випробувальні строки, що спливають, прострочені вакансії, кандидати без руху 7+ днів. З нього варто починати робочий тиждень.</div></div>
+        <div class="doc-tab-card"><div class="t">🎯 Кандидати</div><div class="d">Дошка-канбан: колонка = етап відбору. <b>Перетягніть картку</b> в наступну колонку — етап зміниться, а дата проставиться сама. Клік по картці відкриває повну картку з історією рухів. Помаранчева смужка зліва = кандидат «завис» на 7+ днів.</div></div>
+        <div class="doc-tab-card"><div class="t">📡 Канали</div><div class="d">Звідки приходять люди і скільки це коштує. Таблиця: кандидати → співбесіди → офери → найнято, конверсія і <b>вартість найму</b>. Щоб зʼявилась вартість, внесіть витрати кнопкою «💵 Витрати на канали» (публікації вакансій, підписки, послуги агенцій).</div></div>
+        <div class="doc-tab-card"><div class="t">📌 Вакансії</div><div class="d">Усі відкриті й закриті позиції: скільки днів відкрита, чи прострочена планова дата, скільки кандидатів на кожному етапі. Клік по рядку — картка вакансії з її власною воронкою і списком кандидатів.</div></div>
+        <div class="doc-tab-card"><div class="t">🧑‍💼 Співробітники</div><div class="d">Довідник команди — таблицею або картками (кнопка «▦ Картки»). Клік відкриває профіль: дані, компенсація (якщо є доступ) та <b>історія всіх змін</b> — хто, коли і що правив.</div></div>
+        <div class="doc-tab-card"><div class="t">💰 Фонд оплати</div><div class="d">Тільки для тих, кому відкрито доступ до зарплат. Фонд по місяцях, план проти факту, середня й медіанна зарплата, розріз по підрозділах і посадах, вилки зарплат (min/середина/max) і хто з них випадає.</div></div>
+        <div class="doc-tab-card"><div class="t">🚪 Плинність</div><div class="d">Скільки людей пішло, за власним бажанням чи ні, з яких підрозділів і посад, який стаж мали на момент виходу і з яких причин. Найцінніший розділ для розмови з керівниками: показує, де саме компанія втрачає людей.</div></div>
+        <div class="doc-tab-card"><div class="t">📖 Інструкція</div><div class="d">Цей розділ. Оновлюється щоразу, коли в дашборді щось змінюється — унизу є історія змін.</div></div>
+      </div>
+      <h3>Панель фільтрів</h3>
+      <ul>
+        <li><strong>Період</strong> (3/6/12 місяців, з початку року, весь час або вручну) — впливає на всі показники «за період».</li>
+        <li><strong>Компанія і підрозділ</strong> — звужують геть усе: KPI, графіки, таблиці. Зручно, коли треба подивитись лише Barpi або лише Виробництво.</li>
+        <li><strong>🔍 Пошук</strong> — звужує <strong>тільки списки й таблиці</strong>, показники навмисно лишаються по всій компанії. Інакше, набравши прізвище, ви побачили б «плинність по одній людині».</li>
+        <li><span class="doc-kbd">🕘</span> — журнал усіх змін у дашборді, <span class="doc-kbd">⚙️</span> — довідники, <span class="doc-kbd">↻</span> — перечитати дані з бази.</li>
+      </ul>
+    </section>
+
+    <section class="doc-sec" id="g-how">
+      <h2>🛠 Як зробити (рецепти)</h2>
+      <div class="lead">Короткі покрокові сценарії на щодня.</div>
+
+      <h3>Додати кандидата</h3>
+      <p>Вкладка «Кандидати» → <span class="doc-kbd">+ Кандидат</span>. Обовʼязкові: ПІБ і джерело. Дуже бажано — вакансія та <strong>дата першого контакту</strong> (від неї рахується час найму). Далі кандидат зʼявиться у колонці «Новий».</p>
+
+      <h3>Перемістити кандидата етапом</h3>
+      <p>На компʼютері — перетягніть картку мишею в потрібну колонку. На телефоні чи планшеті — відкрийте картку кандидата й натисніть «→ наступний етап» або оберіть етап зі списку. Дата етапу проставиться автоматично; при відмові система запитає причину.</p>
+
+      <h3>Оформити кандидата у штат</h3>
+      <p>Відкрийте картку кандидата → <span class="doc-kbd">✅ Оформити</span>. Заповніть дату виходу, кінець випробувального, посаду й підрозділ — картка співробітника створиться сама, а кандидат перейде на етап «Вийшов на роботу». Якщо це була остання позиція у вакансії, дашборд запропонує її закрити.</p>
+
+      <h3>Звільнити співробітника</h3>
+      <p>Картка співробітника → <span class="doc-kbd">🚪 Звільнити</span> → дата, тип (за власним бажанням / з ініціативи компанії), причина, коментар.</p>
+      <div class="doc-note warn">Звільняйте <strong>тільки цією кнопкою</strong>, а не правкою полів у формі. Кнопка одночасно ставить статус і дату — інакше людина може лишитись «працює» у чисельності й водночас потрапити у плинність.</div>
+
+      <h3>Внести зарплати за місяць</h3>
+      <p>Вкладка «Фонд оплати» → <span class="doc-kbd">✏️ Нарахування за місяць</span> → оберіть місяць. Кнопка «↺ Підставити оклади з карток» заповнить порожні поля окладами зі списку співробітників — далі виправите руками там, де були бонуси чи понаднормові. Внизу видно підсумок. «💾 Зберегти місяць» записує все одразу.</p>
+      <div class="doc-note">Колонка «Податки» — це ЄСВ роботодавця. Вона <strong>не входить</strong> у фонд, а показується окремим рядком, щоб фонд не подвоївся.</div>
+
+      <h3>Задати вилку зарплат по посаді</h3>
+      <p>«Фонд оплати» → <span class="doc-kbd">+ Вилка</span>: посада, мінімум, середина, максимум. Після цього у таблиці зарплат зʼявиться <strong>compa-ratio</strong> — оклад людини у відсотках від середини вилки. Нижче 85% — недоплата, вище 115% — виходить за вилку.</p>
+
+      <h3>Внести витрати на канал пошуку</h3>
+      <p>«Канали» → <span class="doc-kbd">💵 Витрати на канали</span>: канал, місяць, сума. Дашборд поділить витрати на кількість найнятих і покаже вартість найму.</p>
+
+      <h3>Імпортувати список з Excel</h3>
+      <ol class="doc-steps">
+        <li>В Excel: «Зберегти як» → <strong>CSV UTF-8</strong>. Перший рядок — назви колонок.</li>
+        <li>Вкладка «Співробітники» (або «Кандидати») → <span class="doc-kbd">⬆ Імпорт</span> → перетягніть файл.</li>
+        <li>Перевірте зіставлення колонок — система вгадує їх сама, але назви можна поміняти.</li>
+        <li>Натисніть «Перевірити»: покаже, скільки рядків готові, де погані дати й <strong>чи є дублікати</strong> з тим, що вже в базі.</li>
+        <li>«⬆ Імпортувати». За раз — до 300 рядків.</li>
+      </ol>
+      <div class="doc-note">Дати приймаються у форматі <code>ДД.ММ.РРРР</code> або <code>РРРР-ММ-ДД</code>. Кнопка «Завантажити шаблон» дає готовий файл з правильними колонками і прикладом.</div>
+
+      <h3>Вивантажити дані</h3>
+      <p>Кнопка <span class="doc-kbd">⬇ CSV</span> є майже на кожній вкладці — вивантажується те, що зараз на екрані, з урахуванням фільтрів. Файл відкривається в Excel як є (кирилиця не ламається).</p>
+
+      <h3>Додати підрозділ, посаду або канал</h3>
+      <p>Два способи: <span class="doc-kbd">⚙️</span> у панелі фільтрів → оберіть розділ довідника → «+ Додати». Або просто впишіть нову назву прямо у формі — поля приймають вільний текст, а список підказує вже наявні значення. Якщо у даних зʼявились назви поза довідником, редактор довідників запропонує додати їх одним кліком.</p>
+
+      <h3>Подивитись, хто що змінив</h3>
+      <p>Кнопка <span class="doc-kbd">🕘</span> згори — журнал усіх дій за останній час. Історію конкретної людини видно в її картці на вкладці «Історія».</p>
+    </section>
+
+    <section class="doc-sec" id="g-metrics">
+      <h2>📐 Як рахуються показники</h2>
+      <div class="lead">Щоб цифрам можна було довіряти — ось точні формули і межі їх застосування.</div>
+      <table>
+        <thead><tr><th style="width:26%">Показник</th><th>Формула і що врахувати</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Чисельність</strong></td><td>Люди, у яких дата прийняття вже настала, а дати звільнення ще немає (або вона в майбутньому). Співробітники у відпустці чи декреті <strong>враховуються</strong>. Якщо в картці немає дати прийняття — людина не потрапить у графік динаміки.</td></tr>
+          <tr><td><strong>Плинність</strong></td><td>Середня чисельність = (на початок періоду + на кінець) ÷ 2. Плинність = звільнені за період ÷ середня чисельність × 100%.<br><strong>Обережно:</strong> цифра «за період» залежить від його довжини — 8% за квартал це ≈32% річних. Тому поруч завжди показано <strong>річний еквівалент</strong>, і саме з ним порівнюють норму: для харчового виробництва 15–25% на рік, понад 30% — системна проблема.</td></tr>
+          <tr><td><strong>Час найму</strong><br><span class="muted">Time to Hire</span></td><td>Дата прийняття офера − дата першого контакту, у днях. Береться середнє й медіана по всіх наймах періоду. Медіана надійніша, коли наймів мало.<br>Якщо дата прийняття офера не заповнена, береться дата виходу на роботу — це вже інша величина (довша на час відпрацювання).</td></tr>
+          <tr><td><strong>Воронка</strong></td><td>Рахується за <strong>максимально досягнутим</strong> етапом кожного кандидата, а не за поточним. Тому людина, якій відмовили після співбесіди, все одно врахована у «Скринінг» і «Співбесіда HR», і воронка ніколи не «розширюється» донизу.</td></tr>
+          <tr><td><strong>Вартість найму</strong><br><span class="muted">Cost per Hire</span></td><td>Витрати на канал за період ÷ кількість найнятих з цього каналу. Не включає час рекрутера й реферальні бонуси. Якщо кандидат прийшов у грудні, а вийшов у січні — на межі періодів цифра трохи «пливе».</td></tr>
+          <tr><td><strong>Фонд оплати праці</strong></td><td>Оклад + бонус + понаднормові + інше за місяць, по всіх внесених нарахуваннях. <strong>Брутто</strong>, до утримань. ЄСВ роботодавця у фонд не входить — вводиться окремою колонкою «Податки» і показується окремим рядком.</td></tr>
+          <tr><td><strong>Середня і медіанна ЗП</strong></td><td>Рахуються з <strong>поточних окладів у картках</strong> (не з нарахувань). Медіана показова, коли в компанії є і робітники, і керівники: середня «підтягується» вгору кількома високими окладами.</td></tr>
+          <tr><td><strong>Compa-ratio</strong></td><td>Оклад ÷ середина вилки посади × 100%. 85–115% — у нормі, нижче — недоплата, вище — вихід за вилку. Рахується з окладу без бонусу.</td></tr>
+          <tr><td><strong>Стаж</strong></td><td>Від дати прийняття до дати звільнення (або до сьогодні), у роках. Частка тих, хто пішов <strong>до 1 року</strong> — найкращий індикатор помилок найму й онбордингу.</td></tr>
+          <tr><td><strong>Різні валюти</strong></td><td>Якщо зарплати ведуться в різних валютах, для зведеного фонду потрібні курси (кнопка «💱 Курси»). Якщо курс не заданий, сума <strong>не обнуляється мовчки</strong> — вона виключається з підсумку, а дашборд показує попередження.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="doc-sec" id="g-rules">
+      <h2>✅ Правила ведення даних</h2>
+      <div class="lead">Пʼять звичок, без яких статистика почне брехати.</div>
+      <ol>
+        <li><strong>Кандидату — джерело і дату першого контакту.</strong> Без джерела він зникає зі звіту по каналах, без дати — з розрахунку часу найму.</li>
+        <li><strong>Звільнення — тільки кнопкою «Звільнити».</strong> Вона ставить дату й статус разом.</li>
+        <li><strong>Назви підрозділів і посад — з підказок.</strong> «Виробництво» і «виробництво» для бази це два різні підрозділи.</li>
+        <li><strong>Не імпортуйте той самий файл двічі.</strong> Крок «Перевірити» попереджає про схожі записи — не ігноруйте це попередження.</li>
+        <li><strong>Результат випробувального ставте вчасно.</strong> Віджет на «Огляді» показує, у кого строк спливає; якщо результат не проставити, показник «пройшли випробувальний» рахуватиметься неправильно.</li>
+      </ol>
+    </section>
+
+    <section class="doc-sec" id="g-access">
+      <h2>🔐 Доступи і безпека</h2>
+      <div class="lead">Два рівні: з сумами зарплат і без.</div>
+      <table>
+        <thead><tr><th style="width:30%">Рівень</th><th>Що видно</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Базовий</strong><br><code>hr-dashboard</code></td><td>Усі сім робочих вкладок: люди, кандидати, вакансії, канали, плинність. <strong>Без будь-яких сум зарплат</strong> — вкладка «Фонд оплати» закрита, колонок Зарплата/Бонус немає.</td></tr>
+          <tr><td><strong>З зарплатами</strong><br><code>hr-payroll</code></td><td>Додатково: вкладка «Фонд оплати», оклади й бонуси в картках, вилки, compa-ratio, історія нарахувань.</td></tr>
+        </tbody>
+      </table>
+      <p>Свій рівень видно у правому верхньому куті: <span class="chip chip-y">🔓 Повний доступ</span> або <span class="chip chip-gray">🔒 Доступ без сум ЗП</span>.</p>
+      <div class="doc-note ok">Зарплатні дані відсікаються <strong>на сервері</strong>, а не ховаються в інтерфейсі: якщо у вас немає доступу до зарплат, вони просто не надсилаються у ваш браузер. Те саме стосується журналу змін — суми в ньому приховані.</div>
+      <p>Змінити склад доступів може адміністратор (Вадим або Пилип): Brand Bible → <strong>Maintenance → Розподіл доступу</strong> → блоки <code>hr-dashboard</code> і <code>hr-payroll</code>.</p>
+      <div class="doc-note warn">Не пересилайте вивантажені CSV із зарплатами звичайною поштою чи месенджерами — це той самий чутливий файл, від якого ми захищаємось у самому дашборді.</div>
+    </section>
+
+    <section class="doc-sec" id="g-faq">
+      <h2>❓ Якщо щось не так</h2>
+      <table>
+        <thead><tr><th style="width:34%">Ситуація</th><th>Що робити</th></tr></thead>
+        <tbody>
+          <tr><td>Не приходить код на пошту</td><td>Перевірте теку «Спам». Якщо код не прийшов зовсім — вашого email немає у списку доступу: напишіть на vg@sneco.ua.</td></tr>
+          <tr><td>«Цього email немає у whitelist»</td><td>Доступ ще не відкрито. Кнопка у вікні входу одразу формує лист-запит.</td></tr>
+          <tr><td>Не бачу вкладку «Фонд оплати»</td><td>У вас базовий рівень доступу. Це не помилка — див. розділ «Доступи».</td></tr>
+          <tr><td>Графіки порожні, хоча люди є</td><td>Найчастіше — завузький період (перемкніть на «Весь час») або незаповнені дати прийняття у картках.</td></tr>
+          <tr><td>Показники не змінюються, коли шукаю людину</td><td>Так і має бути: пошук звужує списки, але не аналітику.</td></tr>
+          <tr><td>Дані не оновились після правки колегою</td><td>Натисніть <span class="doc-kbd">↻</span> у панелі фільтрів — дашборд перечитає базу.</td></tr>
+          <tr><td>«Сесія завершилась» / не зберігається</td><td>Натисніть 🔒 у правому нижньому куті й увійдіть заново. Сесія живе 30 днів.</td></tr>
+          <tr><td>Випадково видалив запис</td><td>Видалення незворотне, але слід лишається в журналі <span class="doc-kbd">🕘</span> — там видно, що саме було в записі, і його можна відновити руками.</td></tr>
+          <tr><td>Щось працює не так, як тут написано</td><td>Напишіть Вадиму — інструкція оновлюється разом із дашбордом, і розбіжність означає або баг, або застарілий текст.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="doc-sec" id="g-tech">
+      <h2>⚙️ Для адміністратора</h2>
+      <div class="lead">Коротко про внутрішній устрій — потрібне лише тому, хто змінює дашборд.</div>
+      <ul>
+        <li><strong>Сторінка:</strong> <code>brand/dashboard/hr/hr.html</code> — один самодостатній файл із власним входом.</li>
+        <li><strong>API:</strong> <code>sneco-auth/src/hr.js</code>, роути <code>/api/hr/*</code>. Дані — 10 таблиць <code>hr_*</code> у Cloudflare D1 (<code>sneco-bible</code>).</li>
+        <li><strong>Автоматичного наповнення немає</strong> — жодних cron-задач, усе вводиться людьми.</li>
+        <li><strong>Тести:</strong> <code>node sneco-auth/tests/hr_api_check.mjs</code> — перевіряє логіку й розмежування доступів без деплою. Запускати після кожної зміни <code>hr.js</code>.</li>
+        <li><strong>Доступи:</strong> списки в KV (<code>wl:hr-dashboard</code>, <code>wl:hr-payroll</code>) редагуються через Maintenance; запасні списки — у <code>wrangler.toml</code>.</li>
+      </ul>
+      <div class="doc-note bad"><strong>Правило супроводу:</strong> будь-яка зміна дашборда — нова вкладка, поле, показник, зміна формули — <strong>обовʼязково супроводжується оновленням цього розділу</strong> й записом у «Історію змін» нижче. Інакше колеги працюватимуть за інструкцією, якої вже не існує.</div>
+    </section>
+
+    <section class="doc-sec" id="g-changelog">
+      <h2>🧾 Історія змін</h2>
+      <div class="lead">Що і коли змінювалось у дашборді.</div>
+      <div class="doc-ver">
+        <div class="v">
+          <div class="vh">v2.79.1 — Інструкція всередині дашборда</div>
+          <div class="vd">21.08.2026</div>
+          <ul>
+            <li>Зʼявився цей розділ «📖 Інструкція» — з рецептами, формулами показників і правилами ведення даних.</li>
+            <li>Виправлено після перевірки: журнал змін більше не показує суми зарплат тим, у кого немає доступу до них.</li>
+            <li>Плинність тепер показується разом із річним еквівалентом; галузева норма застосовується саме до нього.</li>
+            <li>Воронка рахується за максимально досягнутим етапом — кандидати з відмовою більше не випадають із неї.</li>
+            <li>Пошук у фільтрах звужує лише списки, не показники.</li>
+            <li>Зʼявилися: кнопка «Звільнити» однією дією, редактор довідників, попередження про дублікати при імпорті, звільнення по посадах, зарплати за посадами.</li>
+          </ul>
+        </div>
+        <div class="v">
+          <div class="vh">v2.79.0 — Запуск</div>
+          <div class="vd">20.08.2026</div>
+          <ul>
+            <li>Перший випуск: 7 робочих вкладок, картки людей, канбан кандидатів, вакансії, канали, фонд оплати праці, плинність.</li>
+            <li>Дворівневий доступ до зарплат, імпорт з Excel/CSV, експорт, журнал змін.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+</div>
+
 </div><!-- /wrap -->
 
 <!-- ══════════ DRAWER ══════════ -->
@@ -786,6 +1054,8 @@ body{overflow-x:clip}
 /* ═══════════════════════════════════════════════════════════════════════════
    snEco · HR Dashboard — core (v2.79.0)
    ═══════════════════════════════════════════════════════════════════════════ */
+const HR_VERSION = 'v2.79.1';
+const HR_UPDATED  = '21.08.2026';
 const API = 'https://sneco-auth.vg-ab6.workers.dev';
 const BLOCK_HR = 'hr-dashboard';
 const STAGES = [
@@ -1145,7 +1415,8 @@ function renderAll(){
   $('#cntBadge').textContent = `${emps.filter(e=>e.status==='active').length} у команді`;
   $('#fbInfo').innerHTML = `${dmy(S.f.from)} — ${dmy(S.f.to)}` + (S.f.q ? ` · 🔍 «${esc(S.f.q)}» <span class="muted">(лише списки)</span>` : '');
   ({ overview:renderOverview, candidates:renderCandidates, channels:renderChannels,
-     vacancies:renderVacancies, employees:renderEmployees, payroll:renderPayroll, turnover:renderTurnover })[S.tab]();
+     vacancies:renderVacancies, employees:renderEmployees, payroll:renderPayroll, turnover:renderTurnover,
+     guide:renderGuide })[S.tab]();
 }
 
 /* ══════════ 1 · ОГЛЯД ══════════ */
@@ -1279,6 +1550,7 @@ function renderFirstRun(){
         <div class="cc-title">Заповніть довідники</div>
         <div class="cc-sub" style="margin-bottom:12px">Підрозділи, посади, канали пошуку, причини звільнення — щоб усі писали однаково і статистика збиралась коректно.</div>
         <button class="btn" onclick="openDictEditor()">⚙️ Довідники</button>
+        <button class="btn" onclick="go('guide')" style="margin-left:6px">📖 Інструкція</button>
       </div>
     </div></div>`;
 }
@@ -2724,6 +2996,33 @@ async function openAudit(){
   } catch(e){ $('#mdBody').innerHTML = '<div class="tbl-empty">Не вдалося завантажити</div>'; }
 }
 
+/* ── ІНСТРУКЦІЯ ─────────────────────────────────────────────────────────── */
+function renderGuide(){
+  const v = $('#gVer'), d = $('#gDate');
+  if (v) v.textContent = 'версія ' + HR_VERSION;
+  if (d) d.textContent = 'оновлено ' + HR_UPDATED;
+  const links = $$('#docToc a');
+  if (!links.length || links[0].dataset.bound) return;
+  links.forEach(a=>{
+    a.dataset.bound = '1';
+    a.onclick = e=>{
+      e.preventDefault();
+      const t = document.querySelector(a.getAttribute('href'));
+      if (t) t.scrollIntoView({ behavior:'smooth', block:'start' });
+    };
+  });
+  // підсвічування активного розділу під час гортання
+  const secs = $$('.doc-sec');
+  const spy = ()=>{
+    if (S.tab !== 'guide') return;
+    let cur = secs[0];
+    for (const s of secs) if (s.getBoundingClientRect().top <= 200) cur = s;
+    links.forEach(a=>a.classList.toggle('on', a.getAttribute('href') === '#' + cur.id));
+  };
+  window.addEventListener('scroll', spy, { passive:true });
+  spy();
+}
+
 /* ── НАВІГАЦІЯ ──────────────────────────────────────────────────────────── */
 function go(tab){
   S.tab = tab;
@@ -2798,7 +3097,7 @@ window.bootHR = async function(token, email){
   try {
     await reload();
     const h = (location.hash||'').replace('#','');
-    if (['overview','candidates','channels','vacancies','employees','payroll','turnover'].includes(h)) go(h);
+    if (['overview','candidates','channels','vacancies','employees','payroll','turnover','guide'].includes(h)) go(h);
   } catch(e){
     toast(apiErr(e), 'err');
     $('#kpiRow').innerHTML = `<div class="cc" style="grid-column:1/-1"><div class="empty"><div class="e-ic">⚠️</div>
