@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>snEco — Витрати та окупність</title>
+<style>
+:root{--yel:#FEBF27;--grn:#96C11F;--dark:#1E1E1E;--line:#E5E5DC;--muted:#7a7a72;
+      --red:#DC2626;--amb:#D97706;--bg:#F7F7F3}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+     background:var(--bg);color:var(--dark);font-size:14px;line-height:1.5}
+body.dash-locked{overflow:hidden}
+/* ── auth gate ── */
+#dashauth-overlay{position:fixed;inset:0;background:#1E1E1E;z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}
+#dashauth-overlay.is-hidden{display:none}
+.dashauth-card{background:#fff;width:100%;max-width:440px;border-radius:14px;padding:36px 30px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.dashauth-logo{font-size:24px;font-weight:900;color:var(--yel);margin-bottom:6px;letter-spacing:-.5px;text-align:center}
+.dashauth-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#888;text-align:center;margin-bottom:24px}
+.dashauth-icon{font-size:36px;text-align:center;margin-bottom:16px}
+.dashauth-h1{font-size:18px;font-weight:800;text-align:center;margin-bottom:6px}
+.dashauth-desc{font-size:13px;color:#666;text-align:center;line-height:1.55;margin-bottom:20px}
+.dashauth-input{width:100%;padding:12px 14px;border:2px solid var(--line);border-radius:8px;font-size:14px;font-family:inherit;outline:none}
+.dashauth-input:focus{border-color:var(--yel)}
+.dashauth-input.code{font-family:monospace;letter-spacing:.4em;text-align:center;font-size:18px}
+.dashauth-btn{width:100%;padding:13px;background:var(--dark);color:#fff;border:0;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;margin-top:14px;font-family:inherit}
+.dashauth-btn:hover{background:#000}.dashauth-btn:disabled{opacity:.5;cursor:not-allowed}
+.dashauth-msg{font-size:12.5px;line-height:1.5;margin-top:12px;text-align:center;min-height:18px}
+.dashauth-msg.is-error{color:var(--red)}.dashauth-msg a{color:var(--yel);font-weight:600}
+.dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
+.dashauth-session{position:fixed;top:10px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#6f9200;
+  border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-weight:600;display:flex;gap:8px;align-items:center}
+.dashauth-session button{background:none;border:0;color:#6f9200;cursor:pointer;font-size:14px;padding:0}
+/* ── layout ── */
+.topbar{background:var(--dark);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.topbar b{color:var(--yel);font-size:16px;letter-spacing:-.3px}
+.topbar nav a{color:#bbb;text-decoration:none;font-size:12.5px;margin-right:14px}
+.topbar nav a:hover,.topbar nav a.on{color:var(--yel)}
+.wrap{max-width:1280px;margin:0 auto;padding:20px}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#fff;border:1px solid var(--line);
+     border-radius:10px;padding:12px 14px;margin-bottom:18px;position:sticky;top:0;z-index:50}
+.bar label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+select,input[type=date]{font:inherit;font-size:13px;padding:6px 10px;border:1.5px solid var(--line);border-radius:7px;background:#fff}
+select:focus,input:focus{outline:2px solid var(--yel);outline-offset:1px}
+.hint{font-size:11.5px;color:var(--muted)}
+h2{font-size:15px;margin:26px 0 10px;display:flex;align-items:center;gap:8px}
+h2 .cnt{font-size:11px;font-weight:600;color:var(--muted);background:#EFEFE8;padding:2px 8px;border-radius:10px}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:6px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.kpi.red{border-left:4px solid var(--red)}.kpi.amb{border-left:4px solid var(--amb)}
+.kpi.grn{border-left:4px solid var(--grn)}.kpi.yel{border-left:4px solid var(--yel)}
+.kpi-l{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+.kpi-v{font-size:22px;font-weight:800;letter-spacing:-.5px}
+.kpi-s{font-size:11.5px;color:var(--muted);margin-top:4px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);
+   padding:8px 10px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:2}
+td{padding:8px 10px;border-bottom:1px solid #F1F1EC}
+tbody tr:hover{background:#FFFBEF}
+.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.scroll{max-height:460px;overflow:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
+.tag{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:5px}
+.t-red{background:#FEE2E2;color:#991B1B}.t-amb{background:#FEF3C7;color:#92400E}
+.t-grn{background:#ECFCCB;color:#3F6212}.t-gry{background:#EFEFE8;color:#666}
+.an{display:flex;gap:12px;padding:12px 14px;border-radius:10px;background:#fff;border:1px solid var(--line);margin-bottom:8px}
+.an.red{border-left:4px solid var(--red)}.an.amber{border-left:4px solid var(--amb)}.an.info{border-left:4px solid #9CA3AF}
+.an-i{font-size:20px;line-height:1}
+.an-t{font-weight:700;font-size:13.5px}
+.an-w{font-size:12px;color:var(--muted);margin:2px 0 4px}
+.an-d{font-size:12.5px;line-height:1.55}
+.bar-mini{height:6px;background:#EFEFE8;border-radius:3px;overflow:hidden;min-width:60px}
+.bar-mini i{display:block;height:100%;background:var(--grn)}
+.bar-mini i.red{background:var(--red)}.bar-mini i.amb{background:var(--amb)}
+.note{font-size:11.5px;color:var(--muted);line-height:1.55;margin-top:8px}
+.empty{padding:26px;text-align:center;color:var(--muted);font-size:13px}
+.loader{padding:60px;text-align:center;color:var(--muted)}
+@media(max-width:640px){.wrap{padding:12px}.bar{position:static}}
+</style>
+</head>
+<body class="dash-locked">
+
+<!-- ── AUTH GATE ── -->
+<div id="dashauth-overlay">
+  <div class="dashauth-card">
+    <div class="dashauth-logo">snEco</div>
+    <div class="dashauth-sub">Витрати · Confidential</div>
+    <div id="dashauth-stage"></div>
+  </div>
+</div>
+
+<div class="topbar">
+  <b>snEco · Витрати</b>
+  <nav>
+    <a href="../">Каталог</a>
+    <a href="../finance/finance.html">Фінанси</a>
+    <a href="../customer-360/customer-360.html">Customer 360</a>
+    <a href="../ask/">AI-асистент</a>
+    <a class="on" href="#">Витрати</a>
+  </nav>
+  <span style="margin-left:auto;font-size:11px;color:#888" id="gen"></span>
+</div>
+
+<div class="wrap" id="root">
+  <div class="loader">Завантажуємо…</div>
+</div>
+
+<script src="../_shared/helpers.js"></script>
+<script>
+(function(){
+  const WORKER='https://sneco-auth.vg-ab6.workers.dev';
+  const BLOCK='expenses-dashboard';
+  const STORAGE_KEY='snEco-jwt-'+BLOCK;
+  const overlay=document.getElementById('dashauth-overlay');
+  const stage=document.getElementById('dashauth-stage');
+  let email='';
+  window.__exp={token:null};
+  function unlock(token,em,exp){
+    try{localStorage.setItem(STORAGE_KEY,JSON.stringify({token,email:em,exp}));}catch(e){}
+    window.__exp.token=token;
+    document.body.classList.remove('dash-locked');
+    overlay.classList.add('is-hidden');
+    const b=document.createElement('div');b.className='dashauth-session';
+    b.innerHTML='✓ '+em.replace(/[<>&]/g,'')+' <button title="Вийти">🔒</button>';
+    b.querySelector('button').onclick=()=>{localStorage.removeItem(STORAGE_KEY);location.reload();};
+    document.body.appendChild(b);
+    if(window.__expInit)window.__expInit();
+  }
+  async function verifyExisting(){
+    let s;try{s=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');}catch(e){}
+    if(!s||!s.token||!s.exp||s.exp*1000<Date.now())return null;
+    try{const r=await fetch(WORKER+'/api/session/verify',{method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({token:s.token,block:BLOCK})});
+      const j=await r.json();return j.ok?s:null;}catch(e){return null;}
+  }
+  function renderEmail(){
+    stage.innerHTML=`
+      <div class="dashauth-icon">💸</div>
+      <div class="dashauth-h1">Витрати та окупність</div>
+      <div class="dashauth-desc">Структура витрат, окупність трейд-маркетингу по контрагентах і сигнали аномалій. Google або email-код. Сесія 30 днів.</div>
+      <div id="gsi" style="display:flex;justify-content:center;margin:18px 0 8px"></div>
+      <div style="font-size:11px;color:#777;text-align:center;margin:8px 0 4px">— або через email-код —</div>
+      <input class="dashauth-input" type="email" id="auth-em" placeholder="ім'я@sneco.ua" autocomplete="email">
+      <button class="dashauth-btn" id="auth-send">Надіслати код</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="../../" class="dashauth-back">← Brand Bible</a>`;
+    if(window.SnecoAuth){
+      window.SnecoAuth.signInWithGoogle(BLOCK,document.getElementById('gsi'),
+        j=>unlock(j.token,j.email,j.exp),
+        m=>{const e=document.getElementById('auth-msg');if(e){e.textContent=m;e.className='dashauth-msg is-error';}});
+    }
+    const em=document.getElementById('auth-em'),send=document.getElementById('auth-send'),msg=document.getElementById('auth-msg');
+    em.addEventListener('keydown',e=>{if(e.key==='Enter')send.click();});
+    send.onclick=async()=>{
+      const v=em.value.trim();
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){msg.textContent='Введіть правильний email.';msg.className='dashauth-msg is-error';return;}
+      send.disabled=true;send.textContent='Надсилаємо...';msg.textContent='';
+      try{
+        const r=await fetch(WORKER+'/api/otp/request',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({email:v,block:BLOCK})});
+        if(!r.ok){const j=await r.json().catch(()=>({}));
+          msg.innerHTML=j.error==='not_in_whitelist'
+            ? `❌ Цього email немає у whitelist. <a href="mailto:vg@sneco.ua?subject=Expenses%20access">✉ Запит доступу</a>`
+            : 'Помилка: '+(j.error||r.status);
+          msg.className='dashauth-msg is-error';send.disabled=false;send.textContent='Надіслати код';return;}
+        email=v;renderCode();
+      }catch(e){msg.textContent='Помилка мережі: '+e.message;msg.className='dashauth-msg is-error';
+        send.disabled=false;send.textContent='Надіслати код';}
+    };
+  }
+  function renderCode(){
+    stage.innerHTML=`
+      <div class="dashauth-icon">🔢</div>
+      <div class="dashauth-h1">Код надіслано</div>
+      <div class="dashauth-desc">Перевір пошту <b>${email.replace(/[<>&]/g,'')}</b> — код дійсний 10 хвилин.</div>
+      <input class="dashauth-input code" id="auth-code" maxlength="6" inputmode="numeric" placeholder="000000">
+      <button class="dashauth-btn" id="auth-ok">Увійти</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="javascript:void(0)" class="dashauth-back" id="auth-again">← інший email</a>`;
+    const c=document.getElementById('auth-code'),ok=document.getElementById('auth-ok'),msg=document.getElementById('auth-msg');
+    c.focus();c.addEventListener('keydown',e=>{if(e.key==='Enter')ok.click();});
+    document.getElementById('auth-again').onclick=renderEmail;
+    ok.onclick=async()=>{
+      const v=c.value.trim();
+      if(!/^\d{6}$/.test(v)){msg.textContent='Код — 6 цифр.';msg.className='dashauth-msg is-error';return;}
+      ok.disabled=true;ok.textContent='Перевіряємо...';
+      try{
+        const r=await fetch(WORKER+'/api/otp/verify',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({email,code:v,block:BLOCK})});
+        const j=await r.json();
+        if(!r.ok||!j.token){msg.textContent=j.error==='bad_code'?'Невірний код.':('Помилка: '+(j.error||r.status));
+          msg.className='dashauth-msg is-error';ok.disabled=false;ok.textContent='Увійти';return;}
+        unlock(j.token,email,j.exp);
+      }catch(e){msg.textContent='Помилка мережі.';msg.className='dashauth-msg is-error';ok.disabled=false;ok.textContent='Увійти';}
+    };
+  }
+  verifyExisting().then(s=>{ if(s) unlock(s.token,s.email,s.exp); else renderEmail(); });
+})();
+
+// ══════════════════════════════════════════════════════════════════════════
+//  Дашборд
+// ══════════════════════════════════════════════════════════════════════════
+const WORKER='https://sneco-auth.vg-ab6.workers.dev';
+let D=null, PERIOD='all', ITEM='Маркетинг и реклама';
+
+const nf=n=>(n==null?'—':Math.round(n).toLocaleString('uk-UA'));
+const esc=s=>String(s==null?'':s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const pct=x=>x==null?'—':(x*100).toFixed(0)+'%';
+
+// які місяці входять у вибраний період
+function monthsIn(){
+  if(!D) return [];
+  const all=D.months;
+  if(PERIOD==='all') return all;
+  if(PERIOD.startsWith('year:')) return all.filter(m=>m.startsWith(PERIOD.slice(5)));
+  if(PERIOD.startsWith('month:')) return all.filter(m=>m===PERIOD.slice(6));
+  if(PERIOD==='last3') return all.slice(-3);
+  if(PERIOD==='last6') return all.slice(-6);
+  if(PERIOD==='last12') return all.slice(-12);
+  return all;
+}
+
+function periodOptions(){
+  const yrs=[...new Set(D.months.map(m=>m.slice(0,4)))].sort().reverse();
+  const MN=['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
+  let h='<optgroup label="Швидкі">'
+    +'<option value="all">Весь час</option>'
+    +'<option value="last3">Останні 3 міс</option>'
+    +'<option value="last6">Останні 6 міс</option>'
+    +'<option value="last12">Останні 12 міс</option></optgroup>';
+  h+='<optgroup label="Рік">'+yrs.map(y=>`<option value="year:${y}">${y} рік</option>`).join('')+'</optgroup>';
+  h+='<optgroup label="Місяць">'+D.months.slice().reverse().slice(0,24).map(m=>{
+      const [y,mm]=m.split('-');return `<option value="month:${m}">${MN[+mm-1]} ${y}</option>`;}).join('')+'</optgroup>';
+  return h;
+}
+
+function itemTotal(it,ms){ return ms.reduce((a,m)=>a+(it.by_month[m]||0),0); }
+
+// ── аномалії ──────────────────────────────────────────────────────────────
+const AN_ICON={payback:'🔻',no_effect:'🤷',new_payee:'🆕',spike:'📈',big_single:'💰'};
+function renderAnomalies(){
+  const a=D.anomalies||[];
+  if(!a.length) return '<div class="card empty">Сигналів немає — витрати в межах звичного.</div>';
+  return a.map(x=>`
+    <div class="an ${x.severity}">
+      <div class="an-i">${AN_ICON[x.type]||'•'}</div>
+      <div style="flex:1">
+        <div class="an-t">${esc(x.title)}</div>
+        <div class="an-w">${x.counterparty?esc(x.counterparty)+' · ':''}${esc(x.item)}</div>
+        <div class="an-d">${esc(x.detail)}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── окупність трейд-маркетингу ────────────────────────────────────────────
+function renderPayback(){
+  const rows=(D.payback||[]).filter(r=>r.spend>0);
+  if(!rows.length) return '<div class="card empty">Немає даних.</div>';
+  const body=rows.map(r=>{
+    const s=r.share_gross;
+    const cls=s==null?'gry':s>=.5?'red':s>=.25?'amb':'grn';
+    const w=Math.min(100,Math.round((s||0)*100));
+    return `<tr>
+      <td>${esc(r.name)} ${r.kind==='vendor'?'<span class="tag t-gry">медіа</span>':''}</td>
+      <td class="num">${nf(r.spend)}</td>
+      <td class="num">${nf(r.gross)}</td>
+      <td class="num"><b class="tag t-${cls}">${pct(s)}</b></td>
+      <td style="width:90px"><div class="bar-mini"><i class="${cls==='grn'?'':cls}" style="width:${w}%"></i></div></td>
+      <td class="num" style="color:${r.net<0?'var(--red)':'inherit'}">${nf(r.net)}</td>
+    </tr>`;}).join('');
+  return `<div class="scroll"><table>
+    <thead><tr><th>Контрагент</th><th class="num">Маркетинг</th><th class="num">Валовий прибуток</th>
+      <th class="num">Частка</th><th></th><th class="num">Лишається нам</th></tr></thead>
+    <tbody>${body}</tbody></table></div>
+    <div class="note">Валовий прибуток — сировина плюс техоперації, без оренди, зарплат, логістики й маркетингу.
+      Тому рядок, де частка близька до 100%, означає роботу в мінус.</div>`;
+}
+
+// ── статті ────────────────────────────────────────────────────────────────
+function renderItems(){
+  const ms=monthsIn();
+  const rows=D.items.map(it=>({...it,sum:itemTotal(it,ms)}))
+                    .filter(r=>r.sum>0).sort((a,b)=>b.sum-a.sum);
+  const tot=rows.reduce((a,r)=>a+r.sum,0)||1;
+  const body=rows.map(r=>{
+    const trade=r.kind_split?.trade||0, vend=r.kind_split?.vendor||0, k=trade+vend||1;
+    return `<tr style="cursor:pointer" onclick="selItem('${esc(r.item).replace(/'/g,"\\'")}')">
+      <td>${esc(r.item)}</td>
+      <td class="num">${nf(r.sum)}</td>
+      <td class="num">${(r.sum/tot*100).toFixed(1)}%</td>
+      <td style="width:120px"><div class="bar-mini"><i style="width:${Math.round(r.sum/rows[0].sum*100)}%"></i></div></td>
+      <td class="num hint">${trade>0?`трейд ${Math.round(trade/k*100)}%`:''}</td>
+    </tr>`;}).join('');
+  return `<div class="scroll"><table>
+    <thead><tr><th>Стаття</th><th class="num">Сума, грн</th><th class="num">Частка</th><th></th><th class="num">Розподіл</th></tr></thead>
+    <tbody>${body}</tbody></table></div>
+    <div class="note">Клік на статтю — розріз по контрагентах нижче. «Трейд» — частка виплат тим, кому ми ще й відвантажуємо.</div>`;
+}
+
+// ── контрагенти всередині статті ──────────────────────────────────────────
+function renderDrill(){
+  const list=(D.by_item_counterparty||{})[ITEM]||[];
+  if(!list.length) return '<div class="card empty">Оберіть статтю у таблиці вище.</div>';
+  const body=list.map(r=>`<tr>
+      <td>${esc(r.name)} ${r.kind==='trade'?'<span class="tag t-grn">покупець</span>':'<span class="tag t-gry">постачальник</span>'}</td>
+      <td class="num">${nf(r.sum)}</td>
+      <td class="num">${r.n}</td>
+      <td class="num">${r.months}</td>
+      <td class="num">${nf(r.sum/Math.max(r.n,1))}</td>
+    </tr>`).join('');
+  return `<div class="scroll"><table>
+    <thead><tr><th>Контрагент — «${esc(ITEM)}»</th><th class="num">Сума</th><th class="num">Платежів</th>
+      <th class="num">Місяців</th><th class="num">Сер. чек</th></tr></thead>
+    <tbody>${body}</tbody></table></div>`;
+}
+
+window.selItem=function(i){ ITEM=i; draw(); document.getElementById('drill')?.scrollIntoView({behavior:'smooth',block:'start'}); };
+
+function draw(){
+  const ms=monthsIn();
+  const total=D.items.reduce((a,it)=>a+itemTotal(it,ms),0);
+  const mk=D.items.find(i=>i.item==='Маркетинг и реклама');
+  const mkSum=mk?itemTotal(mk,ms):0;
+  const red=(D.anomalies||[]).filter(a=>a.severity==='red').length;
+  const amb=(D.anomalies||[]).filter(a=>a.severity==='amber').length;
+  const worst=(D.payback||[]).filter(r=>r.share_gross!=null)[0];
+
+  document.getElementById('root').innerHTML=`
+    <div class="bar">
+      <label>Період</label>
+      <select id="per">${periodOptions()}</select>
+      <span class="hint" id="perHint"></span>
+      <span style="margin-left:auto" class="hint">Оновлено ${esc(D.generated)}</span>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi yel"><div class="kpi-l">Витрати за період</div>
+        <div class="kpi-v">${nf(total)} ₴</div><div class="kpi-s">${ms.length} міс · ${D.items.length} статей</div></div>
+      <div class="kpi"><div class="kpi-l">Маркетинг</div>
+        <div class="kpi-v">${nf(mkSum)} ₴</div>
+        <div class="kpi-s">${total?(mkSum/total*100).toFixed(1):0}% усіх витрат</div></div>
+      <div class="kpi ${red?'red':amb?'amb':'grn'}"><div class="kpi-l">Сигнали</div>
+        <div class="kpi-v">${red} 🔴 ${amb} 🟡</div><div class="kpi-s">потребують рішення</div></div>
+      <div class="kpi ${worst&&worst.share_gross>=.5?'red':'amb'}"><div class="kpi-l">Найгірша окупність</div>
+        <div class="kpi-v">${worst?pct(worst.share_gross):'—'}</div>
+        <div class="kpi-s">${worst?esc(worst.name).slice(0,28):''}</div></div>
+    </div>
+
+    <h2>⚠ Що потребує уваги <span class="cnt">${(D.anomalies||[]).length}</span></h2>
+    ${renderAnomalies()}
+
+    <h2>🔻 Окупність трейд-маркетингу <span class="cnt">рік ${D.current_month.slice(0,4)}</span></h2>
+    ${renderPayback()}
+
+    <h2>📊 Витрати за статтями</h2>
+    ${renderItems()}
+
+    <h2 id="drill">🔍 Розріз статті</h2>
+    ${renderDrill()}
+  `;
+  const sel=document.getElementById('per');
+  sel.value=PERIOD;
+  sel.onchange=()=>{PERIOD=sel.value;draw();};
+  document.getElementById('perHint').textContent = ms.length?`${ms[0]} — ${ms[ms.length-1]}`:'';
+  document.getElementById('gen').textContent='дані на '+D.generated;
+}
+
+window.__expInit=async function(){
+  try{
+    const r=await fetch(WORKER+'/api/dashboard/blob?name=expenses',
+      {headers:{'Authorization':'Bearer '+window.__exp.token}});
+    if(r.status===401){document.getElementById('root').innerHTML=
+      '<div class="card empty">Сесія застаріла. <a href="javascript:location.reload()">Оновити</a></div>';return;}
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    D=await r.json();
+    if(typeof D==='string') D=JSON.parse(D);
+    PERIOD = D.months.length>12 ? 'last12' : 'all';
+    draw();
+  }catch(e){
+    document.getElementById('root').innerHTML=
+      `<div class="card empty">Не вдалось завантажити дані: ${esc(e.message)}<br>
+       <span class="hint">Якщо це перший запуск — синк ще не відпрацював. Він о 07:00 щодня.</span></div>`;
+  }
+};
+</script>
+</body>
+</html>
