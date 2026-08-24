@@ -369,8 +369,11 @@ function draw(){
 
 window.__expInit=async function(){
   try{
-    const r=await fetch(WORKER+'/api/dashboard/blob?name=expenses',
-      {headers:{'Authorization':'Bearer '+window.__exp.token}});
+    // ⚠ POST з ім'ям у тілі. GET на цей роут віддає 405.
+    const r=await fetch(WORKER+'/api/dashboard/blob',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+window.__exp.token},
+      body:JSON.stringify({name:'expenses'})});
     if(r.status===401){document.getElementById('root').innerHTML=
       '<div class="card empty">Сесія застаріла. <a href="javascript:location.reload()">Оновити</a></div>';return;}
     if(!r.ok) throw new Error('HTTP '+r.status);
