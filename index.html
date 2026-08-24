@@ -15168,6 +15168,87 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
   };
   window.snAuth = snAuth; // expose for admin UI
 
+  // ===================================================================
+  // GATED DOCUMENTS (v2.79.2)
+  // ===================================================================
+  // documents/ і strategy/ більше не лежать у публічному repo — вони в R2,
+  // і Worker віддає їх лише авторизованим. Перевірено 24.08.2026: до цього
+  // SOP «технологія сушки» і Sweden Sales Report качались анонімно.
+  //
+  // Розмітку не чіпаємо: у HTML лишаються звичайні <a href="documents/…">,
+  // а цей перехоплювач міняє клік на «попроси підписану URL → відкрий її».
+  // Так правило v2.25 (кожен документ — клікабельне посилання) живе далі,
+  // і не треба переписувати 103 посилання при кожній зміні схеми доступу.
+  const DOC_GATED = [/^documents\//i, /^strategy\/.*\.html$/i];
+  const DOC_RESTRICTED_HINT = [/^documents\/(production|markets|sku|packaging)\//i, /^strategy\//i];
+  const docIsGated = h => DOC_GATED.some(re => re.test(h));
+
+  function docModal(html) {
+    let wrap = document.getElementById('doc-gate-modal');
+    if (!wrap) {
+      wrap = document.createElement('div');
+      wrap.id = 'doc-gate-modal';
+      wrap.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);' +
+        'display:flex;align-items:center;justify-content:center;padding:20px';
+      wrap.addEventListener('click', e => { if (e.target === wrap) wrap.remove(); });
+      document.body.appendChild(wrap);
+    }
+    wrap.innerHTML = '<div class="otp-card" style="max-width:400px;width:100%;margin:0">' + html + '</div>';
+    return wrap.firstChild;
+  }
+
+  async function docOpen(rel, tab) {
+    const sess = snAuth.anySession && snAuth.anySession();
+    if (!sess) {
+      if (tab) tab.close();
+      const card = docModal('');
+      // mountOtpForm сам малює Google-кнопку + email-код і зберігає сесію
+      mountOtpForm(card, 'documents', () => {
+        document.getElementById('doc-gate-modal')?.remove();
+        docOpen(rel, window.open('', '_blank'));
+      });
+      return;
+    }
+    try {
+      const r = await fetch(snAuth.workerUrl + '/api/docs/sign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sess.token },
+        body: JSON.stringify({ path: rel }),
+      });
+      const data = await r.json().catch(() => ({}));
+      if (r.ok && data.url) { if (tab) tab.location = data.url; else window.open(data.url, '_blank', 'noopener'); return; }
+      if (tab) tab.close();
+      if (r.status === 401) {                       // сесія протухла — просимо перезайти
+        snAuth.clear(sess.block || 'documents');
+        return docOpen(rel, null);
+      }
+      const restricted = data.restricted || DOC_RESTRICTED_HINT.some(re => re.test(rel));
+      docModal(
+        '<div class="otp-icon">' + (restricted ? '🔒' : '⚠️') + '</div>' +
+        '<div class="otp-title">' + (restricted ? 'Обмежений доступ' : 'Не вдалося відкрити') + '</div>' +
+        '<div class="otp-desc">' + (restricted
+          ? 'Цей документ у вужчому колі (виробничі інструкції, ринкові звіти, вихідні макети, стратегія).<br>Доступ відкриває Вадим — напишіть на vg@sneco.ua.'
+          : 'Помилка: ' + (data.error || ('HTTP ' + r.status))) + '</div>' +
+        '<button class="otp-btn secondary" onclick="document.getElementById(\'doc-gate-modal\').remove()">Закрити</button>');
+    } catch (e) {
+      if (tab) tab.close();
+      docModal('<div class="otp-icon">⚠️</div><div class="otp-title">Немає зв\'язку</div>' +
+        '<div class="otp-desc">' + String(e.message || e) + '</div>' +
+        '<button class="otp-btn secondary" onclick="document.getElementById(\'doc-gate-modal\').remove()">Закрити</button>');
+    }
+  }
+
+  document.addEventListener('click', function (e) {
+    const a = e.target.closest && e.target.closest('a[href]');
+    if (!a) return;
+    const rel = a.getAttribute('href') || '';
+    if (!docIsGated(rel)) return;
+    e.preventDefault();
+    // ⚠ Вкладку відкриваємо СИНХРОННО, у самому обробнику кліку. Якщо чекати
+    // на fetch і лише потім кликати window.open — блокувальник попапів її вб'є.
+    docOpen(rel, window.open('', '_blank'));
+  });
+
   // v2.78.50: Admin-only mode — show pre-built proposal previews for vg/fg
   function snAuthApplyAdminClass() {
     try {
