@@ -15227,8 +15227,8 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
     return wrap.firstChild;
   }
 
-  async function docOpen(rel, tab) {
-    const sess = snAuth.anySession && snAuth.anySession();
+  async function docOpen(rel, tab, retried) {
+    const sess = retried ? null : (snAuth.anySession && snAuth.anySession());
     if (!sess) {
       if (tab) tab.close();
       const card = docModal('');
@@ -15248,9 +15248,12 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
       const data = await r.json().catch(() => ({}));
       if (r.ok && data.url) { if (tab) tab.location = data.url; else window.open(data.url, '_blank', 'noopener'); return; }
       if (tab) tab.close();
-      if (r.status === 401) {                       // сесія протухла — просимо перезайти
-        snAuth.clear(sess.block || 'documents');
-        return docOpen(rel, null);
+      if (r.status === 401) {
+        // ⚠ Сесія протухла. snAuth.clear() чистить ключ за назвою блоку, а в
+        // збереженій сесії блоку може не бути — тоді anySession() поверне ту саму
+        // мертву сесію і ми зациклимось. Тому другий захід іде примусово на форму.
+        try { snAuth.clear(sess.block || 'documents'); } catch (_) {}
+        return docOpen(rel, null, true);
       }
       const restricted = data.restricted || DOC_RESTRICTED_HINT.some(re => re.test(rel));
       docModal(
