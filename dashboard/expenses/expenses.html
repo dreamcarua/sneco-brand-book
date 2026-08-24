@@ -370,15 +370,18 @@ function renderMutual(){
   const body=rows.map(r=>`<tr>
       <td>${esc(r.name)}</td>
       <td class="num">${nf(r.paid)}</td>
+      <td class="num">${nf(r.supplied)}</td>
       <td class="num">${nf(r.sold)}</td>
       <td class="num"><b style="color:${r.saldo<0?'var(--red)':'var(--grn)'}">${r.saldo>0?'+':''}${nf(r.saldo)}</b></td>
-      <td class="hint">${r.saldo<0?'ми платимо більше':'нам винні більше'}</td>
     </tr>`).join('');
-  return `<div class="lead">Контрагенти, з якими грошовий потік іде <b>в обидва боки</b> і обидва суттєві.
-    Тут важлива не сума виплати, а <b>сальдо</b> — хто кому винен за підсумком. Типово це
-    внутрішньогрупові розрахунки та пов'язані особи.</div>
-    <div class="scroll"><table><thead><tr><th>Контрагент</th><th class="num">Платимо їм</th>
-      <th class="num">Продаємо їм</th><th class="num">Сальдо</th><th></th></tr></thead>
+  return `<div class="lead">Контрагенти зі справжнім зустрічним потоком: те, що ми віддаємо їм
+    (виплати або постачання від них), тягне щонайменше на <b>половину</b> того, що вони в нас
+    купують. Поріг саме такий, щоб сюди не потрапили мережі — вони отримують ретро-бонус і
+    купують у нас, але бонус це знижка постфактум, а не купівля в них.
+    Дивитись треба не на суму, а на <b>сальдо</b> — хто кому винен за підсумком.</div>
+    <div class="scroll"><table><thead><tr><th>Контрагент</th><th class="num">Сплатили їм</th>
+      <th class="num">Постачань від них</th><th class="num">Продали їм</th>
+      <th class="num">Сальдо</th></tr></thead>
       <tbody>${body}</tbody></table></div>`;
 }
 
