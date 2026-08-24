@@ -75,6 +75,14 @@ tbody tr:hover{background:#FFFBEF}
 .bar-mini i.red{background:var(--red)}.bar-mini i.amb{background:var(--amb)}
 .note{font-size:11.5px;color:var(--muted);line-height:1.55;margin-top:8px}
 .empty{padding:26px;text-align:center;color:var(--muted);font-size:13px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin:0 0 16px;border-bottom:2px solid var(--line)}
+.tabs button{font:inherit;font-size:13px;font-weight:600;background:none;border:0;padding:9px 14px;
+  cursor:pointer;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px}
+.tabs button:hover{color:var(--dark)}
+.tabs button.on{color:var(--dark);border-bottom-color:var(--yel)}
+.tabs button .n{font-size:10.5px;background:#EFEFE8;border-radius:9px;padding:1px 6px;margin-left:5px;color:#666}
+.lead{font-size:12.5px;color:var(--muted);line-height:1.6;background:#FFFDF6;border:1px solid #F2E6C4;
+  border-radius:8px;padding:10px 13px;margin-bottom:12px}
 .loader{padding:60px;text-align:center;color:var(--muted)}
 @media(max-width:640px){.wrap{padding:12px}.bar{position:static}}
 </style>
@@ -316,7 +324,112 @@ function renderDrill(){
     <tbody>${body}</tbody></table></div>`;
 }
 
-window.selItem=function(i){ ITEM=i; draw(); document.getElementById('drill')?.scrollIntoView({behavior:'smooth',block:'start'}); };
+window.selItem=function(i){ ITEM=i; TAB='all'; draw(); setTimeout(()=>document.getElementById('drill')?.scrollIntoView({behavior:'smooth',block:'start'}),50); };
+
+// ── вкладки: не «одна на статтю», а за ПРИРОДОЮ витрати ────────────────────
+// До кожної природи своя лінза. Маркетинг мережам можна міряти окупністю,
+// перевізника — концентрацією, зарплату — лише трендом.
+let TAB='signals';
+const TABS=[
+  {k:'signals', t:'⚠ Сигнали'},
+  {k:'trade',   t:'🔻 Трейд-маркетинг'},
+  {k:'mutual',  t:'🔄 Взаємозаліки'},
+  {k:'vendor',  t:'🚚 Постачальники послуг'},
+  {k:'internal',t:'🏠 Внутрішні'},
+  {k:'all',     t:'📊 Усі статті'},
+];
+window.setTab=function(k){TAB=k;draw();window.scrollTo({top:0,behavior:'smooth'});};
+
+function itemsOfGroup(g){
+  const ms=monthsIn(), gr=D.groups||{};
+  return D.items.map(it=>({...it,sum:itemTotal(it,ms)}))
+                .filter(r=>r.sum>0 && (gr[r.item]||'vendor')===g)
+                .sort((a,b)=>b.sum-a.sum);
+}
+
+function renderGroupTable(g,note){
+  const rows=itemsOfGroup(g);
+  if(!rows.length) return '<div class="card empty">За цей період витрат немає.</div>';
+  const tot=rows.reduce((a,r)=>a+r.sum,0);
+  const body=rows.map(r=>`<tr style="cursor:pointer" onclick="selItem('${esc(r.item).replace(/'/g,"\\'")}')">
+      <td>${esc(r.item)}</td>
+      <td class="num">${nf(r.sum)}</td>
+      <td class="num">${(r.sum/tot*100).toFixed(1)}%</td>
+      <td style="width:130px"><div class="bar-mini"><i style="width:${Math.round(r.sum/rows[0].sum*100)}%"></i></div></td>
+    </tr>`).join('');
+  return `<div class="lead">${note}</div>
+    <div class="scroll"><table><thead><tr><th>Стаття</th><th class="num">Сума, грн</th>
+      <th class="num">Частка</th><th></th></tr></thead><tbody>${body}</tbody>
+      <tfoot><tr><td><b>Разом</b></td><td class="num"><b>${nf(tot)}</b></td><td></td><td></td></tr></tfoot>
+      </table></div>`;
+}
+
+function renderMutual(){
+  const rows=D.mutual||[];
+  if(!rows.length) return '<div class="card empty">Двосторонніх розрахунків немає.</div>';
+  const body=rows.map(r=>`<tr>
+      <td>${esc(r.name)}</td>
+      <td class="num">${nf(r.paid)}</td>
+      <td class="num">${nf(r.sold)}</td>
+      <td class="num"><b style="color:${r.saldo<0?'var(--red)':'var(--grn)'}">${r.saldo>0?'+':''}${nf(r.saldo)}</b></td>
+      <td class="hint">${r.saldo<0?'ми платимо більше':'нам винні більше'}</td>
+    </tr>`).join('');
+  return `<div class="lead">Контрагенти, з якими грошовий потік іде <b>в обидва боки</b> і обидва суттєві.
+    Тут важлива не сума виплати, а <b>сальдо</b> — хто кому винен за підсумком. Типово це
+    внутрішньогрупові розрахунки та пов'язані особи.</div>
+    <div class="scroll"><table><thead><tr><th>Контрагент</th><th class="num">Платимо їм</th>
+      <th class="num">Продаємо їм</th><th class="num">Сальдо</th><th></th></tr></thead>
+      <tbody>${body}</tbody></table></div>`;
+}
+
+function renderVendors(){
+  const rows=D.vendor_items||[];
+  if(!rows.length) return '<div class="card empty">Немає даних.</div>';
+  const body=rows.map(r=>{
+    const s=r.top_share;
+    const cls=s>=.8?'red':s>=.5?'amb':'grn';
+    return `<tr style="cursor:pointer" onclick="selItem('${esc(r.item).replace(/'/g,"\\'")}')">
+      <td>${esc(r.item)}</td>
+      <td class="num">${nf(r.total)}</td>
+      <td class="num">${r.n_vendors}</td>
+      <td>${esc((r.top_name||'').slice(0,30))}</td>
+      <td class="num"><span class="tag t-${cls}">${pct(s)}</span></td>
+    </tr>`;}).join('');
+  return `<div class="lead">Постачальники послуг — перевізники, оренда, комуналка, підрядники.
+    Окупність тут не рахується: ми їм нічого не продаємо. Натомість важлива <b>концентрація</b> —
+    наскільки ми залежимо від одного контрагента. Понад 80% в одних руках означає, що його
+    зникнення або підняття тарифу б'є одразу і без запасних варіантів.</div>
+    <div class="scroll"><table><thead><tr><th>Стаття</th><th class="num">Сума</th>
+      <th class="num">Постачальників</th><th>Найбільший</th><th class="num">Його частка</th></tr></thead>
+      <tbody>${body}</tbody></table></div>`;
+}
+
+function tabBody(){
+  switch(TAB){
+    case 'signals':
+      return `<h2>⚠ Що потребує уваги <span class="cnt">${(D.anomalies||[]).length}</span></h2>
+        <div class="lead">Сигнали, які варто перевірити. Червоні — гроші, що майже не повертаються.
+          Про нові з них щоранку приходить Telegram; повторно про те саме не турбуємо.</div>
+        ${renderAnomalies()}`;
+    case 'trade':
+      return `<h2>🔻 Окупність трейд-маркетингу <span class="cnt">рік ${D.current_month.slice(0,4)}</span></h2>
+        <div class="lead">Виплати тим, кому ми <b>ще й продаємо</b>: ретро-бонуси мережам, плата за полицю,
+          акції. Це не рекламний бюджет, а знижка постфактум конкретному покупцю. Тому міряємо
+          не відсотком від виручки, а часткою <b>валового прибутку</b>, який повертається назад.</div>
+        ${renderPayback()}
+        <h2>Статті цієї групи</h2>
+        ${renderGroupTable('trade','Сюди потрапляють статті, де понад 30% суми йде нашим покупцям.')}`;
+    case 'mutual':   return `<h2>🔄 Взаємозаліки</h2>${renderMutual()}`;
+    case 'vendor':   return `<h2>🚚 Постачальники послуг</h2>${renderVendors()}`;
+    case 'internal':
+      return `<h2>🏠 Внутрішні витрати</h2>
+        ${renderGroupTable('internal','Зарплати, дивіденди, податки, кредити. Це не платежі постачальникам, '+
+          'тож ні окупність, ні концентрація тут не мають сенсу — дивимось лише на суми й динаміку.')}`;
+    default:
+      return `<h2>📊 Витрати за статтями</h2>${renderItems()}
+        <h2 id="drill">🔍 Розріз статті</h2>${renderDrill()}`;
+  }
+}
 
 function draw(){
   const ms=monthsIn();
@@ -348,17 +461,14 @@ function draw(){
         <div class="kpi-s">${worst?esc(worst.name).slice(0,28):''}</div></div>
     </div>
 
-    <h2>⚠ Що потребує уваги <span class="cnt">${(D.anomalies||[]).length}</span></h2>
-    ${renderAnomalies()}
-
-    <h2>🔻 Окупність трейд-маркетингу <span class="cnt">рік ${D.current_month.slice(0,4)}</span></h2>
-    ${renderPayback()}
-
-    <h2>📊 Витрати за статтями</h2>
-    ${renderItems()}
-
-    <h2 id="drill">🔍 Розріз статті</h2>
-    ${renderDrill()}
+    <div class="tabs">${TABS.map(t=>{
+        let n='';
+        if(t.k==='signals') n=`<span class="n">${(D.anomalies||[]).length}</span>`;
+        if(t.k==='mutual')  n=`<span class="n">${(D.mutual||[]).length}</span>`;
+        if(t.k==='vendor')  n=`<span class="n">${(D.vendor_items||[]).length}</span>`;
+        return `<button class="${TAB===t.k?'on':''}" onclick="setTab('${t.k}')">${t.t}${n}</button>`;
+      }).join('')}</div>
+    ${tabBody()}
   `;
   const sel=document.getElementById('per');
   sel.value=PERIOD;
