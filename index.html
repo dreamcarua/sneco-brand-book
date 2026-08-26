@@ -14625,7 +14625,10 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
   }));
 
   // hash routing on load
-  const initial = location.hash.replace('#','');
+  // Приймаємо обидві форми: #packaging і #sec-packaging. Друга лишилась у вже
+  // збереженій історії AI-асистента (ask_history) і в старих email-розсилках,
+  // тому просто нормалізуємо, а не ламаємо ті посилання.
+  const initial = location.hash.replace('#','').replace(/^sec-/, '');
   if (initial && document.getElementById('sec-' + initial)) {
     show(initial, false);
   } else if (initial.startsWith('idea-')) {
