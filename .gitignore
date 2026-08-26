@@ -11,6 +11,8 @@ dashboard/production/data.json
 
 # v2.79.2 (24.08.2026): documents/ і strategy/ переїхали у R2 за авторизацію.
 # Роздає Worker /api/docs/sign → /docs/get. НЕ повертати у публічний repo.
-documents/
+documents/*
+!documents/certificates/
+!documents/sk_certificates/
 strategy/
 dashboard/LAUNCHER_CARDS_FOR_VADYM.md
