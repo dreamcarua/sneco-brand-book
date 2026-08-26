@@ -338,6 +338,10 @@ const TABS=[
   {k:'internal',t:'🏠 Внутрішні'},
   {k:'all',     t:'📊 Усі статті'},
 ];
+// Worker вирізає зарплати й дивіденди для всіх, крім вужчого кола (hr-payroll),
+// і ставить прапорець internal_hidden. Тоді вкладка «Внутрішні» просто зникає —
+// краще, ніж показати її порожньою і змусити гадати, чи це збій.
+function tabsVisible(){ return TABS.filter(t => !(t.k==='internal' && D.internal_hidden)); }
 window.setTab=function(k){TAB=k;draw();window.scrollTo({top:0,behavior:'smooth'});};
 
 function itemsOfGroup(g){
@@ -464,7 +468,7 @@ function draw(){
         <div class="kpi-s">${worst?esc(worst.name).slice(0,28):''}</div></div>
     </div>
 
-    <div class="tabs">${TABS.map(t=>{
+    <div class="tabs">${tabsVisible().map(t=>{
         let n='';
         if(t.k==='signals') n=`<span class="n">${(D.anomalies||[]).length}</span>`;
         if(t.k==='mutual')  n=`<span class="n">${(D.mutual||[]).length}</span>`;
