@@ -6609,6 +6609,73 @@ snEco не тане і не заветрюється: 24 місяці за зв�
 <span data-lang="en">⚠️ If a buyer says "let's put it in the cheese section" — push back gently but firmly toward the snack aisle. In the cheese block, snEco becomes a confusing product wedged between mozzarella and parmesan — and repeat-purchase drops.</span><span data-lang="sk">⚠️ Ak nákupca povie „dajme to do oddelenia syrov" — jemne ale pevne presunieme do snack-zóny. Inak sa snEco stane nezrozumiteľným produktom medzi mozzarellou a parmezánom — a opakované nákupy klesnú.</span>
 </div>
 </div>
+<!-- ===== Калькулятор акцій (ідея Ярослава → Богдан, 26.08.2026) ===== -->
+<h3 class="block-title" id="sales-kalkuliator-aktsii">🧮 <span data-lang="uk">Калькулятор акції — яку знижку можна дати</span><span data-lang="en">Promo calculator — what discount is safe</span><span data-lang="sk">Kalkulačka akcie — akú zľavu môžeme dať</span></h3>
+<div class="card" style="border-left:4px solid #2D6A00;margin-bottom:24px">
+<div style="font-size:13.5px;line-height:1.7;margin-bottom:16px">
+<span data-lang="uk">Партнер просить знижку — питання завжди одне: наскільки має вирости обсяг, щоб ми не втратили гроші. Введіть свої цифри, решту порахує калькулятор. <strong>Собівартість і поточні ціни беріть у Finance-дашборді</strong> — тут вони свідомо не зашиті, бо сторінка відкрита.</span>
+<span data-lang="en">A partner asks for a discount — the question is always the same: how much must volume grow so we don't lose money. Enter your figures, the calculator does the rest. <strong>Take cost and current prices from the Finance dashboard</strong> — they are deliberately not hard-coded here, as this page is public.</span>
+<span data-lang="sk">Partner žiada zľavu — otázka je vždy rovnaká: o koľko musí narásť objem, aby sme nestratili. Zadajte svoje čísla, zvyšok dopočíta kalkulačka. <strong>Náklady a aktuálne ceny nájdete vo Finance dashboarde</strong> — tu zámerne nie sú zapísané, stránka je verejná.</span>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px">
+<label style="font-size:12px"><span style="display:block;color:var(--text-muted);margin-bottom:4px"><span data-lang="uk">Ціна відвантаження</span><span data-lang="en">Your selling price</span><span data-lang="sk">Vaša predajná cena</span></span><input id="pc-price" type="number" value="66.86" step="0.01" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:14px"></label>
+<label style="font-size:12px"><span style="display:block;color:var(--text-muted);margin-bottom:4px"><span data-lang="uk">Собівартість</span><span data-lang="en">Unit cost</span><span data-lang="sk">Náklad na kus</span></span><input id="pc-cost" type="number" value="20.65" step="0.01" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:14px"></label>
+<label style="font-size:12px"><span style="display:block;color:var(--text-muted);margin-bottom:4px"><span data-lang="uk">Обсяг/міс, шт</span><span data-lang="en">Volume/mo, units</span><span data-lang="sk">Objem/mes, ks</span></span><input id="pc-qty" type="number" value="6000" step="100" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:14px"></label>
+<label style="font-size:12px"><span style="display:block;color:var(--text-muted);margin-bottom:4px"><span data-lang="uk">Знижка, %</span><span data-lang="en">Discount, %</span><span data-lang="sk">Zľava, %</span></span><input id="pc-disc" type="number" value="15" step="1" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:14px"></label>
+</div>
+<div id="pc-out" style="font-size:13.5px;line-height:1.9"></div>
+<div style="margin-top:14px;padding:10px 14px;background:rgba(45,106,0,0.06);border-radius:6px;font-size:12px;color:var(--text-muted);border-left:3px solid #2D6A00">
+<span data-lang="uk"><strong>Прибуток тут валовий</strong> — сировина і техоперації. Оренда, зарплати, логістика й маркетинг не враховані, тож реальний поріг вищий за розрахунковий. Ще одне: обсяг після акції майже ніколи не лишається на новому рівні — частина приросту це викуп «про запас», який з'їсть наступний місяць.</span>
+<span data-lang="en"><strong>Profit here is gross</strong> — raw materials and processing only. Rent, salaries, logistics and marketing are excluded, so the real break-even is higher than calculated. Also: post-promo volume rarely stays at the new level — part of the lift is stocking up, which eats into the following month.</span>
+<span data-lang="sk"><strong>Zisk je hrubý</strong> — suroviny a spracovanie. Nájom, mzdy, logistika a marketing nie sú zahrnuté, reálny prah je teda vyšší. A ešte: objem po akcii málokedy zostane na novej úrovni — časť nárastu je predzásobenie, ktoré ukrojí z ďalšieho mesiaca.</span>
+</div>
+</div>
+<script>
+(function(){
+  var ids = ['pc-price','pc-cost','pc-qty','pc-disc'];
+  function calc(){
+    var p = +document.getElementById('pc-price').value || 0;
+    var c = +document.getElementById('pc-cost').value || 0;
+    var q = +document.getElementById('pc-qty').value || 0;
+    var d = +document.getElementById('pc-disc').value || 0;
+    var out = document.getElementById('pc-out');
+    if (!out) return;
+    if (p <= 0 || c < 0 || p <= c) { out.innerHTML = '<span style="color:#B00">Ціна має бути більшою за собівартість.</span>'; return; }
+    var m0 = p - c, newP = p * (1 - d/100), m1 = newP - c;
+    var profit0 = m0 * q;
+    // Скільки одиниць треба продати на новій маржі, щоб лишитись при тому ж валовому прибутку.
+    var need = m1 > 0 ? profit0 / m1 : Infinity;
+    var lift = m1 > 0 ? (need/q - 1) * 100 : Infinity;
+    var f = function(x){ return x.toLocaleString('uk-UA', {maximumFractionDigits:0}); };
+    var rows = [
+      ['Маржа зараз', m0.toFixed(2) + ' ₴/шт · ' + (m0/p*100).toFixed(1) + '%'],
+      ['Ціна зі знижкою', newP.toFixed(2) + ' ₴'],
+      ['Маржа після знижки', (m1 > 0 ? m1.toFixed(2) + ' ₴/шт · ' + (m1/newP*100).toFixed(1) + '%' : '<span style="color:#B00">нижче собівартості</span>')],
+      ['Валовий прибуток зараз', f(profit0) + ' ₴/міс'],
+    ];
+    var verdict;
+    if (m1 <= 0) {
+      verdict = '<div style="margin-top:10px;padding:10px 14px;background:rgba(176,0,0,.10);border-left:3px solid #B00;border-radius:6px"><strong>Так не можна.</strong> Знижка заводить ціну нижче собівартості — кожна продана пачка збільшує збиток.</div>';
+    } else {
+      var color = lift <= 30 ? '#2D6A00' : (lift <= 70 ? '#B8860B' : '#B00');
+      var note = lift <= 30 ? 'Реалістично — такий приріст промо зазвичай дає.'
+               : lift <= 70 ? 'Амбітно. Просіть у партнера зобов’язання по обсягу і додаткову викладку.'
+               : 'Малоймовірно. Краще запропонувати меншу знижку або компенсацію іншим (викладка, спільний маркетинг).';
+      verdict = '<div style="margin-top:10px;padding:10px 14px;background:rgba(45,106,0,.07);border-left:3px solid ' + color + ';border-radius:6px">'
+              + '<strong>Щоб не втратити гроші, обсяг має вирости на <span style="color:' + color + '">+' + lift.toFixed(0) + '%</span></strong> — з ' + f(q) + ' до ' + f(Math.ceil(need)) + ' шт/міс.<br><span style="font-size:12.5px;color:var(--text-muted)">' + note + '</span></div>';
+    }
+    out.innerHTML = rows.map(function(r){
+      return '<div style="display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid var(--black-05);padding:4px 0"><span style="color:var(--text-muted)">' + r[0] + '</span><strong>' + r[1] + '</strong></div>';
+    }).join('') + verdict;
+  }
+  ids.forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('input', calc);
+  });
+  if (document.getElementById('pc-out')) calc();
+})();
+</script>
+
 <h3 class="block-title" id="sales-derevo-zaperechen"><span data-lang="uk">Дерево заперечень</span><span data-lang="en">Objection tree</span><span data-lang="sk">Strom námietok</span></h3>
 <div class="card">
 <div style="display:flex;flex-direction:column;gap:14px">
