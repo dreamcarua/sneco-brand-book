@@ -324,25 +324,18 @@ function renderDrill(){
     <tbody>${body}</tbody></table></div>`;
 }
 
-window.selItem=function(i){ ITEM=i; TAB='all'; draw(); setTimeout(()=>document.getElementById('drill')?.scrollIntoView({behavior:'smooth',block:'start'}),50); };
+// Розріз статті лишився в межах однієї сторінки — вкладки «Усі статті» більше немає.
+window.selItem=function(i){ ITEM=i; draw(); setTimeout(()=>document.getElementById('drill')?.scrollIntoView({behavior:'smooth',block:'start'}),50); };
 
 // ── вкладки: не «одна на статтю», а за ПРИРОДОЮ витрати ────────────────────
 // До кожної природи своя лінза. Маркетинг мережам можна міряти окупністю,
 // перевізника — концентрацією, зарплату — лише трендом.
-let TAB='signals';
-const TABS=[
-  {k:'signals', t:'⚠ Сигнали'},
-  {k:'trade',   t:'🔻 Трейд-маркетинг'},
-  {k:'mutual',  t:'🔄 Взаємозаліки'},
-  {k:'vendor',  t:'🚚 Постачальники послуг'},
-  {k:'internal',t:'🏠 Внутрішні'},
-  {k:'all',     t:'📊 Усі статті'},
-];
-// Worker вирізає зарплати й дивіденди для всіх, крім вужчого кола (hr-payroll),
-// і ставить прапорець internal_hidden. Тоді вкладка «Внутрішні» просто зникає —
-// краще, ніж показати її порожньою і змусити гадати, чи це збій.
-function tabsVisible(){ return TABS.filter(t => !(t.k==='internal' && D.internal_hidden)); }
-window.setTab=function(k){TAB=k;draw();window.scrollTo({top:0,behavior:'smooth'});};
+// ⚠ 26.08.2026, рішення VG: вкладок більше немає. Прибрано Взаємозаліки,
+// Постачальників послуг, Внутрішні та Усі статті — дашборд відкрито всій
+// команді, а ці розрізи показують зарплати, дивіденди й розрахунки з
+// пов'язаними особами. Лишились Сигнали + Трейд-маркетинг, зведені в одну
+// сторінку. Worker ріже дані на своєму боці (trade_only), тож ховати щось
+// у фронтенді не потрібно — його все одно можна обійти.
 
 function itemsOfGroup(g){
   const ms=monthsIn(), gr=D.groups||{};
@@ -412,30 +405,25 @@ function renderVendors(){
 }
 
 function tabBody(){
-  switch(TAB){
-    case 'signals':
-      return `<h2>⚠ Що потребує уваги <span class="cnt">${(D.anomalies||[]).length}</span></h2>
-        <div class="lead">Сигнали, які варто перевірити. Червоні — гроші, що майже не повертаються.
-          Про нові з них щоранку приходить Telegram; повторно про те саме не турбуємо.</div>
-        ${renderAnomalies()}`;
-    case 'trade':
-      return `<h2>🔻 Окупність трейд-маркетингу <span class="cnt">рік ${D.current_month.slice(0,4)}</span></h2>
-        <div class="lead">Виплати тим, кому ми <b>ще й продаємо</b>: ретро-бонуси мережам, плата за полицю,
-          акції. Це не рекламний бюджет, а знижка постфактум конкретному покупцю. Тому міряємо
-          не відсотком від виручки, а часткою <b>валового прибутку</b>, який повертається назад.</div>
-        ${renderPayback()}
-        <h2>Статті цієї групи</h2>
-        ${renderGroupTable('trade','Сюди потрапляють статті, де понад 30% суми йде нашим покупцям.')}`;
-    case 'mutual':   return `<h2>🔄 Взаємозаліки</h2>${renderMutual()}`;
-    case 'vendor':   return `<h2>🚚 Постачальники послуг</h2>${renderVendors()}`;
-    case 'internal':
-      return `<h2>🏠 Внутрішні витрати</h2>
-        ${renderGroupTable('internal','Зарплати, дивіденди, податки, кредити. Це не платежі постачальникам, '+
-          'тож ні окупність, ні концентрація тут не мають сенсу — дивимось лише на суми й динаміку.')}`;
-    default:
-      return `<h2>📊 Витрати за статтями</h2>${renderItems()}
-        <h2 id="drill">🔍 Розріз статті</h2>${renderDrill()}`;
-  }
+  // Одна сторінка: спершу те, що потребує рішення, далі — цифри, на яких
+  // це рішення ґрунтується. Перемикати вкладки тут не було чого.
+  return `
+    <h2>⚠ Що потребує уваги <span class="cnt">${(D.anomalies||[]).length}</span></h2>
+    <div class="lead">Сигнали, які варто перевірити. Червоні — гроші, що майже не повертаються.
+      Про нові з них щоранку приходить Telegram; повторно про те саме не турбуємо.</div>
+    ${renderAnomalies()}
+
+    <h2 style="margin-top:40px">🔻 Окупність трейд-маркетингу <span class="cnt">рік ${D.current_month.slice(0,4)}</span></h2>
+    <div class="lead">Виплати тим, кому ми <b>ще й продаємо</b>: ретро-бонуси мережам, плата за полицю,
+      акції. Це не рекламний бюджет, а знижка постфактум конкретному покупцю. Тому міряємо
+      не відсотком від виручки, а часткою <b>валового прибутку</b>, який повертається назад.</div>
+    ${renderPayback()}
+
+    <h2>Статті цієї групи</h2>
+    ${renderGroupTable('trade','Сюди потрапляють статті, де понад 30% суми йде нашим покупцям.')}
+
+    <h2 id="drill" style="margin-top:40px">🔍 Розріз статті</h2>
+    ${renderDrill()}`;
 }
 
 function draw(){
@@ -468,13 +456,6 @@ function draw(){
         <div class="kpi-s">${worst?esc(worst.name).slice(0,28):''}</div></div>
     </div>
 
-    <div class="tabs">${tabsVisible().map(t=>{
-        let n='';
-        if(t.k==='signals') n=`<span class="n">${(D.anomalies||[]).length}</span>`;
-        if(t.k==='mutual')  n=`<span class="n">${(D.mutual||[]).length}</span>`;
-        if(t.k==='vendor')  n=`<span class="n">${(D.vendor_items||[]).length}</span>`;
-        return `<button class="${TAB===t.k?'on':''}" onclick="setTab('${t.k}')">${t.t}${n}</button>`;
-      }).join('')}</div>
     ${tabBody()}
   `;
   const sel=document.getElementById('per');
