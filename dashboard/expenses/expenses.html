@@ -74,6 +74,20 @@ tbody tr:hover{background:#FFFBEF}
 .bar-mini i{display:block;height:100%;background:var(--grn)}
 .bar-mini i.red{background:var(--red)}.bar-mini i.amb{background:var(--amb)}
 .note{font-size:11.5px;color:var(--muted);line-height:1.55;margin-top:8px}
+/* калькулятор акції */
+.pc-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+.pc-row label{display:block;font-size:11px;color:var(--muted)}
+.pc-row input,.pc-row select{width:100%;margin-top:4px;padding:7px 8px;border:1px solid var(--line);
+  border-radius:6px;font-size:13.5px;font-family:inherit;background:#fff}
+.pc-row select{max-width:100%}
+.pc-line{display:flex;justify-content:space-between;gap:14px;padding:5px 0;border-bottom:1px solid var(--line);font-size:13px}
+.pc-verdict{margin-top:10px;padding:10px 13px;border-radius:8px;font-size:13.5px;line-height:1.6;
+  background:rgba(45,106,0,.07);border-left:3px solid var(--grn,#2D6A00)}
+.pc-verdict.amb{background:rgba(184,134,11,.09);border-left-color:#B8860B}
+.pc-verdict.red{background:rgba(176,0,0,.08);border-left-color:var(--red,#B00)}
+.pc-note{display:block;margin-top:4px;font-size:12px;color:var(--muted)}
+.pc-bad{margin-top:10px;padding:10px 13px;border-radius:8px;font-size:13.5px;
+  background:rgba(176,0,0,.09);border-left:3px solid var(--red,#B00)}
 .empty{padding:26px;text-align:center;color:var(--muted);font-size:13px}
 .tabs{display:flex;gap:4px;flex-wrap:wrap;margin:0 0 16px;border-bottom:2px solid var(--line)}
 .tabs button{font:inherit;font-size:13px;font-weight:600;background:none;border:0;padding:9px 14px;
@@ -286,6 +300,71 @@ function renderPayback(){
       Тому рядок, де частка близька до 100%, означає роботу в мінус.</div>`;
 }
 
+// ── калькулятор акції ─────────────────────────────────────────────────────
+// Живе саме тут, а не в публічній частині Brand Bible: сторінка під гейтом,
+// тож можна підставити справжню собівартість замість ручного вводу.
+// ⚠ Прибуток валовий — сировина й техоперації. Оренда, зарплати, логістика
+// і маркетинг не враховані, тож реальний поріг завжди вищий за розрахунковий.
+function renderPromoCalc(){
+  const sku=(D.sku_economics||[]);
+  if(!sku.length) return '<div class="card empty">Немає даних про собівартість. Дочекайся нічного синку.</div>';
+  const opts=sku.map((s,i)=>`<option value="${i}">${esc(s.name)} · ${s.qty_mo} шт/міс</option>`).join('');
+  return `<div class="card">
+    <div class="pc-row">
+      <label>Товар<select id="pc-sku">${opts}</select></label>
+      <label>Ціна, ₴<input id="pc-price" type="number" step="0.01"></label>
+      <label>Собівартість, ₴<input id="pc-cost" type="number" step="0.01"></label>
+      <label>Обсяг/міс, шт<input id="pc-qty" type="number" step="100"></label>
+      <label>Знижка, %<input id="pc-disc" type="number" step="1" value="15"></label>
+    </div>
+    <div id="pc-out" class="pc-out"></div>
+  </div>`;
+}
+
+function pcCalc(){
+  const sku=(D.sku_economics||[]);
+  const g=id=>document.getElementById(id);
+  const out=g('pc-out'); if(!out) return;
+  const p=+g('pc-price').value||0, c=+g('pc-cost').value||0,
+        q=+g('pc-qty').value||0,  d=+g('pc-disc').value||0;
+  if(p<=0||p<=c){ out.innerHTML='<div class="pc-bad">Ціна має бути більшою за собівартість.</div>'; return; }
+  const m0=p-c, np=p*(1-d/100), m1=np-c, prof0=m0*q;
+  const need=m1>0?prof0/m1:Infinity, lift=m1>0?(need/q-1)*100:Infinity;
+  const rows=[
+    ['Маржа зараз', `${m0.toFixed(2)} ₴/шт · ${(m0/p*100).toFixed(1)}%`],
+    ['Ціна зі знижкою', `${np.toFixed(2)} ₴`],
+    ['Маржа після знижки', m1>0?`${m1.toFixed(2)} ₴/шт · ${(m1/np*100).toFixed(1)}%`:'<b style="color:var(--red)">нижче собівартості</b>'],
+    ['Валовий прибуток зараз', `${nf(prof0)} ₴/міс`],
+  ].map(r=>`<div class="pc-line"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('');
+  let verdict;
+  if(m1<=0){
+    verdict='<div class="pc-bad"><b>Так не можна.</b> Знижка заводить ціну нижче собівартості — кожна продана пачка збільшує збиток.</div>';
+  }else{
+    const cls=lift<=30?'grn':lift<=70?'amb':'red';
+    const note=lift<=30?'Реалістично — такий приріст промо зазвичай дає.'
+              :lift<=70?'Амбітно. Просіть зобов’язання по обсягу і додаткову викладку.'
+              :'Малоймовірно. Краще менша знижка або компенсація іншим — викладка, спільний маркетинг.';
+    verdict=`<div class="pc-verdict ${cls}">Щоб не втратити гроші, обсяг має вирости на
+      <b>+${lift.toFixed(0)}%</b> — з ${nf(q)} до ${nf(Math.ceil(need))} шт/міс.
+      <span class="pc-note">${note}</span></div>`;
+  }
+  out.innerHTML=rows+verdict+
+    '<div class="note">Прибуток валовий: сировина і техоперації. Оренда, зарплати, логістика й маркетинг '+
+    'не враховані, тож реальний поріг вищий. І ще: обсяг після акції рідко лишається на новому рівні — '+
+    'частина приросту це викуп «про запас», який з’їсть наступний місяць.</div>';
+}
+
+function pcBind(){
+  const sku=(D.sku_economics||[]);
+  const g=id=>document.getElementById(id);
+  if(!g('pc-sku')) return;
+  const fill=()=>{ const s=sku[+g('pc-sku').value]||sku[0]; if(!s) return;
+    g('pc-price').value=s.price; g('pc-cost').value=s.cost; g('pc-qty').value=s.qty_mo; pcCalc(); };
+  g('pc-sku').addEventListener('change',fill);
+  ['pc-price','pc-cost','pc-qty','pc-disc'].forEach(i=>g(i).addEventListener('input',pcCalc));
+  fill();
+}
+
 // ── статті ────────────────────────────────────────────────────────────────
 function renderItems(){
   const ms=monthsIn();
@@ -419,6 +498,12 @@ function tabBody(){
       не відсотком від виручки, а часткою <b>валового прибутку</b>, який повертається назад.</div>
     ${renderPayback()}
 
+    <h2 style="margin-top:40px">🧮 Калькулятор акції <span class="cnt">перед перемовинами</span></h2>
+    <div class="lead">Партнер просить знижку — питання завжди одне: наскільки має вирости обсяг,
+      щоб ми не втратили гроші. Ціна й собівартість підтягнуті з обліку за останні 3 місяці,
+      але будь-яке поле можна перебити вручну.</div>
+    ${renderPromoCalc()}
+
     <h2>Статті цієї групи</h2>
     ${renderGroupTable('trade','Сюди потрапляють статті, де понад 30% суми йде нашим покупцям.')}
 
@@ -463,6 +548,8 @@ function draw(){
   sel.onchange=()=>{PERIOD=sel.value;draw();};
   document.getElementById('perHint').textContent = ms.length?`${ms[0]} — ${ms[ms.length-1]}`:'';
   document.getElementById('gen').textContent='дані на '+D.generated;
+  // Калькулятор перемальовується разом із рештою, тож слухачі вішаємо щоразу.
+  pcBind();
 }
 
 window.__expInit=async function(){
