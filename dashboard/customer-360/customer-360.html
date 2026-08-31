@@ -1644,7 +1644,7 @@ function applyOverviewFilter(customers, filter){
   if (!filter || filter === 'all') return pool.filter(c => c.__metrics?.totalShipped > 0);
   const cutoff30 = new Date(Date.now() - 30*86400000).toISOString().slice(0,10);
   const cutoff60 = new Date(Date.now() - 60*86400000).toISOString().slice(0,10);
-  const curMonthYM = new Date().toISOString().slice(0,7);
+  const curMonthYM = ymLocal(new Date());
   switch(filter) {
     case 'active':  return pool.filter(c => c.__metrics?.lastOrder && c.__metrics.lastOrder.slice(0,10) >= cutoff30);
     case 'at-risk': return pool.filter(c => c.__metrics?.totalShipped > 0 && c.__health >= 40 && c.__health < 70);
@@ -1845,9 +1845,9 @@ function computeCustomerMetrics(c, allDemands, allReturns){
 
   // MoM — поточний vs попередній місяць (по календарю) — legacy для backward compat
   const now = new Date();
-  const curMonthYM = now.toISOString().slice(0,7);
+  const curMonthYM = ymLocal(now);
   const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const prevMonthYM = prevMonth.toISOString().slice(0,7);
+  const prevMonthYM = ymLocal(prevMonth);
   const monthRev = byMonth[curMonthYM] || 0;
   const prevMonthRev = byMonth[prevMonthYM] || 0;
 
@@ -2840,6 +2840,19 @@ function _buildOverviewHtml(){
   `;
 }
 
+// Місяць у форматі YYYY-MM за ЛОКАЛЬНИМ часом.
+//
+// ⚠ 31.08.2026, знайшла Поліна. Скрізь стояло `d.toISOString().slice(0,7)`.
+// toISOString переводить у UTC, а Київ улітку — UTC+3. Тому `new Date(2026,6,1)`
+// (1 липня, 00:00 локально) у UTC стає 30 червня 21:00 і дає рядок «2026-06».
+// Через це графік «12 завершених місяців» зсувався на місяць назад: показував
+// по червень, хоча липень давно закритий і 4,02 млн ₴ у базі лежали.
+// Дати, зібрані як `new Date(y, m, 1)`, ламалися ЗАВЖДИ; `new Date()` — лише
+// вночі до 03:00, тобто рівно у вікні нічних синків.
+function ymLocal(d){
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+
 // Render trend charts after innerHTML applied (v2.78.5: 2 charts — 12-month bar + YTD comparison)
 function _renderOverviewCharts(){
   // Aggregate revenue per month across ALL customers (одна агрегація для обох charts)
@@ -2861,7 +2874,7 @@ function _renderOverviewCharts(){
     const months12 = [];
     for (let i=12; i>=1; i--) {
       const d = new Date(currentY, currentM - i, 1);
-      months12.push(d.toISOString().slice(0,7));
+      months12.push(ymLocal(d));
     }
     const labels12 = months12.map(m => {
       const [y,mn] = m.split('-');
@@ -4738,7 +4751,7 @@ function renderCustomerView(c){
       const months6 = [];
       for (let i = 5; i >= 0; i--) {
         const d = new Date(now2.getFullYear(), now2.getMonth() - i, 1);
-        months6.push({ key: d.toISOString().slice(0,7), label: mNames2[d.getMonth()] });
+        months6.push({ key: ymLocal(d), label: mNames2[d.getMonth()] });
       }
       const revByMonthLocal = {}, ordByMonthLocal = {};
       dems.forEach(d => {
