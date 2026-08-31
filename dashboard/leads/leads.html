@@ -45,6 +45,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* ─── LAYOUT ─── */
 .wrap{padding:20px 24px;max-width:1400px;margin:0 auto}
+/* аналітика: воронка, причини, сегменти, джерела */
+.an-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:16px 0 20px}
+.an-card{background:#fff;border:1px solid var(--line,#e5e5e5);border-radius:10px;padding:13px 15px}
+.an-card h3{margin:0 0 9px;font-size:13px;font-weight:700;letter-spacing:.02em}
+.an-card h3 .cnt{font-weight:500;color:#999;font-size:11px;margin-left:5px}
+.fn-row{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:12.5px}
+.fn-l{flex:1;min-width:0;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fn-bar{flex:0 0 66px;height:7px;background:#f0f0f0;border-radius:4px;overflow:hidden}
+.fn-bar i{display:block;height:100%;background:#2D6A00;border-radius:4px}
+.fn-n{flex:0 0 auto;font-variant-numeric:tabular-nums;min-width:22px;text-align:right}
+.fn-p{flex:0 0 34px;text-align:right;color:#999;font-size:11px}
+.rj-wrap{margin-top:5px}
+.rj-wrap select{font-size:11.5px;border-color:#d99}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+
 .empty-hero{padding:80px 20px;text-align:center;color:var(--muted)}
 .empty-hero .eh-icon{font-size:60px;margin-bottom:14px;opacity:.5}
 .empty-hero .eh-title{font-size:18px;font-weight:700;color:var(--d);margin-bottom:6px}
@@ -457,13 +472,35 @@ tr:hover td{background:#FEFCF7}
 </div></div>
 
 <div class="wrap">
-  <div class="kpis">
-    <div class="k acc"><div class="n" id="k-new">0</div><div class="l">Нових · не оброблені</div></div>
-    <div class="k"><div class="n" id="k-7">0</div><div class="l">За 7 днів</div></div>
-    <div class="k"><div class="n" id="k-30">0</div><div class="l">За 30 днів</div></div>
-    <div class="k"><div class="n" id="k-work">0</div><div class="l">В роботі</div></div>
-    <div class="k"><div class="n" id="k-won">0</div><div class="l">Успішні</div></div>
+  <!-- Період керує всім на сторінці: KPI, воронкою, причинами, таблицями. -->
+  <div class="bar" style="margin-bottom:14px">
+    <label style="font-size:12px;color:#666">Період</label>
+    <select id="f-period">
+      <option value="7">Останні 7 днів</option>
+      <option value="30" selected>Останні 30 днів</option>
+      <option value="90">Останні 90 днів</option>
+      <option value="mtd">Цей місяць</option>
+      <option value="prev">Минулий місяць</option>
+      <option value="ytd">Цей рік</option>
+      <option value="all">Весь час</option>
+      <option value="custom">Довільний…</option>
+    </select>
+    <input type="date" id="f-from" style="display:none">
+    <input type="date" id="f-to" style="display:none">
+    <span class="sub" id="perHint" style="font-size:12px;color:#888"></span>
+    <div class="sp"></div>
+    <span class="sub" id="upd2" style="font-size:12px;color:#888"></span>
   </div>
+
+  <div class="kpis">
+    <div class="k acc"><div class="n" id="k-total">0</div><div class="l">Заявок за період</div></div>
+    <div class="k"><div class="n" id="k-new">0</div><div class="l">Не оброблені</div></div>
+    <div class="k"><div class="n" id="k-work">0</div><div class="l">В роботі</div></div>
+    <div class="k"><div class="n" id="k-won">0</div><div class="l">Замовили</div></div>
+    <div class="k"><div class="n" id="k-conv">—</div><div class="l">Конверсія в замовлення</div></div>
+  </div>
+
+  <div id="analytics"></div>
 
   <div class="bar">
     <select id="f-status">
@@ -474,7 +511,14 @@ tr:hover td{background:#FEFCF7}
       <option value="lost">Втрачені</option><option value="duplicate">Дублікат</option><option value="spam">Спам</option>
     </select>
     <select id="f-source"><option value="">Усі джерела</option></select>
-    <input id="f-q" placeholder="Пошук: імʼя, компанія, email, телефон…" style="min-width:260px">
+    <select id="f-segment">
+      <option value="">Усі сегменти</option>
+      <option value="distributor">Дистриб'ютор</option><option value="horeca">HoReCa</option>
+      <option value="retail-chain">Мережа</option><option value="retail-single">Окремий магазин</option>
+      <option value="online">Онлайн / маркетплейс</option><option value="other">Інше</option>
+      <option value="__none">Без сегмента</option>
+    </select>
+    <input id="f-q" placeholder="Пошук: імʼя, компанія, email, телефон…" style="min-width:220px">
     <div class="sp"></div>
     <button class="btn gh" id="purge" title="Видалити тестові записи (example.com, smoke-*)">🧹 Тестові</button>
     <button class="btn gh" id="csv">↓ CSV</button>
@@ -482,11 +526,15 @@ tr:hover td{background:#FEFCF7}
   </div>
 
   <div id="tablebox"></div>
+
+  <h2 style="margin:34px 0 6px;font-size:17px">🛒 Клієнти, що зробили замовлення</h2>
+  <div class="sub" style="margin-bottom:10px;font-size:13px;color:#666">Ліди, які дійшли до угоди. Історія замовлень підтягується з МойСкладу через картку контрагента.</div>
+  <div id="ordersbox"></div>
   <div style="height:40px"></div>
 </div>
 
 <script>
-var WORKER='https://sneco-auth.vg-ab6.workers.dev', TOKEN=null, LEADS=[];
+var WORKER='https://sneco-auth.vg-ab6.workers.dev', TOKEN=null, LEADS=[], ORDERS=[];
 var ST={'new':'Новий','contacted':"Зв'язались",'qualified':'Кваліфікований','opportunity':'Можливість','sample-sent':'Зразки надіслані','won':'Успішний','lost':'Втрачений','duplicate':'Дублікат','spam':'Спам'};
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function dt(v){if(!v)return '';var d=new Date(typeof v==='number'?v*1000:v);if(isNaN(d))return esc(v);
@@ -499,28 +547,158 @@ async function api(path,body){
   return r.json();
 }
 
-function kpis(){
-  var now=Date.now(), d7=now-7*864e5, d30=now-30*864e5;
-  var f=function(fn){return LEADS.filter(fn).length;};
+// ── довідники ─────────────────────────────────────────────────────────────
+// Причини відмови — фіксований список. З вільного тексту неможливо зібрати
+// зведення «скільки втратили через ціну», а саме воно й потрібне.
+var REASON={price:'Дорого / ціна',assortment:'Не підійшов асортимент',
+  'not-relevant':'Неактуально',thinking:'Думає',
+  'no-response':'Не виходить на звʼязок',other:'Інше'};
+var SEGMENT={distributor:'Дистрибʼютор',horeca:'HoReCa','retail-chain':'Мережа',
+  'retail-single':'Окремий магазин',online:'Онлайн / маркетплейс',other:'Інше'};
+// Порядок = рух воронкою. Duplicate/spam сюди не входять — це не етапи.
+var FUNNEL=['new','contacted','qualified','opportunity','sample-sent','won'];
+var WORK=['contacted','qualified','opportunity','sample-sent'];
+
+// ── період ────────────────────────────────────────────────────────────────
+function periodRange(){
+  var v=document.getElementById('f-period').value, now=new Date(), from, to=now;
+  if(v==='custom'){
+    var a=document.getElementById('f-from').value, b=document.getElementById('f-to').value;
+    from=a?new Date(a+'T00:00:00'):new Date(0);
+    to=b?new Date(b+'T23:59:59'):now;
+  } else if(v==='all'){ from=new Date(0); }
+  else if(v==='mtd'){ from=new Date(now.getFullYear(),now.getMonth(),1); }
+  else if(v==='prev'){ from=new Date(now.getFullYear(),now.getMonth()-1,1);
+                       to=new Date(now.getFullYear(),now.getMonth(),0,23,59,59); }
+  else if(v==='ytd'){ from=new Date(now.getFullYear(),0,1); }
+  else { from=new Date(now.getTime()-parseInt(v)*864e5); }
+  return {from:from.getTime(), to:to.getTime(), label:v};
+}
+function inPeriod(l,R){ var t=ts(l.created_at); return t>=R.from && t<=R.to; }
+
+function kpis(rows){
+  var f=function(fn){return rows.filter(fn).length;};
+  var won=f(function(l){return l.status==='won';});
+  // Знаменник — усе, крім сміття: дублікати й спам не були реальними заявками.
+  var real=rows.filter(function(l){return ['duplicate','spam'].indexOf(l.status)<0;}).length;
+  document.getElementById('k-total').textContent=rows.length;
   document.getElementById('k-new').textContent=f(function(l){return (l.status||'new')==='new';});
-  document.getElementById('k-7').textContent=f(function(l){return ts(l.created_at)>d7;});
-  document.getElementById('k-30').textContent=f(function(l){return ts(l.created_at)>d30;});
-  document.getElementById('k-work').textContent=f(function(l){return ['contacted','qualified','opportunity','sample-sent'].indexOf(l.status)>=0;});
-  document.getElementById('k-won').textContent=f(function(l){return l.status==='won';});
+  document.getElementById('k-work').textContent=f(function(l){return WORK.indexOf(l.status)>=0;});
+  document.getElementById('k-won').textContent=won;
+  document.getElementById('k-conv').textContent=real?(won/real*100).toFixed(0)+'%':'—';
+}
+
+// ── аналітика: воронка, причини відмов, сегменти, джерела ──────────────────
+function renderAnalytics(rows){
+  var box=document.getElementById('analytics');
+  if(!rows.length){box.innerHTML='';return;}
+  var cnt=function(arr,key){var m={};arr.forEach(function(l){var k=l[key]||'__none';m[k]=(m[k]||0)+1;});return m;};
+
+  // Воронка: скільки лідів дійшли ЩОНАЙМЕНШЕ до кожного етапу.
+  // Через це вона монотонна — «відкотів» назад не показує навіть для відмов.
+  var byStatus=cnt(rows,'status');
+  var reached=FUNNEL.map(function(st,i){
+    var n=0;
+    rows.forEach(function(l){
+      var idx=FUNNEL.indexOf(l.status||'new');
+      if(idx>=i) n++;
+      else if(l.status==='lost'&&i===0) n++;
+    });
+    return {st:st,n:n};
+  });
+  var top=reached[0].n||1;
+  var ST_L={new:'Нові',contacted:'Звʼязались',qualified:'Кваліфіковані',
+            opportunity:'Можливість','sample-sent':'Зразки',won:'Замовили'};
+  var funnel=reached.map(function(r){
+    var w=Math.round(r.n/top*100);
+    return '<div class="fn-row"><span class="fn-l">'+ST_L[r.st]+'</span>'
+      +'<span class="fn-bar"><i style="width:'+w+'%"></i></span>'
+      +'<b class="fn-n">'+r.n+'</b><span class="fn-p">'+w+'%</span></div>';
+  }).join('');
+
+  var lost=rows.filter(function(l){return l.status==='lost';});
+  var byReason=cnt(lost,'reject_reason');
+  var reasons=Object.keys(byReason).sort(function(a,b){return byReason[b]-byReason[a];}).map(function(k){
+    return '<div class="fn-row"><span class="fn-l">'+(k==='__none'?'<i style="color:#bbb">не вказано</i>':esc(REASON[k]||k))+'</span>'
+      +'<b class="fn-n">'+byReason[k]+'</b></div>';
+  }).join('') || '<div class="sub" style="color:#999;font-size:13px">Відмов за період немає.</div>';
+
+  var bySeg=cnt(rows,'segment');
+  var segs=Object.keys(bySeg).sort(function(a,b){return bySeg[b]-bySeg[a];}).map(function(k){
+    return '<div class="fn-row"><span class="fn-l">'+(k==='__none'?'<i style="color:#bbb">не вказано</i>':esc(SEGMENT[k]||k))+'</span>'
+      +'<b class="fn-n">'+bySeg[k]+'</b></div>';
+  }).join('');
+
+  var bySrc=cnt(rows,'source');
+  var srcs=Object.keys(bySrc).sort(function(a,b){return bySrc[b]-bySrc[a];}).slice(0,8).map(function(k){
+    var w=rows.filter(function(l){return (l.source||'__none')===k&&l.status==='won';}).length;
+    return '<div class="fn-row"><span class="fn-l">'+(k==='__none'?'—':esc(k))+'</span>'
+      +'<b class="fn-n">'+bySrc[k]+'</b><span class="fn-p">'+(w?'→ '+w+' 🛒':'')+'</span></div>';
+  }).join('');
+
+  box.innerHTML='<div class="an-grid">'
+    +'<div class="an-card"><h3>Воронка</h3>'+funnel+'</div>'
+    +'<div class="an-card"><h3>Причини відмов <span class="cnt">'+lost.length+'</span></h3>'+reasons+'</div>'
+    +'<div class="an-card"><h3>Сегменти</h3>'+segs+'</div>'
+    +'<div class="an-card"><h3>Джерела <span class="cnt">топ-8</span></h3>'+srcs+'</div>'
+    +'</div>';
+}
+
+// ── клієнти із замовленнями ───────────────────────────────────────────────
+function renderOrders(rows){
+  var box=document.getElementById('ordersbox');
+  var byAgent={};
+  (ORDERS||[]).forEach(function(o){ (byAgent[o.agent_id]=byAgent[o.agent_id]||[]).push(o); });
+  var withOrders=rows.filter(function(l){return l.ms_counterparty_id&&byAgent[l.ms_counterparty_id];});
+  if(!withOrders.length){
+    box.innerHTML='<div class="empty">Замовлень від лідів за цей період ще немає.<br>'
+      +'<span style="font-size:13px">Щойно клієнт із заявки оформить замовлення в МойСкладі, воно зʼявиться тут автоматично.</span></div>';
+    return;
+  }
+  var h='<table><thead><tr><th>Клієнт</th><th>Сегмент</th><th>Джерело</th>'
+    +'<th class="num">Замовлень</th><th>Перше</th><th>Останнє</th><th class="num">Сума, ₴</th></tr></thead><tbody>';
+  withOrders.map(function(l){
+    var os=byAgent[l.ms_counterparty_id].slice().sort(function(a,b){return String(a.moment).localeCompare(String(b.moment));});
+    var sum=os.reduce(function(s,o){return s+(+o.sum_kop||0);},0)/100;
+    return {l:l,os:os,sum:sum};
+  }).sort(function(a,b){return b.sum-a.sum;}).forEach(function(x){
+    var l=x.l, os=x.os;
+    h+='<tr><td><div class="who">'+esc(l.company||l.name||l.email)+'</div>'
+      +'<div class="meta">'+esc(l.email||'')+'</div></td>'
+      +'<td>'+(l.segment?esc(SEGMENT[l.segment]||l.segment):'<span style="color:#bbb">—</span>')+'</td>'
+      +'<td><span class="tag src">'+esc(l.source||'—')+'</span></td>'
+      +'<td class="num"><b>'+os.length+'</b>'+(os.length>1?' <span title="повторні">🔁</span>':'')+'</td>'
+      +'<td style="white-space:nowrap;font-size:13px">'+esc(String(os[0].moment||'').slice(0,10))+'</td>'
+      +'<td style="white-space:nowrap;font-size:13px">'+esc(String(os[os.length-1].moment||'').slice(0,10))+'</td>'
+      +'<td class="num">'+x.sum.toLocaleString('uk-UA',{maximumFractionDigits:0})+'</td></tr>';
+  });
+  box.innerHTML=h+'</tbody></table>';
 }
 
 function render(){
+  var R=periodRange();
+  var inPer=LEADS.filter(function(l){return inPeriod(l,R);});
+  // KPI, воронка й таблиця замовлень дивляться на період, а не на фільтри
+  // нижче — інакше «конверсія» стрибала б від кожного клацання по статусу.
+  kpis(inPer); renderAnalytics(inPer); renderOrders(inPer);
+  var hint=document.getElementById('perHint');
+  if(hint) hint.textContent=R.label==='all'?'за весь час'
+    :new Date(R.from).toLocaleDateString('uk-UA')+' — '+new Date(R.to).toLocaleDateString('uk-UA');
+
   var q=(document.getElementById('f-q').value||'').toLowerCase().trim();
   var st=document.getElementById('f-status').value, sr=document.getElementById('f-source').value;
-  var rows=LEADS.filter(function(l){
+  var sg=document.getElementById('f-segment').value;
+  var rows=inPer.filter(function(l){
     if(st && (l.status||'new')!==st) return false;
     if(sr && l.source!==sr) return false;
+    if(sg==='__none'){ if(l.segment) return false; }
+    else if(sg && l.segment!==sg) return false;
     if(q){var hay=[l.name,l.company,l.email,l.phone,l.message].join(' ').toLowerCase();if(hay.indexOf(q)<0)return false;}
     return true;
   });
   var box=document.getElementById('tablebox');
   if(!rows.length){box.innerHTML='<div class="empty">Лідів не знайдено.<br><span style="font-size:13px">Заявки з лендингу <b>/dystrybyutor/</b> зʼявляться тут автоматично.</span></div>';return;}
-  var h='<table><thead><tr><th>Дата</th><th>Хто</th><th>Контакти</th><th>Коментар клієнта</th><th class="hide-m">Джерело / UTM</th><th>МС</th><th>Статус</th><th>Нотатка менеджера</th><th></th></tr></thead><tbody>';
+  var h='<table><thead><tr><th>Дата</th><th>Хто</th><th>Контакти</th><th>Коментар клієнта</th><th class="hide-m">Джерело / UTM</th><th>МС</th><th>Сегмент</th><th>Статус</th><th>Нотатка менеджера</th><th></th></tr></thead><tbody>';
   rows.forEach(function(l){
     var nm=l.company||l.name||'—';
     h+='<tr>'
@@ -530,8 +708,14 @@ function render(){
      +'<td><div class="msg">'+(l.message?esc(l.message):'<span style="color:#bbb">—</span>')+'</div></td>'
      +'<td class="hide-m"><span class="tag src">'+esc(l.source||'—')+'</span>'+(l.utm_source?'<div class="meta">'+esc(l.utm_source)+' / '+esc(l.utm_medium||'-')+' / '+esc(l.utm_campaign||'-')+'</div>':'')+'</td>'
      +'<td>'+(l.ms_counterparty_id?'<span class="ms">✓</span>':'<span class="ms no">—</span>')+'</td>'
-     +'<td><select class="st" data-id="'+l.id+'">'+Object.keys(ST).map(function(k){return '<option value="'+k+'"'+((l.status||'new')===k?' selected':'')+'>'+ST[k]+'</option>';}).join('')+'</select></td>'
-     +'<td><textarea class="nt" data-id="'+l.id+'" rows="2" placeholder="Нотатка: домовленості, наступний крок…">'+esc(l.internal_notes||'')+'</textarea><div class="ntst" data-for="'+l.id+'"></div></td>'
+     +'<td><select class="sg" data-id="'+l.id+'"><option value="">— сегмент —</option>'
+        +Object.keys(SEGMENT).map(function(k){return '<option value="'+k+'"'+(l.segment===k?' selected':'')+'>'+SEGMENT[k]+'</option>';}).join('')+'</select></td>'
+     +'<td><select class="st" data-id="'+l.id+'">'+Object.keys(ST).map(function(k){return '<option value="'+k+'"'+((l.status||'new')===k?' selected':'')+'>'+ST[k]+'</option>';}).join('')+'</select>'
+        // Причина показується лише для втрачених — інакше поле збиває з пантелику.
+        +'<div class="rj-wrap" data-for="'+l.id+'" style="'+(l.status==='lost'?'':'display:none')+'">'
+        +'<select class="rj" data-id="'+l.id+'"><option value="">— причина —</option>'
+        +Object.keys(REASON).map(function(k){return '<option value="'+k+'"'+(l.reject_reason===k?' selected':'')+'>'+REASON[k]+'</option>';}).join('')+'</select></div></td>'
+     +'<td><textarea class="nt" data-id="'+l.id+'" rows="2" placeholder="Нотатка: домовленості, наступний крок…">'+esc(l.notes||'')+'</textarea><div class="ntst" data-for="'+l.id+'"></div></td>'
      +'<td><button class="del" data-id="'+l.id+'" title="Видалити лід">✕</button></td>'
      +'</tr>';
   });
@@ -546,7 +730,7 @@ function render(){
       try{
         await api('/api/leads/update',{id:parseInt(id),notes:ta.value});
         orig=ta.value;
-        var L=LEADS.find(function(x){return String(x.id)===String(id);});if(L)L.internal_notes=ta.value;
+        var L=LEADS.find(function(x){return String(x.id)===String(id);});if(L)L.notes=ta.value;
         st.textContent='✓ збережено'; setTimeout(function(){st.textContent='';},1800);
       }catch(e){ st.textContent='✕ помилка'; }
     }
@@ -571,29 +755,78 @@ function render(){
     sel.addEventListener('change',async function(){
       var id=this.dataset.id,v=this.value,el=this;el.disabled=true;
       try{await api('/api/leads/update',{id:parseInt(id),status:v});
-        var L=LEADS.find(function(x){return String(x.id)===String(id);});if(L)L.status=v;kpis();
+        var L=LEADS.find(function(x){return String(x.id)===String(id);});if(L)L.status=v;
+        // Поле причини зʼявляється/зникає одразу, без перезавантаження таблиці —
+        // інакше менеджер втратив би фокус і місце в довгому списку.
+        var w=box.querySelector('.rj-wrap[data-for="'+id+'"]');
+        if(w) w.style.display = (v==='lost') ? '' : 'none';
+        refreshTop();
       }catch(e){alert('Не вдалося оновити статус: '+e.message);}
+      el.disabled=false;
+    });
+  });
+  box.querySelectorAll('.sg').forEach(function(sel){
+    sel.addEventListener('change',async function(){
+      var id=this.dataset.id,v=this.value,el=this;el.disabled=true;
+      try{await api('/api/leads/update',{id:parseInt(id),segment:v||null});
+        var L=LEADS.find(function(x){return String(x.id)===String(id);});if(L)L.segment=v||null;
+        refreshTop();
+      }catch(e){alert('Не вдалося оновити сегмент: '+e.message);}
+      el.disabled=false;
+    });
+  });
+  box.querySelectorAll('.rj').forEach(function(sel){
+    sel.addEventListener('change',async function(){
+      var id=this.dataset.id,v=this.value,el=this;el.disabled=true;
+      try{await api('/api/leads/update',{id:parseInt(id),reject_reason:v||null});
+        var L=LEADS.find(function(x){return String(x.id)===String(id);});if(L)L.reject_reason=v||null;
+        refreshTop();
+      }catch(e){alert('Не вдалося зберегти причину: '+e.message);}
       el.disabled=false;
     });
   });
 }
 
+// Перерахунок верхньої частини без перемальовування таблиці.
+function refreshTop(){
+  var R=periodRange();
+  var inPer=LEADS.filter(function(l){return inPeriod(l,R);});
+  kpis(inPer); renderAnalytics(inPer); renderOrders(inPer);
+}
+
 async function load(){
   try{
+    // Тягнемо все, ріжемо періодом на клієнті: лідів сотні, не сотні тисяч,
+    // і так перемикання періоду миттєве, без запиту до сервера.
     var d=await api('/api/leads/list',{limit:2000});
     LEADS=d.leads||[];
+    ORDERS=d.orders||[];
     var srcs=[...new Set(LEADS.map(function(l){return l.source;}).filter(Boolean))].sort();
     var sel=document.getElementById('f-source'),cur=sel.value;
     sel.innerHTML='<option value="">Усі джерела</option>'+srcs.map(function(s){return '<option value="'+esc(s)+'">'+esc(s)+'</option>';}).join('');
     sel.value=cur;
-    document.getElementById('upd').textContent='Усього '+LEADS.length+' · оновлено '+new Date().toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
-    kpis();render();
+    var stamp='Усього '+LEADS.length+' · оновлено '+new Date().toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('upd').textContent=stamp;
+    var u2=document.getElementById('upd2'); if(u2) u2.textContent=stamp;
+    render();
   }catch(e){
     document.getElementById('tablebox').innerHTML='<div class="empty">Помилка завантаження: '+esc(e.message)+'</div>';
   }
 }
 
-['f-status','f-source'].forEach(function(id){document.getElementById(id).addEventListener('change',render);});
+['f-status','f-source','f-segment','f-from','f-to'].forEach(function(id){
+  var el=document.getElementById(id); if(el) el.addEventListener('change',render);
+});
+document.getElementById('f-period').addEventListener('change',function(){
+  var custom=this.value==='custom';
+  ['f-from','f-to'].forEach(function(id){document.getElementById(id).style.display=custom?'':'none';});
+  if(custom&&!document.getElementById('f-from').value){
+    var d=new Date(); d.setDate(d.getDate()-30);
+    document.getElementById('f-from').value=d.toISOString().slice(0,10);
+    document.getElementById('f-to').value=new Date().toISOString().slice(0,10);
+  }
+  render();
+});
 document.getElementById('f-q').addEventListener('input',render);
 document.getElementById('reload').addEventListener('click',load);
 document.getElementById('purge').addEventListener('click',async function(){
