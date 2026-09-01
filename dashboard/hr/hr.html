@@ -196,6 +196,14 @@ table.tbl tfoot td{font-weight:700;background:#FAFAF5;border-top:2px solid var(-
 .kb-card:hover{box-shadow:0 3px 10px rgba(0,0,0,.14)}
 .kb-card:active{cursor:grabbing}
 .kb-card.dragging{opacity:.4;transform:rotate(1.5deg)}
+/* Привид, що летить за курсором. pointer-events:none — обовʼязково, інакше
+   elementFromPoint бачитиме привида замість колонки під ним. z-index 940 —
+   нижче модалки (950), щоб не перекривав діалог причини відмови. */
+.kb-ghost{position:fixed;z-index:940;width:226px;pointer-events:none;opacity:.95;
+  box-shadow:0 10px 28px rgba(0,0,0,.24);transform:rotate(2deg);border-radius:9px;
+  background:#fff;padding:9px 10px;border-left:3px solid var(--y);font-size:12px}
+.kb-card:focus-visible{outline:2px solid var(--y);outline-offset:2px}
+body.kb-dragging{cursor:grabbing;user-select:none;-webkit-user-select:none}
 .kb-card.stale{border-left-color:var(--orange)}
 .kb-card.hot{border-left-color:var(--g)}
 .kbc-top{display:flex;align-items:center;gap:7px;margin-bottom:5px}
@@ -834,6 +842,7 @@ body{overflow-x:clip}
     <a href="#g-start">Швидкий старт</a>
     <a href="#g-tabs">Вкладки — що де</a>
     <a href="#g-how">Як зробити (рецепти)</a>
+    <a href="#g-drag">Перетягування</a>
     <a href="#g-metrics">Як рахуються показники</a>
     <a href="#g-rules">Правила ведення даних</a>
     <a href="#g-access">Доступи і безпека</a>
@@ -938,6 +947,20 @@ body{overflow-x:clip}
       <p>Кнопка <span class="doc-kbd">🕘</span> згори — журнал усіх дій за останній час. Історію конкретної людини видно в її картці на вкладці «Історія».</p>
     </section>
 
+    <section class="doc-sec" id="g-drag">
+      <h2>🖐 Як пересунути кандидата між етапами</h2>
+      <div class="lead">Три способи — усі роблять одне й те саме, вибирайте зручніший.</div>
+      <table>
+        <thead><tr><th style="width:24%">Спосіб</th><th>Як</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Мишею</strong></td><td>Затисніть картку і ведіть у потрібну колонку. Колонка підсвітиться жовтим — відпускайте. Якщо тягнете до краю екрана, канбан прокрутиться сам.</td></tr>
+          <tr><td><strong>Пальцем</strong><br><span class="muted">планшет, телефон</span></td><td><strong>Притисніть і потримайте</strong> картку ≈пів секунди — телефон коротко вібрує, картка «відклеїться». Далі ведіть. Якщо провести пальцем одразу, без утримання — просто прогортається список, картка лишиться на місці.</td></tr>
+          <tr><td><strong>З картки</strong></td><td>Відкрийте кандидата і скористайтесь кнопкою наступного етапу, кнопкою «Відмова» або випадайкою зі списком усіх етапів. Найнадійніший спосіб, якщо працюєте з клавіатури.</td></tr>
+        </tbody>
+      </table>
+      <div class="rj-note">При переході у «Відмову» або «Офер відхилено» дашборд запитає причину — вона потрапляє в аналітику відмов під канбаном. Якщо натиснути «Скасувати» у цьому запиті, кандидат лишиться на місці.</div>
+    </section>
+
     <section class="doc-sec" id="g-metrics">
       <h2>📐 Як рахуються показники</h2>
       <div class="lead">Щоб цифрам можна було довіряти — ось точні формули і межі їх застосування.</div>
@@ -1023,6 +1046,16 @@ body{overflow-x:clip}
       <div class="lead">Що і коли змінювалось у дашборді.</div>
       <div class="doc-ver">
         <div class="v">
+          <div class="vh">v2.79.3 — Перетягування карток працює скрізь</div>
+          <div class="vd">01.09.2026</div>
+          <ul>
+            <li>Картку кандидата тепер можна <strong>перетягнути мишею</strong> в іншу колонку — раніше механізм був у коді, але не спрацьовував.</li>
+            <li><strong>На планшеті й телефоні</strong> перетягування зʼявилося вперше: притисніть картку на пів секунди, потім ведіть. Коротке ведення пальцем, як і раніше, гортає список.</li>
+            <li>Коли тягнете до краю — канбан прокручується сам, тож дальні колонки (як «Відмова») тепер досяжні.</li>
+            <li>Картку можна відкрити з клавіатури: Tab до неї, потім Enter.</li>
+          </ul>
+        </div>
+        <div class="v">
           <div class="vh">v2.79.2 — Аналітика відмов і дрібні виправлення</div>
           <div class="vd">01.09.2026</div>
           <ul>
@@ -1086,7 +1119,7 @@ body{overflow-x:clip}
 /* ═══════════════════════════════════════════════════════════════════════════
    snEco · HR Dashboard — core (v2.79.0)
    ═══════════════════════════════════════════════════════════════════════════ */
-const HR_VERSION = 'v2.79.2';
+const HR_VERSION = 'v2.79.3';
 const HR_UPDATED  = '01.09.2026';
 const API = 'https://sneco-auth.vg-ab6.workers.dev';
 const BLOCK_HR = 'hr-dashboard';
@@ -1639,7 +1672,9 @@ function kbCard(c){
   const stale = days>=7 && !STAGE_MAP[c.stage]?.terminal && c.stage!=='hired';
   const src = c.source ? `<span class="chip chip-gray">${esc(c.source)}</span>` : '';
   const stars = c.rating ? `<span class="stars" title="Оцінка ${c.rating}/5">${'★'.repeat(c.rating)}${'☆'.repeat(5-c.rating)}</span>` : '';
-  return `<div class="kb-card${stale?' stale':''}" draggable="true" data-id="${c.id}" onclick="openCandidate(${c.id})">
+  // draggable/onclick прибрано свідомо — тепер усе через pointer events (див. bindKanban).
+  // tabindex+role: картку можна відкрити з клавіатури, а етап змінити в самій картці.
+  return `<div class="kb-card${stale?' stale':''}" data-id="${c.id}" tabindex="0" role="button" aria-label="${esc(c.full_name)} — відкрити картку">
     <div class="kbc-top">
       <div class="av" style="background:${hashColor(c.full_name)};width:24px;height:24px;font-size:9.5px">${initials(c.full_name)}</div>
       <div class="kbc-nm">${esc(c.full_name)}</div>
@@ -1648,22 +1683,107 @@ function kbCard(c){
     <div class="kbc-meta">${src}${stars}<span class="kbc-days${stale?' warn':''}">${days}д</span></div>
   </div>`;
 }
+/* ── Перетягування карток ───────────────────────────────────────────────────
+   ⚠ 01.09.2026, зауваження VG: «функціонал бачу, перетягнути не можу».
+   Було на HTML5 drag&drop (draggable="true" + dataTransfer). Він:
+     • не працює на тач-екранах ВЗАГАЛІ — планшет і телефон лишались без функції;
+     • мовчки ламається від дрібниць у CSS предків, без жодної помилки в консолі;
+     • конфліктував з onclick на картці — відпускання відкривало картку кандидата.
+   Переписано на pointer events: одна модель для миші, тача і стилуса.
+   Миша — тягнемо одразу після 6px зсуву (менше = клік). Палець — після
+   утримання 220 мс, інакше палець має скролити колонку, а не тягати картку. */
 function bindKanban(){
-  let dragId = null;
+  const wrap = document.querySelector('.kb-wrap');
+  let st = null;
+
+  const reset = ()=>{
+    if (!st) return;
+    clearTimeout(st.holdTimer);
+    st.ghost?.remove();
+    st.card.classList.remove('dragging');
+    document.body.classList.remove('kb-dragging');
+    document.body.style.touchAction = '';
+    $$('.kb-col').forEach(c=>c.classList.remove('over'));
+    st = null;
+  };
+
+  const colAt = (x,y)=>{
+    const el = document.elementFromPoint(x,y);
+    return el ? el.closest('.kb-col') : null;
+  };
+
+  // Автопрокрутка: канбан ширший за екран, і без цього дальні колонки
+  // (наприклад «Відмова») недосяжні — картку нікуди дотягнути.
+  const autoScroll = (x,y)=>{
+    if (wrap){
+      const r = wrap.getBoundingClientRect(), edge = 60;
+      if (x > r.right - edge) wrap.scrollLeft += 14;
+      else if (x < r.left + edge) wrap.scrollLeft -= 14;
+    }
+    const col = colAt(x,y);
+    const body = col?.querySelector('.kb-body');
+    if (body){
+      const r = body.getBoundingClientRect(), edge = 40;
+      if (y > r.bottom - edge) body.scrollTop += 10;
+      else if (y < r.top + edge) body.scrollTop -= 10;
+    }
+  };
+
   $$('.kb-card').forEach(card=>{
-    card.addEventListener('dragstart', e=>{ dragId = +card.dataset.id; card.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; try{e.dataTransfer.setData('text/plain',String(dragId));}catch(_){} });
-    card.addEventListener('dragend', ()=>{ card.classList.remove('dragging'); dragId=null; $$('.kb-col').forEach(c=>c.classList.remove('over')); });
-  });
-  $$('.kb-body').forEach(body=>{
-    const col = body.closest('.kb-col');
-    body.addEventListener('dragover', e=>{ e.preventDefault(); e.dataTransfer.dropEffect='move'; col.classList.add('over'); });
-    body.addEventListener('dragleave', ()=>col.classList.remove('over'));
-    body.addEventListener('drop', async e=>{
-      e.preventDefault(); col.classList.remove('over');
-      const id = dragId || +e.dataTransfer.getData('text/plain');
-      const to = body.dataset.stage;
-      if (!id || !to) return;
-      await moveStage(id, to);
+    card.addEventListener('pointerdown', e=>{
+      if (e.button > 0) return;                 // лише ліва кнопка
+      reset();
+      const touch = e.pointerType === 'touch';
+      st = { id:+card.dataset.id, card, x0:e.clientX, y0:e.clientY,
+             pid:e.pointerId, moved:false, ghost:null, armed:!touch };
+      if (touch) st.holdTimer = setTimeout(()=>{
+        if (st){ st.armed = true; document.body.style.touchAction='none'; navigator.vibrate?.(12); }
+      }, 220);
+      try { card.setPointerCapture(e.pointerId); } catch(_){}
+    });
+
+    card.addEventListener('pointermove', e=>{
+      if (!st || st.pid !== e.pointerId) return;
+      const dist = Math.hypot(e.clientX - st.x0, e.clientY - st.y0);
+      if (!st.armed){                            // палець поїхав до утримання — це скрол
+        if (dist > 8) reset();
+        return;
+      }
+      if (!st.moved){
+        if (dist < 6) return;                    // дрібний зсув = клік, не перетягування
+        st.moved = true;
+        const r = card.getBoundingClientRect();
+        st.dx = st.x0 - r.left; st.dy = st.y0 - r.top;
+        const g = card.cloneNode(true);
+        g.className = 'kb-ghost';
+        g.removeAttribute('tabindex'); g.removeAttribute('role');
+        document.body.appendChild(g);
+        st.ghost = g;
+        card.classList.add('dragging');
+        document.body.classList.add('kb-dragging');
+      }
+      e.preventDefault();
+      st.ghost.style.left = (e.clientX - st.dx) + 'px';
+      st.ghost.style.top  = (e.clientY - st.dy) + 'px';
+      const col = colAt(e.clientX, e.clientY);
+      $$('.kb-col').forEach(c=>c.classList.toggle('over', c === col));
+      autoScroll(e.clientX, e.clientY);
+    }, { passive:false });
+
+    card.addEventListener('pointerup', e=>{
+      if (!st || st.pid !== e.pointerId) return;
+      const { id, moved } = st;
+      const col = moved ? colAt(e.clientX, e.clientY) : null;
+      reset();
+      if (!moved){ openCandidate(id); return; }  // не тягнули — звичайний клік
+      const to = col?.dataset.stage;
+      if (to) moveStage(id, to);
+    });
+
+    card.addEventListener('pointercancel', reset);
+    card.addEventListener('lostpointercapture', ()=>{ if (st && !st.moved) reset(); });
+    card.addEventListener('keydown', e=>{
+      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openCandidate(+card.dataset.id); }
     });
   });
 }
