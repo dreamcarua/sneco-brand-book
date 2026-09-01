@@ -1707,9 +1707,19 @@ function bindKanban(){
     st = null;
   };
 
+  /* ⚠ Колонку шукаємо ГЕОМЕТРИЧНО, а не через document.elementFromPoint.
+     Причина (знайдено 01.09.2026 інструментальним тестом): панель фільтрів
+     .filterbar липка і має z-index 150 — вона фізично накриває верхню
+     частину колонок. elementFromPoint чесно повертає те, що зверху, тобто
+     панель, і колонка під курсором не знаходиться. Саме на це ламався і
+     старий HTML5 drag&drop: подія drop не доходила до .kb-body.
+     Обхід rect-ами не залежить ні від z-index, ні від будь-яких накладань. */
   const colAt = (x,y)=>{
-    const el = document.elementFromPoint(x,y);
-    return el ? el.closest('.kb-col') : null;
+    for (const col of $$('.kb-col')){
+      const r = col.getBoundingClientRect();
+      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return col;
+    }
+    return null;
   };
 
   // Автопрокрутка: канбан ширший за екран, і без цього дальні колонки
