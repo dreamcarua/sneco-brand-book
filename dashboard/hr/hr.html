@@ -176,6 +176,18 @@ table.tbl tfoot td{font-weight:700;background:#FAFAF5;border-top:2px solid var(-
 .kb-col{background:#EDEDE5;border-radius:11px;width:246px;min-width:246px;display:flex;flex-direction:column;max-height:calc(100vh - 250px)}
 .kb-col.over{background:var(--yf);box-shadow:inset 0 0 0 2px var(--y)}
 .kb-col.terminal{background:#E8E8E0}
+/* аналітика відмов */
+.rj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.rj-card{padding:13px 15px}
+.rj-card h4{margin:0 0 9px;font-size:12.5px;font-weight:700}
+.rj-tot{font-weight:500;color:#9a9a90;font-size:11px;margin-left:5px}
+.rj-row{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:12.5px}
+.rj-l{flex:1;min-width:0;color:#55554e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rj-bar{flex:0 0 70px;height:7px;background:#EFEFEA;border-radius:4px;overflow:hidden}
+.rj-bar i{display:block;height:100%;border-radius:4px}
+.rj-n{flex:0 0 auto;font-variant-numeric:tabular-nums;min-width:20px;text-align:right}
+.rj-p{flex:0 0 34px;text-align:right;color:#9a9a90;font-size:11px}
+.rj-note{margin-top:8px;font-size:11px;color:#9a9a90;line-height:1.45}
 .kb-head{padding:9px 11px 7px;display:flex;align-items:center;justify-content:space-between;gap:6px;border-bottom:1px solid rgba(0,0,0,.055);position:sticky;top:0;background:inherit;border-radius:11px 11px 0 0;z-index:1}
 .kb-title{font-size:11.5px;font-weight:700;display:flex;align-items:center;gap:6px}
 .kb-cnt{background:rgba(0,0,0,.09);border-radius:9px;padding:1px 7px;font-size:10.5px;font-weight:700}
@@ -655,6 +667,7 @@ body{overflow-x:clip}
   </div>
   <div class="g4" id="candKpi" style="margin-bottom:14px"></div>
   <div class="kb-wrap"><div class="kb" id="kanban"></div></div>
+  <div id="rejStats" style="margin-top:16px"></div>
   <div class="hint">На компʼютері — перетягніть картку між колонками; на телефоні відкрийте картку кандидата й оберіть етап зі списку. Дати етапів проставляються автоматично. Помаранчева смужка зліва — кандидат без руху 7+ днів.</div>
 </div>
 
@@ -1576,7 +1589,15 @@ function renderCandidates(){
     kpi({ lbl:'Time to Hire', val: tth.avg===null?'—':Math.round(tth.avg)+' дн', sub: tth.n?`по ${tth.n} наймах`:'немає даних', color:'cp' }),
   ].join('');
 
-  const cols = STAGES.filter(s=>showClosed || !s.terminal);
+  renderRejectStats(inP, pool);
+
+  // ⚠ 01.09.2026, прохання Валерії: «додати віконечко Відмова».
+  // Технічно етап існував з самого початку, але колонка ховалася за галочкою
+  // «показати закриті» — тож перетягнути кандидата у відмову було нікуди,
+  // кнопка лежала всередині картки. Відмова — це нормальний результат воронки,
+  // а не архів: показуємо завжди. «Офер відхилено» лишається під галочкою —
+  // трапляється рідше і плутає з відмовою з нашого боку.
+  const cols = STAGES.filter(s=>showClosed || !s.terminal || s.k==='rejected');
   $('#kanban').innerHTML = cols.map(s=>{
     const items = pool.filter(c=>c.stage===s.k)
       .sort((a,b)=>(b.stage_changed_at||0)-(a.stage_changed_at||0));
@@ -1644,6 +1665,67 @@ async function moveStage(id, to){
     if (to==='hired') offerHire(c);
     renderCandidates();
   } catch(e){ Object.assign(c, prev); renderCandidates(); toast(apiErr(e),'err'); }
+}
+
+/* ── Аналітика відмов ──────────────────────────────────────────────────────
+   Дві речі, які реально впливають на рішення:
+   1) НА ЯКОМУ етапі втрачаємо — рано (економимо час) чи після інтервʼю
+      керівника (спалили години команди);
+   2) ЧОМУ — якщо половина через зарплатні очікування, проблема у вилці,
+      а не в рекрутингу.
+   Етап відмови не зберігаємо окремим полем: він однозначно виводиться
+   з дат етапів — останній етап, у якого дата проставлена. */
+const REJ_STEPS = [
+  { k:'mgr_interview_date', l:'після інтервʼю з керівником', c:'#DC2626' },
+  { k:'hr_interview_date',  l:'після HR-інтервʼю',           c:'#EA580C' },
+  { k:'screening_date',     l:'на скринінгу',                c:'#CA8A04' },
+];
+function rejectedAtStage(c){
+  for (const s of REJ_STEPS) if (c[s.k]) return s;
+  return { k:'new', l:'до першого контакту', c:'#78716C' };
+}
+
+function renderRejectStats(inPeriod, pool){
+  const box = $('#rejStats'); if (!box) return;
+  // Рахуємо по даті закриття — інакше «відмови за серпень» показували б
+  // кандидатів, які прийшли в серпні, а відмовили їм у вересні.
+  const { from, to } = S.f;
+  const rej = pool.filter(c => c.stage === 'rejected' &&
+    (!c.closed_date || (c.closed_date >= from && c.closed_date <= to)));
+
+  if (!rej.length){
+    box.innerHTML = `<div class="card" style="padding:14px 16px;color:#8a8a80;font-size:12.5px">
+      Відмов за період немає. Коли зʼявляться — тут буде видно, на якому етапі
+      найчастіше вибувають кандидати і з яких причин.</div>`;
+    return;
+  }
+  const byStep = {}, byReason = {};
+  rej.forEach(c => {
+    const s = rejectedAtStage(c);
+    byStep[s.l] = byStep[s.l] || { n:0, c:s.c };
+    byStep[s.l].n++;
+    // Причина зберігається як «Значення — уточнення»; групуємо по значенню.
+    const r = (c.reject_reason || '').split(' — ')[0].trim() || 'не вказано';
+    byReason[r] = (byReason[r] || 0) + 1;
+  });
+  const row = (l, n, tot, color) => {
+    const w = Math.round(n / tot * 100);
+    return `<div class="rj-row">
+      <span class="rj-l">${esc(l)}</span>
+      <span class="rj-bar"><i style="width:${w}%;background:${color||'#78716C'}"></i></span>
+      <b class="rj-n">${n}</b><span class="rj-p">${w}%</span></div>`;
+  };
+  const steps = REJ_STEPS.map(s=>s.l).concat(['до першого контакту'])
+    .filter(l=>byStep[l]).map(l=>row(l, byStep[l].n, rej.length, byStep[l].c)).join('');
+  const reasons = Object.keys(byReason).sort((a,b)=>byReason[b]-byReason[a]).slice(0,6)
+    .map(r=>row(r, byReason[r], rej.length)).join('');
+
+  box.innerHTML = `<div class="rj-grid">
+    <div class="card rj-card"><h4>На якому етапі відмовили <span class="rj-tot">${rej.length}</span></h4>${steps}
+      <div class="rj-note">Чим нижче в списку — тим пізніше вибув кандидат і тим дорожче обійшовся відбір.</div></div>
+    <div class="card rj-card"><h4>Причини</h4>${reasons}
+      <div class="rj-note">Причина фіксується при переході у «Відмову». Уточнення в дужках не групуються.</div></div>
+  </div>`;
 }
 
 /* ══════════ 3 · КАНАЛИ ══════════ */
