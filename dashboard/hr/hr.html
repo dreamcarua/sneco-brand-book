@@ -192,7 +192,7 @@ table.tbl tfoot td{font-weight:700;background:#FAFAF5;border-top:2px solid var(-
 .kb-title{font-size:11.5px;font-weight:700;display:flex;align-items:center;gap:6px}
 .kb-cnt{background:rgba(0,0,0,.09);border-radius:9px;padding:1px 7px;font-size:10.5px;font-weight:700}
 .kb-body{padding:8px;display:flex;flex-direction:column;gap:7px;overflow-y:auto;flex:1;min-height:70px}
-.kb-card{background:#fff;border-radius:9px;padding:9px 10px;box-shadow:0 1px 3px rgba(0,0,0,.09);cursor:grab;border-left:3px solid var(--border);transition:box-shadow .15s,transform .1s}
+.kb-card{background:#fff;border-radius:9px;padding:9px 10px;box-shadow:0 1px 3px rgba(0,0,0,.09);cursor:grab;user-select:none;-webkit-user-select:none;touch-action:manipulation;border-left:3px solid var(--border);transition:box-shadow .15s,transform .1s}
 .kb-card:hover{box-shadow:0 3px 10px rgba(0,0,0,.14)}
 .kb-card:active{cursor:grabbing}
 .kb-card.dragging{opacity:.4;transform:rotate(1.5deg)}
@@ -1046,6 +1046,15 @@ body{overflow-x:clip}
       <div class="lead">Що і коли змінювалось у дашборді.</div>
       <div class="doc-ver">
         <div class="v">
+          <div class="vh">v2.79.4 — Перетягування: виправлено остаточно</div>
+          <div class="vd">01.09.2026</div>
+          <ul>
+            <li>У версії 2.79.3 перетягування все ще не спрацьовувало. Причина виявилась іншою: браузер під час ведення мишею починав виділяти текст усередині картки й переривав жест на півдорозі.</li>
+            <li>Тепер жест відстежується на рівні вікна, тож доводиться до кінця, навіть якщо курсор пішов з картки.</li>
+            <li>Якщо відпустити картку повз колонки — зʼявиться підказка, що етап не змінено. Раніше нічого не відбувалося і було незрозуміло, спрацювало чи ні.</li>
+          </ul>
+        </div>
+        <div class="v">
           <div class="vh">v2.79.3 — Перетягування карток працює скрізь</div>
           <div class="vd">01.09.2026</div>
           <ul>
@@ -1120,7 +1129,7 @@ body{overflow-x:clip}
 /* ═══════════════════════════════════════════════════════════════════════════
    snEco · HR Dashboard — core (v2.79.0)
    ═══════════════════════════════════════════════════════════════════════════ */
-const HR_VERSION = 'v2.79.3';
+const HR_VERSION = 'v2.79.4';
 const HR_UPDATED  = '01.09.2026';
 const API = 'https://sneco-auth.vg-ab6.workers.dev';
 const BLOCK_HR = 'hr-dashboard';
@@ -1685,114 +1694,113 @@ function kbCard(c){
   </div>`;
 }
 /* ── Перетягування карток ───────────────────────────────────────────────────
-   ⚠ 01.09.2026, зауваження VG: «функціонал бачу, перетягнути не можу».
-   Було на HTML5 drag&drop (draggable="true" + dataTransfer). Він:
-     • не працює на тач-екранах ВЗАГАЛІ — планшет і телефон лишались без функції;
-     • мовчки ламається від дрібниць у CSS предків, без жодної помилки в консолі;
-     • конфліктував з onclick на картці — відпускання відкривало картку кандидата.
-   Переписано на pointer events: одна модель для миші, тача і стилуса.
-   Миша — тягнемо одразу після 6px зсуву (менше = клік). Палець — після
-   утримання 220 мс, інакше палець має скролити колонку, а не тягати картку. */
-function bindKanban(){
+   ⚠ 01.09.2026. Три спроби, три різні причини — записано, щоб не повторювати:
+   1) HTML5 drag&drop (draggable + dataTransfer): на тач-екранах не працює
+      взагалі, а на десктопі подія drop не доходила до колонки — її
+      перехоплювала липка .filterbar (z-index 150).
+   2) Pointer events зі слухачами на картці + setPointerCapture: синтетичний
+      тест проходив, живцем — ні. Без preventDefault на pointerdown браузер
+      починає нативне виділення тексту, це скасовує захоплення вказівника,
+      і жест умирає. Синтетичні PointerEvent нативної поведінки не запускають,
+      тому тест давав хибно-зелений результат.
+   3) Слухачі на window, але стан у замиканні bindKanban: слухачі
+      реєструються один раз, а канбан перемальовується — вони назавжди
+      бачили стан ПЕРШОГО рендеру.
+   Підсумок: стан і хелпери живуть зовні (kbDrag), bindKanban лише навішує
+   pointerdown на свіжі картки, рух і відпускання слухає window, колонка
+   шукається геометрично по rect — накладання панелей не заважають. */
+let kbDrag = null;
+
+function kbReset(){
+  if (!kbDrag) return;
+  clearTimeout(kbDrag.holdTimer);
+  kbDrag.ghost?.remove();
+  kbDrag.card.classList.remove('dragging');
+  document.body.classList.remove('kb-dragging');
+  document.body.style.touchAction = '';
+  $$('.kb-col').forEach(c=>c.classList.remove('over'));
+  kbDrag = null;
+}
+function kbColAt(x,y){
+  for (const col of $$('.kb-col')){
+    const r = col.getBoundingClientRect();
+    if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return col;
+  }
+  return null;
+}
+// Канбан ширший за екран — без автопрокрутки дальні колонки недосяжні.
+function kbAutoScroll(x,y){
   const wrap = document.querySelector('.kb-wrap');
-  let st = null;
+  if (wrap){
+    const r = wrap.getBoundingClientRect(), edge = 60;
+    if (x > r.right - edge) wrap.scrollLeft += 14;
+    else if (x < r.left + edge) wrap.scrollLeft -= 14;
+  }
+  const body = kbColAt(x,y)?.querySelector('.kb-body');
+  if (body){
+    const r = body.getBoundingClientRect(), edge = 40;
+    if (y > r.bottom - edge) body.scrollTop += 10;
+    else if (y < r.top + edge) body.scrollTop -= 10;
+  }
+}
+function kbBindWindowOnce(){
+  if (window.__kbBound) return;
+  window.__kbBound = true;
 
-  const reset = ()=>{
-    if (!st) return;
-    clearTimeout(st.holdTimer);
-    st.ghost?.remove();
-    st.card.classList.remove('dragging');
-    document.body.classList.remove('kb-dragging');
-    document.body.style.touchAction = '';
-    $$('.kb-col').forEach(c=>c.classList.remove('over'));
-    st = null;
-  };
-
-  /* ⚠ Колонку шукаємо ГЕОМЕТРИЧНО, а не через document.elementFromPoint.
-     Причина (знайдено 01.09.2026 інструментальним тестом): панель фільтрів
-     .filterbar липка і має z-index 150 — вона фізично накриває верхню
-     частину колонок. elementFromPoint чесно повертає те, що зверху, тобто
-     панель, і колонка під курсором не знаходиться. Саме на це ламався і
-     старий HTML5 drag&drop: подія drop не доходила до .kb-body.
-     Обхід rect-ами не залежить ні від z-index, ні від будь-яких накладань. */
-  const colAt = (x,y)=>{
-    for (const col of $$('.kb-col')){
-      const r = col.getBoundingClientRect();
-      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return col;
+  window.addEventListener('pointermove', e=>{
+    if (!kbDrag) return;
+    const dist = Math.hypot(e.clientX - kbDrag.x0, e.clientY - kbDrag.y0);
+    if (!kbDrag.armed){ if (dist > 8) kbReset(); return; }   // палець гортає, не тягне
+    if (!kbDrag.moved){
+      if (dist < 6) return;                                  // дрібний зсув — це клік
+      kbDrag.moved = true;
+      const r = kbDrag.card.getBoundingClientRect();
+      kbDrag.dx = kbDrag.x0 - r.left; kbDrag.dy = kbDrag.y0 - r.top;
+      const g = kbDrag.card.cloneNode(true);
+      g.className = 'kb-ghost';
+      g.removeAttribute('tabindex'); g.removeAttribute('role');
+      document.body.appendChild(g);
+      kbDrag.ghost = g;
+      kbDrag.card.classList.add('dragging');
+      document.body.classList.add('kb-dragging');
     }
-    return null;
-  };
+    e.preventDefault();
+    kbDrag.ghost.style.left = (e.clientX - kbDrag.dx) + 'px';
+    kbDrag.ghost.style.top  = (e.clientY - kbDrag.dy) + 'px';
+    const col = kbColAt(e.clientX, e.clientY);
+    $$('.kb-col').forEach(c=>c.classList.toggle('over', c === col));
+    kbAutoScroll(e.clientX, e.clientY);
+  }, { passive:false });
 
-  // Автопрокрутка: канбан ширший за екран, і без цього дальні колонки
-  // (наприклад «Відмова») недосяжні — картку нікуди дотягнути.
-  const autoScroll = (x,y)=>{
-    if (wrap){
-      const r = wrap.getBoundingClientRect(), edge = 60;
-      if (x > r.right - edge) wrap.scrollLeft += 14;
-      else if (x < r.left + edge) wrap.scrollLeft -= 14;
-    }
-    const col = colAt(x,y);
-    const body = col?.querySelector('.kb-body');
-    if (body){
-      const r = body.getBoundingClientRect(), edge = 40;
-      if (y > r.bottom - edge) body.scrollTop += 10;
-      else if (y < r.top + edge) body.scrollTop -= 10;
-    }
-  };
+  window.addEventListener('pointerup', e=>{
+    if (!kbDrag) return;
+    const id = kbDrag.id, moved = kbDrag.moved;
+    const col = moved ? kbColAt(e.clientX, e.clientY) : null;
+    kbReset();
+    if (!moved){ openCandidate(id); return; }
+    if (col?.dataset.stage) moveStage(id, col.dataset.stage);
+    else toast('Картку відпущено повз колонку — етап не змінено');
+  });
 
+  window.addEventListener('pointercancel', kbReset);
+  window.addEventListener('blur', kbReset);
+}
+function bindKanban(){
+  kbBindWindowOnce();
   $$('.kb-card').forEach(card=>{
     card.addEventListener('pointerdown', e=>{
-      if (e.button > 0) return;                 // лише ліва кнопка
-      reset();
+      if (e.button > 0) return;
+      kbReset();
       const touch = e.pointerType === 'touch';
-      st = { id:+card.dataset.id, card, x0:e.clientX, y0:e.clientY,
-             pid:e.pointerId, moved:false, ghost:null, armed:!touch };
-      if (touch) st.holdTimer = setTimeout(()=>{
-        if (st){ st.armed = true; document.body.style.touchAction='none'; navigator.vibrate?.(12); }
+      // ⚠ Без preventDefault браузер виділяє текст картки і рве жест.
+      //    Для пальця не блокуємо — там має лишитись прокрутка списку.
+      if (!touch) e.preventDefault();
+      kbDrag = { id:+card.dataset.id, card, x0:e.clientX, y0:e.clientY,
+                 moved:false, ghost:null, armed:!touch };
+      if (touch) kbDrag.holdTimer = setTimeout(()=>{
+        if (kbDrag){ kbDrag.armed = true; document.body.style.touchAction='none'; navigator.vibrate?.(12); }
       }, 220);
-      try { card.setPointerCapture(e.pointerId); } catch(_){}
     });
-
-    card.addEventListener('pointermove', e=>{
-      if (!st || st.pid !== e.pointerId) return;
-      const dist = Math.hypot(e.clientX - st.x0, e.clientY - st.y0);
-      if (!st.armed){                            // палець поїхав до утримання — це скрол
-        if (dist > 8) reset();
-        return;
-      }
-      if (!st.moved){
-        if (dist < 6) return;                    // дрібний зсув = клік, не перетягування
-        st.moved = true;
-        const r = card.getBoundingClientRect();
-        st.dx = st.x0 - r.left; st.dy = st.y0 - r.top;
-        const g = card.cloneNode(true);
-        g.className = 'kb-ghost';
-        g.removeAttribute('tabindex'); g.removeAttribute('role');
-        document.body.appendChild(g);
-        st.ghost = g;
-        card.classList.add('dragging');
-        document.body.classList.add('kb-dragging');
-      }
-      e.preventDefault();
-      st.ghost.style.left = (e.clientX - st.dx) + 'px';
-      st.ghost.style.top  = (e.clientY - st.dy) + 'px';
-      const col = colAt(e.clientX, e.clientY);
-      $$('.kb-col').forEach(c=>c.classList.toggle('over', c === col));
-      autoScroll(e.clientX, e.clientY);
-    }, { passive:false });
-
-    card.addEventListener('pointerup', e=>{
-      if (!st || st.pid !== e.pointerId) return;
-      const { id, moved } = st;
-      const col = moved ? colAt(e.clientX, e.clientY) : null;
-      reset();
-      if (!moved){ openCandidate(id); return; }  // не тягнули — звичайний клік
-      const to = col?.dataset.stage;
-      if (to) moveStage(id, to);
-    });
-
-    card.addEventListener('pointercancel', reset);
-    card.addEventListener('lostpointercapture', ()=>{ if (st && !st.moved) reset(); });
     card.addEventListener('keydown', e=>{
       if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openCandidate(+card.dataset.id); }
     });
