@@ -203,6 +203,13 @@ table.tbl tfoot td{font-weight:700;background:#FAFAF5;border-top:2px solid var(-
   box-shadow:0 10px 28px rgba(0,0,0,.24);transform:rotate(2deg);border-radius:9px;
   background:#fff;padding:9px 10px;border-left:3px solid var(--y);font-size:12px}
 .kb-card:focus-visible{outline:2px solid var(--y);outline-offset:2px}
+/* Підпис під привидом: куди саме впаде картка. Без нього людина цілиться
+   «на око» і мовчки промахується в сусідню колонку — так тричі за день
+   кандидат поїхав у «Найнятий» замість «Відмови». */
+.kb-aim{position:fixed;z-index:941;pointer-events:none;background:#1E1E1E;color:#fff;
+  font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:13px;white-space:nowrap;
+  box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.kb-aim.none{background:#B91C1C}
 body.kb-dragging{cursor:grabbing;user-select:none;-webkit-user-select:none}
 .kb-card.stale{border-left-color:var(--orange)}
 .kb-card.hot{border-left-color:var(--g)}
@@ -1046,6 +1053,15 @@ body{overflow-x:clip}
       <div class="lead">Що і коли змінювалось у дашборді.</div>
       <div class="doc-ver">
         <div class="v">
+          <div class="vh">v2.79.5 — Видно, куди впаде картка</div>
+          <div class="vd">01.09.2026</div>
+          <ul>
+            <li><strong>Біля картки тепер підпис із назвою колонки</strong>, у яку вона потрапить. Якщо відпустити повз колонки — підпис червоніє і попереджає, що етап не зміниться.</li>
+            <li>Виправлено головну причину промахів: прокрутка канбану працювала, лише поки курсор рухався. Дотягнувши картку до краю і зупинивши руку, ви зупиняли і прокрутку — крайня колонка «Відмова» не встигала виїхати на екран.</li>
+            <li>⚠ Через це кандидат тричі за день потрапляв у «Найнятий» замість «Відмови». Якщо бачите когось не на своєму етапі — перевірте картку.</li>
+          </ul>
+        </div>
+        <div class="v">
           <div class="vh">v2.79.4 — Перетягування: виправлено остаточно</div>
           <div class="vd">01.09.2026</div>
           <ul>
@@ -1129,7 +1145,7 @@ body{overflow-x:clip}
 /* ═══════════════════════════════════════════════════════════════════════════
    snEco · HR Dashboard — core (v2.79.0)
    ═══════════════════════════════════════════════════════════════════════════ */
-const HR_VERSION = 'v2.79.4';
+const HR_VERSION = 'v2.79.5';
 const HR_UPDATED  = '01.09.2026';
 const API = 'https://sneco-auth.vg-ab6.workers.dev';
 const BLOCK_HR = 'hr-dashboard';
@@ -1714,7 +1730,9 @@ let kbDrag = null;
 function kbReset(){
   if (!kbDrag) return;
   clearTimeout(kbDrag.holdTimer);
+  if (kbScrollTimer){ cancelAnimationFrame(kbScrollTimer); kbScrollTimer = null; }
   kbDrag.ghost?.remove();
+  kbDrag.aim?.remove();
   kbDrag.card.classList.remove('dragging');
   document.body.classList.remove('kb-dragging');
   document.body.style.touchAction = '';
@@ -1729,19 +1747,41 @@ function kbColAt(x,y){
   return null;
 }
 // Канбан ширший за екран — без автопрокрутки дальні колонки недосяжні.
-function kbAutoScroll(x,y){
+// ⚠ Прокрутку веде окремий цикл, а НЕ обробник pointermove. Причина
+// (01.09.2026): коли прокрутка висіла на русі курсора, людина дотягувала
+// картку до краю, зупиняла руку — і прокрутка завмирала разом з нею.
+// «Відмова» (крайня права колонка) лишалась за екраном, картку відпускали
+// над сусідньою «Найнятий». Так тричі поспіль кандидат поїхав не туди.
+let kbScrollTimer = null;
+function kbScrollTick(){
+  if (!kbDrag || !kbDrag.moved){ kbScrollTimer = null; return; }
+  const { lx:x, ly:y } = kbDrag;
   const wrap = document.querySelector('.kb-wrap');
   if (wrap){
-    const r = wrap.getBoundingClientRect(), edge = 60;
-    if (x > r.right - edge) wrap.scrollLeft += 14;
-    else if (x < r.left + edge) wrap.scrollLeft -= 14;
+    const r = wrap.getBoundingClientRect(), edge = 70;
+    if (x > r.right - edge) wrap.scrollLeft += 12;
+    else if (x < r.left + edge) wrap.scrollLeft -= 12;
   }
   const body = kbColAt(x,y)?.querySelector('.kb-body');
   if (body){
     const r = body.getBoundingClientRect(), edge = 40;
-    if (y > r.bottom - edge) body.scrollTop += 10;
-    else if (y < r.top + edge) body.scrollTop -= 10;
+    if (y > r.bottom - edge) body.scrollTop += 8;
+    else if (y < r.top + edge) body.scrollTop -= 8;
   }
+  kbHighlight(x,y);
+  kbScrollTimer = requestAnimationFrame(kbScrollTick);
+}
+// Підсвітка колонки + підпис «куди впаде». Виноситься окремо, бо викликається
+// і з руху курсора, і з циклу прокрутки.
+function kbHighlight(x,y){
+  const col = kbColAt(x,y);
+  $$('.kb-col').forEach(c=>c.classList.toggle('over', c === col));
+  if (!kbDrag?.aim) return;
+  const name = col?.querySelector('.kb-title')?.textContent?.trim();
+  kbDrag.aim.textContent = name ? '→ ' + name : '↩ повз колонки — етап не зміниться';
+  kbDrag.aim.classList.toggle('none', !name);
+  kbDrag.aim.style.left = (x + 16) + 'px';
+  kbDrag.aim.style.top  = (y + 20) + 'px';
 }
 function kbBindWindowOnce(){
   if (window.__kbBound) return;
@@ -1761,15 +1801,19 @@ function kbBindWindowOnce(){
       g.removeAttribute('tabindex'); g.removeAttribute('role');
       document.body.appendChild(g);
       kbDrag.ghost = g;
+      const aim = document.createElement('div');
+      aim.className = 'kb-aim';
+      document.body.appendChild(aim);
+      kbDrag.aim = aim;
       kbDrag.card.classList.add('dragging');
       document.body.classList.add('kb-dragging');
+      if (!kbScrollTimer) kbScrollTimer = requestAnimationFrame(kbScrollTick);
     }
     e.preventDefault();
+    kbDrag.lx = e.clientX; kbDrag.ly = e.clientY;
     kbDrag.ghost.style.left = (e.clientX - kbDrag.dx) + 'px';
     kbDrag.ghost.style.top  = (e.clientY - kbDrag.dy) + 'px';
-    const col = kbColAt(e.clientX, e.clientY);
-    $$('.kb-col').forEach(c=>c.classList.toggle('over', c === col));
-    kbAutoScroll(e.clientX, e.clientY);
+    kbHighlight(e.clientX, e.clientY);
   }, { passive:false });
 
   window.addEventListener('pointerup', e=>{
