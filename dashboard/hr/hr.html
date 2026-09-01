@@ -333,11 +333,19 @@ table.tbl tfoot td{font-weight:700;background:#FAFAF5;border-top:2px solid var(-
 @media(max-width:760px){.dashauth-session{top:auto;bottom:12px;right:12px;left:12px;justify-content:center}}
 .dashauth-session button{background:none;border:0;color:#96C11F;cursor:pointer;font-size:14px;padding:0;line-height:1}
 body.dash-locked{overflow:hidden}
-/* сесійний бейдж — унизу праворуч, щоб не перекривав панель фільтрів */
-.dashauth-session{top:auto!important;bottom:14px!important;right:14px!important;left:auto!important;z-index:10000;box-shadow:0 4px 16px rgba(0,0,0,.18);background:#fff!important;border-color:rgba(150,193,31,.5)!important;pointer-events:none;opacity:.92}
+/* сесійний бейдж — унизу праворуч, щоб не перекривав панель фільтрів.
+   ⚠ 01.09.2026, знайшла Валерія: бейдж мав z-index 10000 і накривав кнопку
+   «Зберегти» у формі кандидата — зберегти запис було просто нічим.
+   Тепер 800: вище звичайного контенту, але нижче drawer (901) і модалки (950).
+   Плюс правила нижче ховають його, коли щось із них відкрите. */
+.dashauth-session{top:auto!important;bottom:14px!important;right:14px!important;left:auto!important;z-index:800;box-shadow:0 4px 16px rgba(0,0,0,.18);background:#fff!important;border-color:rgba(150,193,31,.5)!important;pointer-events:none;opacity:.92}
 .dashauth-session:hover{opacity:1}
 .dashauth-session button{pointer-events:auto;cursor:pointer}
 @media(max-width:760px){.dashauth-session{left:14px!important;justify-content:center}}
+/* На телефоні бейдж розтягнутий на всю ширину внизу — навіть із меншим
+   z-index він з'їдає місце під кнопками. Ховаємо, поки відкрите вікно. */
+body:has(.modal-back.open) .dashauth-session,
+body:has(.drawer.open) .dashauth-session{display:none!important}
 
 /* фікс: drawer/модалка за межами вʼюпорта не мають створювати горизонтальний скрол */
 html{overflow-x:clip}
@@ -940,6 +948,7 @@ body{overflow-x:clip}
           <tr><td><strong>Плинність</strong></td><td>Середня чисельність = (на початок періоду + на кінець) ÷ 2. Плинність = звільнені за період ÷ середня чисельність × 100%.<br><strong>Обережно:</strong> цифра «за період» залежить від його довжини — 8% за квартал це ≈32% річних. Тому поруч завжди показано <strong>річний еквівалент</strong>, і саме з ним порівнюють норму: для харчового виробництва 15–25% на рік, понад 30% — системна проблема.</td></tr>
           <tr><td><strong>Час найму</strong><br><span class="muted">Time to Hire</span></td><td>Дата прийняття офера − дата першого контакту, у днях. Береться середнє й медіана по всіх наймах періоду. Медіана надійніша, коли наймів мало.<br>Якщо дата прийняття офера не заповнена, береться дата виходу на роботу — це вже інша величина (довша на час відпрацювання).</td></tr>
           <tr><td><strong>Воронка</strong></td><td>Рахується за <strong>максимально досягнутим</strong> етапом кожного кандидата, а не за поточним. Тому людина, якій відмовили після співбесіди, все одно врахована у «Скринінг» і «Співбесіда HR», і воронка ніколи не «розширюється» донизу.</td></tr>
+          <tr><td><strong>Етап відмови</strong></td><td>Визначається за <strong>заповненими датами етапів</strong> у картці кандидата, а не окремим полем. Береться найпізніший етап, дата якого проставлена: інтервʼю з керівником → HR-інтервʼю → скринінг; якщо жодної дати немає — «до першого контакту». <strong>Наслідок:</strong> якщо рекрутер не проставив дату етапу, відмова впаде в ранішу категорію. Дати етапів варто заповнювати навіть заднім числом.</td></tr>
           <tr><td><strong>Вартість найму</strong><br><span class="muted">Cost per Hire</span></td><td>Витрати на канал за період ÷ кількість найнятих з цього каналу. Не включає час рекрутера й реферальні бонуси. Якщо кандидат прийшов у грудні, а вийшов у січні — на межі періодів цифра трохи «пливе».</td></tr>
           <tr><td><strong>Фонд оплати праці</strong></td><td>Оклад + бонус + понаднормові + інше за місяць, по всіх внесених нарахуваннях. <strong>Брутто</strong>, до утримань. ЄСВ роботодавця у фонд не входить — вводиться окремою колонкою «Податки» і показується окремим рядком.</td></tr>
           <tr><td><strong>Середня і медіанна ЗП</strong></td><td>Рахуються з <strong>поточних окладів у картках</strong> (не з нарахувань). Медіана показова, коли в компанії є і робітники, і керівники: середня «підтягується» вгору кількома високими окладами.</td></tr>
@@ -1014,6 +1023,16 @@ body{overflow-x:clip}
       <div class="lead">Що і коли змінювалось у дашборді.</div>
       <div class="doc-ver">
         <div class="v">
+          <div class="vh">v2.79.2 — Аналітика відмов і дрібні виправлення</div>
+          <div class="vd">01.09.2026</div>
+          <ul>
+            <li>Колонка «Відмова» на канбані тепер видима завжди — раніше вона ховалась разом із закритими етапами, і відмови було не видно без окремої галочки.</li>
+            <li>Під канбаном зʼявився блок «Аналітика відмов»: на якому етапі відмовляють найчастіше і топ причин. Етап береться з дат етапів у картці — див. розділ «Як рахуються показники».</li>
+            <li>Виправлено: позначка вашого доступу в куті екрана перекривала кнопку «Зберегти» у формах — зберегти запис було просто нічим.</li>
+            <li>Виправлено заголовки форм: було «Новий кандидата», стало «Новий кандидат», «Нова вакансія».</li>
+          </ul>
+        </div>
+        <div class="v">
           <div class="vh">v2.79.1 — Інструкція всередині дашборда</div>
           <div class="vd">21.08.2026</div>
           <ul>
@@ -1067,8 +1086,8 @@ body{overflow-x:clip}
 /* ═══════════════════════════════════════════════════════════════════════════
    snEco · HR Dashboard — core (v2.79.0)
    ═══════════════════════════════════════════════════════════════════════════ */
-const HR_VERSION = 'v2.79.1';
-const HR_UPDATED  = '21.08.2026';
+const HR_VERSION = 'v2.79.2';
+const HR_UPDATED  = '01.09.2026';
 const API = 'https://sneco-auth.vg-ab6.workers.dev';
 const BLOCK_HR = 'hr-dashboard';
 const STAGES = [
@@ -2271,7 +2290,7 @@ function openCostEditor(){
    ФОРМИ · DRAWER · МОДАЛКИ · ІМПОРТ/ЕКСПОРТ
    ═══════════════════════════════════════════════════════════════════════════ */
 const F = {
-  employee: { title:'співробітника', icon:'🧑‍💼', fields:[
+  employee: { title:'співробітника', titleNew:'Новий співробітник', icon:'🧑‍💼', fields:[
     { s:'Основне' },
     { k:'full_name', l:'ПІБ', t:'text', req:1, full:1, ph:'Прізвище Імʼя По батькові' },
     { k:'emp_code', l:'Employee ID', t:'text', ph:'напр. SN-014', help:'Внутрішній табельний номер' },
@@ -2304,7 +2323,7 @@ const F = {
     { k:'termination_reason', l:'Причина', t:'dictfree', dict:'exit_reason', full:1 },
     { k:'notes', l:'Нотатки', t:'textarea', full:1 },
   ]},
-  candidate: { title:'кандидата', icon:'🎯', fields:[
+  candidate: { title:'кандидата', titleNew:'Новий кандидат', icon:'🎯', fields:[
     { s:'Основне' },
     { k:'full_name', l:'ПІБ', t:'text', req:1, full:1 },
     { k:'vacancy_id', l:'Вакансія', t:'vac' },
@@ -2333,7 +2352,7 @@ const F = {
     { k:'reject_reason', l:'Причина відмови', t:'dictfree', dict:'reject_reason', full:1 },
     { k:'notes', l:'Нотатки', t:'textarea', full:1, ph:'Враження зі співбесіди, сильні/слабкі сторони…' },
   ]},
-  vacancy: { title:'вакансію', icon:'📌', fields:[
+  vacancy: { title:'вакансію', titleNew:'Нова вакансія', icon:'📌', fields:[
     { s:'Основне' },
     { k:'title', l:'Посада', t:'text', req:1, full:1 },
     { k:'department', l:'Підрозділ', t:'dict', dict:'department' },
@@ -2355,7 +2374,7 @@ const F = {
     { k:'requirements', l:'Вимоги / опис', t:'textarea', full:1 },
     { k:'notes', l:'Нотатки', t:'textarea', full:1 },
   ]},
-  band: { title:'вилку зарплат', icon:'💰', payrollOnly:1, fields:[
+  band: { title:'вилку зарплат', titleNew:'Нова вилка зарплат', icon:'💰', payrollOnly:1, fields:[
     { k:'position', l:'Посада', t:'dictfree', dict:'position', req:1, full:1 },
     { k:'department', l:'Підрозділ', t:'dict', dict:'department' },
     { k:'company', l:'Компанія', t:'dict', dict:'company' },
@@ -2439,7 +2458,7 @@ function openForm(entity, id){
   if (cfg.payrollOnly && !S.me.canPayroll) return toast('Немає доступу до зарплатних даних','err');
   const src = id ? ({ employee:empById, candidate:candById, vacancy:vacById, band:i=>S.bands.find(b=>b.id===i) })[entity](id) : {};
   DR = { entity, id: id||null, tab:0 };
-  $('#drTitle').textContent = (id?'Редагувати ':'Новий ') + cfg.title;
+  $('#drTitle').textContent = id ? ('Редагувати '+cfg.title) : (cfg.titleNew || ('Новий '+cfg.title));
   $('#drSub').textContent = id ? (src.full_name || src.title || src.position || '') : cfg.icon + ' Заповніть поля та збережіть';
   $('#drTabs').innerHTML = '';
   const defaults = id ? src : ({
