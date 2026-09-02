@@ -1053,6 +1053,14 @@ body{overflow-x:clip}
       <div class="lead">Що і коли змінювалось у дашборді.</div>
       <div class="doc-ver">
         <div class="v">
+          <div class="vh">v2.79.6 — «Відмова» нарешті зберігається</div>
+          <div class="vd">02.09.2026</div>
+          <ul>
+            <li>Перенесення кандидата у «Відмову» не зберігалося: вікно з причиною закривалося раніше, ніж причина встигала записатися, і дашборд вважав, що ви передумали. Мовчки, без жодного попередження.</li>
+            <li>Стосувалося <strong>тільки</strong> «Відмови» та «Офер відхилено» — єдиних переходів, що запитують причину. Решта етапів зберігалися нормально.</li>
+          </ul>
+        </div>
+        <div class="v">
           <div class="vh">v2.79.5 — Видно, куди впаде картка</div>
           <div class="vd">01.09.2026</div>
           <ul>
@@ -1145,7 +1153,7 @@ body{overflow-x:clip}
 /* ═══════════════════════════════════════════════════════════════════════════
    snEco · HR Dashboard — core (v2.79.0)
    ═══════════════════════════════════════════════════════════════════════════ */
-const HR_VERSION = 'v2.79.5';
+const HR_VERSION = 'v2.79.6';
 const HR_UPDATED  = '01.09.2026';
 const API = 'https://sneco-auth.vg-ab6.workers.dev';
 const BLOCK_HR = 'hr-dashboard';
@@ -2957,15 +2965,28 @@ function offerHire(c){
       } },
   ]);
 }
+/* ⚠ 02.09.2026, VG: «переніс у Відмову — не зберігається».
+   Перетягування працювало (переходи між звичайними етапами лягали в базу),
+   ламалась саме «Відмова» — єдиний шлях, що проходить через цей діалог.
+   Причина: кнопка «Зберегти» робила closeModal() ПЕРЕД res(v), а closeModal
+   негайно смикає onClose → res(null). Проміс вирішується один раз, тому
+   перемагав null, moveStage читав його як «користувач скасував» і виходив,
+   мовчки і без помилки. Тепер результат фіксується прапорцем done: що б не
+   викликало закриття, значення вже віддане, і onClose нічого не перезапише. */
 function askReason(title){
   return new Promise(res=>{
+    let done = false;
+    const finish = v => { if (done) return; done = true; res(v); };
     const list = dictOf('reject_reason');
     modal(title, `<div class="fld"><label>Причина</label>
       <select id="rrS">${list.map(r=>`<option>${esc(r)}</option>`).join('')}</select></div>
       <div class="fld" style="margin-top:10px"><label>Уточнення (необовʼязково)</label><input id="rrN" placeholder="деталі"></div>`, [
-      { l:'Пропустити', cls:'btn', fn:()=>{ closeModal(); res(''); } },
-      { l:'Зберегти', cls:'btn btn-primary', fn:()=>{ const v=$('#rrS').value+($('#rrN').value?' — '+$('#rrN').value:''); closeModal(); res(v); } },
-    ], true, ()=>res(null));
+      { l:'Пропустити', cls:'btn', fn:()=>{ finish(''); closeModal(); } },
+      { l:'Зберегти', cls:'btn btn-primary', fn:()=>{
+          const v = $('#rrS').value + ($('#rrN').value ? ' — ' + $('#rrN').value : '');
+          finish(v); closeModal();
+        } },
+    ], true, ()=>finish(null));
   });
 }
 </script>
