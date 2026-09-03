@@ -989,7 +989,7 @@ body{overflow-x:clip}
       <table>
         <thead><tr><th style="width:26%">Питання</th><th>Відповідь</th></tr></thead>
         <tbody>
-          <tr><td><strong>Куди завантажити</strong></td><td>Відкрийте картку кандидата → блок «Файли» → перетягніть файл у рамку або натисніть на неї. Можна кілька за раз.</td></tr>
+          <tr><td><strong>Куди завантажити</strong></td><td>Два місця, обидва працюють: <strong>у формі нового кандидата</strong> (файли підуть разом зі збереженням) або <strong>у вже створеній картці</strong> → блок «Файли». Перетягніть файл у рамку або натисніть на неї. Можна кілька за раз.</td></tr>
           <tr><td><strong>Які формати</strong></td><td>PDF, Word (doc, docx), ODT, RTF, TXT, зображення (JPG, PNG, WEBP, HEIC). До 10 МБ на файл. Архіви й програми свідомо не приймаються — їх потім відкриватиме людина.</td></tr>
           <tr><td><strong>Хто бачить</strong></td><td>Ті самі люди, що мають доступ до HR-дашборда. Окремого рівня для файлів немає.</td></tr>
           <tr><td><strong>Чи можна переслати посилання</strong></td><td><strong>Ні, і це навмисно.</strong> Файл не має адреси в інтернеті — дашборд отримує його вмістом після вашого входу. Щоб поділитися резюме, завантажте його собі й надішліть вкладенням, свідомо.</td></tr>
@@ -1083,6 +1083,15 @@ body{overflow-x:clip}
       <h2>🧾 Історія змін</h2>
       <div class="lead">Що і коли змінювалось у дашборді.</div>
       <div class="doc-ver">
+        <div class="v">
+          <div class="vh">v2.79.8 — Файли можна додати одразу при створенні</div>
+          <div class="vd">02.09.2026</div>
+          <ul>
+            <li>Блок «Файли» зʼявився і у <strong>формі нового кандидата</strong>. Раніше він був лише у вже збереженій картці, тож резюме доводилось нести другим заходом.</li>
+            <li>Обрані файли чекають унизу форми з позначкою «завантажиться після збереження» — і йдуть на сервер разом із карткою. Після збереження картка відкривається одразу, з файлами на місці.</li>
+            <li>Передумали до збереження — приберіть хрестиком, нічого нікуди не піде.</li>
+          </ul>
+        </div>
         <div class="v">
           <div class="vh">v2.79.7 — Файли в картці кандидата</div>
           <div class="vd">02.09.2026</div>
@@ -1195,7 +1204,7 @@ body{overflow-x:clip}
 /* ═══════════════════════════════════════════════════════════════════════════
    snEco · HR Dashboard — core (v2.79.0)
    ═══════════════════════════════════════════════════════════════════════════ */
-const HR_VERSION = 'v2.79.7';
+const HR_VERSION = 'v2.79.8';
 const HR_UPDATED  = '01.09.2026';
 const API = 'https://sneco-auth.vg-ab6.workers.dev';
 const BLOCK_HR = 'hr-dashboard';
@@ -1919,6 +1928,47 @@ async function moveStage(id, to){
   } catch(e){ Object.assign(c, prev); renderCandidates(); toast(apiErr(e),'err'); }
 }
 
+/* Файли, обрані у формі СТВОРЕННЯ. Кандидата ще немає в базі, тож прикріпити
+   їх нікуди — тримаємо у памʼяті й доливаємо одразу після збереження.
+   Без цього довелось би спершу зберегти картку, потім відкрити її знову
+   і лише тоді нести резюме — саме на цьому спіткнувся VG 02.09.2026. */
+let cfQueue = [];
+
+function cfFormBlock(id){
+  const box = $('#cfFormBox'); if (!box) return;
+  if (id){ box.innerHTML = '<span class="spin"></span>'; cfRenderList(id, box); return; }
+  cfQueue = [];
+  cfRenderQueue(box);
+}
+
+function cfRenderQueue(box){
+  box.innerHTML =
+    cfQueue.map((f,i)=>`<div class="cf-row">
+      <span class="cf-ico">${cfIcon(f.type, f.name)}</span>
+      <div class="cf-main"><div class="cf-nm" style="cursor:default;text-decoration:none">${esc(f.name)}</div>
+        <div class="cf-meta">${cfSize(f.size)} · завантажиться після збереження</div></div>
+      <button class="cf-del" onclick="cfQueueDrop(${i})" title="Прибрати">✕</button>
+    </div>`).join('') +
+    `<div class="cf-drop" id="cfQDrop">📎 Перетягніть файл сюди або натисніть, щоб обрати
+       <div style="font-size:11px;margin-top:4px;color:#9a9a90">PDF, Word, зображення · до 10 МБ · завантажаться разом зі збереженням</div>
+     </div>
+     <input type="file" id="cfQInput" accept="${CF_ACCEPT}" multiple style="display:none">`;
+  const drop = $('#cfQDrop'), inp = $('#cfQInput');
+  const take = list => {
+    for (const f of list){
+      if (f.size > CF_MAX){ toast(`«${f.name}» більший за 10 МБ`, 'err'); continue; }
+      cfQueue.push(f);
+    }
+    cfRenderQueue(box);
+  };
+  drop.onclick = ()=>inp.click();
+  inp.onchange = ()=>{ take([...inp.files]); inp.value=''; };
+  drop.ondragover = e=>{ e.preventDefault(); drop.classList.add('over'); };
+  drop.ondragleave = ()=>drop.classList.remove('over');
+  drop.ondrop = e=>{ e.preventDefault(); drop.classList.remove('over'); take([...(e.dataTransfer.files||[])]); };
+}
+function cfQueueDrop(i){ cfQueue.splice(i,1); cfRenderQueue($('#cfFormBox')); }
+
 /* ── Файли кандидата (v2.79.7) ──────────────────────────────────────────────
    Резюме — персональні дані, тому файли не мають публічної адреси взагалі:
    качаємо через fetch з токеном і показуємо як blob. Переслати «пряме
@@ -1938,11 +1988,14 @@ function cfSize(b){
   return b < 1024*1024 ? Math.round(b/1024) + ' КБ' : (b/1048576).toFixed(1) + ' МБ';
 }
 
-async function loadCandFiles(id){
-  const box = $('#candFiles'); if (!box) return;
+async function loadCandFiles(id){ return cfRenderList(id, $('#candFiles')); }
+
+async function cfRenderList(id, box){
+  if (!box) return;
   let rows = [];
   try { rows = (await api('/api/hr/files', { candidate_id: id })).rows || []; }
   catch(e){ box.innerHTML = '<div class="hint">Не вдалося завантажити список файлів</div>'; return; }
+  const back = box.id === 'cfFormBox' ? id : id;
   box.innerHTML =
     rows.map(f=>`<div class="cf-row">
       <span class="cf-ico">${cfIcon(f.mime, f.filename)}</span>
@@ -1950,22 +2003,22 @@ async function loadCandFiles(id){
         <div class="cf-nm" onclick="cfOpen(${f.id})" title="Відкрити">${esc(f.filename)}</div>
         <div class="cf-meta">${cfSize(f.size_bytes)} · ${esc(f.uploaded_by||'')} · ${f.uploaded_at?dmy(new Date(f.uploaded_at*1000).toISOString().slice(0,10)):''}</div>
       </div>
-      <button class="cf-del" onclick="cfDelete(${f.id},${id})" title="Видалити">✕</button>
+      <button class="cf-del" onclick="cfDelete(${f.id},${back},'${box.id}')" title="Видалити">✕</button>
     </div>`).join('') +
     `<div class="cf-drop" id="cfDrop">📎 Перетягніть файл сюди або натисніть, щоб обрати
        <div style="font-size:11px;margin-top:4px;color:#9a9a90">PDF, Word, зображення · до 10 МБ</div>
      </div>
      <input type="file" id="cfInput" accept="${CF_ACCEPT}" multiple style="display:none">`;
-  const drop = $('#cfDrop'), inp = $('#cfInput');
+  const drop = $('#cfDrop'), inp = $('#cfInput'), tgt = box.id;
   drop.onclick = ()=>inp.click();
-  inp.onchange = ()=>{ cfUpload([...inp.files], id); inp.value=''; };
+  inp.onchange = ()=>{ cfUpload([...inp.files], id, false, tgt); inp.value=''; };
   drop.ondragover = e=>{ e.preventDefault(); drop.classList.add('over'); };
   drop.ondragleave = ()=>drop.classList.remove('over');
   drop.ondrop = e=>{ e.preventDefault(); drop.classList.remove('over');
-                     cfUpload([...(e.dataTransfer.files||[])], id); };
+                     cfUpload([...(e.dataTransfer.files||[])], id, false, tgt); };
 }
 
-async function cfUpload(files, candId){
+async function cfUpload(files, candId, silent, targetId){
   for (const f of files){
     if (f.size > CF_MAX){ toast(`«${f.name}» більший за 10 МБ`, 'err'); continue; }
     try {
@@ -1983,7 +2036,7 @@ async function cfUpload(files, candId){
       toast(e.message || apiErr(e) || 'Не вдалося завантажити', 'err');
     } finally { loading(false); }
   }
-  loadCandFiles(candId);
+  if (!silent) cfRenderList(candId, $('#' + (targetId || 'candFiles')));
 }
 
 async function cfOpen(id){
@@ -2004,11 +2057,11 @@ async function cfOpen(id){
   finally { loading(false); }
 }
 
-async function cfDelete(id, candId){
+async function cfDelete(id, candId, targetId){
   if (!confirm('Видалити файл? Дію не можна скасувати.')) return;
   try { await api('/api/hr/file-delete', { id }); toast('Файл видалено', 'ok'); }
   catch(e){ toast(apiErr(e), 'err'); }
-  loadCandFiles(candId);
+  cfRenderList(candId, $('#' + (targetId || 'candFiles')));
 }
 
 /* ── Аналітика відмов ──────────────────────────────────────────────────────
@@ -2792,7 +2845,10 @@ function openForm(entity, id){
     vacancy:{ status:'open', open_date:todayISO(), priority:'normal', headcount:1, currency:'UAH' },
     band:{ currency:'UAH' },
   })[entity];
-  $('#drBody').innerHTML = `<div class="fgrid">${cfg.fields.filter(f=>!(f.pay && !S.me.canPayroll)).map(f=>fieldHtml(f, defaults[f.k])).join('')}</div>`;
+  $('#drBody').innerHTML = `<div class="fgrid">${cfg.fields.filter(f=>!(f.pay && !S.me.canPayroll)).map(f=>fieldHtml(f, defaults[f.k])).join('')}</div>`
+    + (entity==='candidate' ? `<div class="sec" style="margin-top:22px">Файли · резюме, тестові, скани</div>
+        <div id="cfFormBox"></div>` : '');
+  if (entity==='candidate') cfFormBlock(id);
   $('#drFoot').innerHTML = `
     ${id?`<button class="btn btn-danger" onclick="delEntity('${entity}',${id})">🗑 Видалити</button>`:''}
     <span class="sp"></span>
@@ -2823,7 +2879,17 @@ async function saveForm(entity, id){
       if (entity==='employee') openEmployee(id);
       else if (entity==='candidate') openCandidate(id);
       else if (entity==='vacancy') openVacancy(id);
-    } else if (entity==='candidate') go('candidates');
+    } else if (entity==='candidate') {
+      // Файли, обрані ДО збереження: кандидата ще не існувало, прикріпити не було до чого.
+      // Тепер id є — доливаємо чергу і одразу відкриваємо картку, щоб було видно результат.
+      const newId = r.id || r.row?.id;
+      if (newId && cfQueue.length){
+        const q = cfQueue.slice(); cfQueue = [];
+        await cfUpload(q, newId, true);
+        await reload();
+        openCandidate(newId);
+      } else { cfQueue = []; go('candidates'); }
+    }
   } catch(e){
     if (e.error==='validation_failed' && e.fields){
       const MSG = { required:'обовʼязкове поле', bad_date:'невірна дата', bad_period:'невірний місяць', bad_enum:'оберіть зі списку',
