@@ -210,6 +210,20 @@ table.tbl tfoot td{font-weight:700;background:#FAFAF5;border-top:2px solid var(-
   font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:13px;white-space:nowrap;
   box-shadow:0 4px 14px rgba(0,0,0,.3)}
 .kb-aim.none{background:#B91C1C}
+/* Файли кандидата */
+.cf-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border);
+  border-radius:8px;margin-bottom:7px;background:#fff}
+.cf-ico{flex:0 0 auto;font-size:17px}
+.cf-main{flex:1;min-width:0}
+.cf-nm{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  cursor:pointer;text-decoration:underline;text-decoration-color:rgba(0,0,0,.2)}
+.cf-nm:hover{text-decoration-color:currentColor}
+.cf-meta{font-size:11px;color:#9a9a90;margin-top:2px}
+.cf-del{flex:0 0 auto;background:none;border:0;cursor:pointer;color:#B91C1C;font-size:15px;padding:2px 6px;border-radius:5px}
+.cf-del:hover{background:rgba(185,28,28,.09)}
+.cf-drop{border:1.5px dashed var(--border);border-radius:9px;padding:14px;text-align:center;
+  font-size:12.5px;color:#78716C;cursor:pointer;transition:.15s;background:#fff}
+.cf-drop:hover,.cf-drop.over{border-color:var(--y);background:var(--yf);color:#3d3d38}
 body.kb-dragging{cursor:grabbing;user-select:none;-webkit-user-select:none}
 .kb-card.stale{border-left-color:var(--orange)}
 .kb-card.hot{border-left-color:var(--g)}
@@ -850,6 +864,7 @@ body{overflow-x:clip}
     <a href="#g-tabs">Вкладки — що де</a>
     <a href="#g-how">Як зробити (рецепти)</a>
     <a href="#g-drag">Перетягування</a>
+    <a href="#g-files">Файли</a>
     <a href="#g-metrics">Як рахуються показники</a>
     <a href="#g-rules">Правила ведення даних</a>
     <a href="#g-access">Доступи і безпека</a>
@@ -968,6 +983,22 @@ body{overflow-x:clip}
       <div class="rj-note">При переході у «Відмову» або «Офер відхилено» дашборд запитає причину — вона потрапляє в аналітику відмов під канбаном. Якщо натиснути «Скасувати» у цьому запиті, кандидат лишиться на місці.</div>
     </section>
 
+    <section class="doc-sec" id="g-files">
+      <h2>📎 Файли кандидата</h2>
+      <div class="lead">Куди класти резюме і як воно захищене.</div>
+      <table>
+        <thead><tr><th style="width:26%">Питання</th><th>Відповідь</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Куди завантажити</strong></td><td>Відкрийте картку кандидата → блок «Файли» → перетягніть файл у рамку або натисніть на неї. Можна кілька за раз.</td></tr>
+          <tr><td><strong>Які формати</strong></td><td>PDF, Word (doc, docx), ODT, RTF, TXT, зображення (JPG, PNG, WEBP, HEIC). До 10 МБ на файл. Архіви й програми свідомо не приймаються — їх потім відкриватиме людина.</td></tr>
+          <tr><td><strong>Хто бачить</strong></td><td>Ті самі люди, що мають доступ до HR-дашборда. Окремого рівня для файлів немає.</td></tr>
+          <tr><td><strong>Чи можна переслати посилання</strong></td><td><strong>Ні, і це навмисно.</strong> Файл не має адреси в інтернеті — дашборд отримує його вмістом після вашого входу. Щоб поділитися резюме, завантажте його собі й надішліть вкладенням, свідомо.</td></tr>
+          <tr><td><strong>Видалення</strong></td><td>Хрестик праворуч у рядку. Файл стирається остаточно, запис про видалення лишається в журналі змін.</td></tr>
+          <tr><td><strong>А поле «Посилання на CV»?</strong></td><td>Лишається і працює як раніше — для зовнішніх посилань (LinkedIn, профіль на work.ua, тека в Google Drive). Використовуйте те, що зручніше.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
     <section class="doc-sec" id="g-metrics">
       <h2>📐 Як рахуються показники</h2>
       <div class="lead">Щоб цифрам можна було довіряти — ось точні формули і межі їх застосування.</div>
@@ -1052,6 +1083,17 @@ body{overflow-x:clip}
       <h2>🧾 Історія змін</h2>
       <div class="lead">Що і коли змінювалось у дашборді.</div>
       <div class="doc-ver">
+        <div class="v">
+          <div class="vh">v2.79.7 — Файли в картці кандидата</div>
+          <div class="vd">02.09.2026</div>
+          <ul>
+            <li>У картці кандидата зʼявився блок <strong>«Файли»</strong>: резюме, тестові завдання, скани. Перетягніть файл у пунктирну рамку або натисніть на неї.</li>
+            <li>Приймаються PDF, Word (doc/docx), ODT, RTF, TXT і зображення (JPG, PNG, WEBP, HEIC) — до 10 МБ кожен, можна кілька за раз.</li>
+            <li>Видно, хто і коли завантажив. Видалити може будь-хто з доступом до HR — дія записується в журнал.</li>
+            <li>🔒 <strong>У файлів немає прямого посилання.</strong> Вони не лежать на сайті: дашборд отримує їх особисто для вас після входу. Переслати комусь «лінк на резюме» технічно неможливо — посилання просто не існує. Це вимога до персональних даних.</li>
+            <li>Поле «Посилання на CV» лишається — воно для зовнішніх посилань (LinkedIn, work.ua, Google Drive). Файли й посилання співіснують.</li>
+          </ul>
+        </div>
         <div class="v">
           <div class="vh">v2.79.6 — «Відмова» нарешті зберігається</div>
           <div class="vd">02.09.2026</div>
@@ -1153,7 +1195,7 @@ body{overflow-x:clip}
 /* ═══════════════════════════════════════════════════════════════════════════
    snEco · HR Dashboard — core (v2.79.0)
    ═══════════════════════════════════════════════════════════════════════════ */
-const HR_VERSION = 'v2.79.6';
+const HR_VERSION = 'v2.79.7';
 const HR_UPDATED  = '01.09.2026';
 const API = 'https://sneco-auth.vg-ab6.workers.dev';
 const BLOCK_HR = 'hr-dashboard';
@@ -1875,6 +1917,98 @@ async function moveStage(id, to){
     if (to==='hired') offerHire(c);
     renderCandidates();
   } catch(e){ Object.assign(c, prev); renderCandidates(); toast(apiErr(e),'err'); }
+}
+
+/* ── Файли кандидата (v2.79.7) ──────────────────────────────────────────────
+   Резюме — персональні дані, тому файли не мають публічної адреси взагалі:
+   качаємо через fetch з токеном і показуємо як blob. Переслати «пряме
+   посилання» стороннім неможливо, бо посилання не існує. */
+const CF_MAX = 10 * 1024 * 1024;
+const CF_ACCEPT = '.pdf,.doc,.docx,.odt,.rtf,.txt,.jpg,.jpeg,.png,.webp,.heic,.heif';
+
+function cfIcon(mime, name){
+  const n = (name || '').toLowerCase();
+  if ((mime || '').includes('pdf') || n.endsWith('.pdf')) return '📕';
+  if (/\.(jpe?g|png|webp|heic|heif)$/.test(n)) return '🖼';
+  if (/\.(docx?|odt|rtf)$/.test(n)) return '📄';
+  return '📎';
+}
+function cfSize(b){
+  if (!b) return '';
+  return b < 1024*1024 ? Math.round(b/1024) + ' КБ' : (b/1048576).toFixed(1) + ' МБ';
+}
+
+async function loadCandFiles(id){
+  const box = $('#candFiles'); if (!box) return;
+  let rows = [];
+  try { rows = (await api('/api/hr/files', { candidate_id: id })).rows || []; }
+  catch(e){ box.innerHTML = '<div class="hint">Не вдалося завантажити список файлів</div>'; return; }
+  box.innerHTML =
+    rows.map(f=>`<div class="cf-row">
+      <span class="cf-ico">${cfIcon(f.mime, f.filename)}</span>
+      <div class="cf-main">
+        <div class="cf-nm" onclick="cfOpen(${f.id})" title="Відкрити">${esc(f.filename)}</div>
+        <div class="cf-meta">${cfSize(f.size_bytes)} · ${esc(f.uploaded_by||'')} · ${f.uploaded_at?dmy(new Date(f.uploaded_at*1000).toISOString().slice(0,10)):''}</div>
+      </div>
+      <button class="cf-del" onclick="cfDelete(${f.id},${id})" title="Видалити">✕</button>
+    </div>`).join('') +
+    `<div class="cf-drop" id="cfDrop">📎 Перетягніть файл сюди або натисніть, щоб обрати
+       <div style="font-size:11px;margin-top:4px;color:#9a9a90">PDF, Word, зображення · до 10 МБ</div>
+     </div>
+     <input type="file" id="cfInput" accept="${CF_ACCEPT}" multiple style="display:none">`;
+  const drop = $('#cfDrop'), inp = $('#cfInput');
+  drop.onclick = ()=>inp.click();
+  inp.onchange = ()=>{ cfUpload([...inp.files], id); inp.value=''; };
+  drop.ondragover = e=>{ e.preventDefault(); drop.classList.add('over'); };
+  drop.ondragleave = ()=>drop.classList.remove('over');
+  drop.ondrop = e=>{ e.preventDefault(); drop.classList.remove('over');
+                     cfUpload([...(e.dataTransfer.files||[])], id); };
+}
+
+async function cfUpload(files, candId){
+  for (const f of files){
+    if (f.size > CF_MAX){ toast(`«${f.name}» більший за 10 МБ`, 'err'); continue; }
+    try {
+      loading(true);
+      const r = await fetch(`${API}/api/hr/file-upload?candidate_id=${candId}&filename=${encodeURIComponent(f.name)}`, {
+        method:'POST',
+        headers:{ 'Content-Type': f.type || 'application/octet-stream',
+                  'Authorization':'Bearer ' + S.token },
+        body: f,
+      });
+      const j = await r.json().catch(()=>({}));
+      if (!r.ok) throw j;
+      toast(`${f.name} — завантажено`, 'ok');
+    } catch(e){
+      toast(e.message || apiErr(e) || 'Не вдалося завантажити', 'err');
+    } finally { loading(false); }
+  }
+  loadCandFiles(candId);
+}
+
+async function cfOpen(id){
+  try {
+    loading(true);
+    const r = await fetch(`${API}/api/hr/file-get`, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + S.token },
+      body: JSON.stringify({ id }),
+    });
+    if (!r.ok) throw new Error('not_ok');
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank', 'noopener');
+    // Відкликаємо не одразу: Safari встигає не завжди, хвилини вистачає з запасом.
+    setTimeout(()=>URL.revokeObjectURL(url), 60000);
+  } catch(e){ toast('Не вдалося відкрити файл', 'err'); }
+  finally { loading(false); }
+}
+
+async function cfDelete(id, candId){
+  if (!confirm('Видалити файл? Дію не можна скасувати.')) return;
+  try { await api('/api/hr/file-delete', { id }); toast('Файл видалено', 'ok'); }
+  catch(e){ toast(apiErr(e), 'err'); }
+  loadCandFiles(candId);
 }
 
 /* ── Аналітика відмов ──────────────────────────────────────────────────────
@@ -2869,7 +3003,10 @@ function openCandidate(id){
     <div class="tl">${steps.map(s=>`<div class="tl-i" style="${s.done?'':'opacity:.4'}">
       <div class="tl-t">${esc(s.l)}</div><div class="tl-d">${s.d?dmy(s.d):(s.done?'дата не вказана':'—')}</div></div>`).join('')}</div>
     ${c.notes?`<div class="hint" style="margin-top:12px">${esc(c.notes).replace(/\n/g,'<br>')}</div>`:''}
+    <div class="sec">Файли · резюме, тестові, скани</div>
+    <div id="candFiles"><span class="spin"></span></div>
     <div class="sec">Історія рухів</div><div id="candEvents"><span class="spin"></span></div>`;
+  loadCandFiles(id);
   api('/api/hr/candidate-events', { candidate_id:id }).then(r=>{
     const el = $('#candEvents'); if (!el) return;
     const ev = r.events||[];
