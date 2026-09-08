@@ -655,11 +655,21 @@ function kpis(rows){
 
   // Гроші рахуємо по тих самих рядках, що й решта плиток, — щоб цифри
   // згори завжди пояснювались таблицею знизу, а не жили окремим життям.
-  var ltv=0, prof=0, rep=0, o7=0, o14=0;
+  // 🔴 ДЕДУПЛІКАЦІЯ. Заміряно 08.09.2026: ліди 47 і 48 — та сама людина
+  // (lyukovaolga@gmail.com, той самий телефон), одна заявка вже позначена
+  // «Дублікат». Гроші в них однакові, бо клієнт один. Без цієї перевірки
+  // оборот у плитках подвоївся б. Розділ 10 ТЗ вимагає рівно цього:
+  // дублікат не створює повторного клієнта у статистиці.
+  var ltv=0, prof=0, rep=0, o7=0, o14=0, seen={};
   rows.forEach(function(l){
     var m=money(l.id);
-    ltv+=m.ltv||0; prof+=m.profit||0;
-    if((m.repeat_orders||0)>0) rep++;
+    var key=(l.email||('#'+l.id)).toLowerCase().trim();
+    var countMoney = ['duplicate','spam'].indexOf(l.status)<0 && !seen[key];
+    if(countMoney){
+      seen[key]=1;
+      ltv+=m.ltv||0; prof+=m.profit||0;
+      if((m.repeat_orders||0)>0) rep++;
+    }
     if(FINAL.indexOf(l.status)<0){
       var d=staleDays(l);
       if(d!==null&&d>=7) o7++;
