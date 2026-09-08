@@ -498,12 +498,39 @@ tr:hover td{background:#FEFCF7}
     <span class="sub" id="upd2" style="font-size:12px;color:#888"></span>
   </div>
 
-  <div class="kpis">
+  <style>
+/* Контроль актуальності контакту (розділ 6 ТЗ). Підсвічуємо рядок, а не
+   комірку: менеджер сканує таблицю очима згори вниз, і смуга помітніша. */
+tr.stale-yellow td{background:#fff8e1}
+tr.stale-red td{background:#ffebee}
+.age{font-size:12px;white-space:nowrap}
+.age b{font-size:14px}
+.age.y{color:#a06800}
+.age.r{color:#c62828;font-weight:700}
+.cmt{max-width:320px}
+.cmt .last{font-size:12px;color:#444;line-height:1.4;margin-bottom:4px}
+.cmt .last .who{color:#888;font-size:11px}
+.cmt textarea{width:100%;box-sizing:border-box;font:inherit;font-size:12px;padding:5px;border:1px solid #ddd;border-radius:5px}
+.cmt .row2{display:flex;gap:5px;align-items:center;margin-top:4px}
+.cmt input[type=date]{font-size:12px;padding:3px 5px;border:1px solid #ddd;border-radius:5px}
+.cmt button{font-size:12px;padding:4px 9px;border:0;border-radius:5px;background:#111;color:#fff;cursor:pointer}
+.cmt button:disabled{opacity:.5;cursor:default}
+.cmt .st2{font-size:11px;color:#888;min-height:13px}
+.mny{white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
+.mny .sub2{font-size:11px;color:#888}
+.nolink{color:#c62828;font-size:11px}
+</style>
+<div class="kpis">
     <div class="k acc"><div class="n" id="k-total">0</div><div class="l">Заявок за період</div></div>
     <div class="k"><div class="n" id="k-new">0</div><div class="l">Не оброблені</div></div>
     <div class="k"><div class="n" id="k-work">0</div><div class="l">В роботі</div></div>
     <div class="k"><div class="n" id="k-won">0</div><div class="l">Замовили</div></div>
     <div class="k"><div class="n" id="k-conv">—</div><div class="l">Конверсія в замовлення</div></div>
+    <div class="k"><div class="n" id="k-rep">0</div><div class="l">З повторними</div></div>
+    <div class="k"><div class="n" id="k-ltv">0 ₴</div><div class="l">Оборот з лідів</div></div>
+    <div class="k"><div class="n" id="k-prof">0 ₴</div><div class="l">Прибуток з лідів</div></div>
+    <div class="k"><div class="n" id="k-o7">0</div><div class="l">Без контакту 7+ днів</div></div>
+    <div class="k"><div class="n" id="k-o14">0</div><div class="l">Без контакту 14+ днів</div></div>
   </div>
 
   <div id="analytics"></div>
@@ -511,10 +538,22 @@ tr:hover td{background:#FEFCF7}
   <div class="bar">
     <select id="f-status">
       <option value="">Усі статуси</option>
-      <option value="new">Нові</option><option value="contacted">Зв'язались</option>
-      <option value="qualified">Кваліфіковані</option><option value="opportunity">Можливість</option>
-      <option value="sample-sent">Зразки надіслані</option><option value="won">Успішні</option>
-      <option value="lost">Втрачені</option><option value="duplicate">Дублікат</option><option value="spam">Спам</option>
+      <option value="new">Нові</option><option value="contacted">В роботі</option>
+      <option value="pending">В очікуванні рішення</option>
+      <option value="sample-sent">Зразки надіслані</option><option value="won">Замовили</option>
+      <option value="lost">Втрата / відмова</option><option value="duplicate">Дублікат</option><option value="spam">Спам</option>
+    </select>
+    <select id="f-age">
+      <option value="">Будь-який контакт</option>
+      <option value="7">Без контакту 7+ днів</option>
+      <option value="14">Без контакту 14+ днів</option>
+      <option value="due">Контакт на сьогодні або прострочено</option>
+    </select>
+    <select id="f-deal">
+      <option value="">Замовлення: будь-які</option>
+      <option value="yes">Є замовлення</option>
+      <option value="repeat">Є повторне</option>
+      <option value="no">Без замовлень</option>
     </select>
     <select id="f-source"><option value="">Усі джерела</option></select>
     <select id="f-segment">
@@ -541,7 +580,28 @@ tr:hover td{background:#FEFCF7}
 
 <script>
 var WORKER='https://sneco-auth.vg-ab6.workers.dev', TOKEN=null, LEADS=[], ORDERS=[];
-var ST={'new':'Новий','contacted':"Зв'язались",'qualified':'Кваліфікований','opportunity':'Можливість','sample-sent':'Зразки надіслані','won':'Успішний','lost':'Втрачений','duplicate':'Дублікат','spam':'Спам'};
+var ST={'new':'Новий','contacted':'В роботі','pending':'В очікуванні рішення','sample-sent':'Зразки надіслані','won':'Замовили','lost':'Втрата / відмова','duplicate':'Дублікат','spam':'Спам'};
+// Фінальні статуси не контролюємо на прострочення: там уже нічого не чекаємо.
+var FINAL=['won','lost','duplicate','spam'];
+// Для цих статусів дата наступного контакту обовʼязкова — інакше лід зависає.
+var NEED_NEXT=['pending','sample-sent'];
+var MONEY={},COMMENTS={};
+function money(id){return MONEY[id]||{orders:0,ltv:0,profit:0,repeat_orders:0,first_at:null,last_at:null,cp_count:0};}
+function uah(v){return (Math.round(v||0)).toLocaleString('uk-UA')+' ₴';}
+/** Днів без нового коментаря. null — коментарів ще не було. */
+function staleDays(l){
+  var t=l.last_comment_at||l.updated_at||l.created_at;
+  if(!t) return null;
+  return Math.floor((Date.now()/1000-t)/86400);
+}
+function staleClass(l){
+  if(FINAL.indexOf(l.status)>=0) return '';
+  var d=staleDays(l);
+  if(d===null) return '';
+  if(d>=14) return 'stale-red';
+  if(d>=7) return 'stale-yellow';
+  return '';
+}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function dt(v){if(!v)return '';var d=new Date(typeof v==='number'?v*1000:v);if(isNaN(d))return esc(v);
  return d.toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+d.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});}
@@ -592,6 +652,25 @@ function kpis(rows){
   document.getElementById('k-work').textContent=f(function(l){return WORK.indexOf(l.status)>=0;});
   document.getElementById('k-won').textContent=won;
   document.getElementById('k-conv').textContent=real?(won/real*100).toFixed(0)+'%':'—';
+
+  // Гроші рахуємо по тих самих рядках, що й решта плиток, — щоб цифри
+  // згори завжди пояснювались таблицею знизу, а не жили окремим життям.
+  var ltv=0, prof=0, rep=0, o7=0, o14=0;
+  rows.forEach(function(l){
+    var m=money(l.id);
+    ltv+=m.ltv||0; prof+=m.profit||0;
+    if((m.repeat_orders||0)>0) rep++;
+    if(FINAL.indexOf(l.status)<0){
+      var d=staleDays(l);
+      if(d!==null&&d>=7) o7++;
+      if(d!==null&&d>=14) o14++;
+    }
+  });
+  document.getElementById('k-rep').textContent=rep;
+  document.getElementById('k-ltv').textContent=uah(ltv);
+  document.getElementById('k-prof').textContent=uah(prof);
+  document.getElementById('k-o7').textContent=o7;
+  document.getElementById('k-o14').textContent=o14;
 }
 
 // ── аналітика: воронка, причини відмов, сегменти, джерела ──────────────────
@@ -694,26 +773,57 @@ function render(){
   var q=(document.getElementById('f-q').value||'').toLowerCase().trim();
   var st=document.getElementById('f-status').value, sr=document.getElementById('f-source').value;
   var sg=document.getElementById('f-segment').value;
+  var agEl=document.getElementById('f-age'), dlEl=document.getElementById('f-deal');
+  var ag=agEl?agEl.value:'', dl=dlEl?dlEl.value:'';
   var rows=inPer.filter(function(l){
     if(st && (l.status||'new')!==st) return false;
     if(sr && l.source!==sr) return false;
     if(sg==='__none'){ if(l.segment) return false; }
     else if(sg && l.segment!==sg) return false;
     if(q){var hay=[l.name,l.company,l.email,l.phone,l.message].join(' ').toLowerCase();if(hay.indexOf(q)<0)return false;}
+    if(ag){
+      if(ag==='due'){
+        if(!l.next_contact_at||l.next_contact_at>Date.now()/1000) return false;
+        if(FINAL.indexOf(l.status)>=0) return false;
+      }else{
+        if(FINAL.indexOf(l.status)>=0) return false;
+        var dd=staleDays(l); if(dd===null||dd<parseInt(ag)) return false;
+      }
+    }
+    if(dl){
+      var mm=money(l.id);
+      if(dl==='yes'&&mm.orders<1) return false;
+      if(dl==='repeat'&&mm.repeat_orders<1) return false;
+      if(dl==='no'&&mm.orders>0) return false;
+    }
     return true;
   });
   var box=document.getElementById('tablebox');
   if(!rows.length){box.innerHTML='<div class="empty">Лідів не знайдено.<br><span style="font-size:13px">Заявки з лендингу <b>/dystrybyutor/</b> зʼявляться тут автоматично.</span></div>';return;}
-  var h='<table><thead><tr><th>Дата</th><th>Хто</th><th>Контакти</th><th>Коментар клієнта</th><th class="hide-m">Джерело / UTM</th><th>МС</th><th>Сегмент</th><th>Статус</th><th>Нотатка менеджера</th><th></th></tr></thead><tbody>';
+  var h='<table><thead><tr><th>Дата</th><th>Хто</th><th>Контакти</th><th>Контакт</th><th class="hide-m">Джерело / UTM</th><th class="num">Замовл.</th><th class="num">Оборот</th><th class="num">Прибуток</th><th>Сегмент</th><th>Статус</th><th>Коментарі менеджера</th><th></th></tr></thead><tbody>';
   rows.forEach(function(l){
     var nm=l.company||l.name||'—';
-    h+='<tr>'
+    var M=money(l.id), D=staleDays(l), cls=staleClass(l);
+    var ageTxt;
+    if(FINAL.indexOf(l.status)>=0) ageTxt='<span style="color:#bbb">—</span>';
+    else if(D===null) ageTxt='<span class="age r"><b>немає</b><br>коментарів</span>';
+    else ageTxt='<span class="age '+(D>=14?'r':(D>=7?'y':''))+'"><b>'+D+'</b> дн.</span>';
+    if(l.next_contact_at){
+      var nd=new Date(l.next_contact_at*1000), over=l.next_contact_at<=Date.now()/1000;
+      ageTxt+='<div class="meta" style="'+(over?'color:#c62828;font-weight:600':'')+'">→ '
+             +nd.toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit'})+(over?' (!)':'')+'</div>';
+    }
+    var cl=COMMENTS[l.id]||[], last=cl[0];
+    h+='<tr class="'+cls+'">'
      +'<td style="white-space:nowrap;font-size:13px">'+dt(l.created_at)+'</td>'
-     +'<td><div class="who">'+esc(nm)+'</div>'+(l.company&&l.name?'<div class="meta">'+esc(l.name)+'</div>':'')+'</td>'
+     +'<td><div class="who">'+esc(nm)+'</div>'+(l.company&&l.name?'<div class="meta">'+esc(l.name)+'</div>':'')
+        +(l.message?'<div class="meta" title="'+esc(l.message)+'">'+esc(l.message.slice(0,60))+(l.message.length>60?'…':'')+'</div>':'')+'</td>'
      +'<td><a class="mail" href="mailto:'+esc(l.email)+'">'+esc(l.email)+'</a>'+(l.phone?'<div class="meta"><a class="mail" href="tel:'+esc(l.phone)+'">'+esc(l.phone)+'</a></div>':'')+'</td>'
-     +'<td><div class="msg">'+(l.message?esc(l.message):'<span style="color:#bbb">—</span>')+'</div></td>'
+     +'<td>'+ageTxt+'</td>'
      +'<td class="hide-m"><span class="tag src">'+esc(l.source||'—')+'</span>'+(l.utm_source?'<div class="meta">'+esc(l.utm_source)+' / '+esc(l.utm_medium||'-')+' / '+esc(l.utm_campaign||'-')+'</div>':'')+'</td>'
-     +'<td>'+(l.ms_counterparty_id?'<span class="ms">✓</span>':'<span class="ms no">—</span>')+'</td>'
+     +'<td class="mny">'+(M.orders||'—')+(M.repeat_orders?'<div class="sub2">+'+M.repeat_orders+' повт.</div>':'')+'</td>'
+     +'<td class="mny">'+(M.orders?uah(M.ltv):'—')+(M.first_at?'<div class="sub2">з '+String(M.first_at).slice(0,10)+'</div>':'')+'</td>'
+     +'<td class="mny">'+(M.orders?uah(M.profit):'—')+'</td>'
      +'<td><select class="sg" data-id="'+l.id+'"><option value="">— сегмент —</option>'
         +Object.keys(SEGMENT).map(function(k){return '<option value="'+k+'"'+(l.segment===k?' selected':'')+'>'+SEGMENT[k]+'</option>';}).join('')+'</select></td>'
      +'<td><select class="st" data-id="'+l.id+'">'+Object.keys(ST).map(function(k){return '<option value="'+k+'"'+((l.status||'new')===k?' selected':'')+'>'+ST[k]+'</option>';}).join('')+'</select>'
@@ -721,27 +831,62 @@ function render(){
         +'<div class="rj-wrap" data-for="'+l.id+'" style="'+(l.status==='lost'?'':'display:none')+'">'
         +'<select class="rj" data-id="'+l.id+'"><option value="">— причина —</option>'
         +Object.keys(REASON).map(function(k){return '<option value="'+k+'"'+(l.reject_reason===k?' selected':'')+'>'+REASON[k]+'</option>';}).join('')+'</select></div></td>'
-     +'<td><textarea class="nt" data-id="'+l.id+'" rows="2" placeholder="Нотатка: домовленості, наступний крок…">'+esc(l.notes||'')+'</textarea><div class="ntst" data-for="'+l.id+'"></div></td>'
+     +'<td class="cmt">'
+        +(last?'<div class="last">'+esc(last.body).replace(/\n/g,'<br>')
+             +'<div class="who">'+esc((last.author_email||'').split('@')[0])+' · '+dt(last.created_at)
+             +(cl.length>1?' · <a href="#" class="more" data-id="'+l.id+'">ще '+(cl.length-1)+'</a>':'')+'</div></div>'
+            :'<div class="last" style="color:#bbb">коментарів ще немає</div>')
+        +'<textarea class="cm" data-id="'+l.id+'" rows="2" placeholder="Що зробили, про що домовились…"></textarea>'
+        +'<div class="row2"><input type="date" class="nx" data-id="'+l.id+'" value="'+(l.next_contact_at?new Date(l.next_contact_at*1000).toISOString().slice(0,10):'')+'" title="Наступний контакт">'
+        +'<button class="cmsave" data-id="'+l.id+'">Додати</button><span class="st2" data-for="'+l.id+'"></span></div></td>'
      +'<td><button class="del" data-id="'+l.id+'" title="Видалити лід">✕</button></td>'
      +'</tr>';
   });
   box.innerHTML=h+'</tbody></table>';
-  // нотатки — зберігаються при втраті фокусу (blur) або Ctrl+Enter
-  box.querySelectorAll('.nt').forEach(function(ta){
-    var orig=ta.value;
-    async function save(){
-      if(ta.value===orig) return;
-      var id=ta.dataset.id, st=box.querySelector('.ntst[data-for="'+id+'"]');
-      st.textContent='збереження…';
+  // Коментар — окремий запис з автором і часом, а не перезапис одного поля.
+  // Ctrl+Enter зберігає: менеджер пише багато і не тягнеться до миші.
+  box.querySelectorAll('.cmsave').forEach(function(b){
+    b.addEventListener('click',async function(){
+      var id=this.dataset.id;
+      var ta=box.querySelector('.cm[data-id="'+id+'"]');
+      var nx=box.querySelector('.nx[data-id="'+id+'"]');
+      var st=box.querySelector('.st2[data-for="'+id+'"]');
+      var txt=(ta.value||'').trim();
+      if(!txt){ ta.focus(); return; }
+      var L=LEADS.find(function(x){return String(x.id)===String(id);});
+      // Розділ 7 ТЗ: для «В очікуванні рішення» і «Зразки надіслані» дата
+      // наступного контакту обовʼязкова — інакше лід нікуди не потрапляє.
+      if(L&&NEED_NEXT.indexOf(L.status)>=0&&!nx.value&&!L.next_contact_at){
+        st.textContent='вкажіть дату наступного контакту'; nx.focus(); return;
+      }
+      this.disabled=true; st.textContent='збереження…';
+      var payload={lead_id:parseInt(id),body:txt};
+      if(nx.value) payload.next_contact_at=Math.floor(new Date(nx.value+'T12:00:00').getTime()/1000);
       try{
-        await api('/api/leads/update',{id:parseInt(id),notes:ta.value});
-        orig=ta.value;
-        var L=LEADS.find(function(x){return String(x.id)===String(id);});if(L)L.notes=ta.value;
-        st.textContent='✓ збережено'; setTimeout(function(){st.textContent='';},1800);
-      }catch(e){ st.textContent='✕ помилка'; }
-    }
-    ta.addEventListener('blur',save);
-    ta.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){ta.blur();}});
+        var r=await api('/api/leads/comment',payload);
+        if(r&&r.lead&&L){ L.last_comment_at=r.lead.last_comment_at; L.next_contact_at=r.lead.next_contact_at; }
+        if(!COMMENTS[id]) COMMENTS[id]=[];
+        COMMENTS[id].unshift({body:txt,author_email:(window.ME||''),created_at:Math.floor(Date.now()/1000)});
+        st.textContent='✓ додано';
+        kpis(LEADS); render();
+      }catch(e){ st.textContent='✕ помилка'; this.disabled=false; }
+    });
+  });
+  box.querySelectorAll('.cm').forEach(function(ta){
+    ta.addEventListener('keydown',function(e){
+      if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){
+        var b=box.querySelector('.cmsave[data-id="'+ta.dataset.id+'"]'); if(b) b.click();
+      }
+    });
+  });
+  box.querySelectorAll('.more').forEach(function(a){
+    a.addEventListener('click',function(e){
+      e.preventDefault();
+      var cl=COMMENTS[this.dataset.id]||[];
+      alert(cl.map(function(c){
+        return dt(c.created_at)+' · '+((c.author_email||'').split('@')[0])+'\n'+c.body;
+      }).join('\n\n──────────\n\n'));
+    });
   });
   // видалення
   box.querySelectorAll('.del').forEach(function(b){
@@ -807,6 +952,7 @@ async function load(){
     var d=await api('/api/leads/list',{limit:2000});
     LEADS=d.leads||[];
     ORDERS=d.orders||[];
+    MONEY=d.money||{}; COMMENTS=d.comments||{};
     var srcs=[...new Set(LEADS.map(function(l){return l.source;}).filter(Boolean))].sort();
     var sel=document.getElementById('f-source'),cur=sel.value;
     sel.innerHTML='<option value="">Усі джерела</option>'+srcs.map(function(s){return '<option value="'+esc(s)+'">'+esc(s)+'</option>';}).join('');
@@ -820,7 +966,7 @@ async function load(){
   }
 }
 
-['f-status','f-source','f-segment','f-from','f-to'].forEach(function(id){
+['f-status','f-source','f-segment','f-from','f-to','f-age','f-deal'].forEach(function(id){
   var el=document.getElementById(id); if(el) el.addEventListener('change',render);
 });
 document.getElementById('f-period').addEventListener('change',function(){
