@@ -519,6 +519,13 @@ tr.stale-red td{background:#ffebee}
 .mny{white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
 .mny .sub2{font-size:11px;color:#888}
 .nolink{color:#c62828;font-size:11px}
+/* Лід у статусі «Замовили», але відвантажень у МійСклад немає. Саме через
+   цю розбіжність 09.09.2026 прийшло питання «чому прибуток такий малий»:
+   у плитці «Замовили» пʼять, а грошей — по одному клієнту. Тепер видно, де
+   статус поставили авансом. */
+.no-deal{display:inline-block;margin-top:3px;padding:1px 6px;border-radius:4px;
+  background:#ffebee;color:#c62828;font-size:11px;font-weight:600;white-space:nowrap}
+.hint-src{font-size:11px;color:#888;margin:6px 0 0}
 </style>
 <div class="kpis">
     <div class="k acc"><div class="n" id="k-total">0</div><div class="l">Заявок за період</div></div>
@@ -531,7 +538,10 @@ tr.stale-red td{background:#ffebee}
     <div class="k"><div class="n" id="k-prof">0 ₴</div><div class="l">Прибуток з лідів</div></div>
     <div class="k"><div class="n" id="k-o7">0</div><div class="l">Без контакту 7+ днів</div></div>
     <div class="k"><div class="n" id="k-o14">0</div><div class="l">Без контакту 14+ днів</div></div>
+    <div class="k"><div class="n" id="k-nodeal">0</div><div class="l">«Замовили» без відвантаження</div></div>
   </div>
+
+  <p class="hint-src">Оборот і прибуток — з МійСклад: відвантаження мінус повернення, прибуток за звітом собівартості (FIFO, рахує сам МійСклад). Клієнт визначається за поштою або телефоном, тому кілька карток одного клієнта рахуються разом. Дублікати й спам у підсумки не входять.</p>
 
   <div id="analytics"></div>
 
@@ -681,6 +691,8 @@ function kpis(rows){
   document.getElementById('k-prof').textContent=uah(prof);
   document.getElementById('k-o7').textContent=o7;
   document.getElementById('k-o14').textContent=o14;
+  document.getElementById('k-nodeal').textContent=
+    rows.filter(function(l){return l.status==='won'&&!money(l.id).orders;}).length;
 }
 
 // ── аналітика: воронка, причини відмов, сегменти, джерела ──────────────────
@@ -840,7 +852,8 @@ function render(){
         // Причина показується лише для втрачених — інакше поле збиває з пантелику.
         +'<div class="rj-wrap" data-for="'+l.id+'" style="'+(l.status==='lost'?'':'display:none')+'">'
         +'<select class="rj" data-id="'+l.id+'"><option value="">— причина —</option>'
-        +Object.keys(REASON).map(function(k){return '<option value="'+k+'"'+(l.reject_reason===k?' selected':'')+'>'+REASON[k]+'</option>';}).join('')+'</select></div></td>'
+        +Object.keys(REASON).map(function(k){return '<option value="'+k+'"'+(l.reject_reason===k?' selected':'')+'>'+REASON[k]+'</option>';}).join('')+'</select></div>'
+        +(l.status==='won'&&!M.orders?'<div class="no-deal" title="Статус «Замовили», але в МійСклад немає жодного відвантаження цього клієнта">без відвантаження</div>':'')+'</td>'
      +'<td class="cmt">'
         +(last?'<div class="last">'+esc(last.body).replace(/\n/g,'<br>')
              +'<div class="who">'+esc((last.author_email||'').split('@')[0])+' · '+dt(last.created_at)
