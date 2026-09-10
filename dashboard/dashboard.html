@@ -8,9 +8,9 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --y:#FEBF27;--g:#96C11F;--d:#1E1E1E;--bg:#F4F4EF;--card:#fff;
+  --y:#FCC01B;--g:#8DC63F;--d:#1E1E1E;--bg:#F4F4EF;--card:#fff;
   --muted:#8a8a8a;--border:#E5E5DC;--red:#E84040;--blue:#3B82F6;
-  --yf:rgba(254,191,39,.13);--gf:rgba(150,193,31,.12);--rf:rgba(232,64,64,.10);
+  --yf:rgba(252,192,27,.13);--gf:rgba(141,198,63,.12);--rf:rgba(232,64,64,.10);
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--d);font-size:14px;min-height:100vh}
 
@@ -28,7 +28,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .nav-menu{display:flex;align-items:center;gap:2px;margin-left:18px;padding-left:18px;border-left:1px solid rgba(255,255,255,.12)}
 .nav-link{color:rgba(255,255,255,.65);text-decoration:none;font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:7px;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
 .nav-link:hover{background:rgba(255,255,255,.08);color:#fff}
-.nav-link.active{background:rgba(254,191,39,.18);color:#FEBF27}
+.nav-link.active{background:rgba(252,192,27,.18);color:#FCC01B}
 .nav-toggle{display:none;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:6px;margin-left:8px}
 @media(max-width:1280px){
   .nav-menu{position:fixed;top:56px;left:0;right:0;background:#1E1E1E;flex-direction:column;align-items:stretch;padding:8px 16px;gap:0;margin:0;border-left:none;border-bottom:1px solid rgba(255,255,255,.1);transform:translateY(-110%);transition:transform .25s;z-index:180;box-shadow:0 6px 20px rgba(0,0,0,.4)}
@@ -39,7 +39,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .badge{padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:600;white-space:nowrap}
 @media(max-width:900px){.badge{padding:2px 7px;font-size:10px}#lastBootBadge{display:none}}
 @media(max-width:520px){#lastUpdate{display:none}}
-.badge-green{background:rgba(150,193,31,.2);color:var(--g);border:1px solid rgba(150,193,31,.3)}
+.badge-green{background:rgba(141,198,63,.2);color:var(--g);border:1px solid rgba(141,198,63,.3)}
 .badge-gray{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1)}
 
 /* ─── TAB NAV ─── */
@@ -116,7 +116,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .kpi-sub{font-size:11px;color:var(--muted)}
 .kpi.dark .kpi-sub{color:rgba(255,255,255,.3)}
 .pill{display:inline-flex;align-items:center;padding:2px 7px;border-radius:10px;font-size:11px;font-weight:700;gap:2px}
-.pill-up{background:rgba(150,193,31,.12);color:#5a8a00}
+.pill-up{background:rgba(141,198,63,.12);color:#5a8a00}
 .pill-dn{background:rgba(232,64,64,.1);color:var(--red)}
 .pill-neu{background:var(--yf);color:#996600}
 
@@ -160,7 +160,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .mtbtn.on-b{color:var(--blue);border-color:var(--blue);background:rgba(59,130,246,.08)}
 
 /* ─── ALERT ─── */
-.alert{background:rgba(254,191,39,.08);border:1px solid rgba(254,191,39,.3);border-radius:8px;padding:10px 14px;font-size:12px;color:#806000;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.alert{background:rgba(252,192,27,.08);border:1px solid rgba(252,192,27,.3);border-radius:8px;padding:10px 14px;font-size:12px;color:#806000;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .alerts{display:grid;grid-template-columns:1.2fr .9fr .9fr;gap:10px}
 .alert-soft{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 14px}
 .alert-soft b{color:var(--d)}
@@ -187,12 +187,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .chart-h600{position:relative;height:600px}
 .abc-badge{display:inline-block;padding:2px 10px;border-radius:12px;font-weight:700;font-size:12px}
 .abc-a{background:rgba(232,64,64,.13);color:#E84040}
-.abc-b{background:rgba(254,191,39,.18);color:#c48a00}
-.abc-c{background:rgba(150,193,31,.15);color:#5a8a00}
+.abc-b{background:rgba(252,192,27,.18);color:#c48a00}
+.abc-c{background:rgba(141,198,63,.15);color:#5a8a00}
 .cat-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
-.cat-gp{background:rgba(150,193,31,.15);color:#4a7000}
+.cat-gp{background:rgba(141,198,63,.15);color:#4a7000}
 .cat-sr{background:rgba(59,130,246,.12);color:#1d5fa6}
-.cat-up{background:rgba(254,191,39,.18);color:#9a6a00}
+.cat-up{background:rgba(252,192,27,.18);color:#9a6a00}
 .cat-in{background:rgba(138,138,138,.12);color:#555}
 .chart-h360{position:relative;height:360px}
 
@@ -209,26 +209,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 #dashauth-overlay{position:fixed;inset:0;background:#1E1E1E;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 #dashauth-overlay.is-hidden{display:none}
 .dashauth-card{background:#fff;width:100%;max-width:440px;border-radius:14px;padding:36px 30px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.dashauth-logo{font-size:24px;font-weight:900;color:#FEBF27;margin-bottom:6px;letter-spacing:-0.5px;text-align:center}
+.dashauth-logo{font-size:24px;font-weight:900;color:#FCC01B;margin-bottom:6px;letter-spacing:-0.5px;text-align:center}
 .dashauth-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#888;text-align:center;margin-bottom:24px}
 .dashauth-icon{font-size:36px;text-align:center;margin-bottom:16px}
 .dashauth-h1{font-size:18px;font-weight:800;text-align:center;color:#1E1E1E;margin-bottom:6px}
 .dashauth-desc{font-size:13px;color:#666;text-align:center;line-height:1.55;margin-bottom:20px}
 .dashauth-input{width:100%;padding:12px 14px;border:2px solid #E5E5DC;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
-.dashauth-input:focus{border-color:#FEBF27}
+.dashauth-input:focus{border-color:#FCC01B}
 .dashauth-input.code{font-family:'SF Mono',Menlo,Consolas,monospace;letter-spacing:.4em;text-align:center;font-size:18px}
 .dashauth-btn{width:100%;padding:13px;background:#1E1E1E;color:#fff;border:0;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;margin-top:14px;font-family:inherit;transition:background .15s}
 .dashauth-btn:hover{background:#000}
 .dashauth-btn:disabled{opacity:.5;cursor:not-allowed}
 .dashauth-msg{font-size:12.5px;line-height:1.5;margin-top:12px;text-align:center;min-height:18px}
 .dashauth-msg.is-error{color:#DC2626}
-.dashauth-msg a{color:#FEBF27;font-weight:600;text-decoration:underline}
+.dashauth-msg a{color:#FCC01B;font-weight:600;text-decoration:underline}
 .dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
-.dashauth-back:hover{color:#FEBF27}
+.dashauth-back:hover{color:#FCC01B}
 /* v2.77.1: top:115px — нижче tab nav */
-.dashauth-session{position:fixed;top:115px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-family:-apple-system,sans-serif;font-weight:600;display:flex;align-items:center;gap:8px}
+.dashauth-session{position:fixed;top:115px;right:12px;z-index:10000;background:rgba(141,198,63,.18);color:#8DC63F;border:1px solid rgba(141,198,63,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-family:-apple-system,sans-serif;font-weight:600;display:flex;align-items:center;gap:8px}
 @media(max-width:760px){.dashauth-session{top:auto;bottom:12px;right:12px;left:12px;justify-content:center}}
-.dashauth-session button{background:none;border:0;color:#96C11F;cursor:pointer;font-size:14px;padding:0;line-height:1}
+.dashauth-session button{background:none;border:0;color:#8DC63F;cursor:pointer;font-size:14px;padding:0;line-height:1}
 body.dash-locked{overflow:hidden}
 </style>
 <script>
@@ -1279,7 +1279,7 @@ function escapeHtml(s){return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp
     </div>
   </div>
 
-  <div style="margin-top:18px;padding:14px 18px;background:rgba(150,193,31,.06);border-left:3px solid var(--g);border-radius:8px;font-size:12.5px;line-height:1.6;color:#4a7000">
+  <div style="margin-top:18px;padding:14px 18px;background:rgba(141,198,63,.06);border-left:3px solid var(--g);border-radius:8px;font-size:12.5px;line-height:1.6;color:#4a7000">
     💡 <strong>Як читати цю вкладку:</strong>
     Лінійний менеджер — натискай на revival list, дзвони перші 5–10 ім'я.
     Керівник відділу — слідкуй за DSO (норма 30–45 днів) і концентрацією (норма ТОП-10 &lt;55%).
@@ -1309,9 +1309,9 @@ function showFetchBanner(text, type) {
     document.body.appendChild(banner);
   }
   const styles = {
-    loading: 'background:rgba(254,191,39,0.95);color:#1E1E1E',
+    loading: 'background:rgba(252,192,27,0.95);color:#1E1E1E',
     error:   'background:rgba(239,68,68,0.95);color:#fff',
-    empty:   'background:rgba(150,193,31,0.95);color:#1E1E1E'
+    empty:   'background:rgba(141,198,63,0.95);color:#1E1E1E'
   };
   banner.style.cssText += ';' + (styles[type] || styles.loading);
   // v2.78.88 SECURITY: text comes from caller — escape якщо містить error messages (e.message може мати HTML)
@@ -1360,8 +1360,8 @@ if(D.stock_detail){
   if(D.stock_detail.in_transit) D.stock_detail.in_transit = D.stock_detail.in_transit.filter(s=>!_stockEx(s));
 }
 
-const Y='#FEBF27',G='#96C11F',R='#E84040',B='#3B82F6',DK='#1E1E1E';
-const YF='rgba(254,191,39,.13)',GF='rgba(150,193,31,.12)',RF='rgba(232,64,64,.10)',BF='rgba(59,130,246,.08)';
+const Y='#FCC01B',G='#8DC63F',R='#E84040',B='#3B82F6',DK='#1E1E1E';
+const YF='rgba(252,192,27,.13)',GF='rgba(141,198,63,.12)',RF='rgba(232,64,64,.10)',BF='rgba(59,130,246,.08)';
 const MN=['Січ','Лют','Бер','Кві','Тра','Чер','Лип','Сер','Вер','Жов','Лис','Гру'];
 
 Chart.defaults.font.family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif";
@@ -1629,7 +1629,7 @@ function buildCashflow(){
   const data=getFiltered();
   const lbl=data.map(r=>r.ym);
   const vals=data.map(r=>Math.round(r.net/1000));
-  const colors=vals.map(v=>v>=0?'rgba(150,193,31,.7)':'rgba(232,64,64,.65)');
+  const colors=vals.map(v=>v>=0?'rgba(141,198,63,.7)':'rgba(232,64,64,.65)');
   mkChart('cashflowChart',{type:'bar',data:{labels:lbl,datasets:[{label:'Net Cash Flow',data:vals,backgroundColor:colors,borderRadius:3}]},options:{...JSON.parse(JSON.stringify(baseOpts)),plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` Cash Flow: ${fmtK(ctx.raw)} тис. ₴`}}}}});
 }
 
@@ -1749,11 +1749,11 @@ function buildHist() {
           backgroundColor: [
             YF,
             YF,
-            'rgba(254,191,39,.3)',
-            'rgba(254,191,39,.5)',
+            'rgba(252,192,27,.3)',
+            'rgba(252,192,27,.5)',
             Y,
             Y,
-            'rgba(150,193,31,.5)',
+            'rgba(141,198,63,.5)',
             G
           ],
           borderRadius: 5
@@ -2057,9 +2057,9 @@ function buildStock(){
   const catNames = Object.keys(cats).filter(k=>cats[k].value>0);
   const catVals  = catNames.map(k=>Math.round(cats[k].value/1000));
   const catColors= catNames.map(k=>({
-    'Готова продукція':'rgba(150,193,31,0.8)',
+    'Готова продукція':'rgba(141,198,63,0.8)',
     'Сировина':'rgba(59,130,246,0.8)',
-    'Упаковка':'rgba(254,191,39,0.8)',
+    'Упаковка':'rgba(252,192,27,0.8)',
     'Інше':'rgba(138,138,138,0.6)',
   }[k]||'rgba(138,138,138,0.6)'));
 
@@ -2157,7 +2157,7 @@ function buildABC(){
     labels:['A — критичні (80%)','B — важливі (15%)','C — решта (5%)'],
     datasets:[
       {label:'Вартість',data:[Math.round((summary.A?.value||0)/1000),Math.round((summary.B?.value||0)/1000),Math.round((summary.C?.value||0)/1000)],
-        backgroundColor:['rgba(232,64,64,0.75)','rgba(254,191,39,0.75)','rgba(150,193,31,0.75)'],borderRadius:6,borderSkipped:false}]
+        backgroundColor:['rgba(232,64,64,0.75)','rgba(252,192,27,0.75)','rgba(141,198,63,0.75)'],borderRadius:6,borderSkipped:false}]
   },options:{responsive:true,maintainAspectRatio:false,
     plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmtK(ctx.raw)} тис. ₴`}}},
     scales:{x:{grid:{display:false}},y:{grid:{color:'#F0F0E8'},ticks:{callback:v=>fmtK(v)}}}}});
@@ -2206,7 +2206,7 @@ function buildStockHistory(){
     return;
   }
   if(wrap && !wrap.querySelector('canvas')) wrap.innerHTML='<canvas id="stockHistChart"></canvas>';
-  const palette=['#FEBF27','#96C11F','#3B82F6','#E84040','#8B5CF6'];
+  const palette=['#FCC01B','#8DC63F','#3B82F6','#E84040','#8B5CF6'];
   const datasets = sh.series.map((s,i)=>({
     label:s.name.length>30?s.name.substring(0,30)+'…':s.name,
     data:s.data, borderColor:palette[i%palette.length],
@@ -2362,7 +2362,7 @@ function buildTopClientsMargin(){
   if(wrap && !wrap.querySelector('canvas')){
     wrap.innerHTML='<canvas id="clientsMarginChart"></canvas>';
   }
-  const colors=sorted.map(r=>r.margin>=0?'rgba(150,193,31,0.75)':'rgba(232,64,64,0.75)');
+  const colors=sorted.map(r=>r.margin>=0?'rgba(141,198,63,0.75)':'rgba(232,64,64,0.75)');
   mkChart('clientsMarginChart',{type:'bar',data:{
     labels:sorted.map(r=>r.name.length>28?r.name.substring(0,28)+'…':r.name),
     datasets:[{label:'Маржа, %',data:sorted.map(r=>r.margin),backgroundColor:colors,borderRadius:4,borderSkipped:false}]
@@ -2442,7 +2442,7 @@ function buildTopClientsAbsMargin(){
     wrap.innerHTML='<canvas id="clientsAbsMarginChart"></canvas>';
   }
   const maxAbs = withAbs[0].absMargin || 1;
-  const colors = withAbs.map(r=>r.absMargin>=0?'rgba(254,191,39,0.80)':'rgba(232,64,64,0.75)');
+  const colors = withAbs.map(r=>r.absMargin>=0?'rgba(252,192,27,0.80)':'rgba(232,64,64,0.75)');
   mkChart('clientsAbsMarginChart',{type:'bar',data:{
     labels:withAbs.map(r=>r.name.length>28?r.name.substring(0,28)+'…':r.name),
     datasets:[{label:'Прибуток, ₴',data:withAbs.map(r=>Math.round(r.absMargin/1000)),backgroundColor:colors,borderRadius:4,borderSkipped:false}]
@@ -2485,7 +2485,7 @@ function buildTopProductsAbsMargin(){
     wrap.innerHTML='<canvas id="productsAbsMarginChart"></canvas>';
   }
   const maxAbs = withAbs[0].absMargin || 1;
-  const colors = withAbs.map(r=>r.absMargin>=0?'rgba(150,193,31,0.80)':'rgba(232,64,64,0.75)');
+  const colors = withAbs.map(r=>r.absMargin>=0?'rgba(141,198,63,0.80)':'rgba(232,64,64,0.75)');
   mkChart('productsAbsMarginChart',{type:'bar',data:{
     labels:withAbs.map(r=>r.name.length>30?r.name.substring(0,30)+'…':r.name),
     datasets:[{label:'Прибуток, ₴',data:withAbs.map(r=>Math.round(r.absMargin/1000)),backgroundColor:colors,borderRadius:4,borderSkipped:false}]
@@ -2607,7 +2607,7 @@ function buildSparkline(){
     mkChart('sparklineChart',{type:'line',data:{
       labels:last12.map(r=>r.ym.slice(5)),
       datasets:[{label:'Виручка',data:last12.map(r=>Math.round(r.income/1000)),
-        borderColor:Y,backgroundColor:'rgba(254,191,39,.15)',
+        borderColor:Y,backgroundColor:'rgba(252,192,27,.15)',
         fill:true,tension:.4,pointRadius:3,pointHoverRadius:6,borderWidth:2,pointBackgroundColor:Y}]
     },options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmtK(ctx.raw)} тис. ₴`}}},
@@ -2629,7 +2629,7 @@ function buildSparkline(){
       {
         label: dd.curr_label||'Поточні 30 днів',
         data: dd.curr.map(v=>Math.round(v/1000)),
-        borderColor:Y, backgroundColor:'rgba(254,191,39,.12)',
+        borderColor:Y, backgroundColor:'rgba(252,192,27,.12)',
         fill:true, tension:.35, pointRadius:2, pointHoverRadius:5,
         borderWidth:2.5, pointBackgroundColor:Y
       },
@@ -3039,7 +3039,7 @@ function buildDriedMomChart(){
       datasets:[{
         label:'MoM зміна, %',
         data:momData,
-        backgroundColor:momData.map(v=>v>=0?'rgba(150,193,31,.7)':'rgba(232,64,64,.7)'),
+        backgroundColor:momData.map(v=>v>=0?'rgba(141,198,63,.7)':'rgba(232,64,64,.7)'),
         borderRadius:4
       }]
     },
@@ -3064,7 +3064,7 @@ function buildDriedByProductChart(){
   const prodSet=new Set();
   dm.forEach(m=>(m.products||[]).forEach(p=>prodSet.add(p.name)));
   const products=[...prodSet];
-  const colors=['#F5C518','#96C11F','#3B82F6','#EF4444','#A855F7','#F97316','#06B6D4','#EC4899','#84CC16','#6366F1'];
+  const colors=['#F5C518','#8DC63F','#3B82F6','#EF4444','#A855F7','#F97316','#06B6D4','#EC4899','#84CC16','#6366F1'];
 
   const datasets=products.map((pName,i)=>({
     label:pName.replace(/Сушен(ий|ый) (Сир|сыр) SnEco /i,'').replace(/"/g,''),
@@ -3461,8 +3461,8 @@ function buildActionItems(){
         labels: fm.map(x => x.ym),
         datasets: [
           { label: 'Замовлення', data: fm.map(x => x.orders||0), borderColor:'#3B82F6', backgroundColor:'rgba(59,130,246,.1)', tension: 0.3 },
-          { label: 'Відвантаження', data: fm.map(x => x.shipments||x.shipped||0), borderColor:'#96C11F', backgroundColor:'rgba(150,193,31,.1)', tension: 0.3 },
-          { label: 'Оплати', data: fm.map(x => x.payments||x.paid||0), borderColor:'#FEBF27', backgroundColor:'rgba(254,191,39,.1)', tension: 0.3 },
+          { label: 'Відвантаження', data: fm.map(x => x.shipments||x.shipped||0), borderColor:'#8DC63F', backgroundColor:'rgba(141,198,63,.1)', tension: 0.3 },
+          { label: 'Оплати', data: fm.map(x => x.payments||x.paid||0), borderColor:'#FCC01B', backgroundColor:'rgba(252,192,27,.1)', tension: 0.3 },
         ]
       },
       options: {
@@ -3564,8 +3564,8 @@ showTab(1);
       statusEl.style.borderColor = 'rgba(220,38,38,0.4)';
     } else {
       statusEl.textContent = `⚠ Останній sync: ${fmt}`;
-      statusEl.style.background = 'rgba(254,191,39,0.2)';
-      statusEl.style.color = '#FEBF27';
+      statusEl.style.background = 'rgba(252,192,27,0.2)';
+      statusEl.style.color = '#FCC01B';
     }
     updateEl.textContent = ageStr;
   } catch(e) {

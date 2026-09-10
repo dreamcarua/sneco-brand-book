@@ -10,9 +10,9 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --y:#FEBF27;--g:#96C11F;--d:#1E1E1E;--bg:#F4F4EF;--card:#fff;
+  --y:#FCC01B;--g:#8DC63F;--d:#1E1E1E;--bg:#F4F4EF;--card:#fff;
   --muted:#6b6b6b;--border:#E5E5DC;--red:#dc2626;--blue:#3B82F6;
-  --yf:rgba(254,191,39,.13);--gf:rgba(150,193,31,.12);--rf:rgba(232,64,64,.10);
+  --yf:rgba(252,192,27,.13);--gf:rgba(141,198,63,.12);--rf:rgba(232,64,64,.10);
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--d);font-size:14px;min-height:100vh}
 
@@ -30,7 +30,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .nav-menu{display:flex;align-items:center;gap:2px;margin-left:18px;padding-left:18px;border-left:1px solid rgba(255,255,255,.12)}
 .nav-link{color:rgba(255,255,255,.65);text-decoration:none;font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:7px;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
 .nav-link:hover{background:rgba(255,255,255,.08);color:#fff}
-.nav-link.active{background:rgba(254,191,39,.18);color:var(--y)}
+.nav-link.active{background:rgba(252,192,27,.18);color:var(--y)}
 .nav-toggle{display:none;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:6px;margin-left:8px}
 @media(max-width:1280px){
   .nav-menu{position:fixed;top:56px;left:0;right:0;background:#1E1E1E;flex-direction:column;align-items:stretch;padding:8px 16px;gap:0;margin:0;border-left:none;border-bottom:1px solid rgba(255,255,255,.1);transform:translateY(-110%);transition:transform .25s;z-index:180;box-shadow:0 6px 20px rgba(0,0,0,.4)}
@@ -41,7 +41,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .badge{padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:600;white-space:nowrap}
 @media(max-width:900px){.badge{padding:2px 7px;font-size:10px}}
 @media(max-width:520px){#lastUpdate{display:none}}
-.badge-green{background:rgba(150,193,31,.2);color:var(--g);border:1px solid rgba(150,193,31,.3)}
+.badge-green{background:rgba(141,198,63,.2);color:var(--g);border:1px solid rgba(141,198,63,.3)}
 .badge-gray{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1)}
 
 /* ─── SELECTOR ─── */
@@ -69,17 +69,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   border:1.5px solid var(--line,#e2e2dd);border-radius:8px;padding:6px 30px 6px 12px;cursor:pointer;
   appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");
   background-repeat:no-repeat;background-position:right 11px center}
-.gper-select:focus{outline:2px solid #FEBF27;outline-offset:1px}
-.gper-select.gper-on{border-color:#FEBF27;background-color:#FFFBEF}
+.gper-select:focus{outline:2px solid #FCC01B;outline-offset:1px}
+.gper-select.gper-on{border-color:#FCC01B;background-color:#FFFBEF}
 .gper-hint{font-size:11px;color:var(--muted)}
 .gper-range{display:inline-flex;align-items:center;gap:5px}
 .gper-date{font:inherit;font-size:12px;color:var(--d);background:#fff;border:1.5px solid var(--line,#e2e2dd);
   border-radius:7px;padding:5px 8px;cursor:pointer}
-.gper-date.gper-on{border-color:#FEBF27;background:#FFFBEF}
+.gper-date.gper-on{border-color:#FCC01B;background:#FFFBEF}
 .gper-dash{color:var(--muted);font-size:12px}
 .gper-apply{font:inherit;font-size:11.5px;font-weight:600;color:var(--d);background:#fff;
   border:1.5px solid var(--line,#e2e2dd);border-radius:7px;padding:5px 10px;cursor:pointer}
-.gper-apply:hover{border-color:#FEBF27;background:#FFFBEF}
+.gper-apply:hover{border-color:#FCC01B;background:#FFFBEF}
 @media (max-width:640px){.gper-range{width:100%;justify-content:center;flex-wrap:wrap}}
 .gper-reset{display:none;font:inherit;font-size:11px;color:var(--muted);background:transparent;
   border:1px solid var(--line,#e2e2dd);border-radius:6px;padding:4px 9px;cursor:pointer}
@@ -135,14 +135,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* ─── HEADER CARD (customer info) ─── */
 .cust-header{background:linear-gradient(135deg, #1E1E1E 0%, #2A2A2A 100%);color:#fff;border-radius:14px;padding:24px 28px;margin-bottom:20px;position:relative;overflow:hidden}
-.cust-header::after{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle, rgba(254,191,39,0.15) 0%, transparent 70%);pointer-events:none}
+.cust-header::after{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle, rgba(252,192,27,0.15) 0%, transparent 70%);pointer-events:none}
 .cust-name{font-size:26px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px;line-height:1.2}
 .cust-meta{display:flex;flex-wrap:wrap;gap:12px 18px;font-size:13px;color:rgba(255,255,255,.75);margin-bottom:14px}
 .cust-meta-item{display:flex;align-items:center;gap:6px}
 .cust-meta-item a{color:var(--y);text-decoration:none}
 .cust-meta-item a:hover{text-decoration:underline}
 .cust-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.cust-tag{padding:3px 10px;background:rgba(254,191,39,.18);color:var(--y);font-size:11px;font-weight:600;border-radius:10px;border:1px solid rgba(254,191,39,.3)}
+.cust-tag{padding:3px 10px;background:rgba(252,192,27,.18);color:var(--y);font-size:11px;font-weight:600;border-radius:10px;border:1px solid rgba(252,192,27,.3)}
 
 /* ─── v2.74.0 OVERVIEW (першого екрана) ─── */
 .overview-wrap{padding:18px 24px 0}
@@ -163,12 +163,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ov-kpi-val{font-size:20px;font-weight:800;color:var(--d);line-height:1.1}
 .ov-kpi-sub{font-size:10.5px;color:var(--muted);margin-top:3px}
 .ov-kpi-delta{display:inline-block;padding:1px 6px;border-radius:6px;font-size:10px;font-weight:700;margin-top:3px}
-.ov-kpi-delta.up{background:rgba(150,193,31,.18);color:#4a7000}
+.ov-kpi-delta.up{background:rgba(141,198,63,.18);color:#4a7000}
 .ov-kpi-delta.down{background:rgba(232,64,64,.14);color:#a00}
 .ov-kpi-delta.flat{background:rgba(138,138,138,.13);color:#666}
 
 /* Concentration alert */
-.ov-concentration{background:rgba(254,191,39,.10);border:1px solid rgba(254,191,39,.35);border-left:4px solid var(--y);border-radius:8px;padding:11px 16px;font-size:12.5px;color:#7a5a00;line-height:1.5}
+.ov-concentration{background:rgba(252,192,27,.10);border:1px solid rgba(252,192,27,.35);border-left:4px solid var(--y);border-radius:8px;padding:11px 16px;font-size:12.5px;color:#7a5a00;line-height:1.5}
 .ov-concentration b{color:var(--d);font-weight:800}
 
 /* Portfolio chart */
@@ -191,7 +191,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ov-actions-row .ova-amount{text-align:right;font-weight:700;color:var(--red);font-size:12.5px}
 .ov-actions-row .ova-actions{text-align:right;display:flex;gap:4px;justify-content:flex-end}
 .ov-actions-row .ova-btn{padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:#fff;font-size:10.5px;font-weight:600;color:var(--d);cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:3px}
-.ov-actions-row .ova-btn:hover{border-color:var(--y);background:rgba(254,191,39,.08)}
+.ov-actions-row .ova-btn:hover{border-color:var(--y);background:rgba(252,192,27,.08)}
 .ov-actions-empty{padding:24px;text-align:center;color:#4a7000;font-weight:600;font-size:13px}
 
 /* Movers — 2 columns */
@@ -232,8 +232,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ov-heatmap-cell.header{background:transparent;cursor:default;padding:6px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
 .ov-heatmap-cell.header:hover{transform:none;box-shadow:none}
 .ov-heatmap-cell.label{background:transparent;cursor:default;font-weight:700;color:var(--d);font-size:12px;text-align:left;padding:14px 4px}
-.ov-heatmap-cell.green{background:rgba(150,193,31,.18);color:#4a7000;border:1px solid rgba(150,193,31,.3)}
-.ov-heatmap-cell.yellow{background:rgba(254,191,39,.18);color:#996600;border:1px solid rgba(254,191,39,.3)}
+.ov-heatmap-cell.green{background:rgba(141,198,63,.18);color:#4a7000;border:1px solid rgba(141,198,63,.3)}
+.ov-heatmap-cell.yellow{background:rgba(252,192,27,.18);color:#996600;border:1px solid rgba(252,192,27,.3)}
 .ov-heatmap-cell.red{background:rgba(232,64,64,.16);color:#a00;border:1px solid rgba(232,64,64,.3)}
 .ov-heatmap-cell .ovh-num{font-size:20px;font-weight:800;line-height:1.1}
 .ov-heatmap-cell .ovh-sub{font-size:10px;font-weight:600;margin-top:3px;opacity:.85}
@@ -241,7 +241,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* Quick filter chips */
 .ov-filters{display:flex;gap:6px;flex-wrap:wrap;padding:0 0 4px}
 .ov-chip{padding:6px 12px;background:#F1F1EB;color:#555;font-size:11.5px;font-weight:600;border-radius:14px;cursor:pointer;border:1.5px solid transparent;transition:all .12s;font-family:inherit}
-.ov-chip:hover{background:rgba(254,191,39,.18);color:var(--d)}
+.ov-chip:hover{background:rgba(252,192,27,.18);color:var(--d)}
 .ov-chip.active{background:var(--d);color:#fff;border-color:var(--d)}
 .ov-chip.active:hover{background:var(--d)}
 .ov-chip .ovc-count{opacity:.6;margin-left:4px;font-weight:500}
@@ -298,8 +298,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .health-body{flex:1;min-width:0}
 .health-title{font-size:13px;font-weight:800;color:var(--d);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:10px}
 .health-badge{padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
-.health-badge.good{background:rgba(150,193,31,.18);color:#4a7000}
-.health-badge.warn{background:rgba(254,191,39,.20);color:#996600}
+.health-badge.good{background:rgba(141,198,63,.18);color:#4a7000}
+.health-badge.warn{background:rgba(252,192,27,.20);color:#996600}
 .health-badge.bad{background:rgba(232,64,64,.14);color:#a00}
 .health-breakdown{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11.5px;color:#666}
 .health-breakdown b{color:var(--d);font-weight:700}
@@ -340,7 +340,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 @media(max-width:760px){.dm-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.dm-grid{grid-template-columns:1fr}}
 .dm-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:11px 13px;position:relative}
-.dm-card .dm-role{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--y);background:rgba(254,191,39,.12);padding:2px 7px;border-radius:6px;display:inline-block;margin-bottom:5px}
+.dm-card .dm-role{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--y);background:rgba(252,192,27,.12);padding:2px 7px;border-radius:6px;display:inline-block;margin-bottom:5px}
 .dm-card .dm-name{font-weight:700;color:var(--d);font-size:13px;margin-bottom:3px}
 .dm-card .dm-contact{display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:#555}
 .dm-card .dm-contact a{color:#1d5fa6;text-decoration:none}
@@ -383,8 +383,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* ─── INSIGHTS ─── */
 .insight{padding:14px 18px;border-radius:10px;font-size:13px;line-height:1.55;display:flex;align-items:flex-start;gap:10px}
-.insight.green{background:rgba(150,193,31,.08);color:#4a7000;border-left:3px solid var(--g)}
-.insight.yellow{background:rgba(254,191,39,.08);color:#996600;border-left:3px solid var(--y)}
+.insight.green{background:rgba(141,198,63,.08);color:#4a7000;border-left:3px solid var(--g)}
+.insight.yellow{background:rgba(252,192,27,.08);color:#996600;border-left:3px solid var(--y)}
 .insight.red{background:rgba(232,64,64,.06);color:#a00;border-left:3px solid var(--red)}
 .insight.blue{background:rgba(59,130,246,.07);color:#1d5fa6;border-left:3px solid var(--blue)}
 .insight-icon{font-size:18px;flex-shrink:0;margin-top:-2px}
@@ -396,8 +396,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .tl-item{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);align-items:flex-start}
 .tl-item:last-child{border:none}
 .tl-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.tl-icon.demand{background:rgba(150,193,31,.15);color:#4a7000}
-.tl-icon.payment{background:rgba(254,191,39,.18);color:#996600}
+.tl-icon.demand{background:rgba(141,198,63,.15);color:#4a7000}
+.tl-icon.payment{background:rgba(252,192,27,.18);color:#996600}
 .tl-icon.order{background:rgba(59,130,246,.13);color:#1d5fa6}
 .tl-icon.return{background:rgba(232,64,64,.12);color:var(--red)}
 .tl-icon.invoice{background:rgba(138,138,138,.15);color:#555}
@@ -467,25 +467,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 #dashauth-overlay{position:fixed;inset:0;background:#1E1E1E;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 #dashauth-overlay.is-hidden{display:none}
 .dashauth-card{background:#fff;width:100%;max-width:440px;border-radius:14px;padding:36px 30px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.dashauth-logo{font-size:24px;font-weight:900;color:#FEBF27;margin-bottom:6px;letter-spacing:-0.5px;text-align:center}
+.dashauth-logo{font-size:24px;font-weight:900;color:#FCC01B;margin-bottom:6px;letter-spacing:-0.5px;text-align:center}
 .dashauth-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#888;text-align:center;margin-bottom:24px}
 .dashauth-icon{font-size:36px;text-align:center;margin-bottom:16px}
 .dashauth-h1{font-size:18px;font-weight:800;text-align:center;color:#1E1E1E;margin-bottom:6px}
 .dashauth-desc{font-size:13px;color:#666;text-align:center;line-height:1.55;margin-bottom:20px}
 .dashauth-input{width:100%;padding:12px 14px;border:2px solid #E5E5DC;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
-.dashauth-input:focus{border-color:#FEBF27}
+.dashauth-input:focus{border-color:#FCC01B}
 .dashauth-input.code{font-family:'SF Mono',Menlo,Consolas,monospace;letter-spacing:.4em;text-align:center;font-size:18px}
 .dashauth-btn{width:100%;padding:13px;background:#1E1E1E;color:#fff;border:0;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;margin-top:14px;font-family:inherit;transition:background .15s}
 .dashauth-btn:hover{background:#000}
 .dashauth-btn:disabled{opacity:.5;cursor:not-allowed}
 .dashauth-msg{font-size:12.5px;line-height:1.5;margin-top:12px;text-align:center;min-height:18px}
 .dashauth-msg.is-error{color:#DC2626}
-.dashauth-msg a{color:#FEBF27;font-weight:600;text-decoration:underline}
+.dashauth-msg a{color:#FCC01B;font-weight:600;text-decoration:underline}
 .dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
-.dashauth-back:hover{color:#FEBF27}
+.dashauth-back:hover{color:#FCC01B}
 /* v2.78.32: auth session badge inline у topbar справа (не floating). Стиснутий, прозорий. */
-.dashauth-session{display:inline-flex;align-items:center;gap:6px;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:4px 10px;border-radius:12px;font-size:10.5px;font-family:-apple-system,sans-serif;font-weight:600;margin-left:8px;white-space:nowrap}
-.dashauth-session button{background:none;border:0;color:#96C11F;cursor:pointer;font-size:13px;padding:0;line-height:1;opacity:.8}
+.dashauth-session{display:inline-flex;align-items:center;gap:6px;background:rgba(141,198,63,.18);color:#8DC63F;border:1px solid rgba(141,198,63,.35);padding:4px 10px;border-radius:12px;font-size:10.5px;font-family:-apple-system,sans-serif;font-weight:600;margin-left:8px;white-space:nowrap}
+.dashauth-session button{background:none;border:0;color:#8DC63F;cursor:pointer;font-size:13px;padding:0;line-height:1;opacity:.8}
 .dashauth-session button:hover{opacity:1}
 @media(max-width:760px){.dashauth-session{font-size:10px;padding:3px 7px}}
 body.dash-locked{overflow:hidden}
@@ -2886,8 +2886,8 @@ function _renderOverviewCharts(){
       type: 'bar',
       data: { labels: labels12, datasets: [{
         label: 'Виручка ₴', data: data12,
-        backgroundColor: 'rgba(254,191,39,.75)',
-        borderColor: '#FEBF27', borderWidth: 1
+        backgroundColor: 'rgba(252,192,27,.75)',
+        borderColor: '#FCC01B', borderWidth: 1
       }]},
       options: {
         responsive: true, maintainAspectRatio: false,
@@ -2934,11 +2934,11 @@ function _renderOverviewCharts(){
           {
             label: `${currentY} (поточний)`,
             data: currentYearData,
-            borderColor: '#FEBF27',
-            backgroundColor: 'rgba(254,191,39,.1)',
+            borderColor: '#FCC01B',
+            backgroundColor: 'rgba(252,192,27,.1)',
             borderWidth: 3,
             pointRadius: 5,
-            pointBackgroundColor: '#FEBF27',
+            pointBackgroundColor: '#FCC01B',
             pointHoverRadius: 7,
             tension: 0.25,
             spanGaps: false
@@ -3445,7 +3445,7 @@ function _buildLegacyListsHtml(customersPool){
       title: `ТОП-100 клієнтів · ${period.label}`,
       subtitle: `${topClients.length} з ${pool.filter(c=>!c.archived).length} клієнтів мають продажі`,
       items: topClients, valueKey: '__periodRev', valueLabel: period.label,
-      valueColor: '#4a7000', badgeBg: 'rgba(150,193,31,.15)', badgeFg: '#4a7000',
+      valueColor: '#4a7000', badgeBg: 'rgba(141,198,63,.15)', badgeFg: '#4a7000',
       emptyMsg: 'нема продажів у цьому періоді'
     }),
     dormantChips,
@@ -3571,7 +3571,7 @@ window.selectCustomer = function(name){
   // v2.78.33: compact mode — search прихований через CSS клас, тільки back-button лівий
   document.querySelector('.selector-bar')?.classList.add('compact');
   pillsEl.innerHTML = `
-    <button onclick="showPillsList()" style="background:rgba(254,191,39,.18);color:#996600;border:1px solid rgba(254,191,39,.35);padding:5px 12px;border-radius:8px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px">← До списку клієнтів</button>
+    <button onclick="showPillsList()" style="background:rgba(252,192,27,.18);color:#996600;border:1px solid rgba(252,192,27,.35);padding:5px 12px;border-radius:8px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px">← До списку клієнтів</button>
   `;
 
   // v2.76.1: try/catch — якщо renderCustomerView кине throw, contentWrap лишиться
@@ -4600,7 +4600,7 @@ function renderCustomerView(c){
       const events = [];
       dems.slice(0, 50).forEach(d => events.push({
         date: d.ms_moment, type: 'demand', icon: '📦',
-        title: `Замовлення ${d.name || ''}`, sum: (d.sum_kop||0)/100, color: '#4a7000', bg: 'rgba(150,193,31,.10)'
+        title: `Замовлення ${d.name || ''}`, sum: (d.sum_kop||0)/100, color: '#4a7000', bg: 'rgba(141,198,63,.10)'
       }));
       pays.slice(0, 50).forEach(p => {
         const t = String(p.payment_type||'').toLowerCase();
@@ -4608,7 +4608,7 @@ function renderCustomerView(c){
         events.push({
           date: p.ms_moment, type: inb?'paymentin':'paymentout', icon: inb?'💵':'💸',
           title: `${inb?'Оплата вх.':'Оплата вих.'} ${p.name || ''}`,
-          sum: (p.sum_kop||0)/100, color: inb?'#4a7000':'#a00', bg: inb?'rgba(150,193,31,.10)':'rgba(232,64,64,.10)'
+          sum: (p.sum_kop||0)/100, color: inb?'#4a7000':'#a00', bg: inb?'rgba(141,198,63,.10)':'rgba(232,64,64,.10)'
         });
       });
       const myKey = c.__key || c.id || c.name;
@@ -4722,15 +4722,15 @@ function renderCustomerView(c){
             {
               label: 'Відвантажено, ₴',
               data: allMonths.map(m => shipByMonth[m] || 0),
-              backgroundColor: 'rgba(254,191,39,.75)',
-              borderColor: '#FEBF27',
+              backgroundColor: 'rgba(252,192,27,.75)',
+              borderColor: '#FCC01B',
               borderWidth: 1,
             },
             {
               label: 'Отримано грошей, ₴',
               data: allMonths.map(m => payByMonth[m] || 0),
-              backgroundColor: 'rgba(150,193,31,.75)',
-              borderColor: '#96C11F',
+              backgroundColor: 'rgba(141,198,63,.75)',
+              borderColor: '#8DC63F',
               borderWidth: 1,
             }
           ]
@@ -4826,8 +4826,8 @@ function renderCustomerView(c){
       } catch(e){}
       if (alerts.length === 0) alerts.push({ type: 'good', icon: '✅', title: 'Без аномалій', sub: 'Клієнт стабільний.' });
       const STY = {
-        good: { bg: 'rgba(150,193,31,.10)', border: '#96C11F', color: '#4a7000' },
-        warn: { bg: 'rgba(254,191,39,.13)', border: '#FEBF27', color: '#996600' },
+        good: { bg: 'rgba(141,198,63,.10)', border: '#8DC63F', color: '#4a7000' },
+        warn: { bg: 'rgba(252,192,27,.13)', border: '#FCC01B', color: '#996600' },
         danger: { bg: 'rgba(232,64,64,.10)', border: '#E84040', color: '#a00' },
       };
       // v2.78.34 (Богдан): + Lifetime KPIs + peer comparison + share-of-wallet + payment ratio + YoY
@@ -4911,7 +4911,7 @@ function renderCustomerView(c){
 
         <!-- YoY badge якщо є дані попереднього року -->
         ${yoyDelta !== null ? `
-          <div style="background:${yoyDelta >= 0 ? 'rgba(150,193,31,.10)' : 'rgba(232,64,64,.10)'};border:1px solid ${yoyDelta >= 0 ? '#96C11F' : '#E84040'};border-radius:6px;padding:7px 12px;margin-bottom:10px;display:flex;justify-content:space-between;font-size:11.5px">
+          <div style="background:${yoyDelta >= 0 ? 'rgba(141,198,63,.10)' : 'rgba(232,64,64,.10)'};border:1px solid ${yoyDelta >= 0 ? '#8DC63F' : '#E84040'};border-radius:6px;padding:7px 12px;margin-bottom:10px;display:flex;justify-content:space-between;font-size:11.5px">
             <div><b>📅 YoY (${curY} YTD vs ${curY-1} YTD)</b></div>
             <div style="font-weight:700;color:${yoyDelta >= 0 ? '#4a7000' : '#a00'}">${yoyDelta >= 0 ? '↑+' : '↓'}${Math.abs(yoyDelta).toFixed(0)}% · ${nfm(ytdRev)} ₴ vs ${nfm(lyytdRev)} ₴</div>
           </div>
@@ -4925,8 +4925,8 @@ function renderCustomerView(c){
               <div style="font-size:11.5px;font-weight:700;color:${revDelta >= 0 ? '#4a7000' : '#a00'}">${revDelta >= 0 ? '↑+' : '↓'}${Math.abs(revDelta).toFixed(0)}%</div>
             </div>
             <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:${H}px">
-              <path d="${revPath}" fill="none" stroke="#96C11F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              ${revDot ? `<circle cx="${revDot.x}" cy="${revDot.y}" r="3.5" fill="#96C11F" stroke="#fff" stroke-width="1.5"/>` : ''}
+              <path d="${revPath}" fill="none" stroke="#8DC63F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              ${revDot ? `<circle cx="${revDot.x}" cy="${revDot.y}" r="3.5" fill="#8DC63F" stroke="#fff" stroke-width="1.5"/>` : ''}
             </svg>
             <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-top:1px">${months6.map(m => `<span>${m.label}</span>`).join('')}</div>
             <div style="font-size:10.5px;color:var(--d);margin-top:3px"><b>${nfm(revLast)} ₴</b> · попер. ${nfm(revPrev)} ₴</div>
@@ -4937,8 +4937,8 @@ function renderCustomerView(c){
               <div style="font-size:11.5px;font-weight:700;color:${ordDelta >= 0 ? '#4a7000' : '#a00'}">${ordDelta >= 0 ? '↑+' : '↓'}${Math.abs(ordDelta).toFixed(0)}%</div>
             </div>
             <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:${H}px">
-              <path d="${ordPath}" fill="none" stroke="#FEBF27" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              ${ordDot ? `<circle cx="${ordDot.x}" cy="${ordDot.y}" r="3.5" fill="#FEBF27" stroke="#fff" stroke-width="1.5"/>` : ''}
+              <path d="${ordPath}" fill="none" stroke="#FCC01B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              ${ordDot ? `<circle cx="${ordDot.x}" cy="${ordDot.y}" r="3.5" fill="#FCC01B" stroke="#fff" stroke-width="1.5"/>` : ''}
             </svg>
             <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-top:1px">${months6.map(m => `<span>${m.label}</span>`).join('')}</div>
             <div style="font-size:10.5px;color:var(--d);margin-top:3px"><b>${ordLast}</b> · попер. ${ordPrev} · разом ${ordersCount}</div>
@@ -5012,7 +5012,7 @@ function renderNotes(c){
     c.email ? ['Email', `<a href="mailto:${escapeAttr(c.email)}" style="color:var(--blue)">${escapeHtml(c.email)}</a>`] : null,
     c.phone ? ['Телефон', `<a href="tel:${escapeAttr(c.phone)}" style="color:var(--blue)">${escapeHtml(c.phone)}</a>`] : null,
     fax ? ['Факс', escapeHtml(String(fax))] : null,
-    tagsArr.length ? ['Теги', tagsArr.map(t => `<span class="cust-tag" style="background:rgba(254,191,39,.15);color:#996600;padding:1px 8px;border-radius:8px;font-size:11px;font-weight:600;display:inline-block;margin:1px 2px">${escapeHtml(t)}</span>`).join(' ')] : null,
+    tagsArr.length ? ['Теги', tagsArr.map(t => `<span class="cust-tag" style="background:rgba(252,192,27,.15);color:#996600;padding:1px 8px;border-radius:8px;font-size:11px;font-weight:600;display:inline-block;margin:1px 2px">${escapeHtml(t)}</span>`).join(' ')] : null,
   ].filter(Boolean);
 
   // Finance card
@@ -5028,7 +5028,7 @@ function renderNotes(c){
   const addrRows = [];
   if (legalAddr || legalAddrComment) {
     const inner = (legalAddr ? escapeHtml(String(legalAddr)) : '<span style="color:var(--muted);font-style:italic">— адреса не вказана —</span>')
-      + (legalAddrComment ? `<div style="font-size:12px;color:#5c4400;background:#FFFBE6;border-left:3px solid #FEBF27;padding:8px 12px;border-radius:4px;margin-top:6px;white-space:pre-wrap;word-wrap:break-word"><strong>📝 Коментар до адреси:</strong>\n${escapeHtml(String(legalAddrComment))}</div>` : '');
+      + (legalAddrComment ? `<div style="font-size:12px;color:#5c4400;background:#FFFBE6;border-left:3px solid #FCC01B;padding:8px 12px;border-radius:4px;margin-top:6px;white-space:pre-wrap;word-wrap:break-word"><strong>📝 Коментар до адреси:</strong>\n${escapeHtml(String(legalAddrComment))}</div>` : '');
     addrRows.push(['🏛 Юридична адреса', inner]);
   }
   if (actualAddr && actualAddr !== legalAddr) {
@@ -5251,8 +5251,8 @@ function startRefreshTicker(){
     let txt = '🔄 Оновлено: ' + formatAge(ageMs) + ' тому';
     if (_lastSyncTime && (Date.now() - _lastSyncTime) > 3600000) {
       txt += ' · ⚠ Sync застарів';
-      el.style.background = 'rgba(254,191,39,.18)';
-      el.style.color = '#FEBF27';
+      el.style.background = 'rgba(252,192,27,.18)';
+      el.style.color = '#FCC01B';
     } else {
       // v2.78.39 fix C4: reset inline styles коли sync ок (інакше badge назавжди жовтий)
       el.style.background = '';

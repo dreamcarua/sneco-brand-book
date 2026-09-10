@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>snEco — AI-асистент даних</title>
 <style>
-:root{--dark:#1E1E1E;--yel:#FEBF27;--grn:#96C11F;--blu:#3B7DD8;--bg:#f3f3f0;--card:#fff;--line:#e6e6e0;--muted:#6b6b6b}
+:root{--dark:#1E1E1E;--yel:#FCC01B;--grn:#8DC63F;--blu:#3B7DD8;--bg:#f3f3f0;--card:#fff;--line:#e6e6e0;--muted:#6b6b6b}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--dark);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.55}
 body.dash-locked{overflow:hidden}
@@ -27,7 +27,7 @@ a{color:inherit}
 .dashauth-msg{font-size:12.5px;line-height:1.5;margin-top:12px;text-align:center;min-height:18px}
 .dashauth-msg.is-error{color:#DC2626}.dashauth-msg a{color:var(--yel);font-weight:600}
 .dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
-.dashauth-session{position:fixed;top:12px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#6f9200;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:8px}
+.dashauth-session{position:fixed;top:12px;right:12px;z-index:10000;background:rgba(141,198,63,.18);color:#6f9200;border:1px solid rgba(141,198,63,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:8px}
 .dashauth-session button{background:none;border:0;color:#6f9200;cursor:pointer;font-size:14px;padding:0}
 /* ── topbar ── */
 .topbar{background:var(--dark);color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:50}
@@ -434,7 +434,7 @@ function renderHistory(){
     const isMe=s.email===_hist.me;
     return `<tr${isMe?' style="background:#fffdf0"':''}>
       <td class="medal">${medal}</td>
-      <td>${esc(shortMail(s.email))}${isMe?' <span style="font-size:10px;color:#96C11F">(ви)</span>':''}<span class="bar" style="width:${Math.round(60*s.total/max)}px"></span></td>
+      <td>${esc(shortMail(s.email))}${isMe?' <span style="font-size:10px;color:#8DC63F">(ви)</span>':''}<span class="bar" style="width:${Math.round(60*s.total/max)}px"></span></td>
       <td class="num">${s.d7||0}</td><td class="num">${s.d30||0}</td><td class="num"><b>${s.total}</b></td></tr>`;
   }).join('')||'<tr><td colspan="5" style="text-align:center;color:#999;padding:14px">Ще немає питань</td></tr>';
 }
