@@ -38,9 +38,9 @@ snEco.showFetchBanner = function(text, type){
     document.body.appendChild(banner);
   }
   const styles = {
-    loading: 'background:rgba(254,191,39,0.95);color:#1E1E1E',
+    loading: 'background:rgba(252,192,27,0.95);color:#1E1E1E',
     error:   'background:rgba(239,68,68,0.95);color:#fff',
-    empty:   'background:rgba(150,193,31,0.95);color:#1E1E1E'
+    empty:   'background:rgba(141,198,63,0.95);color:#1E1E1E'
   };
   banner.style.cssText += ';' + (styles[type] || styles.loading);
   banner.innerHTML = String(text || '').replace(/<script/gi, '&lt;script');
@@ -65,13 +65,13 @@ snEco.handle401 = function(block){
   o.id = 'sn-401-overlay';
   o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;color:#fff;font-family:system-ui;padding:20px';
   o.innerHTML = `
-    <div style="background:#FEBF27;color:#1E1E1E;padding:30px 32px;border-radius:12px;text-align:center;max-width:420px;box-shadow:0 12px 48px rgba(0,0,0,0.5)">
+    <div style="background:#FCC01B;color:#1E1E1E;padding:30px 32px;border-radius:12px;text-align:center;max-width:420px;box-shadow:0 12px 48px rgba(0,0,0,0.5)">
       <div style="font-size:42px;margin-bottom:8px">🔒</div>
       <h2 style="margin:0 0 6px;font-size:19px">Сесія закінчилась</h2>
       <p style="margin:0 0 16px;font-size:13px;line-height:1.5;color:#3a3a3a">Увійдіть знову — через Google (1 клік) або email-OTP</p>
       <div id="sn401-google-btn" style="display:flex;justify-content:center;margin-bottom:12px;min-height:42px"></div>
       <div style="font-size:11px;color:#5a5a5a;margin:8px 0">— або —</div>
-      <button onclick="localStorage.removeItem('snEco-jwt-${block}'); location.reload();" style="background:#1E1E1E;color:#FEBF27;border:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;width:100%">Увійти через email-OTP</button>
+      <button onclick="localStorage.removeItem('snEco-jwt-${block}'); location.reload();" style="background:#1E1E1E;color:#FCC01B;border:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;width:100%">Увійти через email-OTP</button>
       <div id="sn401-msg" style="font-size:12px;color:#dc2626;margin-top:10px;min-height:14px"></div>
     </div>`;
   document.body.appendChild(o);

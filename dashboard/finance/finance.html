@@ -8,10 +8,10 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --y:#FEBF27;--g:#96C11F;--d:#1E1E1E;--bg:#F4F4EF;--card:#fff;
+  --y:#FCC01B;--g:#8DC63F;--d:#1E1E1E;--bg:#F4F4EF;--card:#fff;
   --muted:#6b6b6b;--border:#E5E5DC;--red:#dc2626;--blue:#3B82F6;
   --orange:#F97316;--purple:#7209B7;
-  --yf:rgba(254,191,39,.13);--gf:rgba(150,193,31,.12);--rf:rgba(232,64,64,.10);
+  --yf:rgba(252,192,27,.13);--gf:rgba(141,198,63,.12);--rf:rgba(232,64,64,.10);
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--d);font-size:14px;min-height:100vh}
 
@@ -29,7 +29,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .nav-menu{display:flex;align-items:center;gap:2px;margin-left:18px;padding-left:18px;border-left:1px solid rgba(255,255,255,.12)}
 .nav-link{color:rgba(255,255,255,.65);text-decoration:none;font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:7px;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
 .nav-link:hover{background:rgba(255,255,255,.08);color:#fff}
-.nav-link.active{background:rgba(254,191,39,.18);color:#FEBF27}
+.nav-link.active{background:rgba(252,192,27,.18);color:#FCC01B}
 .nav-toggle{display:none;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:6px;margin-left:8px}
 @media(max-width:1280px){
   .nav-menu{position:fixed;top:56px;left:0;right:0;background:#1E1E1E;flex-direction:column;align-items:stretch;padding:8px 16px;gap:0;margin:0;border-left:none;border-bottom:1px solid rgba(255,255,255,.1);transform:translateY(-110%);transition:transform .25s;z-index:180;box-shadow:0 6px 20px rgba(0,0,0,.4)}
@@ -40,7 +40,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .badge{padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:600;white-space:nowrap}
 @media(max-width:900px){.badge{padding:2px 7px;font-size:10px}#lastBootBadge{display:none}}
 @media(max-width:520px){#lastUpdate{display:none}}
-.badge-green{background:rgba(150,193,31,.2);color:var(--g);border:1px solid rgba(150,193,31,.3)}
+.badge-green{background:rgba(141,198,63,.2);color:var(--g);border:1px solid rgba(141,198,63,.3)}
 .badge-gray{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1)}
 
 /* ─── LAYOUT ─── */
@@ -59,7 +59,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* ─── HERO HEADER ─── */
 .fin-header{background:linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%);color:#fff;border-radius:14px;padding:24px 28px;margin-bottom:20px;position:relative;overflow:hidden}
-.fin-header::after{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle, rgba(150,193,31,0.18) 0%, transparent 70%);pointer-events:none}
+.fin-header::after{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle, rgba(141,198,63,0.18) 0%, transparent 70%);pointer-events:none}
 .fin-title{font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;line-height:1.2}
 .fin-sub{font-size:13px;color:rgba(255,255,255,.75)}
 
@@ -68,7 +68,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .period-bar-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-right:2px}
 .period-chips{display:flex;gap:4px;background:#F1F1EB;padding:3px;border-radius:9px;flex-wrap:wrap}
 .period-chip{padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;color:#555;cursor:pointer;border:none;background:transparent;transition:all .15s ease;white-space:nowrap}
-.period-chip:hover{background:rgba(254,191,39,.18);color:var(--d)}
+.period-chip:hover{background:rgba(252,192,27,.18);color:var(--d)}
 .period-chip.active{background:var(--d);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15)}
 .period-chip.active:hover{background:var(--d);color:#fff}
 .period-custom{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
@@ -77,11 +77,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .granularity-toggle{display:flex;gap:3px;background:#F1F1EB;padding:3px;border-radius:8px;margin-left:auto}
 .granularity-toggle .gt-btn{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;color:#555;cursor:pointer;border:none;background:transparent}
 .granularity-toggle .gt-btn.active{background:#fff;color:var(--d);box-shadow:0 1px 2px rgba(0,0,0,.08)}
-.period-range-info{font-size:11px;color:var(--muted);padding:4px 10px;background:rgba(150,193,31,.08);border-radius:7px;font-weight:500;white-space:nowrap}
+.period-range-info{font-size:11px;color:var(--muted);padding:4px 10px;background:rgba(141,198,63,.08);border-radius:7px;font-weight:500;white-space:nowrap}
 @media(max-width:760px){.period-bar{padding:10px 12px;gap:8px}.period-chips{flex:1;justify-content:flex-start;overflow-x:auto}.granularity-toggle{margin-left:0;width:100%;justify-content:flex-start;margin-top:4px}}
 
 .diag-strip{background:#FFF9E5;border-bottom:1px solid #F5E6B3;padding:8px 24px;display:flex;align-items:center;gap:16px;font-size:11.5px;flex-wrap:wrap}
-.diag-strip.ok{background:rgba(150,193,31,.08);border-color:rgba(150,193,31,.25)}
+.diag-strip.ok{background:rgba(141,198,63,.08);border-color:rgba(141,198,63,.25)}
 .diag-strip.warn{background:#FFF9E5;border-color:#F5E6B3}
 .diag-strip.err{background:rgba(232,64,64,.05);border-color:rgba(232,64,64,.18)}
 .diag-item{display:flex;align-items:center;gap:5px;color:#555;font-weight:500}
@@ -106,7 +106,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .kpi-val{font-size:22px;font-weight:800;color:var(--d);line-height:1.1}
 .kpi-sub{font-size:11px;color:var(--muted);margin-top:6px}
 .kpi-delta{display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;margin-top:6px}
-.kpi-delta.up{background:rgba(150,193,31,.15);color:#4a7000}
+.kpi-delta.up{background:rgba(141,198,63,.15);color:#4a7000}
 .kpi-delta.down{background:rgba(232,64,64,.12);color:#a00}
 .kpi-delta.flat{background:rgba(138,138,138,.13);color:#666}
 
@@ -121,8 +121,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* ─── INSIGHTS ─── */
 .insight{padding:14px 18px;border-radius:10px;font-size:13px;line-height:1.55;display:flex;align-items:flex-start;gap:10px}
-.insight.green{background:rgba(150,193,31,.08);color:#4a7000;border-left:3px solid var(--g)}
-.insight.yellow{background:rgba(254,191,39,.08);color:#996600;border-left:3px solid var(--y)}
+.insight.green{background:rgba(141,198,63,.08);color:#4a7000;border-left:3px solid var(--g)}
+.insight.yellow{background:rgba(252,192,27,.08);color:#996600;border-left:3px solid var(--y)}
 .insight.red{background:rgba(232,64,64,.06);color:#a00;border-left:3px solid var(--red)}
 .insight.blue{background:rgba(59,130,246,.07);color:#1d5fa6;border-left:3px solid var(--blue)}
 .insight-icon{font-size:18px;flex-shrink:0;margin-top:-2px}
@@ -140,8 +140,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* ─── BUCKETS ─── */
 .bucket-pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700}
-.bucket-pill.b0{background:rgba(150,193,31,.18);color:#4a7000}
-.bucket-pill.b30{background:rgba(254,191,39,.18);color:#996600}
+.bucket-pill.b0{background:rgba(141,198,63,.18);color:#4a7000}
+.bucket-pill.b30{background:rgba(252,192,27,.18);color:#996600}
 .bucket-pill.b60{background:rgba(249,115,22,.18);color:#c2410c}
 .bucket-pill.b90{background:rgba(232,64,64,.15);color:#a00}
 
@@ -158,8 +158,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* ─── QUICK ACTIONS ─── */
 .act-btn{padding:6px 12px;border-radius:7px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:600;color:var(--d);cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .15s;text-decoration:none}
 .act-btn:hover{border-color:var(--y);background:var(--yf)}
-.act-btn.tel{border-color:rgba(150,193,31,.35);color:#4a7000}
-.act-btn.tel:hover{background:rgba(150,193,31,.12)}
+.act-btn.tel{border-color:rgba(141,198,63,.35);color:#4a7000}
+.act-btn.tel:hover{background:rgba(141,198,63,.12)}
 .act-btn.mail{border-color:rgba(59,130,246,.35);color:#1d5fa6}
 .act-btn.mail:hover{background:rgba(59,130,246,.08)}
 
@@ -169,14 +169,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .cc-title-icon{display:inline-flex;align-items:center;gap:6px}
 .cc-title-tag{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-left:6px;vertical-align:middle}
 .cc-title-tag.red{background:rgba(232,64,64,.13);color:#a00}
-.cc-title-tag.green{background:rgba(150,193,31,.15);color:#4a7000}
+.cc-title-tag.green{background:rgba(141,198,63,.15);color:#4a7000}
 
 /* ─── PAYMENT TIMELINE ─── */
 .pay-tl{padding:6px 0}
 .pay-tl-item{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid var(--border);align-items:center}
 .pay-tl-item:last-child{border:none}
 .pay-tl-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
-.pay-tl-icon.inb{background:rgba(150,193,31,.18);color:#4a7000}
+.pay-tl-icon.inb{background:rgba(141,198,63,.18);color:#4a7000}
 .pay-tl-icon.outb{background:rgba(232,64,64,.13);color:var(--red)}
 .pay-tl-date{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:600;width:80px;flex-shrink:0;white-space:nowrap}
 .pay-tl-body{flex:1;min-width:0}
@@ -214,26 +214,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 #dashauth-overlay{position:fixed;inset:0;background:#1E1E1E;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 #dashauth-overlay.is-hidden{display:none}
 .dashauth-card{background:#fff;width:100%;max-width:440px;border-radius:14px;padding:36px 30px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.dashauth-logo{font-size:24px;font-weight:900;color:#FEBF27;margin-bottom:6px;letter-spacing:-0.5px;text-align:center}
+.dashauth-logo{font-size:24px;font-weight:900;color:#FCC01B;margin-bottom:6px;letter-spacing:-0.5px;text-align:center}
 .dashauth-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#888;text-align:center;margin-bottom:24px}
 .dashauth-icon{font-size:36px;text-align:center;margin-bottom:16px}
 .dashauth-h1{font-size:18px;font-weight:800;text-align:center;color:#1E1E1E;margin-bottom:6px}
 .dashauth-desc{font-size:13px;color:#666;text-align:center;line-height:1.55;margin-bottom:20px}
 .dashauth-input{width:100%;padding:12px 14px;border:2px solid #E5E5DC;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
-.dashauth-input:focus{border-color:#FEBF27}
+.dashauth-input:focus{border-color:#FCC01B}
 .dashauth-input.code{font-family:'SF Mono',Menlo,Consolas,monospace;letter-spacing:.4em;text-align:center;font-size:18px}
 .dashauth-btn{width:100%;padding:13px;background:#1E1E1E;color:#fff;border:0;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;margin-top:14px;font-family:inherit;transition:background .15s}
 .dashauth-btn:hover{background:#000}
 .dashauth-btn:disabled{opacity:.5;cursor:not-allowed}
 .dashauth-msg{font-size:12.5px;line-height:1.5;margin-top:12px;text-align:center;min-height:18px}
 .dashauth-msg.is-error{color:#DC2626}
-.dashauth-msg a{color:#FEBF27;font-weight:600;text-decoration:underline}
+.dashauth-msg a{color:#FCC01B;font-weight:600;text-decoration:underline}
 .dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
-.dashauth-back:hover{color:#FEBF27}
+.dashauth-back:hover{color:#FCC01B}
 /* v2.77.1: top:115px — нижче period-bar (sticky top:56px, висота ~55px) щоб не overlap'ило granularity toggle */
-.dashauth-session{position:fixed;top:115px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-family:-apple-system,sans-serif;font-weight:600;display:flex;align-items:center;gap:8px}
+.dashauth-session{position:fixed;top:115px;right:12px;z-index:10000;background:rgba(141,198,63,.18);color:#8DC63F;border:1px solid rgba(141,198,63,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-family:-apple-system,sans-serif;font-weight:600;display:flex;align-items:center;gap:8px}
 @media(max-width:760px){.dashauth-session{top:auto;bottom:12px;right:12px;left:12px;justify-content:center}}
-.dashauth-session button{background:none;border:0;color:#96C11F;cursor:pointer;font-size:14px;padding:0;line-height:1}
+.dashauth-session button{background:none;border:0;color:#8DC63F;cursor:pointer;font-size:14px;padding:0;line-height:1}
 body.dash-locked{overflow:hidden}
 </style>
 <script>
@@ -757,7 +757,7 @@ function renderDiagnostic(){
     </span>
     ${issues.length > 0
       ? `<button class="diag-action" onclick="alert('Проблема: ${issues.join(', ')}\\n\\nЩо робити:\\n1) Перевір що Run #18+ МoySklad Sync пройшов успішно\\n2) Apply migration 0004 у D1 (для expense_item_id, payment_purpose)\\n3) wrangler deploy\\n4) Запусти full sync через workflow_dispatch')">Що робити?</button>`
-      : `<span class="diag-action" style="background:rgba(150,193,31,.12);color:#4a7000">✓ дані OK</span>`}
+      : `<span class="diag-action" style="background:rgba(141,198,63,.12);color:#4a7000">✓ дані OK</span>`}
   `;
 }
 
@@ -1723,15 +1723,15 @@ function renderDashboard(){
             {
               label: 'Виставлено рахунків (₴)',
               data: months.map(m => invByMonth[m]),
-              backgroundColor: 'rgba(254,191,39,.75)',
-              borderColor: '#FEBF27',
+              backgroundColor: 'rgba(252,192,27,.75)',
+              borderColor: '#FCC01B',
               borderWidth: 1,
             },
             {
               label: 'Надходження (₴)',
               data: months.map(m => cashByMonth[m]),
-              backgroundColor: 'rgba(150,193,31,.75)',
-              borderColor: '#96C11F',
+              backgroundColor: 'rgba(141,198,63,.75)',
+              borderColor: '#8DC63F',
               borderWidth: 1,
             },
             {
@@ -1764,7 +1764,7 @@ function renderDashboard(){
           labels: doughnutLabels,
           datasets: [{
             data: doughnutData,
-            backgroundColor: ['#E84040', '#F97316', '#FEBF27', '#96C11F', '#3B82F6', '#7209B7', '#0EA5E9', '#EC4899', '#8a8a8a'],
+            backgroundColor: ['#E84040', '#F97316', '#FCC01B', '#8DC63F', '#3B82F6', '#7209B7', '#0EA5E9', '#EC4899', '#8a8a8a'],
             borderWidth: 2,
             borderColor: '#fff',
           }]
@@ -1802,7 +1802,7 @@ function renderDashboard(){
             ],
             datasets: [{
               data: [buckets.b0, buckets.b30, buckets.b60, buckets.b90],
-              backgroundColor: ['#96C11F', '#FEBF27', '#F97316', '#E84040'],
+              backgroundColor: ['#8DC63F', '#FCC01B', '#F97316', '#E84040'],
               borderWidth: 2,
               borderColor: '#fff',
             }]

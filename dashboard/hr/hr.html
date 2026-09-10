@@ -9,10 +9,10 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --y:#FEBF27;--g:#96C11F;--d:#1E1E1E;--bg:#F4F4EF;--card:#fff;
+  --y:#FCC01B;--g:#8DC63F;--d:#1E1E1E;--bg:#F4F4EF;--card:#fff;
   --muted:#6b6b6b;--border:#E5E5DC;--red:#DC2626;--blue:#3B82F6;
   --orange:#F97316;--purple:#7209B7;--teal:#0D9488;--pink:#DB2777;
-  --yf:rgba(254,191,39,.13);--gf:rgba(150,193,31,.12);--rf:rgba(220,38,38,.09);
+  --yf:rgba(252,192,27,.13);--gf:rgba(141,198,63,.12);--rf:rgba(220,38,38,.09);
   --bf:rgba(59,130,246,.10);--of:rgba(249,115,22,.10);--pf:rgba(114,9,183,.09);
   --shadow:0 1px 3px rgba(0,0,0,.06);--shadow-lg:0 12px 40px rgba(0,0,0,.16);
 }
@@ -31,7 +31,7 @@ a{color:inherit}
 .nav-menu{display:flex;align-items:center;gap:2px;margin-left:18px;padding-left:18px;border-left:1px solid rgba(255,255,255,.12)}
 .nav-link{color:rgba(255,255,255,.65);text-decoration:none;font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:7px;transition:all .15s;white-space:nowrap}
 .nav-link:hover{background:rgba(255,255,255,.08);color:#fff}
-.nav-link.active{background:rgba(254,191,39,.18);color:var(--y)}
+.nav-link.active{background:rgba(252,192,27,.18);color:var(--y)}
 .nav-toggle{display:none;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:6px}
 @media(max-width:1280px){
   .nav-menu{position:fixed;top:56px;left:0;right:0;background:#1E1E1E;flex-direction:column;align-items:stretch;padding:8px 16px;gap:0;margin:0;border-left:none;transform:translateY(-115%);transition:transform .25s;z-index:180;box-shadow:0 6px 20px rgba(0,0,0,.4)}
@@ -40,9 +40,9 @@ a{color:inherit}
   .nav-toggle{display:inline-block}
 }
 .badge{padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:600;white-space:nowrap}
-.badge-green{background:rgba(150,193,31,.2);color:var(--g);border:1px solid rgba(150,193,31,.3)}
+.badge-green{background:rgba(141,198,63,.2);color:var(--g);border:1px solid rgba(141,198,63,.3)}
 .badge-gray{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1)}
-.badge-lock{background:rgba(254,191,39,.15);color:var(--y);border:1px solid rgba(254,191,39,.3)}
+.badge-lock{background:rgba(252,192,27,.15);color:var(--y);border:1px solid rgba(252,192,27,.3)}
 @media(max-width:900px){#roleBadge{display:none}}
 
 /* ─── TABS ─── */
@@ -52,7 +52,7 @@ a{color:inherit}
 .tabbtn:hover{color:#fff}
 .tabbtn.active{color:var(--y);border-bottom-color:var(--y)}
 .tabbtn .tcount{background:rgba(255,255,255,.12);border-radius:9px;padding:1px 6px;font-size:10.5px;font-weight:700}
-.tabbtn.active .tcount{background:rgba(254,191,39,.22);color:var(--y)}
+.tabbtn.active .tcount{background:rgba(252,192,27,.22);color:var(--y)}
 @media(max-width:620px){.tabbar{padding:0 8px;top:48px}.tabbtn{padding:10px 9px;font-size:12px}}
 
 /* ─── FILTER BAR ─── */
@@ -114,7 +114,7 @@ a{color:inherit}
 .kpi-delta.down{background:var(--rf);color:#a01818}
 .kpi-delta.flat{background:rgba(138,138,138,.13);color:#666}
 .kpi.clickable{cursor:pointer}
-.kpi.clickable:hover{border-color:var(--y);box-shadow:0 3px 12px rgba(254,191,39,.2)}
+.kpi.clickable:hover{border-color:var(--y);box-shadow:0 3px 12px rgba(252,192,27,.2)}
 
 /* ─── CARDS ─── */
 .cc{background:var(--card);border-radius:12px;padding:16px 18px;border:1px solid var(--border);box-shadow:var(--shadow)}
@@ -341,33 +341,33 @@ body.kb-dragging{cursor:grabbing;user-select:none;-webkit-user-select:none}
 #dashauth-overlay{position:fixed;inset:0;background:#1E1E1E;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 #dashauth-overlay.is-hidden{display:none}
 .dashauth-card{background:#fff;width:100%;max-width:440px;border-radius:14px;padding:36px 30px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.dashauth-logo{font-size:24px;font-weight:900;color:#FEBF27;margin-bottom:6px;letter-spacing:-0.5px;text-align:center}
+.dashauth-logo{font-size:24px;font-weight:900;color:#FCC01B;margin-bottom:6px;letter-spacing:-0.5px;text-align:center}
 .dashauth-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#888;text-align:center;margin-bottom:24px}
 .dashauth-icon{font-size:36px;text-align:center;margin-bottom:16px}
 .dashauth-h1{font-size:18px;font-weight:800;text-align:center;color:#1E1E1E;margin-bottom:6px}
 .dashauth-desc{font-size:13px;color:#666;text-align:center;line-height:1.55;margin-bottom:20px}
 .dashauth-input{width:100%;padding:12px 14px;border:2px solid #E5E5DC;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
-.dashauth-input:focus{border-color:#FEBF27}
+.dashauth-input:focus{border-color:#FCC01B}
 .dashauth-input.code{font-family:'SF Mono',Menlo,Consolas,monospace;letter-spacing:.4em;text-align:center;font-size:18px}
 .dashauth-btn{width:100%;padding:13px;background:#1E1E1E;color:#fff;border:0;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;margin-top:14px;font-family:inherit;transition:background .15s}
 .dashauth-btn:hover{background:#000}
 .dashauth-btn:disabled{opacity:.5;cursor:not-allowed}
 .dashauth-msg{font-size:12.5px;line-height:1.5;margin-top:12px;text-align:center;min-height:18px}
 .dashauth-msg.is-error{color:#DC2626}
-.dashauth-msg a{color:#FEBF27;font-weight:600;text-decoration:underline}
+.dashauth-msg a{color:#FCC01B;font-weight:600;text-decoration:underline}
 .dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
-.dashauth-back:hover{color:#FEBF27}
+.dashauth-back:hover{color:#FCC01B}
 /* v2.77.1: top:115px — нижче period-bar (sticky top:56px, висота ~55px) щоб не overlap'ило granularity toggle */
-.dashauth-session{position:fixed;top:115px;right:12px;z-index:10000;background:rgba(150,193,31,.18);color:#96C11F;border:1px solid rgba(150,193,31,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-family:-apple-system,sans-serif;font-weight:600;display:flex;align-items:center;gap:8px}
+.dashauth-session{position:fixed;top:115px;right:12px;z-index:10000;background:rgba(141,198,63,.18);color:#8DC63F;border:1px solid rgba(141,198,63,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-family:-apple-system,sans-serif;font-weight:600;display:flex;align-items:center;gap:8px}
 @media(max-width:760px){.dashauth-session{top:auto;bottom:12px;right:12px;left:12px;justify-content:center}}
-.dashauth-session button{background:none;border:0;color:#96C11F;cursor:pointer;font-size:14px;padding:0;line-height:1}
+.dashauth-session button{background:none;border:0;color:#8DC63F;cursor:pointer;font-size:14px;padding:0;line-height:1}
 body.dash-locked{overflow:hidden}
 /* сесійний бейдж — унизу праворуч, щоб не перекривав панель фільтрів.
    ⚠ 01.09.2026, знайшла Валерія: бейдж мав z-index 10000 і накривав кнопку
    «Зберегти» у формі кандидата — зберегти запис було просто нічим.
    Тепер 800: вище звичайного контенту, але нижче drawer (901) і модалки (950).
    Плюс правила нижче ховають його, коли щось із них відкрите. */
-.dashauth-session{top:auto!important;bottom:14px!important;right:14px!important;left:auto!important;z-index:800;box-shadow:0 4px 16px rgba(0,0,0,.18);background:#fff!important;border-color:rgba(150,193,31,.5)!important;pointer-events:none;opacity:.92}
+.dashauth-session{top:auto!important;bottom:14px!important;right:14px!important;left:auto!important;z-index:800;box-shadow:0 4px 16px rgba(0,0,0,.18);background:#fff!important;border-color:rgba(141,198,63,.5)!important;pointer-events:none;opacity:.92}
 .dashauth-session:hover{opacity:1}
 .dashauth-session button{pointer-events:auto;cursor:pointer}
 @media(max-width:760px){.dashauth-session{left:14px!important;justify-content:center}}
@@ -1214,8 +1214,8 @@ const STAGES = [
   { k:'hr_interview',   l:'Співбесіда HR',      c:'#0D9488', short:'Співбесіда HR' },
   { k:'mgr_interview',  l:'Співбесіда керівн.', c:'#7209B7', short:'Співбесіда керівника' },
   { k:'offer',          l:'Офер надіслано',     c:'#F97316', short:'Офер' },
-  { k:'offer_accepted', l:'Офер прийнято',      c:'#FEBF27', short:'Офер прийнято' },
-  { k:'hired',          l:'Вийшов на роботу',   c:'#96C11F', short:'Найнято' },
+  { k:'offer_accepted', l:'Офер прийнято',      c:'#FCC01B', short:'Офер прийнято' },
+  { k:'hired',          l:'Вийшов на роботу',   c:'#8DC63F', short:'Найнято' },
   { k:'offer_declined', l:'Офер відхилено',     c:'#DC2626', short:'Офер не прийнято',  terminal:true },
   { k:'rejected',       l:'Відмова',            c:'#78716C', short:'Відмова',           terminal:true },
 ];
@@ -1227,7 +1227,7 @@ const VAC_STATUS_L = { open:'Відкрита', on_hold:'На паузі', close
 const PRIORITY_L  = { low:'Низький', normal:'Звичайний', high:'Високий', critical:'Критичний' };
 const TERM_TYPE_L = { voluntary:'За власним бажанням', involuntary:'З ініціативи компанії' };
 const PROB_L      = { pending:'Триває', passed:'Пройдено', failed:'Не пройдено' };
-const PALETTE = ['#96C11F','#FEBF27','#3B82F6','#7209B7','#F97316','#0D9488','#DB2777','#DC2626','#64748B','#84CC16','#0EA5E9','#A855F7'];
+const PALETTE = ['#8DC63F','#FCC01B','#3B82F6','#7209B7','#F97316','#0D9488','#DB2777','#DC2626','#64748B','#84CC16','#0EA5E9','#A855F7'];
 
 const S = {
   token:null, me:{ email:'', isAdmin:false, canPayroll:false },
@@ -1616,11 +1616,11 @@ function renderOverview(){
     clearPh('chHeadcount'); clearPh('chFlow'); clearPh('chDept');
     chart('chHeadcount', { type:'line', data:{ labels:months.map(periodLabel), datasets:[{
       label:'Чисельність', data:months.map(p=>headcountAt(monthEnd(p), emps)),
-      borderColor:'#96C11F', backgroundColor:'rgba(150,193,31,.14)', fill:true, tension:.32, borderWidth:2.4, pointRadius:2.5 }]},
+      borderColor:'#8DC63F', backgroundColor:'rgba(141,198,63,.14)', fill:true, tension:.32, borderWidth:2.4, pointRadius:2.5 }]},
       options:{ plugins:{ legend:{ display:false } }, scales:{ x:gridX, y:gridY } } });
 
     chart('chFlow', { type:'bar', data:{ labels:months.map(periodLabel), datasets:[
-      { label:'Найнято', data:months.map(p=>emps.filter(e=>periodOf(e.hire_date)===p).length), backgroundColor:'#96C11F', borderRadius:4 },
+      { label:'Найнято', data:months.map(p=>emps.filter(e=>periodOf(e.hire_date)===p).length), backgroundColor:'#8DC63F', borderRadius:4 },
       { label:'Звільнено', data:months.map(p=>-emps.filter(e=>periodOf(e.termination_date)===p).length), backgroundColor:'#DC2626', borderRadius:4 },
     ]}, options:{ plugins:{ legend:{ position:'bottom', labels:{ boxWidth:11, usePointStyle:true, pointStyle:'circle' } },
       tooltip:{ callbacks:{ label: c=>c.dataset.label+': '+Math.abs(c.parsed.y) } } },
@@ -2162,7 +2162,7 @@ function renderChannels(){
   clearPh('chSrcHired'); clearPh('chSrcConv');
   chart('chSrcHired', { type:'bar', data:{ labels:withData.map(s=>s.src), datasets:[
     { label:'Кандидати', data:withData.map(s=>s.candidates), backgroundColor:'#CBD5E1', borderRadius:4 },
-    { label:'Найнято', data:withData.map(s=>s.hired), backgroundColor:'#96C11F', borderRadius:4 },
+    { label:'Найнято', data:withData.map(s=>s.hired), backgroundColor:'#8DC63F', borderRadius:4 },
   ]}, options:{ plugins:{ legend:{ position:'bottom', labels:{ boxWidth:11, usePointStyle:true, pointStyle:'circle' } } }, scales:{ x:gridX, y:gridY } } });
   chart('chSrcConv', { type:'bar', indexAxis:'y', data:{ labels:withData.map(s=>s.src), datasets:[{ label:'Конверсія, %', data:withData.map(s=>s.conv||0), backgroundColor:withData.map((s,i)=>PALETTE[i%PALETTE.length]), borderRadius:4 }]},
     options:{ indexAxis:'y', plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:c=>pct(c.parsed.x,1) } } }, scales:{ x:Object.assign({},gridY,{ticks:{callback:v=>v+'%'}}), y:{ grid:{display:false} } } } });
@@ -2319,7 +2319,7 @@ function renderTurnover(){
 
   const buckets = [ ['<3 міс',0,.25], ['3–6 міс',.25,.5], ['6–12 міс',.5,1], ['1–2 роки',1,2], ['2–3 роки',2,3], ['3+ роки',3,99] ];
   const bd = buckets.map(([l,a,b])=>tenures.filter(t2=>t2>=a&&t2<b).length);
-  if (tenures.length) chart('chTenure', { type:'bar', data:{ labels:buckets.map(b=>b[0]), datasets:[{ data:bd, backgroundColor:buckets.map((b,i)=>i<3?'#F97316':'#96C11F'), borderRadius:4 }]},
+  if (tenures.length) chart('chTenure', { type:'bar', data:{ labels:buckets.map(b=>b[0]), datasets:[{ data:bd, backgroundColor:buckets.map((b,i)=>i<3?'#F97316':'#8DC63F'), borderRadius:4 }]},
     options:{ plugins:{ legend:{display:false} }, scales:{ x:gridX, y:Object.assign({},gridY,{ticks:{precision:0}}) } } });
   else emptyChart('chTenure','Немає даних про стаж (заповніть дати прийняття)');
 
@@ -2408,7 +2408,7 @@ function renderPayroll(){
   } else {
     clearPh('chPayTrend'); clearPh('chPayDept');
     chart('chPayTrend', { data:{ labels:months.map(periodLabel), datasets:[
-        { type:'bar', label:'Факт', data:months.map(p=>fundBy[p]===null?null:fundBy[p]/100), backgroundColor:'#96C11F', borderRadius:4 },
+        { type:'bar', label:'Факт', data:months.map(p=>fundBy[p]===null?null:fundBy[p]/100), backgroundColor:'#8DC63F', borderRadius:4 },
         { type:'line', label:'План', data:months.map(p=>planBy[p]===null?null:planBy[p]/100), borderColor:'#1E1E1E', borderDash:[5,4], borderWidth:2, pointRadius:2.5, tension:.2, backgroundColor:'#1E1E1E' },
       ]}, options:{ plugins:{ legend:{ position:'bottom', labels:{boxWidth:11,usePointStyle:true,pointStyle:'circle'} },
         tooltip:{ callbacks:{ label:c=>c.dataset.label+': '+num(c.parsed.y)+' '+curSym(cur) } } },

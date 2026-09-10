@@ -8,7 +8,7 @@
 :root {
   --bg: #0f1419; --card: #1a1f2b; --border: #2a3142;
   --text: #e4e6eb; --text-muted: #9ba3b4;
-  --yellow: #febf27; --green: #96c11f; --red: #ef4444;
+  --yellow: #FCC01B; --green: #8DC63F; --red: #ef4444;
   --black-05: rgba(0,0,0,0.25);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,7 +23,7 @@ body { background: var(--bg); color: var(--text); font-family: -apple-system, sy
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
 th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); }
 th { font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 11px; letter-spacing: 0.08em; }
-.placeholder { background: linear-gradient(180deg, rgba(254,191,39,0.08) 0%, transparent 100%); border-left: 4px solid var(--yellow); padding: 16px 20px; border-radius: 6px; }
+.placeholder { background: linear-gradient(180deg, rgba(252,192,27,0.08) 0%, transparent 100%); border-left: 4px solid var(--yellow); padding: 16px 20px; border-radius: 6px; }
 .placeholder h3 { color: var(--yellow); margin-bottom: 8px; font-size: 15px; }
 .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px; }
 .kpi { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
@@ -53,7 +53,7 @@ button:hover { opacity: 0.9; }
         const o = document.createElement('div');
         o.id = 'sn-401-overlay';
         o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;color:#fff;font-family:system-ui;';
-        o.innerHTML = '<div style="background:#FEBF27;color:#1E1E1E;padding:32px 48px;border-radius:12px;text-align:center;max-width:480px;box-shadow:0 12px 48px rgba(0,0,0,0.5)"><div style="font-size:48px;margin-bottom:12px">🔒</div><h2 style="margin:0 0 8px;font-size:20px">Сесія закінчилась</h2><p style="margin:0 0 20px;font-size:14px;line-height:1.5">Ваш JWT токен expire (30 днів). Увійдіть знов щоб продовжити.</p><button onclick="try{localStorage.removeItem(&quot;snEco-jwt-attribution-dashboard&quot;)}catch(e){};location.reload();" style="background:#1E1E1E;color:#FEBF27;border:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">Увійти знову</button></div>';
+        o.innerHTML = '<div style="background:#FCC01B;color:#1E1E1E;padding:32px 48px;border-radius:12px;text-align:center;max-width:480px;box-shadow:0 12px 48px rgba(0,0,0,0.5)"><div style="font-size:48px;margin-bottom:12px">🔒</div><h2 style="margin:0 0 8px;font-size:20px">Сесія закінчилась</h2><p style="margin:0 0 20px;font-size:14px;line-height:1.5">Ваш JWT токен expire (30 днів). Увійдіть знов щоб продовжити.</p><button onclick="try{localStorage.removeItem(&quot;snEco-jwt-attribution-dashboard&quot;)}catch(e){};location.reload();" style="background:#1E1E1E;color:#FCC01B;border:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">Увійти знову</button></div>';
         document.body.appendChild(o);
       }
     }
