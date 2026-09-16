@@ -206,7 +206,7 @@ table.main td{border-bottom:1px solid var(--grid); padding:8px 8px; vertical-ali
 table.main tbody tr.row{cursor:pointer} table.main tbody tr.row:hover{background:var(--s1-soft)}
 .num{text-align:right; font-variant-numeric:tabular-nums}
 .scroller{overflow-x:auto; -webkit-overflow-scrolling:touch}
-.detail{padding:16px 18px; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr)); gap:16px; position:sticky; left:0; max-width:calc(100vw - 60px); box-sizing:border-box; background:var(--chip)}
+.detail{padding:16px 18px; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr)); gap:16px; position:sticky; left:0; max-width:var(--scw, calc(100vw - 60px)); box-sizing:border-box; background:var(--chip)}
 .blk{min-width:0} .blk h4{font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin:0 0 6px; font-weight:650}
 .kv{display:grid; grid-template-columns:130px minmax(0,1fr); gap:3px 10px; font-size:12.3px} .kv>div{overflow-wrap:anywhere; min-width:0} .kv .k{color:var(--muted)}
 ul.li{margin:0; padding-left:16px; font-size:12.4px; overflow-wrap:anywhere} ul.li li{margin-bottom:3px}
@@ -641,6 +641,8 @@ function dossier(x){
   if((DATA.verify||[]).length){const c3=card(p,'Адверсаріальна верифікація · '+DATA.verify.length+' перевірок'); const t=el('table','main'); t.innerHTML='<thead><tr><th>Компанія</th><th>Твердження</th><th>Вердикт</th><th>Виправлення</th></tr></thead>'; const b=el('tbody');
     DATA.verify.forEach(v=>{const tr=el('tr'); tr.innerHTML='<td><b>'+H(v.company)+'</b></td><td class="small">'+H(v.claim)+'</td><td style="font-weight:650;color:'+(v.verdict==='confirmed'?'var(--good-text)':v.verdict==='refuted'?'var(--crit)':'#a06a00')+'">'+H(v.verdict)+'</td><td class="small">'+H(v.correction)+' '+lnk(v.source,'↗')+'</td>'; b.append(tr)}); t.append(b); const sc=el('div','scroller'); sc.append(t); c3.append(sc)}
 })();
+// ширина розгорнутої картки = видима ширина скролера (інакше правий край кліпається на широких екранах)
+(function(){const upd=()=>document.querySelectorAll('.scroller').forEach(s=>s.style.setProperty('--scw',(s.clientWidth-2)+'px'));upd();if(window.ResizeObserver)new ResizeObserver(upd).observe(document.body);window.addEventListener('resize',upd)})();
 
 } // end renderAll
 </script>
