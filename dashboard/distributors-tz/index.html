@@ -224,6 +224,10 @@ select.sel{border:1px solid var(--ring); background:var(--surface); color:var(--
 .grid2{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(330px,100%),1fr)); gap:14px}
 .mini-card{border:1px solid var(--ring); border-radius:10px; padding:12px 14px; background:var(--surface); min-width:0; overflow-wrap:anywhere} .mini-card h3{font-size:13.5px; margin-bottom:3px}
 .flag{display:inline-block; width:18px; text-align:center}
+/* прозвон: 10 колонок вміщаються в ширину без горизонтального скролу (правий край не ховається) */
+table.t-call{table-layout:fixed; width:100%} table.t-call td{overflow-wrap:anywhere; vertical-align:top}
+table.t-call th{white-space:normal} table.t-call th:nth-child(1){width:3%} table.t-call th:nth-child(2){width:11%} table.t-call th:nth-child(3){width:10%} table.t-call th:nth-child(4){width:9%} table.t-call th:nth-child(5){width:10%} table.t-call th:nth-child(6){width:10%} table.t-call th:nth-child(7){width:12%} table.t-call th:nth-child(8){width:5%} table.t-call th:nth-child(9){width:15%} table.t-call th:nth-child(10){width:15%}
+@media (max-width:1180px){ table.t-main{table-layout:fixed; width:100%} table.t-main td{overflow-wrap:anywhere} }
 @media (max-width:760px){
   body{padding:16px 12px 50px} .tile .val{font-size:24px} table.main{font-size:12px}
   .sbar{grid-template-columns:130px 1fr 34px} .pbar{grid-template-columns:110px 1fr 40px}
@@ -599,13 +603,13 @@ function dossier(x){
   const f=el('div','flt'); const selG=el('select','sel'); selG.innerHTML='<option value="">A + B + C</option><option>A</option><option>B</option><option>C</option>'; f.append(selG);
   const one=el('span','chip on','1 найкращий контакт на компанію'); let onlyOne=true; one.onclick=()=>{onlyOne=!onlyOne; one.classList.toggle('on',onlyOne); draw()}; f.append(one);
   const ex=el('button','btn','Експорт CSV'); f.append(ex); const cnt=el('span','small mut'); f.append(cnt); c.append(f);
-  const sc=el('div','scroller'); const tb=el('table','main'); tb.innerHTML='<thead><tr><th>#</th><th>Компанія</th><th>Регіон</th><th>Контакт</th><th>Посада</th><th>Телефон</th><th>Email</th><th>Пріор.</th><th>Причина контакту</th><th>Наступна дія</th></tr></thead>'; const body=el('tbody'); tb.append(body); sc.append(tb); c.append(sc);
+  const sc=el('div','scroller'); const tb=el('table','main t-call'); tb.innerHTML='<thead><tr><th>#</th><th>Компанія</th><th>Регіон</th><th>Контакт</th><th>Посада</th><th>Телефон</th><th>Email</th><th>Пріор.</th><th>Причина контакту</th><th>Наступна дія</th></tr></thead>'; const body=el('tbody'); tb.append(body); sc.append(tb); c.append(sc);
   let rowsCache=[];
   function rows(){const out=[]; sorted.filter(x=>x.grade!=='X'&&(!selG.value||x.grade===selG.value)).forEach(x=>{
     let ks=(x.contacts||[]).filter(k=>k.name||k.phone||k.email); if(!ks.length) ks=[{name:'',position:'загальний контакт',phone:(x.phones||[])[0]||'',email:(x.emails||[])[0]||''}];
     if(onlyOne) ks=[ks.find(k=>k.phone)||ks[0]];
     ks.forEach(k=>out.push({rank:x.rank,company:x.name.split(' (')[0],region:[x.city,x.oblast].filter(Boolean).join(', ')+(x.geo_tier?' · '+TIER[x.geo_tier][1]:''),name:k.name||'',position:k.position||'',phone:k.phone||(x.phones||[])[0]||'',email:k.email||(x.emails||[])[0]||'',grade:x.grade,reason:x.contact_reason||'',next:x.next_action||''}))}); return out}
-  function draw(){body.innerHTML=''; rowsCache=rows(); rowsCache.forEach(r=>{const tr=el('tr'); tr.innerHTML='<td class="num">'+r.rank+'</td><td><b>'+H(r.company)+'</b></td><td class="small">'+H(r.region)+'</td><td>'+H(r.name)+'</td><td class="small">'+H(r.position)+'</td><td style="white-space:nowrap">'+H(r.phone)+'</td><td class="small">'+H(r.email)+'</td><td></td><td class="small">'+H(r.reason.slice(0,160))+'</td><td class="small">'+H(r.next.slice(0,140))+'</td>'; tr.children[7].append(gr(r.grade)); body.append(tr)}); cnt.textContent=rowsCache.length+' рядків'}
+  function draw(){body.innerHTML=''; rowsCache=rows(); rowsCache.forEach(r=>{const tr=el('tr'); tr.innerHTML='<td class="num">'+r.rank+'</td><td><b>'+H(r.company)+'</b></td><td class="small">'+H(r.region)+'</td><td>'+H(r.name)+'</td><td class="small">'+H(r.position)+'</td><td class="small">'+H(r.phone)+'</td><td class="small">'+H(r.email)+'</td><td></td><td class="small">'+H(r.reason.slice(0,160))+'</td><td class="small">'+H(r.next.slice(0,140))+'</td>'; tr.children[7].append(gr(r.grade)); body.append(tr)}); cnt.textContent=rowsCache.length+' рядків'}
   ex.onclick=()=>{const hdr=['#','Компанія','Регіон','Контакт','Посада','Телефон','Email','Пріоритет','Причина контакту','Наступна дія']; const esc=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
     const csv='﻿'+[hdr.join(';')].concat(rowsCache.map(r=>[r.rank,r.company,r.region,r.name,r.position,r.phone,r.email,r.grade,r.reason,r.next].map(esc).join(';'))).join('\r\n');
     const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})); a.download='snEco_prozvon_'+DATA.meta.date.replace(/\./g,'-')+'.csv'; document.body.append(a); a.click(); a.remove()};
