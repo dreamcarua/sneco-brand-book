@@ -632,8 +632,8 @@ var REASON={price:'Дорого / ціна',assortment:'Не підійшов а
 var SEGMENT={distributor:'Дистрибʼютор',horeca:'HoReCa','retail-chain':'Мережа',
   'retail-single':'Окремий магазин',online:'Онлайн / маркетплейс',other:'Інше'};
 // Порядок = рух воронкою. Duplicate/spam сюди не входять — це не етапи.
-var FUNNEL=['new','contacted','qualified','opportunity','sample-sent','won'];
-var WORK=['contacted','qualified','opportunity','sample-sent'];
+var FUNNEL=['new','contacted','pending','sample-sent','won'];
+var WORK=['contacted','pending','sample-sent'];
 
 // ── період ────────────────────────────────────────────────────────────────
 function periodRange(){
@@ -714,8 +714,8 @@ function renderAnalytics(rows){
     return {st:st,n:n};
   });
   var top=reached[0].n||1;
-  var ST_L={new:'Нові',contacted:'Звʼязались',qualified:'Кваліфіковані',
-            opportunity:'Можливість','sample-sent':'Зразки',won:'Замовили'};
+  var ST_L={new:'Нові',contacted:'В роботі',pending:'В очікуванні рішення',
+            'sample-sent':'Зразки надіслані',won:'Замовили'};
   var funnel=reached.map(function(r){
     var w=Math.round(r.n/top*100);
     return '<div class="fn-row"><span class="fn-l">'+ST_L[r.st]+'</span>'
