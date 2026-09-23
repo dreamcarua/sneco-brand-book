@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>snEco · Дистрибʼютори UA · База за ТЗ</title>
+<title>snEco · Дистрибʼютори UA · Регіональні та локальні (v3)</title>
 <style>
 
 :root{
@@ -431,12 +431,11 @@ body.dash-locked{overflow:hidden}
 <div class="wrap">
 <header class="top">
   <div>
-    <div class="brand"><span class="logo">sn<em>Eco</em></span><h1>Дистрибʼютори UA · база за ТЗ</h1></div>
+    <div class="brand"><span class="logo">sn<em>Eco</em></span><h1>Дистрибʼютори UA · регіональні та локальні · v3</h1></div>
     <div class="sub" id="subline"></div>
   </div>
   <div style="display:flex;gap:8px;align-items:center">
-    <a class="theme-btn" href="../distributors/" style="text-decoration:none">← Скоринг v1</a>
-    <a class="theme-btn" href="../distributors-reg/" style="text-decoration:none">Регіональні v3 →</a>
+    <a class="theme-btn" href="../distributors-tz/" style="text-decoration:none">← База за ТЗ (v2)</a>
     <button class="theme-btn" onclick="tgTheme()">Тема</button>
   </div>
 </header>
@@ -454,7 +453,7 @@ let DATA = null;
 function tgTheme(){const r=document.documentElement; r.setAttribute('data-theme',(r.getAttribute('data-theme')||'light')==='light'?'dark':'light')}
 window.bootDistributors = async function(token){
   try {
-    const r = await fetch(WORKER_URL + '/api/dashboard/blob', {method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}, body: JSON.stringify({name:'distributors-tz'})});
+    const r = await fetch(WORKER_URL + '/api/dashboard/blob', {method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}, body: JSON.stringify({name:'distributors-reg'})});
     if (!r.ok) throw new Error('HTTP ' + r.status);
     DATA = await r.json();
     const lh = document.getElementById('loadHero'); if (lh) lh.remove();
@@ -552,7 +551,7 @@ function detail(x){
   if((x.contacts||[]).length){const t=el('table','main'); t.innerHTML='<thead><tr><th>Імʼя</th><th>Посада</th><th>Телефон</th><th>Email</th><th>Джерело</th></tr></thead>'; const tb=el('tbody');
     x.contacts.forEach(k=>{const r=el('tr'); r.innerHTML='<td>'+H(k.name)+'</td><td class="small">'+H(k.position)+'</td><td>'+H(k.phone)+'</td><td class="small">'+H(k.email)+'</td><td class="small">'+lnk(k.source,k.source&&/^https?:/.test(k.source)?'↗':k.source)+'</td>'; tb.append(r)}); t.append(tb); const sc=el('div','scroller'); sc.append(t); b5.append(sc)}
   else b5.append(el('div','small mut','Іменних контактів не знайдено у відкритих джерелах — дзвонити на загальний номер.'));
-  kv(b5,[['ЛПР',H(x.decision_maker)],['Причина контакту',H(x.contact_reason)],['Наступна дія',H(x.next_action)]]);
+  kv(b5,[['ЛПР',H(x.decision_maker)],['Причина контакту',H(x.contact_reason)],['Наступна дія',H(x.next_action)],['Чому не було в базі раніше',H(x.why_missed||'')],['Локальний сигнал',H(x.local_signal||'')]]);
   if((x.talking_points||[]).length){b5.append(el('h4',null,'Аргументи')); ul(b5,x.talking_points,6)}
   if((x.not_found||[]).length){const b6=blk(d,'Не знайдено у відкритих джерелах'); ul(b6,x.not_found,10)}
   if((x.sources||[]).length){const b7=blk(d,'Джерела'); b7.style.gridColumn='1 / -1'; const u=el('div','chips'); x.sources.forEach(s=>{const a=document.createElement('a'); a.className='chip'; a.href=s; a.target='_blank'; a.rel='noopener'; a.textContent=String(s).replace(/^https?:\/\/(www\.)?/,'').slice(0,52); u.append(a)}); b7.append(u)}
