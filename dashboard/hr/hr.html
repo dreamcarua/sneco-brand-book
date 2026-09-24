@@ -425,6 +425,26 @@ body{overflow-x:clip}
 .doc-ver .vh{font-size:13px;font-weight:700}
 .doc-ver .vd{font-size:11.5px;color:var(--muted);margin-bottom:4px}
 .doc-ver ul{margin-left:17px;font-size:12.5px}
+/* ── Talent pool (v2.80.0) ── */
+.subtabs{display:inline-flex;background:#ECECE3;border-radius:10px;padding:3px;gap:2px;margin:2px 0 4px;max-width:100%;overflow-x:auto}
+.subtab{border:0;background:none;padding:7px 14px;border-radius:8px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:background .15s,color .15s,box-shadow .15s}
+.subtab:hover{color:var(--d)}
+.subtab.active{background:#fff;color:var(--d);box-shadow:0 1px 3px rgba(0,0,0,.09)}
+.subtab .tcount{background:rgba(0,0,0,.07);border-radius:9px;padding:0 6px;font-size:10.5px}
+.subtab .due{background:var(--orange);color:#fff;border-radius:9px;padding:0 6px;font-size:10.5px}
+.tp-match{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 12px}
+.tp-mchip{border:1px solid var(--border);background:#fff;border-radius:20px;padding:5px 11px;font-size:12px;font-weight:600;cursor:pointer;color:var(--d);transition:border-color .15s,background .15s}
+.tp-mchip:hover{border-color:var(--y)}
+.tp-mchip b{color:#4a7000}
+.tp-mchip.on{border-color:var(--y);background:var(--yf)}
+.tp-name{display:flex;gap:9px;align-items:center;min-width:0}
+.tp-skills{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px}
+.tp-skill{font-size:10px;background:rgba(120,120,120,.09);color:#555;border-radius:5px;padding:1px 6px;white-space:nowrap}
+.tp-late{color:var(--red);font-weight:700}
+.tp-soon{color:var(--orange);font-weight:700}
+.tp-act{display:flex;gap:5px;justify-content:flex-end;flex-wrap:nowrap}
+.fld .tp-inline{display:flex;gap:6px;align-items:center}
+.fld .tp-inline input{flex:1}
 </style>
 <script>
 // v2.78.91 UX: global 401 handler — JWT expired → friendly redirect screen
@@ -692,6 +712,11 @@ body{overflow-x:clip}
 
 <!-- ══════════ 2. КАНДИДАТИ ══════════ -->
 <div class="tabpane" id="pane-candidates">
+  <div class="subtabs" role="tablist" aria-label="Кандидати">
+    <button class="subtab active" data-cv="funnel" role="tab" onclick="setCandView('funnel')">🎯 Воронка</button>
+    <button class="subtab" data-cv="pool" role="tab" onclick="setCandView('pool')">💎 Talent pool <span class="tcount" id="tcPool">0</span><span class="due hidden" id="tcPoolDue" title="Кому пора написати"></span></button>
+  </div>
+  <div id="candFunnelView">
   <div class="sec">Воронка кандидатів
     <span class="sec-act" style="margin-left:auto;display:flex;gap:7px">
       <select class="fsel" id="kbVacFilter"><option value="">Усі вакансії</option></select>
@@ -706,6 +731,36 @@ body{overflow-x:clip}
   <div class="kb-wrap"><div class="kb" id="kanban"></div></div>
   <div id="rejStats" style="margin-top:16px"></div>
   <div class="hint">На компʼютері — перетягніть картку між колонками; на телефоні відкрийте картку кандидата й оберіть етап зі списку. Дати етапів проставляються автоматично. Помаранчева смужка зліва — кандидат без руху 7+ днів.</div>
+  </div><!-- /candFunnelView -->
+
+  <div id="candPoolView" class="hidden">
+    <div class="sec">Talent pool · резерв на майбутні вакансії
+      <span class="sec-act" style="margin-left:auto;display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end">
+        <select class="fsel" id="tpStatus" title="Кого показати">
+          <option value="active">Активні у пулі</option>
+          <option value="due">⏰ Пора написати</option>
+          <option value="engaged">➜ Передані у вакансію</option>
+          <option value="archived">🗄 Архів</option>
+          <option value="all">Усі записи</option>
+        </select>
+        <select class="fsel" id="tpTemp" title="«Температура»">
+          <option value="">Будь-яка «температура»</option>
+          <option value="hot">🔥 Гарячі</option>
+          <option value="warm">🙂 Теплі</option>
+          <option value="cold">❄️ Холодні</option>
+        </select>
+        <select class="fsel" id="tpReason" title="Чому в пулі"><option value="">Усі причини</option></select>
+        <button class="btn btn-sm" onclick="openImport('talent')">⬆ Імпорт</button>
+        <button class="btn btn-sm" onclick="exportCSV('talent')">⬇ CSV</button>
+        <button class="btn btn-sm btn-y" onclick="openForm('talent')">+ У пул</button>
+      </span>
+    </div>
+    <div id="tpNotReady"></div>
+    <div class="g4" id="tpKpi" style="margin-bottom:14px"></div>
+    <div id="tpMatch"></div>
+    <div class="tbl-wrap"><div class="tbl-scroll"><table class="tbl" id="tblTalent"></table></div></div>
+    <div class="hint">Talent pool — люди, яких варто покликати, коли відкриється відповідна вакансія: фіналісти, яким забракло місця, ті, хто відмовився від оферу, рекомендації. <strong>✓ Контакт</strong> — записати розмову і дату наступної. <strong>➜ У вакансію</strong> — повернути людину у воронку новим кандидатом із джерелом «Talent pool». Детально — «📖 Інструкція» → Talent pool.</div>
+  </div>
 </div>
 
 <!-- ══════════ 3. КАНАЛИ ══════════ -->
@@ -865,6 +920,7 @@ body{overflow-x:clip}
     <a href="#g-how">Як зробити (рецепти)</a>
     <a href="#g-drag">Перетягування</a>
     <a href="#g-files">Файли</a>
+    <a href="#g-pool">Talent pool</a>
     <a href="#g-metrics">Як рахуються показники</a>
     <a href="#g-rules">Правила ведення даних</a>
     <a href="#g-access">Доступи і безпека</a>
@@ -905,7 +961,7 @@ body{overflow-x:clip}
       <div class="lead">Вісім розділів. Фільтри згори (період, компанія, підрозділ, пошук) діють одразу на всіх.</div>
       <div class="doc-tabs-list">
         <div class="doc-tab-card"><div class="t">📊 Огляд</div><div class="d">Головна панель: 8 показників (чисельність, найм, звільнення, плинність, відкриті вакансії, час найму, випробувальний) + графіки динаміки + воронка найму. Внизу — блок <b>«Потребує уваги»</b>: дні народження цього місяця, випробувальні строки, що спливають, прострочені вакансії, кандидати без руху 7+ днів. З нього варто починати робочий тиждень.</div></div>
-        <div class="doc-tab-card"><div class="t">🎯 Кандидати</div><div class="d">Дошка-канбан: колонка = етап відбору. <b>Перетягніть картку</b> в наступну колонку — етап зміниться, а дата проставиться сама. Клік по картці відкриває повну картку з історією рухів. Помаранчева смужка зліва = кандидат «завис» на 7+ днів.</div></div>
+        <div class="doc-tab-card"><div class="t">🎯 Кандидати</div><div class="d">Дошка-канбан: колонка = етап відбору. <b>Перетягніть картку</b> в наступну колонку — етап зміниться, а дата проставиться сама. Клік по картці відкриває повну картку з історією рухів. Помаранчева смужка зліва = кандидат «завис» на 7+ днів.<br>Згори перемикач <b>🎯 Воронка / 💎 Talent pool</b>: другий — резерв сильних людей на майбутні вакансії, з нагадуваннями, кому пора написати.</div></div>
         <div class="doc-tab-card"><div class="t">📡 Канали</div><div class="d">Звідки приходять люди і скільки це коштує. Таблиця: кандидати → співбесіди → офери → найнято, конверсія і <b>вартість найму</b>. Щоб зʼявилась вартість, внесіть витрати кнопкою «💵 Витрати на канали» (публікації вакансій, підписки, послуги агенцій).</div></div>
         <div class="doc-tab-card"><div class="t">📌 Вакансії</div><div class="d">Усі відкриті й закриті позиції: скільки днів відкрита, чи прострочена планова дата, скільки кандидатів на кожному етапі. Клік по рядку — картка вакансії з її власною воронкою і списком кандидатів.</div></div>
         <div class="doc-tab-card"><div class="t">🧑‍💼 Співробітники</div><div class="d">Довідник команди — таблицею або картками (кнопка «▦ Картки»). Клік відкриває профіль: дані, компенсація (якщо є доступ) та <b>історія всіх змін</b> — хто, коли і що правив.</div></div>
@@ -934,6 +990,9 @@ body{overflow-x:clip}
 
       <h3>Оформити кандидата у штат</h3>
       <p>Відкрийте картку кандидата → <span class="doc-kbd">✅ Оформити</span>. Заповніть дату виходу, кінець випробувального, посаду й підрозділ — картка співробітника створиться сама, а кандидат перейде на етап «Вийшов на роботу». Якщо це була остання позиція у вакансії, дашборд запропонує її закрити.</p>
+
+      <h3>Зберегти сильного кандидата в Talent pool</h3>
+      <p>Найпростіше — при відмові: у вікні з причиною відмітьте <strong>«💎 Додати в Talent pool»</strong> (для фіналістів і тих, хто відмовився від оферу, галочка вже стоїть). Або в картці кандидата → <span class="doc-kbd">💎 У Talent pool</span>. Людину, якої у воронці не було (рекомендація, знайшли на LinkedIn) — «Кандидати» → <span class="doc-kbd">💎 Talent pool</span> → <span class="doc-kbd">+ У пул</span>. Докладно — розділ <a href="#g-pool">Talent pool</a>.</p>
 
       <h3>Звільнити співробітника</h3>
       <p>Картка співробітника → <span class="doc-kbd">🚪 Звільнити</span> → дата, тип (за власним бажанням / з ініціативи компанії), причина, коментар.</p>
@@ -999,6 +1058,62 @@ body{overflow-x:clip}
       </table>
     </section>
 
+    <section class="doc-sec" id="g-pool">
+      <h2>💎 Talent pool — резерв кандидатів</h2>
+      <div class="lead">Люди, яких варто покликати, коли відкриється відповідна вакансія. Щоб наступний найм починався не з нуля.</div>
+      <p><strong>Навіщо.</strong> Найшвидший і найдешевший найм — людина, яку ви вже знаєте: вона пройшла співбесіду, ви бачили її резюме, вона знає snEco. Talent pool не дає таким людям загубитися в закритих відборах.</p>
+
+      <h3>Кого класти в пул</h3>
+      <table>
+        <thead><tr><th style="width:30%">Причина</th><th>Коли</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Фіналіст відбору</strong></td><td>Дійшов до співбесіди з керівником, але взяли іншого. Найцінніша група.</td></tr>
+          <tr><td><strong>Відмовився від оферу</strong></td><td>Нам підходив, але не зійшлись по умовах чи часу. За пів року ситуація може змінитись.</td></tr>
+          <tr><td><strong>Немає вакансії зараз</strong></td><td>Сам написав або ви помітили сильного фахівця, а місця під нього немає.</td></tr>
+          <tr><td><strong>Рекомендація / Знайшли самі</strong></td><td>Порадили колеги, знайшли на LinkedIn, на виставці.</td></tr>
+          <tr><td><strong>Колишній співробітник</strong></td><td>Пішов у хороших стосунках і міг би повернутись.</td></tr>
+        </tbody>
+      </table>
+      <div class="doc-note">Не кладіть у пул усіх підряд. Пул із 300 імен ніхто не читає; пул із 30 людей, яким ви справді готові подзвонити, працює.</div>
+
+      <h3>«Температура» і коли писати</h3>
+      <table>
+        <thead><tr><th style="width:26%">Позначка</th><th>Що означає</th><th style="width:26%">Нагадати через</th></tr></thead>
+        <tbody>
+          <tr><td>🔥 Гарячий</td><td>Готовий говорити зараз, чекає пропозицію</td><td>1 місяць</td></tr>
+          <tr><td>🙂 Теплий</td><td>Відкритий до змін, але не поспішає</td><td>3 місяці</td></tr>
+          <tr><td>❄️ Холодний</td><td>На перспективу: зараз задоволений роботою</td><td>6 місяців</td></tr>
+        </tbody>
+      </table>
+      <p>Дата наступного контакту підставляється сама за «температурою», її можна змінити. Коли дата настала, людина потрапляє в лічильник <strong>⏰ Пора написати</strong> (помаранчевий значок на перемикачі) і підсвічується в таблиці. Короткого повідомлення раз на квартал досить: «як справи, чи актуально, у нас зʼявилось ось що».</p>
+
+      <h3>Щоденна робота</h3>
+      <ol class="doc-steps">
+        <li>Відкрийте «Кандидати» → <span class="doc-kbd">💎 Talent pool</span> → клік на картку <strong>⏰ Пора написати</strong>. Це ваш список на сьогодні.</li>
+        <li>Поговорили — натисніть <span class="doc-kbd">✓ Контакт</span>: що обговорили, нова «температура», коли наступного разу. Запис із датою додається в нотатки, історія не губиться.</li>
+        <li>Відкрилась вакансія — над таблицею зʼявиться підказка <strong>«Підходять до відкритих вакансій»</strong> зі списком людей з пулу. Клік по ній — лишаються лише вони.</li>
+        <li>Людина готова — <span class="doc-kbd">➜ У вакансію</span>. Створиться новий кандидат у воронці з джерелом «Talent pool», контакти й нотатки перенесуться. Запис у пулі отримає статус «Передано у вакансію» і показуватиме, на якому етапі людина зараз.</li>
+        <li>Більше не розглядаємо — <span class="doc-kbd">🗄 В архів</span> у картці. Запис не зникає: його видно у фільтрі «Архів».</li>
+      </ol>
+
+      <h3>Згода на зберігання даних</h3>
+      <p>Резюме й контакти — персональні дані. Поки йде конкретний відбір, ми їх обробляємо в його межах; найнадійніша підстава тримати людину в резерві після відбору — її згода. Тому в кожного запису є поле <strong>«Згода до»</strong>.</p>
+      <ul>
+        <li>Запитайте при відмові чи першому контакті: «Можемо зберегти ваше резюме і звернутись, коли буде відповідна вакансія?» — і поставте дату (кнопка <span class="doc-kbd">+1 рік</span> у вікні контакту).</li>
+        <li>Прострочена згода підсвічується червоним, у картці є попередження. Або продовжіть згоду, або видаліть запис кнопкою 🗑.</li>
+        <li>Попросили видалити — видаляйте <strong>назавжди</strong> (🗑), не в архів. Архів — це «не зараз», а не «забудьте мене».</li>
+        <li>Для словацького підрозділу діє GDPR — там це правило строге.</li>
+      </ul>
+
+      <h3>Що де видно</h3>
+      <ul>
+        <li><strong>🔁 Повернуто у воронку</strong> і <strong>Найнято з пулу</strong> рахуються по кандидатах з джерелом «Talent pool» — ті самі цифри є у вкладці «Канали», поруч із Work.ua і LinkedIn.</li>
+        <li>Очікування по зарплаті в записах пулу видно лише з доступом <code>hr-payroll</code>, як і в кандидатів.</li>
+        <li>Резюме та файли лишаються в картці відбору, з якого людину додали. У записі пулу є посилання на неї.</li>
+        <li>Імпорт з Excel і вивантаження в CSV — кнопки над таблицею пулу, як в інших вкладках.</li>
+      </ul>
+    </section>
+
     <section class="doc-sec" id="g-metrics">
       <h2>📐 Як рахуються показники</h2>
       <div class="lead">Щоб цифрам можна було довіряти — ось точні формули і межі їх застосування.</div>
@@ -1011,6 +1126,7 @@ body{overflow-x:clip}
           <tr><td><strong>Воронка</strong></td><td>Рахується за <strong>максимально досягнутим</strong> етапом кожного кандидата, а не за поточним. Тому людина, якій відмовили після співбесіди, все одно врахована у «Скринінг» і «Співбесіда HR», і воронка ніколи не «розширюється» донизу.</td></tr>
           <tr><td><strong>Етап відмови</strong></td><td>Визначається за <strong>заповненими датами етапів</strong> у картці кандидата, а не окремим полем. Береться найпізніший етап, дата якого проставлена: інтервʼю з керівником → HR-інтервʼю → скринінг; якщо жодної дати немає — «до першого контакту». <strong>Наслідок:</strong> якщо рекрутер не проставив дату етапу, відмова впаде в ранішу категорію. Дати етапів варто заповнювати навіть заднім числом.</td></tr>
           <tr><td><strong>Вартість найму</strong><br><span class="muted">Cost per Hire</span></td><td>Витрати на канал за період ÷ кількість найнятих з цього каналу. Не включає час рекрутера й реферальні бонуси. Якщо кандидат прийшов у грудні, а вийшов у січні — на межі періодів цифра трохи «пливе».</td></tr>
+          <tr><td><strong>Talent pool</strong></td><td><strong>У пулі</strong> — записи зі статусом «У пулі» (без переданих і архіву). <strong>Пора написати</strong> — з них ті, у кого дата наступного контакту сьогодні або раніше. <strong>Повернуто у воронку</strong> — усі кандидати з джерелом «Talent pool» за весь час, <strong>найнято з пулу</strong> — з них ті, хто вийшов на роботу. Фільтр компанії/підрозділу діє, фільтр періоду — ні: резерв не має «періоду».</td></tr>
           <tr><td><strong>Фонд оплати праці</strong></td><td>Оклад + бонус + понаднормові + інше за місяць, по всіх внесених нарахуваннях. <strong>Брутто</strong>, до утримань. ЄСВ роботодавця у фонд не входить — вводиться окремою колонкою «Податки» і показується окремим рядком.</td></tr>
           <tr><td><strong>Середня і медіанна ЗП</strong></td><td>Рахуються з <strong>поточних окладів у картках</strong> (не з нарахувань). Медіана показова, коли в компанії є і робітники, і керівники: середня «підтягується» вгору кількома високими окладами.</td></tr>
           <tr><td><strong>Compa-ratio</strong></td><td>Оклад ÷ середина вилки посади × 100%. 85–115% — у нормі, нижче — недоплата, вище — вихід за вилку. Рахується з окладу без бонусу.</td></tr>
@@ -1022,12 +1138,13 @@ body{overflow-x:clip}
 
     <section class="doc-sec" id="g-rules">
       <h2>✅ Правила ведення даних</h2>
-      <div class="lead">Пʼять звичок, без яких статистика почне брехати.</div>
+      <div class="lead">Шість звичок, без яких статистика почне брехати.</div>
       <ol>
         <li><strong>Кандидату — джерело і дату першого контакту.</strong> Без джерела він зникає зі звіту по каналах, без дати — з розрахунку часу найму.</li>
         <li><strong>Звільнення — тільки кнопкою «Звільнити».</strong> Вона ставить дату й статус разом.</li>
         <li><strong>Назви підрозділів і посад — з підказок.</strong> «Виробництво» і «виробництво» для бази це два різні підрозділи.</li>
         <li><strong>Не імпортуйте той самий файл двічі.</strong> Крок «Перевірити» попереджає про схожі записи — не ігноруйте це попередження.</li>
+        <li><strong>Людей із пулу повертайте кнопкою «➜ У вакансію»</strong>, а не новою карткою вручну. Тоді джерелом стане «Talent pool», і буде видно, скільки наймів дав резерв.</li>
         <li><strong>Результат випробувального ставте вчасно.</strong> Віджет на «Огляді» показує, у кого строк спливає; якщо результат не проставити, показник «пройшли випробувальний» рахуватиметься неправильно.</li>
       </ol>
     </section>
@@ -1071,7 +1188,7 @@ body{overflow-x:clip}
       <div class="lead">Коротко про внутрішній устрій — потрібне лише тому, хто змінює дашборд.</div>
       <ul>
         <li><strong>Сторінка:</strong> <code>brand/dashboard/hr/hr.html</code> — один самодостатній файл із власним входом.</li>
-        <li><strong>API:</strong> <code>sneco-auth/src/hr.js</code>, роути <code>/api/hr/*</code>. Дані — 10 таблиць <code>hr_*</code> у Cloudflare D1 (<code>sneco-bible</code>).</li>
+        <li><strong>API:</strong> <code>sneco-auth/src/hr.js</code>, роути <code>/api/hr/*</code>. Дані — 12 таблиць <code>hr_*</code> у Cloudflare D1 (<code>sneco-bible</code>); Talent pool — <code>hr_talent_pool</code>, сутність <code>talent</code> (міграція <code>20260924_hr_talent_pool.sql</code>).</li>
         <li><strong>Автоматичного наповнення немає</strong> — жодних cron-задач, усе вводиться людьми.</li>
         <li><strong>Тести:</strong> <code>node sneco-auth/tests/hr_api_check.mjs</code> — перевіряє логіку й розмежування доступів без деплою. Запускати після кожної зміни <code>hr.js</code>.</li>
         <li><strong>Доступи:</strong> списки в KV (<code>wl:hr-dashboard</code>, <code>wl:hr-payroll</code>) редагуються через Maintenance; запасні списки — у <code>wrangler.toml</code>.</li>
@@ -1083,6 +1200,18 @@ body{overflow-x:clip}
       <h2>🧾 Історія змін</h2>
       <div class="lead">Що і коли змінювалось у дашборді.</div>
       <div class="doc-ver">
+        <div class="v">
+          <div class="vh">v2.80.0 — Talent pool: резерв кандидатів</div>
+          <div class="vd">24.09.2026</div>
+          <ul>
+            <li>У вкладці «Кандидати» зʼявився перемикач <strong>🎯 Воронка / 💎 Talent pool</strong>. Пул — резерв сильних людей на майбутні вакансії: фіналісти, ті, хто відмовився від оферу, рекомендації, колишні колеги.</li>
+            <li>Додати людину: галочка <strong>«💎 Додати в Talent pool»</strong> у вікні відмови, кнопка в картці кандидата або «+ У пул» для тих, кого у воронці не було. Контакти, оцінка й причина відмови переносяться самі.</li>
+            <li>«Температура» (🔥 / 🙂 / ❄️) задає, коли нагадати про себе: через місяць, квартал чи пів року. Лічильник <strong>⏰ Пора написати</strong> показує, кому пора.</li>
+            <li><strong>✓ Контакт</strong> записує розмову з датою в нотатки й переносить наступний контакт. <strong>➜ У вакансію</strong> створює нового кандидата з джерелом «Talent pool» — ефективність резерву видно у «Каналах».</li>
+            <li>Над таблицею — підказка, хто з пулу підходить до відкритих вакансій.</li>
+            <li>Поле <strong>«Згода до»</strong> для зберігання персональних даних, прострочені згоди підсвічуються червоним.</li>
+          </ul>
+        </div>
         <div class="v">
           <div class="vh">v2.79.8 — Файли можна додати одразу при створенні</div>
           <div class="vd">02.09.2026</div>
@@ -1204,8 +1333,8 @@ body{overflow-x:clip}
 /* ═══════════════════════════════════════════════════════════════════════════
    snEco · HR Dashboard — core (v2.79.0)
    ═══════════════════════════════════════════════════════════════════════════ */
-const HR_VERSION = 'v2.79.8';
-const HR_UPDATED  = '01.09.2026';
+const HR_VERSION = 'v2.80.0';
+const HR_UPDATED  = '24.09.2026';
 const API = 'https://sneco-auth.vg-ab6.workers.dev';
 const BLOCK_HR = 'hr-dashboard';
 const STAGES = [
@@ -1227,11 +1356,21 @@ const VAC_STATUS_L = { open:'Відкрита', on_hold:'На паузі', close
 const PRIORITY_L  = { low:'Низький', normal:'Звичайний', high:'Високий', critical:'Критичний' };
 const TERM_TYPE_L = { voluntary:'За власним бажанням', involuntary:'З ініціативи компанії' };
 const PROB_L      = { pending:'Триває', passed:'Пройдено', failed:'Не пройдено' };
+// Talent pool (v2.80.0). days — рекомендований інтервал «нагадати про себе»
+const TP_REASON_L = { finalist:'Фіналіст відбору', declined_offer:'Відмовився від оферу', no_vacancy:'Немає вакансії зараз', referral:'Рекомендація', sourced:'Знайшли самі', former_employee:'Колишній співробітник', other:'Інше' };
+const TP_TEMP = {
+  hot:  { l:'Гарячий',  i:'🔥', cls:'chip-r', days:30,  hint:'готовий говорити зараз' },
+  warm: { l:'Теплий',   i:'🙂', cls:'chip-y', days:90,  hint:'відкритий, але не поспішає' },
+  cold: { l:'Холодний', i:'❄️', cls:'chip-b', days:180, hint:'на перспективу' },
+};
+const TP_STATUS_L = { active:'У пулі', engaged:'Передано у вакансію', archived:'Архів' };
+const TP_SOURCE = 'Talent pool';   // джерело кандидата, повернутого з пулу — так канал видно у «Каналах»
 const PALETTE = ['#8DC63F','#FCC01B','#3B82F6','#7209B7','#F97316','#0D9488','#DB2777','#DC2626','#64748B','#84CC16','#0EA5E9','#A855F7'];
 
 const S = {
   token:null, me:{ email:'', isAdmin:false, canPayroll:false },
   dict:{}, employees:[], vacancies:[], candidates:[], payroll:[], plans:[], bands:[], sourceCosts:[],
+  talent:[], talentReady:true, candView:'funnel', tpVac:null,
   fx:{ UAH:1 }, payCur:'UAH',
   f:{ from:'', to:'', company:'', dept:'', q:'' },
   tab:'overview', empView:'table', charts:{}, sort:{},
@@ -1306,6 +1445,7 @@ function dictMeta(kind, value){ const d=(S.dict[kind]||[]).find(x=>x.value===val
 const empById  = id => S.employees.find(e=>e.id===id);
 const vacById  = id => S.vacancies.find(v=>v.id===id);
 const candById = id => S.candidates.find(c=>c.id===id);
+const talentById = id => S.talent.find(t=>t.id===id);
 
 /* ── FX (курси для зведеного фонду) ──────────────────────────────────────── */
 function loadFx(){
@@ -1348,6 +1488,10 @@ const fCandidates = ()=> S.candidates.filter(inFilter);
 const sEmployees  = ()=> fEmployees().filter(e=>matchQ(e,'full_name','position','department','email','emp_code'));
 const sVacancies  = ()=> fVacancies().filter(v=>matchQ(v,'title','department','manager'));
 const sCandidates = ()=> fCandidates().filter(c=>matchQ(c,'full_name','position','source','email'));
+const fTalent     = ()=> S.talent.filter(inFilter);
+const sTalent     = ()=> fTalent().filter(t=>matchQ(t,'full_name','position','department','skills','notes','email','source','location'));
+const tpDue       = t => t.status==='active' && !!t.next_contact_date && t.next_contact_date<=todayISO();
+const tpConsentExpired = t => t.status!=='archived' && !!t.consent_until && t.consent_until<todayISO();
 
 /* ── АНАЛІТИКА ───────────────────────────────────────────────────────────── */
 // чисельність на дату (кінець дня)
@@ -1708,7 +1852,25 @@ const ph = t => `<div style="font-size:11.5px;color:#9a9a90;padding:12px 4px;tex
 const wlItem = (e, right) => `<div class="wl-item" onclick="openEmployee(${e.id})"><div class="av" style="background:${hashColor(e.full_name)};width:24px;height:24px;font-size:9.5px">${initials(e.full_name)}</div><div style="min-width:0"><div class="person-nm">${esc(e.full_name)}</div><div class="person-sub">${esc(e.position||e.department||'')}</div></div><span class="wl-r">${right}</span></div>`;
 
 /* ══════════ 2 · КАНДИДАТИ (Kanban) ══════════ */
+/* ── Перемикач «Воронка / Talent pool» усередині вкладки Кандидати ── */
+function setCandView(v){
+  S.candView = v === 'pool' ? 'pool' : 'funnel';
+  location.hash = S.candView === 'pool' ? 'talent' : 'candidates';
+  renderCandidates();
+}
+function syncCandView(){
+  const pool = S.candView === 'pool';
+  $$('#pane-candidates .subtab').forEach(b=>{ const on = b.dataset.cv === S.candView; b.classList.toggle('active', on); b.setAttribute('aria-selected', on); });
+  $('#candFunnelView').classList.toggle('hidden', pool);
+  $('#candPoolView').classList.toggle('hidden', !pool);
+  const act = fTalent().filter(t=>t.status==='active');
+  const due = act.filter(tpDue).length;
+  $('#tcPool').textContent = act.length;
+  const d = $('#tcPoolDue'); d.textContent = due ? '⏰ ' + due : ''; d.classList.toggle('hidden', !due);
+}
 function renderCandidates(){
+  syncCandView();
+  if (S.candView === 'pool') return renderTalent();
   const showClosed = $('#kbShowClosed').checked;
   const vf = $('#kbVacFilter').value, sf = $('#kbSrcFilter').value;
   let pool = sCandidates();
@@ -1750,6 +1912,264 @@ function renderCandidates(){
     </div>`;
   }).join('');
   bindKanban();
+}
+/* ══════════ 2б · TALENT POOL ══════════
+   Резерв людей на майбутні вакансії. Свідомо НЕ частина воронки:
+   повернення з пулу створює нового кандидата з джерелом «Talent pool»,
+   тож воронка, Time to Hire і «Канали» рахуються як раніше, а ефективність
+   резерву видно окремим каналом. */
+// хто з пулу підходить до вакансії: збіг ролі (одне містить інше);
+// якщо роль у записі не вказана — збіг підрозділу
+function tpMatches(v, list){
+  const vt = norm(v.title), vd = norm(v.department);
+  return list.filter(t=>{
+    const p = norm(t.position);
+    if (p && vt) return p===vt || p.includes(vt) || vt.includes(p);
+    return !p && !!vd && norm(t.department)===vd;
+  });
+}
+function tpSetVac(id){
+  S.tpVac = id || null;
+  if (S.tpVac) $('#tpStatus').value = 'active';
+  renderTalent();
+}
+function tpNextCell(t){
+  if (!t.next_contact_date) return '<span class="muted">—</span>';
+  const d = daysBetween(todayISO(), t.next_contact_date);
+  if (t.status!=='active') return dmy(t.next_contact_date);
+  if (d < 0)  return `<span class="tp-late">${dmy(t.next_contact_date)}<br><span style="font-size:10.5px">прострочено ${-d} дн</span></span>`;
+  if (d === 0) return `<span class="tp-late">сьогодні</span>`;
+  if (d <= 7) return `<span class="tp-soon">${dmy(t.next_contact_date)}<br><span style="font-size:10.5px">через ${d} дн</span></span>`;
+  return dmy(t.next_contact_date);
+}
+function tpStatusCell(t){
+  if (t.status==='engaged'){
+    const c = candById(t.engaged_candidate_id);
+    if (!c) return '<span class="chip chip-gray">Передано</span>';
+    const st = STAGE_MAP[c.stage];
+    return `<a href="#" onclick="event.stopPropagation();openCandidate(${c.id});return false" class="chip" style="background:${st.c}22;color:${st.c};text-decoration:none">➜ ${esc(st.short)}</a>`;
+  }
+  if (t.status==='archived') return '<span class="chip chip-gray">🗄 Архів</span>';
+  return '<span class="chip chip-g">У пулі</span>';
+}
+function renderTalent(){
+  $('#tpNotReady').innerHTML = S.talentReady ? '' :
+    '<div class="hint warn" style="margin:0 0 12px">⚠ Сервер ще не оновлено під Talent pool — записи не збережуться. Натисніть ↻ за кілька хвилин.</div>';
+  // причини — у фільтр, один раз
+  const rs = $('#tpReason');
+  if (rs.options.length <= 1) rs.innerHTML = '<option value="">Усі причини</option>' + Object.entries(TP_REASON_L).map(([k,l])=>`<option value="${k}">${esc(l)}</option>`).join('');
+
+  const all = fTalent();
+  const active = all.filter(t=>t.status==='active');
+  const due = active.filter(tpDue);
+  const byT = k => active.filter(t=>(t.temperature||'warm')===k).length;
+  const fromPool = fCandidates().filter(c=>c.source===TP_SOURCE);
+  const hiredFromPool = fromPool.filter(c=>c.stage==='hired').length;
+  const expired = all.filter(tpConsentExpired).length;
+  const soon = all.filter(t=>t.status!=='archived' && t.consent_until && t.consent_until>=todayISO() && t.consent_until<=isoAdd(todayISO(),30)).length;
+  const noConsent = active.filter(t=>!t.consent_until).length;
+  const oldestDue = due.length ? Math.max(...due.map(t=>-daysBetween(todayISO(), t.next_contact_date))) : 0;
+
+  $('#tpKpi').innerHTML = [
+    kpi({ lbl:'💎 У пулі', val:num(active.length), sub:`🔥 ${byT('hot')} · 🙂 ${byT('warm')} · ❄️ ${byT('cold')}`, color:'cg', click:"$('#tpStatus').value='active';tpSetVac(null)" }),
+    kpi({ lbl:'⏰ Пора написати', val:num(due.length), sub: due.length ? (oldestDue>0 ? `найдовше чекає ${oldestDue} дн` : 'строк — сьогодні') : 'Усі контакти за планом 👌', color:'co', click:"$('#tpStatus').value='due';tpSetVac(null)" }),
+    kpi({ lbl:'🔁 Повернуто у воронку', val:num(fromPool.length), sub: fromPool.length ? `Найнято з пулу: ${hiredFromPool} · ${pct(hiredFromPool/fromPool.length*100,0)}` : 'Кандидати з джерелом «Talent pool»', color:'cb', click:"$('#tpStatus').value='engaged';tpSetVac(null)" }),
+    kpi({ lbl:'🔐 Згода на зберігання', val: expired ? num(expired)+' простр.' : 'ОК', sub:`${soon} спливає за 30 дн · ${noConsent} без дати згоди`, color: expired?'cr':'cg' }),
+  ].join('');
+
+  // підказка «під відкриті вакансії»
+  const openV = fVacancies().filter(v=>v.status==='open');
+  if (S.tpVac && !openV.some(v=>v.id===S.tpVac)) S.tpVac = null;
+  const m = openV.map(v=>({ v, n:tpMatches(v, active).length })).filter(x=>x.n).sort((a,b)=>b.n-a.n);
+  $('#tpMatch').innerHTML = m.length ? `<div class="sec" style="margin-top:0">Підходять до відкритих вакансій</div>
+    <div class="tp-match">${m.map(x=>`<button class="tp-mchip${S.tpVac===x.v.id?' on':''}" onclick="tpSetVac(${S.tpVac===x.v.id?'null':x.v.id})">📌 ${esc(x.v.title)} — <b>${x.n}</b> у пулі</button>`).join('')}
+    ${S.tpVac?'<button class="tp-mchip" onclick="tpSetVac(null)">✕ Показати всіх</button>':''}</div>` : '';
+
+  let rows = sTalent();
+  const st = $('#tpStatus').value, tf = $('#tpTemp').value, rf = $('#tpReason').value;
+  if (st==='due') rows = rows.filter(tpDue);
+  else if (st!=='all') rows = rows.filter(t=>t.status===st);
+  if (tf) rows = rows.filter(t=>(t.temperature||'warm')===tf);
+  if (rf) rows = rows.filter(t=>t.reason===rf);
+  if (S.tpVac){ const v = vacById(S.tpVac); if (v) rows = tpMatches(v, rows); }
+
+  const TORD = { hot:0, warm:1, cold:2 };
+  renderTable('#tblTalent', [
+    { k:'full_name', l:'Людина', fmt:t=>{
+        const sk = String(t.skills||'').split(',').map(x=>x.trim()).filter(Boolean).slice(0,4);
+        return `<div class="tp-name"><div class="av" style="background:${hashColor(t.full_name)};width:28px;height:28px;font-size:10px">${initials(t.full_name)}</div>
+          <div style="min-width:0"><div class="person-nm">${esc(t.full_name)}</div>${sk.length?`<div class="tp-skills">${sk.map(x=>`<span class="tp-skill">${esc(x)}</span>`).join('')}</div>`:''}</div></div>`; } },
+    { k:'position', l:'Роль', fmt:t=>`${esc(t.position||'—')}${t.department?`<div class="person-sub">${esc(t.department)}</div>`:''}` },
+    { k:'temperature', l:'«Температура»', sortVal:t=>TORD[t.temperature||'warm'], fmt:t=>{ const x=TP_TEMP[t.temperature||'warm']; return `<span class="chip ${x.cls}">${x.i} ${esc(x.l)}</span>`; } },
+    { k:'rating', l:'Оцінка', num:1, fmt:t=>t.rating?`<span class="stars">${'★'.repeat(t.rating)}${'☆'.repeat(5-t.rating)}</span>`:'<span class="muted">—</span>' },
+    { k:'reason', l:'Чому в пулі', sortVal:t=>TP_REASON_L[t.reason]||'', fmt:t=>esc(TP_REASON_L[t.reason]||'—') },
+    { k:'last_contact_date', l:'Останній контакт', fmt:t=>dmy(t.last_contact_date) },
+    { k:'next_contact_date', l:'Наступний контакт', fmt:tpNextCell },
+    { k:'consent_until', l:'Згода до', fmt:t=> !t.consent_until ? '<span class="muted">—</span>' : tpConsentExpired(t) ? `<span class="tp-late">${dmy(t.consent_until)}</span>` : dmy(t.consent_until) },
+    { k:'status', l:'Статус', sortVal:t=>t.status, fmt:tpStatusCell },
+    { k:'_act', l:'', sortable:false, fmt:t=> t.status!=='active' ? '' : `<div class="tp-act">
+        <button class="btn btn-sm" onclick="event.stopPropagation();tpContact(${t.id})" title="Записати розмову і дату наступного контакту">✓ Контакт</button>
+        <button class="btn btn-sm btn-y" onclick="event.stopPropagation();tpEngage(${t.id})" title="Створити кандидата у воронці">➜ У вакансію</button></div>` },
+  ], rows, {
+    onRow: openTalent, defaultSort:'next_contact_date', defaultDir:'asc',
+    empty: S.talent.length ? 'За цими фільтрами нікого немає'
+      : `💎 Пул поки порожній.<br><span style="font-size:12px">Додайте сюди сильних людей, яким відмовили не через них, а через відсутність місця:<br>картка кандидата → «💎 У Talent pool», галочка при відмові або кнопка «+ У пул».</span>`,
+  });
+}
+// ── Картка запису пулу ──
+function openTalent(id){
+  const t = talentById(id); if (!t) return;
+  const tm = TP_TEMP[t.temperature||'warm'];
+  const src = candById(t.candidate_id), eng = candById(t.engaged_candidate_id);
+  const skills = String(t.skills||'').split(',').map(x=>x.trim()).filter(Boolean);
+  const nd = t.next_contact_date ? daysBetween(todayISO(), t.next_contact_date) : null;
+  DR = { entity:'talent', id, tab:0 };
+  $('#drTitle').textContent = t.full_name;
+  $('#drSub').textContent = ['💎 Talent pool', t.position, t.department].filter(Boolean).join(' · ');
+  $('#drTabs').innerHTML = '';
+  $('#drBody').innerHTML = `
+    <div class="prof-hero">
+      <div class="av av-lg" style="background:${hashColor(t.full_name)}">${initials(t.full_name)}</div>
+      <div><div class="prof-nm">${esc(t.full_name)}</div>
+        <div class="prof-pos">${esc(t.position||'Роль не вказана')}${t.location?' · '+esc(t.location):''}</div>
+        <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+          <span class="chip ${tm.cls}" title="${esc(tm.hint)}">${tm.i} ${esc(tm.l)}</span>
+          ${tpStatusCell(t)}
+          ${t.reason?`<span class="chip chip-gray">${esc(TP_REASON_L[t.reason]||t.reason)}</span>`:''}
+          ${t.rating?`<span class="stars" style="font-size:13px">${'★'.repeat(t.rating)}${'☆'.repeat(5-t.rating)}</span>`:''}
+        </div></div>
+    </div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px">
+      ${t.status==='active' ? `<button class="btn btn-y btn-sm" onclick="tpContact(${id})">✓ Записати контакт</button>
+        <button class="btn btn-sm" onclick="tpEngage(${id})">➜ У вакансію</button>
+        <button class="btn btn-sm" onclick="tpSetStatus(${id},'archived')" title="Більше не розглядаємо, але історію зберегти">🗄 В архів</button>`
+        : `<button class="btn btn-sm" onclick="tpSetStatus(${id},'active')">↺ Повернути в пул</button>`}
+    </div>
+    ${tpConsentExpired(t)?`<div class="hint warn" style="margin:0 0 12px">🔐 Згода на зберігання даних спливла ${dmy(t.consent_until)}. Попросіть кандидата продовжити її (кнопка «✓ Записати контакт» → поле «Згода до») або видаліть запис.</div>`:''}
+    <dl class="kv">
+      <dt>Email</dt><dd>${t.email?`<a href="mailto:${esc(t.email)}">${esc(t.email)}</a>`:'—'}</dd>
+      <dt>Телефон</dt><dd>${t.phone?`<a href="tel:${esc(t.phone)}">${esc(t.phone)}</a>`:'—'}</dd>
+      <dt>CV / профіль</dt><dd>${t.cv_url?`<a href="${esc(t.cv_url)}" target="_blank" rel="noopener">Відкрити ↗</a>`:''} ${t.linkedin?`<a href="${esc(t.linkedin)}" target="_blank" rel="noopener">LinkedIn ↗</a>`:''}${!t.cv_url&&!t.linkedin?'—':''}</dd>
+      <dt>Навички</dt><dd>${skills.length?`<div class="tp-skills">${skills.map(x=>`<span class="tp-skill">${esc(x)}</span>`).join('')}</div>`:'—'}</dd>
+      <dt>Підрозділ</dt><dd>${esc(t.department||'—')}</dd>
+      <dt>Звідки дізнались</dt><dd>${esc(t.source||'—')}</dd>
+      <dt>Відповідальний</dt><dd>${esc(t.owner_email||'—')}</dd>
+      ${S.me.canPayroll?`<dt>Очікування по ЗП</dt><dd>${t.expected_salary_kop?money(t.expected_salary_kop,t.currency):'—'}</dd>`:''}
+      <dt>Останній контакт</dt><dd>${dmy(t.last_contact_date)}</dd>
+      <dt>Наступний контакт</dt><dd>${t.next_contact_date?`${dmy(t.next_contact_date)}${t.status==='active'&&nd!==null?(nd<0?` <span class="tp-late">прострочено ${-nd} дн</span>`:nd===0?' <span class="tp-late">сьогодні</span>':` <span class="muted">через ${nd} дн</span>`):''}`:'—'}</dd>
+      <dt>Згода на зберігання</dt><dd>${t.consent_until?`до ${dmy(t.consent_until)}`:'<span class="muted">дата не вказана</span>'}</dd>
+      <dt>Відбір, з якого прийшов</dt><dd>${src?`<a href="#" onclick="openCandidate(${src.id});return false">${esc(vacById(src.vacancy_id)?.title||src.position||'картка кандидата')} ↗</a> <span class="muted">· резюме й файли там</span>`:'—'}</dd>
+      ${eng?`<dt>Повернуто у воронку</dt><dd><a href="#" onclick="openCandidate(${eng.id});return false">${esc(vacById(eng.vacancy_id)?.title||eng.position||'картка кандидата')} ↗</a> · ${esc(STAGE_MAP[eng.stage].l)}</dd>`:''}
+    </dl>
+    <div class="sec">Нотатки та історія контактів</div>
+    ${t.notes?`<div class="hint" style="margin-top:0">${esc(t.notes).replace(/\n/g,'<br>')}</div>`:ph('Поки порожньо. «✓ Записати контакт» додає сюди запис із датою.')}`;
+  $('#drFoot').innerHTML = `<button class="btn btn-danger" onclick="delEntity('talent',${id},'запис із Talent pool')" title="Видалити назавжди (напр. кандидат відкликав згоду)">🗑</button>
+    <span class="sp"></span>
+    <button class="btn btn-primary" onclick="openForm('talent',${id})">✏️ Редагувати</button>`;
+  openDrawer();
+}
+async function tpSetStatus(id, status){
+  try {
+    await api('/api/hr/save', { entity:'talent', id, data:{ status } });
+    toast(status==='archived' ? 'Перенесено в архів' : 'Повернуто в пул', 'ok');
+    await reload(); openTalent(id);
+  } catch(e){ toast(apiErr(e),'err'); }
+}
+// ── ✓ Контакт: дата, що обговорили, коли наступного разу, згода ──
+function tpContact(id){
+  const t = talentById(id); if (!t) return;
+  const temp = t.temperature || 'warm';
+  modal('✓ Записати контакт · ' + t.full_name, `
+    <div class="hint info" style="margin-top:0">Запис додасться в нотатки з датою. Дата наступного контакту підставляється за «температурою»: гарячий — через місяць, теплий — через квартал, холодний — через пів року.</div>
+    <div class="fgrid" style="margin-top:12px">
+      <div class="fld"><label>Дата контакту</label><input type="date" id="tcD" value="${todayISO()}"></div>
+      <div class="fld"><label>«Температура» зараз</label><select id="tcT">${Object.entries(TP_TEMP).map(([k,x])=>`<option value="${k}"${k===temp?' selected':''}>${x.i} ${esc(x.l)} — ${esc(x.hint)}</option>`).join('')}</select></div>
+      <div class="fld"><label>Наступний контакт</label><input type="date" id="tcN" value="${isoAdd(todayISO(), TP_TEMP[temp].days)}"></div>
+      <div class="fld"><label>Згода на зберігання до</label><div class="tp-inline"><input type="date" id="tcC" value="${esc(t.consent_until||'')}"><button class="btn btn-sm" type="button" onclick="$('#tcC').value=isoAdd($('#tcD').value||todayISO(),365)">+1 рік</button></div>
+        <div class="fhelp">Якщо кандидат підтвердив, що не проти зберігання резюме</div></div>
+      <div class="fld full"><label>Що обговорили</label><textarea id="tcNote" placeholder="напр. відкритий до змін з січня, цікавить Мукачево, очікування не змінились"></textarea></div>
+    </div>`, [
+    { l:'Скасувати', cls:'btn', fn:closeModal },
+    { l:'💾 Зберегти', cls:'btn btn-primary', fn: async ()=>{
+        const d = $('#tcD').value || todayISO();
+        const note = $('#tcNote').value.trim();
+        const line = dmy(d) + ': ' + (note || 'контакт');
+        const data = { last_contact_date:d, next_contact_date:$('#tcN').value||null, temperature:$('#tcT').value,
+          consent_until:$('#tcC').value||null, notes:(line + (t.notes ? '\n' + t.notes : '')).slice(0, 6000) };
+        try {
+          await api('/api/hr/save', { entity:'talent', id, data });
+          toast('Контакт записано','ok'); closeModal(); await reload();
+          if (DR.entity==='talent' && DR.id===id) openTalent(id);
+        } catch(e){ toast(apiErr(e),'err'); }
+      } },
+  ]);
+  const dEl = $('#tcD'), tEl = $('#tcT'), nEl = $('#tcN');
+  const upd = ()=>{ nEl.value = isoAdd(dEl.value || todayISO(), TP_TEMP[tEl.value].days); };
+  tEl.onchange = upd; dEl.onchange = upd;
+}
+// ── ➜ У вакансію: новий кандидат у воронці + позначка в пулі ──
+function tpEngage(id){
+  const t = talentById(id); if (!t) return;
+  const cur = candById(t.engaged_candidate_id);
+  if (cur && !STAGE_MAP[cur.stage]?.terminal && cur.stage!=='hired'){
+    toast('Ця людина вже у воронці — відкриваю картку','ok'); return openCandidate(cur.id);
+  }
+  const open = S.vacancies.filter(v=>['open','on_hold'].includes(v.status));
+  const best = (S.tpVac && open.some(v=>v.id===S.tpVac)) ? S.tpVac : (open.find(v=>tpMatches(v,[t]).length)?.id || '');
+  modal('➜ Повернути у воронку', `
+    <div class="hint info" style="margin-top:0">Створимо нового кандидата <strong>${esc(t.full_name)}</strong> з джерелом «${TP_SOURCE}» — так видно у «Каналах», скільки наймів дав резерв. Контакти й нотатки перенесуться, запис у пулі отримає статус «Передано у вакансію».</div>
+    <div class="fgrid" style="margin-top:12px">
+      <div class="fld full"><label>Вакансія</label><select id="teV"><option value="">— без вакансії —</option>${open.map(v=>`<option value="${v.id}"${v.id===best?' selected':''}>${esc(v.title)}${v.department?' · '+esc(v.department):''}${tpMatches(v,[t]).length?' ✓ підходить':''}</option>`).join('')}</select></div>
+      <div class="fld"><label>Етап</label><select id="teS"><option value="new">Новий</option><option value="screening">Скринінг (вже поговорили)</option></select></div>
+      <div class="fld"><label>Перший контакт</label><input type="date" id="teD" value="${todayISO()}"><div class="fhelp">Від неї рахується Time to Hire</div></div>
+    </div>`, [
+    { l:'Скасувати', cls:'btn', fn:closeModal },
+    { l:'➜ Створити кандидата', cls:'btn btn-primary', fn: async ()=>{
+        const v = vacById(+$('#teV').value || 0);
+        const d = $('#teD').value || todayISO();
+        const data = { full_name:t.full_name, vacancy_id:v?v.id:null, position:v?v.title:(t.position||null),
+          department:(v&&v.department)||t.department||null, company:(v&&v.company)||t.company||null,
+          source:TP_SOURCE, stage:'new', rating:t.rating||null, email:t.email||null, phone:t.phone||null,
+          linkedin:t.linkedin||null, cv_url:t.cv_url||null, owner_email:t.owner_email||null, first_contact_date:d,
+          notes:('З Talent pool' + (t.reason?' ('+(TP_REASON_L[t.reason]||t.reason).toLowerCase()+')':'') + '.' + (t.skills?' Навички: '+t.skills+'.':'') + (t.notes?'\n'+t.notes:'')).slice(0,4000) };
+        if (S.me.canPayroll && t.expected_salary_kop){ data.expected_salary_kop = t.expected_salary_kop; data.currency = t.currency||'UAH'; }
+        try {
+          const r = await api('/api/hr/save', { entity:'candidate', data });
+          const newId = r.id || r.row?.id;
+          if ($('#teS').value==='screening') await api('/api/hr/stage', { id:newId, to_stage:'screening' });
+          await api('/api/hr/save', { entity:'talent', id, data:{ status:'engaged', engaged_candidate_id:newId, last_contact_date:d } });
+          toast(t.full_name + ' → у воронці','ok'); closeModal(); closeDrawer(); await reload();
+          openCandidate(newId);
+        } catch(e){ toast(apiErr(e),'err'); }
+      } },
+  ]);
+}
+// ── Кандидат → Talent pool ──
+// silent=true: без форми, одразу зберегти (галочка при відмові)
+async function addToPool(candId, silent){
+  const c = candById(candId); if (!c) return;
+  const ex = S.talent.find(t=>t.candidate_id===c.id);
+  if (ex){
+    if (silent) return toast('Уже в Talent pool','ok');
+    closeDrawer(); return openTalent(ex.id);
+  }
+  const v = vacById(c.vacancy_id);
+  const temp = (c.stage==='offer_declined' || (c.rating||0)>=4) ? 'hot' : 'warm';
+  const data = { full_name:c.full_name, candidate_id:c.id, position:v?v.title:(c.position||null),
+    department:(v&&v.department)||c.department||null, company:(v&&v.company)||c.company||null,
+    source:c.source||null, rating:c.rating||null, email:c.email||null, phone:c.phone||null,
+    linkedin:c.linkedin||null, cv_url:c.cv_url||null, owner_email:c.owner_email||null,
+    reason: c.stage==='offer_declined' ? 'declined_offer' : (reachedStage(c,'mgr_interview') ? 'finalist' : 'other'),
+    temperature:temp, status:'active', last_contact_date:c.closed_date||todayISO(),
+    next_contact_date:isoAdd(todayISO(), TP_TEMP[temp].days),
+    notes: c.reject_reason ? 'Причина відмови у відборі: ' + c.reject_reason : null };
+  if (S.me.canPayroll && c.expected_salary_kop){ data.expected_salary_kop = c.expected_salary_kop; data.currency = c.currency||'UAH'; }
+  if (!silent){ closeDrawer(); return openForm('talent', null, data); }
+  try {
+    await api('/api/hr/save', { entity:'talent', data });
+    toast('💎 ' + c.full_name + ' — у Talent pool','ok');
+    await reload();
+  } catch(e){ toast(apiErr(e),'err'); }
 }
 function kbCard(c){
   const days = Math.floor((Date.now()/1000 - (c.stage_changed_at||0))/86400);
@@ -1912,9 +2332,13 @@ function bindKanban(){
 async function moveStage(id, to){
   const c = candById(id); if (!c || c.stage===to) return;
   let reason = null;
+  let toPool = false;
   if ((to==='rejected'||to==='offer_declined')) {
-    reason = await askReason(to==='rejected'?'Причина відмови':'Чому не прийняв оффер');
+    const inPool = S.talent.some(t=>t.candidate_id===c.id);
+    reason = await askReason(to==='rejected'?'Причина відмови':'Чому не прийняв оффер',
+      inPool ? null : (to==='offer_declined' || (c.rating||0)>=4 || reachedStage(c,'mgr_interview')));
     if (reason === null) return;
+    toPool = !!askReason.pool;
   }
   const prev = { ...c };
   Object.assign(c, { stage:to, stage_changed_at: Math.floor(Date.now()/1000) });
@@ -1925,6 +2349,7 @@ async function moveStage(id, to){
     toast(`${c.full_name} → ${STAGE_MAP[to].l}`, 'ok');
     if (to==='hired') offerHire(c);
     renderCandidates();
+    if (toPool) await addToPool(id, true);
   } catch(e){ Object.assign(c, prev); renderCandidates(); toast(apiErr(e),'err'); }
 }
 
@@ -2039,7 +2464,15 @@ async function cfUpload(files, candId, silent, targetId){
   if (!silent) cfRenderList(candId, $('#' + (targetId || 'candFiles')));
 }
 
-async function cfOpen(id){
+/* ⚠ 24.09.2026, VG: «не качається». Дві причини разом:
+   1) воркер віддавав файл без CORS-заголовків → fetch падав (виправлено в hr.js);
+   2) window.open ПІСЛЯ await — уже не «клік користувача», Safari/Chrome блокують
+      таке вікно мовчки. Тому вікно відкриваємо одразу по кліку, а файл
+      підставляємо в нього, коли приїде. Якщо вікно заблоковано — звичайне
+      завантаження через <a download>. */
+async function cfOpen(id, name){
+  let w = null;
+  try { w = window.open('', '_blank'); if (w) w.document.title = 'Відкриваю файл…'; } catch(e){ w = null; }
   try {
     loading(true);
     const r = await fetch(`${API}/api/hr/file-get`, {
@@ -2047,13 +2480,21 @@ async function cfOpen(id){
       headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + S.token },
       body: JSON.stringify({ id }),
     });
-    if (!r.ok) throw new Error('not_ok');
+    if (!r.ok) { let j = {}; try { j = await r.json(); } catch(e){} throw new Error(j.error || ('http_' + r.status)); }
     const blob = await r.blob();
     const url = URL.createObjectURL(blob);
-    window.open(url, '_blank', 'noopener');
+    if (w && !w.closed) w.location.href = url;
+    else {
+      const a = document.createElement('a');
+      a.href = url; a.download = name || 'file'; document.body.appendChild(a); a.click(); a.remove();
+    }
     // Відкликаємо не одразу: Safari встигає не завжди, хвилини вистачає з запасом.
     setTimeout(()=>URL.revokeObjectURL(url), 60000);
-  } catch(e){ toast('Не вдалося відкрити файл', 'err'); }
+  } catch(e){
+    if (w && !w.closed) w.close();
+    const M = { file_missing:'файл відсутній у сховищі', not_found:'запис файлу не знайдено', storage_unavailable:'сховище недоступне', http_401:'сесія завершилась — увійдіть знову' };
+    toast('Не вдалося відкрити файл' + (M[e.message] ? ': ' + M[e.message] : ''), 'err');
+  }
   finally { loading(false); }
 }
 
@@ -2752,6 +3193,33 @@ const F = {
     { k:'requirements', l:'Вимоги / опис', t:'textarea', full:1 },
     { k:'notes', l:'Нотатки', t:'textarea', full:1 },
   ]},
+  talent: { title:'запис Talent pool', titleNew:'Новий запис у Talent pool', icon:'💎', fields:[
+    { s:'Хто це' },
+    { k:'full_name', l:'ПІБ', t:'text', req:1, full:1 },
+    { k:'position', l:'На яку роль розглядаємо', t:'dictfree', dict:'position' },
+    { k:'department', l:'Підрозділ', t:'dict', dict:'department' },
+    { k:'skills', l:'Ключові навички / теги', t:'text', full:1, ph:'напр. HACCP, вакуумна сушка, англійська B2', help:'Через кому. По них працює пошук згори' },
+    { k:'reason', l:'Чому в пулі', t:'select', opts:[['','—'], ...Object.entries(TP_REASON_L)] },
+    { k:'temperature', l:'«Температура»', t:'select', opts:Object.entries(TP_TEMP).map(([k,x])=>[k, x.i+' '+x.l+' — '+x.hint]) },
+    { k:'rating', l:'Оцінка', t:'select', opts:[['','—'],[1,'★☆☆☆☆'],[2,'★★☆☆☆'],[3,'★★★☆☆'],[4,'★★★★☆'],[5,'★★★★★']] },
+    { k:'status', l:'Статус', t:'select', opts:Object.entries(TP_STATUS_L) },
+    { k:'source', l:'Звідки дізнались', t:'dict', dict:'source' },
+    { k:'owner_email', l:'Відповідальний', t:'email', ph:'hr@sneco.ua' },
+    { s:'Контакти' },
+    { k:'email', l:'Email', t:'email' },
+    { k:'phone', l:'Телефон', t:'text' },
+    { k:'linkedin', l:'LinkedIn / профіль', t:'text' },
+    { k:'location', l:'Локація', t:'text', ph:'Мукачево / Гуменне / віддалено' },
+    { k:'cv_url', l:'Посилання на CV', t:'text', full:1, ph:'https://…' },
+    { s:'Звʼязок і згода' },
+    { k:'last_contact_date', l:'Останній контакт', t:'date' },
+    { k:'next_contact_date', l:'Наступний контакт', t:'date', help:'Гарячим — раз на місяць, теплим — раз на квартал, холодним — раз на пів року' },
+    { k:'consent_until', l:'Згода на зберігання даних до', t:'date', full:1, help:'До цієї дати кандидат погодився, щоб ми зберігали його резюме. Минула — продовжіть згоду або видаліть запис' },
+    { s:'Інше' },
+    { k:'expected_salary_kop', l:'Очікування по ЗП', t:'money', pay:1 },
+    { k:'currency', l:'Валюта', t:'select', opts:[['UAH','UAH ₴'],['EUR','EUR €'],['USD','USD $'],['PLN','PLN zł']], pay:1 },
+    { k:'notes', l:'Нотатки та історія контактів', t:'textarea', full:1, ph:'Чим сильний, що важливо для нього, коли готовий до змін…' },
+  ]},
   band: { title:'вилку зарплат', titleNew:'Нова вилка зарплат', icon:'💰', payrollOnly:1, fields:[
     { k:'position', l:'Посада', t:'dictfree', dict:'position', req:1, full:1 },
     { k:'department', l:'Підрозділ', t:'dict', dict:'department' },
@@ -2763,13 +3231,13 @@ const F = {
     { k:'note', l:'Коментар', t:'text', full:1 },
   ]},
 };
-const ENTITY_TABLE = { employee:'employees', candidate:'candidates', vacancy:'vacancies', band:'bands' };
+const ENTITY_TABLE = { employee:'employees', candidate:'candidates', vacancy:'vacancies', band:'bands', talent:'talent' };
 // підказки для поля-довідника: власне довідник + усе, що вже введено в записах
 const DICT_SOURCES = {
   company:      ()=>[...S.employees.map(e=>e.company), ...S.vacancies.map(v=>v.company)],
   department:   ()=>[...S.employees.map(e=>e.department), ...S.vacancies.map(v=>v.department)],
-  position:     ()=>[...S.employees.map(e=>e.position), ...S.vacancies.map(v=>v.title), ...S.candidates.map(c=>c.position)],
-  source:       ()=>[...S.employees.map(e=>e.source), ...S.candidates.map(c=>c.source), ...S.sourceCosts.map(x=>x.source)],
+  position:     ()=>[...S.employees.map(e=>e.position), ...S.vacancies.map(v=>v.title), ...S.candidates.map(c=>c.position), ...S.talent.map(t=>t.position)],
+  source:       ()=>[...S.employees.map(e=>e.source), ...S.candidates.map(c=>c.source), ...S.sourceCosts.map(x=>x.source), ...S.talent.map(t=>t.source)],
   legal_entity: ()=>S.employees.map(e=>e.legal_entity),
   work_format:  ()=>S.employees.map(e=>e.work_format),
   employment_type: ()=>S.employees.map(e=>e.employment_type),
@@ -2831,11 +3299,11 @@ function openDrawer(){ $('#drawerBack').classList.add('open'); $('#drawer').clas
 function closeDrawer(){ $('#drawerBack').classList.remove('open'); $('#drawer').classList.remove('open'); DR={entity:null,id:null,tab:0}; }
 document.addEventListener('keydown', e=>{ if (e.key==='Escape'){ if ($('#modalBack').classList.contains('open')) closeModal(); else closeDrawer(); } });
 
-function openForm(entity, id){
+function openForm(entity, id, preset){
   const cfg = F[entity];
   if (cfg.payrollOnly && !S.me.canPayroll) return toast('Немає доступу до зарплатних даних','err');
-  const src = id ? ({ employee:empById, candidate:candById, vacancy:vacById, band:i=>S.bands.find(b=>b.id===i) })[entity](id) : {};
-  DR = { entity, id: id||null, tab:0 };
+  const src = id ? ({ employee:empById, candidate:candById, vacancy:vacById, band:i=>S.bands.find(b=>b.id===i), talent:talentById })[entity](id) : {};
+  DR = { entity, id: id||null, tab:0, preset: preset||null };
   $('#drTitle').textContent = id ? ('Редагувати '+cfg.title) : (cfg.titleNew || ('Новий '+cfg.title));
   $('#drSub').textContent = id ? (src.full_name || src.title || src.position || '') : cfg.icon + ' Заповніть поля та збережіть';
   $('#drTabs').innerHTML = '';
@@ -2844,7 +3312,9 @@ function openForm(entity, id){
     candidate:{ stage:'new', first_contact_date:todayISO(), currency:'UAH' },
     vacancy:{ status:'open', open_date:todayISO(), priority:'normal', headcount:1, currency:'UAH' },
     band:{ currency:'UAH' },
+    talent:{ temperature:'warm', status:'active', currency:'UAH', last_contact_date:todayISO(), next_contact_date:isoAdd(todayISO(), TP_TEMP.warm.days) },
   })[entity];
+  if (!id && preset) Object.assign(defaults, preset);
   $('#drBody').innerHTML = `<div class="fgrid">${cfg.fields.filter(f=>!(f.pay && !S.me.canPayroll)).map(f=>fieldHtml(f, defaults[f.k])).join('')}</div>`
     + (entity==='candidate' ? `<div class="sec" style="margin-top:22px">Файли · резюме, тестові, скани</div>
         <div id="cfFormBox"></div>` : '');
@@ -2860,6 +3330,8 @@ function openForm(entity, id){
 }
 async function saveForm(entity, id){
   const data = readForm(entity);
+  // звʼязок із відбором, з якого людину додали в пул (у формі поля немає)
+  if (entity==='talent' && !id && DR.preset && DR.preset.candidate_id) data.candidate_id = DR.preset.candidate_id;
   $$('#drBody .ferr').forEach(e=>e.textContent='');
   $$('#drBody .err').forEach(e=>e.classList.remove('err'));
   // клієнтська перевірка обовʼязкових — щоб не створювати картки без ПІБ/дати/джерела
@@ -2879,6 +3351,11 @@ async function saveForm(entity, id){
       if (entity==='employee') openEmployee(id);
       else if (entity==='candidate') openCandidate(id);
       else if (entity==='vacancy') openVacancy(id);
+      else if (entity==='talent') openTalent(id);
+    } else if (entity==='talent') {
+      S.candView = 'pool'; go('candidates');
+      const newId = r.id || r.row?.id;
+      if (newId) openTalent(newId);
     } else if (entity==='candidate') {
       // Файли, обрані ДО збереження: кандидата ще не існувало, прикріпити не було до чого.
       // Тепер id є — доливаємо чергу і одразу відкриваємо картку, щоб було видно результат.
@@ -2891,6 +3368,10 @@ async function saveForm(entity, id){
       } else { cfQueue = []; go('candidates'); }
     }
   } catch(e){
+    if (entity==='talent' && e.error==='duplicate' && e.id){
+      closeDrawer(); await reload(); openTalent(e.id);
+      return toast('Ця людина вже в Talent pool — відкрив наявний запис','ok');
+    }
     if (e.error==='validation_failed' && e.fields){
       const MSG = { required:'обовʼязкове поле', bad_date:'невірна дата', bad_period:'невірний місяць', bad_enum:'оберіть зі списку',
         not_a_number:'має бути число', negative:'не може бути відʼємним', before_hire_date:'раніше дати прийняття',
@@ -3083,6 +3564,7 @@ function openCandidate(id){
   }).catch(()=>{ const el=$('#candEvents'); if(el) el.innerHTML = ph('Не вдалося завантажити'); });
   $('#drFoot').innerHTML = `<button class="btn btn-danger" onclick="delEntity('candidate',${id},'кандидата')">🗑</button>
     <span class="sp"></span>
+    ${c.stage!=='hired' ? `<button class="btn" onclick="addToPool(${id})" title="${S.talent.some(t=>t.candidate_id===id)?'Відкрити запис у пулі':'Зберегти в резерв на майбутні вакансії'}">💎 ${S.talent.some(t=>t.candidate_id===id)?'У пулі':'У Talent pool'}</button>`:''}
     ${c.stage!=='hired' ? `<button class="btn btn-y" onclick="offerHire(candById(${id}))">✅ Оформити</button>`:''}
     <button class="btn btn-primary" onclick="openForm('candidate',${id})">✏️ Редагувати</button>`;
   openDrawer();
@@ -3176,16 +3658,24 @@ function offerHire(c){
    перемагав null, moveStage читав його як «користувач скасував» і виходив,
    мовчки і без помилки. Тепер результат фіксується прапорцем done: що б не
    викликало закриття, значення вже віддане, і onClose нічого не перезапише. */
-function askReason(title){
+// poolDefault: null — не показувати галочку (уже в пулі); true/false — показати, відмічена чи ні.
+// Вибір галочки читається після await з askReason.pool.
+function askReason(title, poolDefault){
+  askReason.pool = false;
   return new Promise(res=>{
     let done = false;
-    const finish = v => { if (done) return; done = true; res(v); };
+    const finish = v => { if (done) return; done = true; if (v === null) askReason.pool = false; res(v); };
+    const readPool = ()=>{ askReason.pool = !!$('#rrPool')?.checked; };
     const list = dictOf('reject_reason');
     modal(title, `<div class="fld"><label>Причина</label>
       <select id="rrS">${list.map(r=>`<option>${esc(r)}</option>`).join('')}</select></div>
-      <div class="fld" style="margin-top:10px"><label>Уточнення (необовʼязково)</label><input id="rrN" placeholder="деталі"></div>`, [
-      { l:'Пропустити', cls:'btn', fn:()=>{ finish(''); closeModal(); } },
+      <div class="fld" style="margin-top:10px"><label>Уточнення (необовʼязково)</label><input id="rrN" placeholder="деталі"></div>
+      ${poolDefault===null || poolDefault===undefined ? '' : `<label style="display:flex;gap:8px;align-items:flex-start;margin-top:12px;font-size:12.5px;cursor:pointer;line-height:1.4">
+        <input type="checkbox" id="rrPool"${poolDefault?' checked':''} style="margin-top:2px">
+        <span>💎 <strong>Додати в Talent pool</strong><br><span class="muted">сильний кандидат — повернемось, коли буде відповідна вакансія</span></span></label>`}`, [
+      { l:'Пропустити', cls:'btn', fn:()=>{ readPool(); finish(''); closeModal(); } },
       { l:'Зберегти', cls:'btn btn-primary', fn:()=>{
+          readPool();
           const v = $('#rrS').value + ($('#rrN').value ? ' — ' + $('#rrN').value : '');
           finish(v); closeModal();
         } },
@@ -3249,6 +3739,14 @@ function exportCSV(what){
       if (pay) r.push((c.expected_salary_kop||0)/100, c.currency||'');
       return r;
     }));
+  } else if (what==='talent'){
+    const h = ['ПІБ','Роль','Підрозділ','Навички','Чому в пулі','Температура','Оцінка','Статус','Звідки дізнались','Email','Телефон','LinkedIn','Локація','Останній контакт','Наступний контакт','Згода до','Відповідальний','Нотатки'];
+    if (pay) h.push('Очікування ЗП','Валюта');
+    downloadCSV('talent_pool', h, fTalent().map(t=>{
+      const r = [t.full_name, t.position||'', t.department||'', t.skills||'', TP_REASON_L[t.reason]||'', TP_TEMP[t.temperature||'warm'].l, t.rating||'', TP_STATUS_L[t.status]||t.status||'', t.source||'', t.email||'', t.phone||'', t.linkedin||'', t.location||'', t.last_contact_date||'', t.next_contact_date||'', t.consent_until||'', t.owner_email||'', t.notes||''];
+      if (pay) r.push(t.expected_salary_kop ? t.expected_salary_kop/100 : '', t.currency||'');
+      return r;
+    }));
   } else if (what==='vacancies'){
     downloadCSV('vacancies', ['Посада','Підрозділ','Компанія','Керівник','Позицій','Пріоритет','Відкрито','План закриття','Закрито','Днів відкрито','Статус','Джерело','Кандидатів','Співбесід','Оферів','Найнято'],
       fVacancies().map(v=>{ const p=vacPipeline(v); return [v.title, v.department||'', v.company||'', v.manager||'', v.headcount||1, PRIORITY_L[v.priority]||'', v.open_date||'', v.target_date||'', v.close_date||'', daysBetween(v.open_date, v.close_date||todayISO())??'', VAC_STATUS_L[v.status]||v.status, v.source||'', p.cands, p.interviews, p.offers, p.hired]; }));
@@ -3304,8 +3802,24 @@ const IMPORT_MAP = {
     { k:'first_contact_date', l:'Перший контакт', aliases:['контакт','дата відгуку','first contact'] },
     { k:'notes', l:'Нотатки', aliases:['нотатки','коментар'] },
   ],
+  // порядок важливий: «наступний контакт» стоїть раніше за «останній», інакше вгадування по входженню переплутає їх
+  talent: [
+    { k:'full_name', l:'ПІБ *', aliases:['піб','ім\'я','name','кандидат','людина'] },
+    { k:'position', l:'Роль', aliases:['роль','посада','position','вакансія'] },
+    { k:'department', l:'Підрозділ', aliases:['підрозділ','відділ','department'] },
+    { k:'skills', l:'Навички', aliases:['навички','skills','теги','компетенції'] },
+    { k:'source', l:'Джерело', aliases:['джерело','канал','source'] },
+    { k:'email', l:'Email', aliases:['email','пошта'] },
+    { k:'phone', l:'Телефон', aliases:['телефон','phone'] },
+    { k:'linkedin', l:'LinkedIn', aliases:['linkedin','профіль'] },
+    { k:'next_contact_date', l:'Наступний контакт', aliases:['наступний контакт','наступний','next contact','нагадати'] },
+    { k:'last_contact_date', l:'Останній контакт', aliases:['останній контакт','останній','last contact','дата контакту'] },
+    { k:'consent_until', l:'Згода до', aliases:['згода','consent'] },
+    { k:'notes', l:'Нотатки', aliases:['нотатки','коментар','notes'] },
+  ],
 };
 let IMP = { entity:null, rows:[], headers:[] };
+const IMPORT_DATE_F = ['birth_date','hire_date','probation_end','termination_date','first_contact_date','last_contact_date','next_contact_date','consent_until'];
 function openImport(entity){
   IMP = { entity, rows:[], headers:[] };
   const flds = IMPORT_MAP[entity].filter(f=>!f.pay || S.me.canPayroll);
@@ -3331,6 +3845,8 @@ function downloadTemplate(entity){
   const flds = IMPORT_MAP[entity].filter(f=>!f.pay || S.me.canPayroll);
   const sample = entity==='employee'
     ? ['Петренко Іван','SN-001','Оператор лінії','Виробництво','snEco','','Офіс','Повна зайнятість','Трудовий договір','ivan@sneco.ua','+380671234567','15.04.1990','01.03.2024','01.06.2024','active','25000','0','UAH','','','Work.ua','']
+    : entity==='talent'
+    ? ['Шевчук Андрій','Технолог','Виробництво','HACCP, вакуумна сушка','LinkedIn','a.shevchuk@mail.com','+380671112233','','01.12.2026','01.09.2026','01.09.2027','Фіналіст на технолога, серпень 2026']
     : ['Ковальчук Олена','Маркетолог','LinkedIn','new','olena@mail.com','+380501234567','05.08.2026',''];
   downloadCSV('template_'+entity, flds.map(f=>f.l.replace(' 🔒','')), [sample.slice(0, flds.length)]);
 }
@@ -3397,7 +3913,7 @@ function renderImportStep2(){
 function buildImportRows(){
   const map = {};
   $$('.imp-map').forEach(s=>{ if (s.value) map[+s.dataset.i] = s.value; });
-  const DATE_F = ['birth_date','hire_date','probation_end','termination_date','first_contact_date'];
+  const DATE_F = IMPORT_DATE_F;
   const MONEY_F = ['salary_kop','bonus_kop'];
   return IMP.rows.map(r=>{
     const o = {};
@@ -3424,8 +3940,11 @@ function previewImport(){
   } else if (IMP.entity==='candidate'){
     const names = new Set(S.candidates.map(c=>norm(c.full_name)));
     dup = rows.filter(r=>names.has(norm(r.full_name))).length;
+  } else if (IMP.entity==='talent'){
+    const names = new Set(S.talent.map(t=>norm(t.full_name)));
+    dup = rows.filter(r=>names.has(norm(r.full_name))).length;
   }
-  const bad = rows.filter(r=>Object.entries(r).some(([k,v])=>['birth_date','hire_date','probation_end','termination_date','first_contact_date'].includes(k) && v && !/^\d{4}-\d{2}-\d{2}$/.test(v)));
+  const bad = rows.filter(r=>Object.entries(r).some(([k,v])=>IMPORT_DATE_F.includes(k) && v && !/^\d{4}-\d{2}-\d{2}$/.test(v)));
   $('#impPreview').innerHTML = `
     <div class="hint ${bad.length?'warn':'info'}">
       Готово до імпорту: <strong>${rows.length}</strong> ${rows.length===1?'запис':'записів'}.
@@ -3536,7 +4055,7 @@ function go(tab){
   S.tab = tab;
   $$('.tabbtn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
   $$('.tabpane').forEach(p=>p.classList.toggle('active', p.id==='pane-'+tab));
-  location.hash = tab;
+  location.hash = (tab==='candidates' && S.candView==='pool') ? 'talent' : tab;
   renderAll();
   window.scrollTo({ top:0, behavior:'smooth' });
 }
@@ -3549,6 +4068,7 @@ async function reload(){
   (d.dict||[]).forEach(x=>{ (S.dict[x.kind] = S.dict[x.kind]||[]).push(x); });
   S.employees = d.employees||[]; S.vacancies = d.vacancies||[]; S.candidates = d.candidates||[];
   S.payroll = d.payroll||[]; S.plans = d.plans||[]; S.bands = d.bands||[]; S.sourceCosts = d.source_costs||[];
+  S.talent = d.talent||[]; S.talentReady = d.talent_ready === true;
   loadFx();
   syncFilterOptions();
   renderAll();
@@ -3595,6 +4115,9 @@ window.bootHR = async function(token, email){
   $('#kbVacFilter').onchange = renderCandidates;
   $('#kbSrcFilter').onchange = renderCandidates;
   $('#kbShowClosed').onchange = renderCandidates;
+  $('#tpStatus').onchange = ()=>{ S.tpVac = null; renderTalent(); };
+  $('#tpTemp').onchange = renderTalent;
+  $('#tpReason').onchange = renderTalent;
   $('#payCurrency').onchange = ()=>{ S.payCur = $('#payCurrency').value; renderPayroll(); };
   $('#btnEmpView').onclick = ()=>{
     S.empView = S.empView==='table' ? 'cards' : 'table';
@@ -3605,7 +4128,8 @@ window.bootHR = async function(token, email){
   try {
     await reload();
     const h = (location.hash||'').replace('#','');
-    if (['overview','candidates','channels','vacancies','employees','payroll','turnover','guide'].includes(h)) go(h);
+    if (h==='talent'){ S.candView = 'pool'; go('candidates'); }
+    else if (['overview','candidates','channels','vacancies','employees','payroll','turnover','guide'].includes(h)) go(h);
   } catch(e){
     toast(apiErr(e), 'err');
     $('#kpiRow').innerHTML = `<div class="cc" style="grid-column:1/-1"><div class="empty"><div class="e-ic">⚠️</div>
