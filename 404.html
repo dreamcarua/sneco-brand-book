@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>snEco Brand Bible</title>
+<script>
+/* 30.09.2026: документи (documents/, strategy/) живуть у закритому сховищі R2, а не в
+   GitHub Pages. Пряме посилання на них веде сюди — передаємо шлях у Brand Bible,
+   яка попросить увійти і відкриє файл. Інші адреси — звичайне «не знайдено». */
+(function () {
+  var p = location.pathname.replace(/^\/+/, '');
+  try { p = decodeURIComponent(p); } catch (e) {}
+  if (/^(documents|strategy)\//.test(p)) {
+    location.replace('/?doc=' + encodeURIComponent(p));
+  }
+})();
+</script>
+<style>
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#1E1E1E;color:#fff;font-family:Arial,sans-serif;text-align:center;padding:16px}
+a{color:#FCC01B}
+</style>
+</head>
+<body>
+<div>
+<h1 style="font-size:28px;margin:0 0 12px">404</h1>
+<p>Сторінку не знайдено · Page not found · Stránka sa nenašla</p>
+<p><a href="/">snEco Brand Bible</a></p>
+</div>
+</body>
+</html>

@@ -15723,6 +15723,30 @@ FINAL: 🟢 Go to limited launch Q4 2026 (~5K units initial run).</pre>
     docOpen(rel, window.open('', '_blank'));
   });
 
+  // 30.09.2026: прямі посилання brand.sneco.ua/documents/… Файлів у Pages немає
+  // (вони в R2), тож 404.html перекидає сюди з ?doc=<шлях>. Відкриваємо документ
+  // у ЦІЙ вкладці: без сесії — форма входу, після входу — підписана URL.
+  (function docDeepLink() {
+    let rel = '';
+    try { rel = new URLSearchParams(location.search).get('doc') || ''; } catch (e) {}
+    rel = rel.replace(/^\/+/, '');
+    if (!rel || !/^(documents|strategy)\//.test(rel) || /(^|\/)\.\.(\/|$)/.test(rel)) return;
+    const sameTab = { set location(u) { window.location.href = u; }, close() {} };
+    const go = () => {
+      const sess = snAuth.anySession && snAuth.anySession();
+      if (!sess) {
+        const card = docModal('');
+        mountOtpForm(card, 'documents', () => {
+          document.getElementById('doc-gate-modal')?.remove();
+          docOpen(rel, sameTab);
+        });
+        return;
+      }
+      docOpen(rel, sameTab);
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else setTimeout(go, 0);
+  })();
+
   // v2.78.50: Admin-only mode — show pre-built proposal previews for vg/fg
   function snAuthApplyAdminClass() {
     try {
