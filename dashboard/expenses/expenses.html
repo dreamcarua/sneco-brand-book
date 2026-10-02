@@ -99,6 +99,102 @@ tbody tr:hover{background:#FFFBEF}
   border-radius:8px;padding:10px 13px;margin-bottom:12px}
 .loader{padding:60px;text-align:center;color:var(--muted)}
 @media(max-width:640px){.wrap{padding:12px}.bar{position:static}}
+/* ── v1.1 (02.10.2026): база мереж, коментарі, пороги ── */
+:root{--ease-out:cubic-bezier(.23,1,.32,1);--ease-drawer:cubic-bezier(.32,.72,0,1)}
+/* ⚠ Бейдж сесії мав z-index 10000 і накривав кнопки панелей — тримаємо нижче за панель (900). */
+.dashauth-session{z-index:800}
+/* Бейдж сесії висить у правому куті шапки й накривав напис «дані на…» — лишаємо йому місце. */
+.topbar{padding-right:230px}
+@media(max-width:640px){.topbar{padding-right:20px}#gen{display:none}}
+.btn{font:inherit;font-size:12.5px;font-weight:700;padding:7px 12px;border-radius:7px;border:1.5px solid var(--line);
+  background:#fff;cursor:pointer;color:var(--dark);white-space:nowrap;
+  transition:transform 140ms var(--ease-out),background-color 140ms ease,border-color 140ms ease}
+.btn:active{transform:scale(.97)}
+.btn.pri{background:var(--dark);color:#fff;border-color:var(--dark)}
+.btn.yel{background:var(--yel);border-color:var(--yel)}
+.btn.sm{padding:4px 9px;font-size:11.5px}
+.btn.danger{color:var(--red)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:focus-visible,.chip:focus-visible,.rowlink:focus-visible{outline:2px solid var(--yel);outline-offset:2px}
+@media(hover:hover) and (pointer:fine){.btn:hover{border-color:#b9b9ae}.btn.pri:hover{background:#000}.chip:hover{border-color:#b9b9ae}}
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 10px}
+.chip{font:inherit;font-size:12px;font-weight:600;padding:4px 10px;border-radius:14px;border:1.5px solid var(--line);
+  background:#fff;cursor:pointer;color:#555;transition:transform 140ms var(--ease-out),border-color 140ms ease}
+.chip:active{transform:scale(.97)}
+.chip.on{background:var(--dark);color:#fff;border-color:var(--dark)}
+.chip .n{opacity:.7;margin-left:4px;font-variant-numeric:tabular-nums}
+.sp{flex:1}
+.cmt{max-width:260px;font-size:12px;line-height:1.4;color:#444}
+.cmt .d{color:var(--muted);font-size:11px}
+.cmt-btn{font:inherit;font-size:11.5px;font-weight:700;border:1.5px solid var(--line);background:#fff;border-radius:6px;
+  padding:3px 8px;cursor:pointer;white-space:nowrap;transition:transform 140ms var(--ease-out)}
+.cmt-btn:active{transform:scale(.97)}
+.cmt-btn.has{background:#FFF7DB;border-color:#F2D675}
+.delta{font-size:11.5px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.delta .up{color:#B45309}.delta .dn{color:#3F6212}.delta .bad{color:var(--red)}.delta .mut{color:var(--muted)}
+.rowlink{cursor:pointer}
+.netname{font-weight:700}
+.sub{font-size:11.5px;color:var(--muted)}
+.pipe{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px;margin-bottom:12px}
+.pipe button{font:inherit;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:9px;padding:9px 11px;cursor:pointer;
+  transition:transform 140ms var(--ease-out),border-color 140ms ease}
+.pipe button:active{transform:scale(.98)}
+.pipe button.on{border-color:var(--dark);box-shadow:inset 0 -3px 0 var(--yel)}
+.pipe b{display:block;font-size:19px;letter-spacing:-.4px}
+.pipe span{font-size:11px;color:var(--muted)}
+.meter{height:5px;background:#EFEFE8;border-radius:3px;overflow:hidden;width:64px;display:inline-block;vertical-align:middle;margin-right:6px}
+.meter i{display:block;height:100%;background:var(--grn)}
+.meter i.amb{background:var(--amb)}.meter i.red{background:var(--red)}
+/* панель */
+.drawer-back{position:fixed;inset:0;background:rgba(20,20,20,.38);z-index:900;opacity:0;pointer-events:none;transition:opacity 180ms ease}
+.drawer-back.open{opacity:1;pointer-events:auto}
+/* Закривається швидше (200 мс), ніж відкривається (280 мс): система має відповідати жвавіше, ніж людина вирішує. */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(600px,100vw);background:#fff;z-index:901;display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform 200ms var(--ease-drawer),visibility 0s linear 200ms;box-shadow:-14px 0 44px rgba(0,0,0,.18);visibility:hidden}
+.drawer.open{transform:translateX(0);transition:transform 280ms var(--ease-drawer),visibility 0s;visibility:visible}
+.dr-h{padding:16px 20px 12px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:flex-start}
+.dr-h h3{margin:0;font-size:16px;line-height:1.3}
+.dr-x{margin-left:auto;font:inherit;font-size:20px;line-height:1;background:none;border:0;cursor:pointer;color:#888;padding:2px 6px}
+.dr-tabs{display:flex;gap:2px;padding:0 14px;border-bottom:1px solid var(--line);overflow-x:auto}
+.dr-tabs button{font:inherit;font-size:12.5px;font-weight:600;background:none;border:0;padding:10px 9px;cursor:pointer;color:var(--muted);
+  border-bottom:3px solid transparent;white-space:nowrap}
+.dr-tabs button.on{color:var(--dark);border-bottom-color:var(--yel)}
+.dr-b{flex:1;overflow:auto;padding:16px 20px 28px}
+.dr-f{padding:12px 20px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;background:#FAFAF7}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+.fg .full{grid-column:1/-1}
+.f{display:block}
+.f>span{display:block;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.f input,.f select,.f textarea{width:100%;font:inherit;font-size:13.5px;padding:8px 10px;border:1.5px solid var(--line);border-radius:7px;background:#fff}
+.f textarea{min-height:74px;resize:vertical;line-height:1.45}
+.f input:focus,.f select:focus,.f textarea:focus{outline:2px solid var(--yel);outline-offset:1px}
+.checks{display:flex;flex-wrap:wrap;gap:6px}
+.checks label{font-size:12px;border:1.5px solid var(--line);border-radius:14px;padding:4px 10px;cursor:pointer;user-select:none}
+.checks input{position:absolute;opacity:0;pointer-events:none}
+.checks label:has(input:checked){background:var(--dark);color:#fff;border-color:var(--dark)}
+.sec{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:20px 0 8px}
+.sec:first-child{margin-top:0}
+.tl{border-left:2px solid var(--line);margin-left:6px;padding-left:14px}
+.tl-i{position:relative;padding:0 0 14px}
+.tl-i:before{content:'';position:absolute;left:-20px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--yel);border:2px solid #fff}
+.tl-m{font-size:11.5px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tl-t{font-size:13.5px;line-height:1.5;margin:3px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.tl-n{font-size:12.5px;background:#FFFDF6;border:1px solid #F2E6C4;border-radius:6px;padding:5px 9px;margin-top:4px}
+.linkbtn{font:inherit;font-size:11.5px;background:none;border:0;padding:0;color:#666;text-decoration:underline;cursor:pointer}
+.linkbtn.danger{color:var(--red)}
+.box{background:#FAFAF7;border:1px solid var(--line);border-radius:9px;padding:12px 14px;margin-bottom:12px}
+.crow{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid #F1F1EC}
+.crow:last-child{border-bottom:0}
+.miss{font-size:12px;color:#92400E;background:#FEF3C7;border-radius:6px;padding:6px 10px;margin-bottom:12px;line-height:1.5}
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,14px);opacity:0;background:var(--dark);color:#fff;font-size:13px;
+  padding:10px 16px;border-radius:9px;z-index:950;pointer-events:none;transition:transform 200ms var(--ease-out),opacity 200ms ease;max-width:90vw}
+.toast.show{transform:translate(-50%,0);opacity:1}
+.toast.err{background:#991B1B}
+.help h3{font-size:14px;margin:22px 0 8px}
+.help p,.help li{font-size:13px;line-height:1.65}
+.help table td,.help table th{vertical-align:top}
+@media(max-width:640px){.fg{grid-template-columns:1fr}.cmt{max-width:170px}}
+@media(prefers-reduced-motion:reduce){.drawer,.toast,.btn,.chip,.cmt-btn,.pipe button{transition:none}}
 </style>
 </head>
 <body class="dash-locked">
@@ -127,6 +223,10 @@ tbody tr:hover{background:#FFFBEF}
 <div class="wrap" id="root">
   <div class="loader">Завантажуємо…</div>
 </div>
+
+<div class="drawer-back" id="drawerBack"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Деталі"></aside>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="../auth-google.js"></script>
 <script>
@@ -161,7 +261,7 @@ tbody tr:hover{background:#FFFBEF}
     stage.innerHTML=`
       <div class="dashauth-icon">💸</div>
       <div class="dashauth-h1">Витрати та окупність</div>
-      <div class="dashauth-desc">Структура витрат, окупність трейд-маркетингу по контрагентах і сигнали аномалій. Google або email-код. Сесія 30 днів.</div>
+      <div class="dashauth-desc">Окупність трейд-маркетингу, база мереж із журналом контактів і сигнали. Google або email-код. Сесія 30 днів.</div>
       <div id="gsi" style="display:flex;justify-content:center;margin:18px 0 8px"></div>
       <div style="font-size:11px;color:#777;text-align:center;margin:8px 0 4px">— або через email-код —</div>
       <input class="dashauth-input" type="email" id="auth-em" placeholder="ім'я@sneco.ua" autocomplete="email">
@@ -274,30 +374,6 @@ function renderAnomalies(){
         <div class="an-d">${esc(x.detail)}</div>
       </div>
     </div>`).join('');
-}
-
-// ── окупність трейд-маркетингу ────────────────────────────────────────────
-function renderPayback(){
-  const rows=(D.payback||[]).filter(r=>r.spend>0);
-  if(!rows.length) return '<div class="card empty">Немає даних.</div>';
-  const body=rows.map(r=>{
-    const s=r.share_gross;
-    const cls=s==null?'gry':s>=.5?'red':s>=.25?'amb':'grn';
-    const w=Math.min(100,Math.round((s||0)*100));
-    return `<tr>
-      <td>${esc(r.name)} ${r.kind==='vendor'?'<span class="tag t-gry">медіа</span>':''}</td>
-      <td class="num">${nf(r.spend)}</td>
-      <td class="num">${nf(r.gross)}</td>
-      <td class="num"><b class="tag t-${cls}">${pct(s)}</b></td>
-      <td style="width:90px"><div class="bar-mini"><i class="${cls==='grn'?'':cls}" style="width:${w}%"></i></div></td>
-      <td class="num" style="color:${r.net<0?'var(--red)':'inherit'}">${nf(r.net)}</td>
-    </tr>`;}).join('');
-  return `<div class="scroll"><table>
-    <thead><tr><th>Контрагент</th><th class="num">Маркетинг</th><th class="num">Валовий прибуток</th>
-      <th class="num">Частка</th><th></th><th class="num">Лишається нам</th></tr></thead>
-    <tbody>${body}</tbody></table></div>
-    <div class="note">Валовий прибуток — сировина плюс техоперації, без оренди, зарплат, логістики й маркетингу.
-      Тому рядок, де частка близька до 100%, означає роботу в мінус.</div>`;
 }
 
 // ── калькулятор акції ─────────────────────────────────────────────────────
@@ -483,13 +559,14 @@ function renderVendors(){
       <tbody>${body}</tbody></table></div>`;
 }
 
-function tabBody(){
+function tabMain(){
   // Одна сторінка: спершу те, що потребує рішення, далі — цифри, на яких
   // це рішення ґрунтується. Перемикати вкладки тут не було чого.
   return `
     <h2>⚠ Що потребує уваги <span class="cnt">${(D.anomalies||[]).length}</span></h2>
     <div class="lead">Сигнали, які варто перевірити. Червоні — гроші, що майже не повертаються.
       Про нові з них щоранку приходить Telegram; повторно про те саме не турбуємо.</div>
+    ${renderBaseAttention()}
     ${renderAnomalies()}
 
     <h2 style="margin-top:40px">🔻 Окупність трейд-маркетингу <span class="cnt">рік ${D.current_month.slice(0,4)}</span></h2>
@@ -497,6 +574,11 @@ function tabBody(){
       акції. Це не рекламний бюджет, а знижка постфактум конкретному покупцю. Тому міряємо
       не відсотком від виручки, а часткою <b>валового прибутку</b>, який повертається назад.</div>
     ${renderPayback()}
+
+    <h2 style="margin-top:40px">📊 Динаміка до попереднього місяця <span class="cnt">${D.mom?mUA(D.mom.m1)+' до '+mUA(D.mom.m0):'скоро'}</span></h2>
+    <div class="lead">Як змінились виплати мережам і валовий прибуток цих клієнтів. Добре, коли вони ростуть разом;
+      погано, коли маркетинг росте, а прибуток стоїть або падає.</div>
+    ${renderMom()}
 
     <h2 style="margin-top:40px">🧮 Калькулятор акції <span class="cnt">перед перемовинами</span></h2>
     <div class="lead">Партнер просить знижку — питання завжди одне: наскільки має вирости обсяг,
@@ -519,6 +601,8 @@ function draw(){
   const red=(D.anomalies||[]).filter(a=>a.severity==='red').length;
   const amb=(D.anomalies||[]).filter(a=>a.severity==='amber').length;
   const worst=(D.payback||[]).filter(r=>r.share_gross!=null)[0];
+  const worstCls=worst?pbClass(worst.spend,worst.gross,worst.share_gross,worst.kind,netOfCp(worst.id)):'grn';
+  const attn=liveNets().filter(n=>netFlags(n).some(f=>f!=='incomplete')).length;
 
   document.getElementById('root').innerHTML=`
     <div class="bar">
@@ -536,12 +620,18 @@ function draw(){
         <div class="kpi-s">${total?(mkSum/total*100).toFixed(1):0}% усіх витрат</div></div>
       <div class="kpi ${red?'red':amb?'amb':'grn'}"><div class="kpi-l">Сигнали</div>
         <div class="kpi-v">${red} 🔴 ${amb} 🟡</div><div class="kpi-s">потребують рішення</div></div>
-      <div class="kpi ${worst&&worst.share_gross>=.5?'red':'amb'}"><div class="kpi-l">Найгірша окупність</div>
+      <div class="kpi ${worstCls==='red'?'red':worstCls==='amb'?'amb':'grn'}"><div class="kpi-l">Найгірша окупність</div>
         <div class="kpi-v">${worst?pct(worst.share_gross):'—'}</div>
         <div class="kpi-s">${worst?esc(worst.name).slice(0,28):''}</div></div>
     </div>
 
-    ${tabBody()}
+    <div class="tabs">
+      <button class="${TAB==='main'?'on':''}" data-act="tab" data-v="main">Окупність і сигнали</button>
+      <button class="${TAB==='nets'?'on':''}" data-act="tab" data-v="nets">База мереж${T?`<span class="n">${liveNets().length}</span>`:''}${attn?`<span class="n" style="background:#FEE2E2;color:#991B1B">${attn} ⚠</span>`:''}</button>
+      <button class="${TAB==='help'?'on':''}" data-act="tab" data-v="help">Довідка</button>
+    </div>
+
+    ${TAB==='nets'?tabNetworks():TAB==='help'?tabHelp():tabMain()}
   `;
   const sel=document.getElementById('per');
   sel.value=PERIOD;
@@ -549,8 +639,723 @@ function draw(){
   document.getElementById('perHint').textContent = ms.length?`${ms[0]} — ${ms[ms.length-1]}`:'';
   document.getElementById('gen').textContent='дані на '+D.generated;
   // Калькулятор перемальовується разом із рештою, тож слухачі вішаємо щоразу.
-  pcBind();
+  if(TAB==='main') pcBind();
 }
+
+// ══════════════════════════════════════════════════════════════════════════
+//  v1.1 (02.10.2026) · Трейд-маркетинг: коментарі, «База мереж», пороги
+//  API: sneco-auth/src/trade.js (/api/trade/*). Журнал спільний із Customer 360.
+//  ⚠ Будь-яка зміна тут — оновити вкладку «Довідка» (tabHelp) і EXP_VERSION.
+// ══════════════════════════════════════════════════════════════════════════
+const EXP_VERSION='1.1.0', EXP_UPDATED='02.10.2026';
+let T=null, T_ERR=null, TAB='main', PB_MODE='cp', PB_FILTER='all';
+const NETF={q:'',stage:'',flag:'',arch:false};
+const DR={kind:null};
+
+const STAGE_UA={prospect:'Потенційна',contacted:'Перший контакт',negotiation:'Переговори',agreed:'Домовленість',active:'Діє',paused:'На паузі',declined:'Відмова'};
+const STAGE_CLS={prospect:'gry',contacted:'gry',negotiation:'amb',agreed:'grn',active:'grn',paused:'gry',declined:'red'};
+const STAGE_HINT={prospect:'ще не контактували',contacted:'є контакт, чекаємо відповіді',negotiation:'обговорюємо умови',agreed:'умови погоджено, ще не стартували',active:'трейд-маркетинг працює',paused:'призупинено',declined:'відмовили або відмовились'};
+const SEG_UA={national_retail:'Національна роздрібна мережа',regional_retail:'Регіональна мережа',fuel:'АЗС',alcomarket:'Алкомаркет',specialty:'Спеціалізована мережа',horeca:'HoReCa',ecom:'Онлайн',distributor:'Дистриб’ютор',other:'Інше'};
+const TMT_UA={retro_bonus:'Ретро-бонус',listing_fee:'Плата за введення',shelf:'Полиця / додаткова викладка',promo:'Промоакція / знижка',catalog:'Каталог / газета',tasting:'Дегустація',branding:'Брендування / POS',logistics_bonus:'Логістичний бонус',other:'Інше'};
+const MISS_UA={contact:'контакт (ім’я + телефон або пошта)',segment:'формат мережі',owner:'відповідальний',next_step:'наступний крок із датою',tm_types:'види трейд-маркетингу',tm_terms:'умови домовленості',cp_link:'прив’язка до контрагента в МойСкладі',decline_reason:'причина відмови'};
+const NOTE_TYPES=['📞 Дзвінок','✉ Email','🤝 Зустріч','💬 Месенджер','📑 Домовленість','📝 Нотатка'];
+const MN_S=['січ','лют','бер','кві','тра','чер','лип','сер','вер','жов','лис','гру'];
+
+const $=id=>document.getElementById(id);
+// Дати — лише рядками YYYY-MM-DD. ⚠ Жодних new Date(...).toISOString(): у Києві це зсуває добу назад.
+const dUA=s=>(s&&/^\d{4}-\d{2}-\d{2}/.test(s))?s.slice(8,10)+'.'+s.slice(5,7)+'.'+s.slice(0,4):'—';
+const mUA=m=>m?MN_S[+m.slice(5,7)-1]+' '+m.slice(0,4):'';
+const today=()=>T?T.today:'';
+const ST=()=>T?T.settings:{payback_amber:.2,payback_red:.25,stale_warn_days:10,stale_red_days:14,mom_pct:.3,mom_min_uah:3000};
+const p0=x=>(x*100).toFixed(0)+'%';
+
+function toast(msg,err){
+  const t=$('toast'); t.textContent=msg; t.className='toast show'+(err?' err':'');
+  clearTimeout(toast._t); toast._t=setTimeout(()=>{t.className='toast'+(err?' err':'');},err?5000:2400);
+}
+const ERR_UA={not_ready:'База ще не розгорнута на сервері.',cp_already_linked:'Цей контрагент уже прив’язаний до іншої мережі',
+  not_author:'Змінювати чужий запис може лише автор або адміністратор.',admin_only:'Це може змінити лише адміністратор.',
+  name_required:'Вкажіть назву мережі.',summary_required:'Напишіть текст запису.',full_name_required:'Вкажіть ім’я контакту.',
+  bad_email:'Перевірте адресу пошти.',note_date_in_future:'Дата запису не може бути в майбутньому.',
+  red_must_exceed_amber:'Червоний поріг має бути вищим за жовтий.',stale_red_before_warn:'«Прострочено» не може наставати раніше за «нагадати».',
+  rate_limited:'Забагато змін за годину. Спробуйте трохи згодом.',unauthorized:'Сесія застаріла — оновіть сторінку.'};
+async function api(path,body){
+  const r=await fetch(WORKER+path,{method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+window.__exp.token},body:JSON.stringify(body||{})});
+  let j={}; try{j=await r.json();}catch(e){}
+  if(!r.ok||j.error){const e=new Error(ERR_UA[j.error]||j.error||('HTTP '+r.status));e.code=j.error;e.data=j;throw e;}
+  return j;
+}
+async function loadTrade(){
+  try{
+    T=await api('/api/trade/bootstrap',{cp_ids:(D.payback||[]).map(r=>r.id)});
+    T_ERR=null;
+  }catch(e){ T=null; T_ERR=e; }
+}
+async function refresh(){ await loadTrade(); draw(); if(DR.kind) await renderDrawer(); }
+
+// ── пороги й кольори ──────────────────────────────────────────────────────
+const liveNets=()=>T?T.networks.filter(n=>!n.archived):[];
+const netOfCp=id=>liveNets().find(n=>n.cp_ids.includes(id))||null;
+const netById=id=>T?T.networks.find(n=>n.id===id)||null:null;
+function thrOf(net){
+  const s=ST(); let a=s.payback_amber,r=s.payback_red,own=false;
+  if(net){ if(net.payback_amber){a=net.payback_amber;own=true;} if(net.payback_red){r=net.payback_red;own=true;} }
+  return {a,r:Math.max(a,r),own};
+}
+// «понад 20%» — жовтий, «понад 25%» — червоний. Рівно на порозі ще не сигнал.
+function pbClass(spend,gross,share,kind,net){
+  if(kind==='vendor') return 'gry';
+  if(share==null) return (spend>0&&gross<=0)?'red':'gry';
+  const t=thrOf(net); return share>t.r?'red':share>t.a?'amb':'grn';
+}
+function deltaCell(s6,g6){
+  if(!s6||!g6||s6.length<2) return '<span class="delta mut">—</span>';
+  const s0=s6[s6.length-2],s1=s6[s6.length-1],g0=g6[g6.length-2],g1=g6[g6.length-1];
+  const one=(a,b,badUp)=>{
+    if(!a&&!b) return '<span class="mut">—</span>';
+    if(a<=0) return `<span class="${badUp?'up':'dn'}">з нуля</span>`;
+    const p=(b-a)/a, big=Math.abs(p)>=ST().mom_pct&&Math.abs(b-a)>=ST().mom_min_uah;
+    const cls=!big?'mut':(p>0?(badUp?'up':'dn'):(badUp?'dn':'bad'));
+    return `<span class="${cls}">${p>0?'▲':p<0?'▼':'•'} ${Math.abs(p*100).toFixed(0)}%</span>`;
+  };
+  return `<span class="delta" title="маркетинг ${nf(s0)} → ${nf(s1)} грн · валовий прибуток ${nf(g0)} → ${nf(g1)} грн">м ${one(s0,s1,true)} · п ${one(g0,g1,false)}</span>`;
+}
+
+// ── рядки окупності: по контрагентах або по мережах ───────────────────────
+function pbRows(){
+  if(PB_MODE==='net'&&D.payback_groups){
+    return D.payback_groups.filter(g=>g.spend>0).map(g=>{
+      // Мережу беремо з живої бази, а не з блоба: блоб оновлюється раз на добу.
+      const net=liveNets().find(n=>g.ids.some(id=>n.cp_ids.includes(id)))||null;
+      return {key:g.key,cpId:g.paying[0]||g.ids[0],name:net?net.name:g.name,kind:'trade',spend:g.spend,gross:g.gross,net:g.net,
+        share:g.share_gross,s6:g.spend6,g6:g.gross6,netw:net,members:g.ids.length,ids:g.ids};
+    });
+  }
+  return (D.payback||[]).filter(r=>r.spend>0).map(r=>({key:r.id,cpId:r.id,name:r.name,kind:r.kind,spend:r.spend,gross:r.gross,
+    net:r.net,share:r.share_gross,s6:r.spend6,g6:r.gross6,netw:netOfCp(r.id),members:1,ids:[r.id]}));
+}
+function noteStat(row){
+  if(!T) return null;
+  // Запис має і контрагента, і мережу, тож лічильники не складаємо, а беремо більший.
+  let best=null,nCp=0,nNet=0;
+  const see=s=>{ if(s&&(!best||s.last_date>best.last_date)) best=s; };
+  row.ids.forEach(id=>{ const s=T.notes_by_cp[id]; if(s){ nCp+=s.n; see(s); } });
+  if(PB_MODE==='net'&&row.netw){ const s=T.notes_by_network[row.netw.id]; if(s){ nNet=s.n; see(s); } }
+  return best?{n:Math.max(nCp,nNet),last_date:best.last_date,last_summary:best.last_summary,last_author:best.last_author}:null;
+}
+function renderPayback(){
+  let rows=pbRows();
+  if(!rows.length) return '<div class="card empty">Немає даних.</div>';
+  rows.forEach(r=>{r.cls=pbClass(r.spend,r.gross,r.share,r.kind,r.netw); r.ns=noteStat(r);});
+  const cnt={all:rows.length,red:rows.filter(r=>r.cls==='red').length,amb:rows.filter(r=>r.cls==='amb').length,
+             nocmt:rows.filter(r=>(r.cls==='red'||r.cls==='amb')&&!r.ns).length};
+  if(PB_FILTER==='red') rows=rows.filter(r=>r.cls==='red');
+  if(PB_FILTER==='amb') rows=rows.filter(r=>r.cls==='amb');
+  if(PB_FILTER==='nocmt') rows=rows.filter(r=>(r.cls==='red'||r.cls==='amb')&&!r.ns);
+  const s=ST();
+  const chip=(k,l,n)=>`<button class="chip ${PB_FILTER===k?'on':''}" data-act="pbfilter" data-v="${k}">${l}<span class="n">${n}</span></button>`;
+  const body=rows.map(r=>{
+    const w=Math.min(100,Math.round((r.share||0)*100));
+    const t=thrOf(r.netw);
+    const shareTxt=r.share==null?(r.cls==='red'?'мінус':'—'):pct(r.share);
+    const cm=r.ns
+      ? `<div class="cmt"><span class="d">${dUA(r.ns.last_date)} · ${esc((r.ns.last_author||'').split('@')[0])}</span><br>${esc(r.ns.last_summary)}</div>`
+      : '<span class="hint">—</span>';
+    return `<tr>
+      <td><span class="netname">${esc(r.name)}</span> ${r.kind==='vendor'?'<span class="tag t-gry">медіа</span>':''}
+        ${r.members>1?`<span class="tag t-gry">${r.members} юросіб</span>`:''}
+        ${r.netw&&PB_MODE==='cp'?`<br><button class="linkbtn" data-act="net" data-id="${r.netw.id}">мережа: ${esc(r.netw.name)}</button>`:''}
+        ${t.own?`<br><span class="sub">власні пороги ${p0(t.a)} / ${p0(t.r)}</span>`:''}</td>
+      <td class="num">${nf(r.spend)}</td>
+      <td class="num">${nf(r.gross)}</td>
+      <td class="num"><b class="tag t-${r.cls}">${shareTxt}</b></td>
+      <td style="width:80px"><div class="bar-mini"><i class="${r.cls==='grn'?'':r.cls}" style="width:${w}%"></i></div></td>
+      <td class="num" style="color:${r.net<0?'var(--red)':'inherit'}">${nf(r.net)}</td>
+      <td>${deltaCell(r.s6,r.g6)}</td>
+      <td>${cm}</td>
+      <td class="num">${r.kind==='vendor'||!T?'':`<button class="cmt-btn ${r.ns?'has':''}" data-act="${PB_MODE==='net'&&r.netw?'net-journal':'cmt'}" data-id="${PB_MODE==='net'&&r.netw?r.netw.id:r.cpId}">💬 ${r.ns?r.ns.n:'додати'}</button>`}</td>
+    </tr>`;}).join('');
+  const m6=D.months6||[];
+  return `<div class="chips">
+      <button class="chip ${PB_MODE==='cp'?'on':''}" data-act="pbmode" data-v="cp">По контрагентах</button>
+      ${D.payback_groups?`<button class="chip ${PB_MODE==='net'?'on':''}" data-act="pbmode" data-v="net">По мережах</button>`:''}
+      <span style="width:10px"></span>
+      ${chip('all','Усі',cnt.all)}${chip('red','🔴 Червоні',cnt.red)}${chip('amb','🟡 Жовті',cnt.amb)}${chip('nocmt','Без коментаря',cnt.nocmt)}
+      <span class="sp"></span>
+      <span class="hint">жовтий — понад ${p0(s.payback_amber)}, червоний — понад ${p0(s.payback_red)}</span>
+      ${T&&T.me.isAdmin?'<button class="btn sm" data-act="settings">⚙ Пороги</button>':''}
+    </div>
+    <div class="scroll" style="max-height:620px"><table>
+    <thead><tr><th>${PB_MODE==='net'?'Мережа':'Контрагент'}</th><th class="num">Маркетинг</th><th class="num">Валовий прибуток</th>
+      <th class="num">Частка</th><th></th><th class="num">Лишається нам</th>
+      <th title="Останній завершений місяць до попереднього: м — маркетинг, п — валовий прибуток">${m6.length>1?mUA(m6[m6.length-1])+' до '+mUA(m6[m6.length-2]):'До попер. міс.'}</th>
+      <th>Останній коментар</th><th></th></tr></thead>
+    <tbody>${body||'<tr><td colspan="9" class="empty">За цим фільтром рядків немає.</td></tr>'}</tbody></table></div>
+    <div class="note">Валовий прибуток — сировина плюс техоперації, без оренди, зарплат, логістики й маркетингу.
+      Тому рядок, де частка близька до 100%, означає роботу в мінус. «Мінус» у частці — виплати є, а валовий прибуток
+      за рік нульовий або від’ємний.${PB_MODE==='net'?' У режимі «По мережах» валовий прибуток зведено по всіх юрособах мережі, а не лише по тих, кому платили.':''}
+      ${T?'':'<br><b>Коментарі й база мереж зараз недоступні</b>: '+esc(T_ERR?T_ERR.message:'')}</div>`;
+}
+
+// ── динаміка місяць до місяця ─────────────────────────────────────────────
+function renderMom(){
+  const m=D.mom; if(!m) return '<div class="card empty">Динаміка з’явиться після наступного нічного оновлення даних.</div>';
+  const t=m.total, pc=x=>x==null?'з нуля':(x>0?'+':'')+(x*100).toFixed(0)+'%';
+  const mk={red:'t-red',amber:'t-amb',info:'t-grn',ok:'t-gry'}, lbl={red:'ризик',amber:'увага',info:'добре',ok:'спокійно'};
+  const rows=(m.rows||[]).map(r=>`<tr>
+      <td><span class="netname">${esc(r.name)}</span><br><span class="sub">${esc(r.title)}</span></td>
+      <td class="num">${nf(r.spend0)} → ${nf(r.spend1)}</td><td class="num"><b>${pc(r.spend_pct)}</b></td>
+      <td class="num">${nf(r.gross0)} → ${nf(r.gross1)}</td><td class="num"><b>${pc(r.gross_pct)}</b></td>
+      <td><span class="tag ${mk[r.severity]}">${lbl[r.severity]}</span></td>
+      <td class="num">${T?`<button class="cmt-btn" data-act="cmt" data-id="${r.id}">💬</button>`:''}</td></tr>`).join('');
+  return `<div class="kpis">
+      <div class="kpi ${t.severity==='red'?'red':t.severity==='amber'?'amb':'grn'}"><div class="kpi-l">Маркетинг мережам</div>
+        <div class="kpi-v">${pc(t.spend_pct)}</div><div class="kpi-s">${nf(t.spend0)} → ${nf(t.spend1)} ₴</div></div>
+      <div class="kpi"><div class="kpi-l">Валовий прибуток цих клієнтів</div>
+        <div class="kpi-v">${pc(t.gross_pct)}</div><div class="kpi-s">${nf(t.gross0)} → ${nf(t.gross1)} ₴</div></div>
+      <div class="kpi"><div class="kpi-l">Частка маркетингу в прибутку</div>
+        <div class="kpi-v">${t.share1==null?'—':pct(t.share1)}</div><div class="kpi-s">було ${t.share0==null?'—':pct(t.share0)}</div></div>
+      <div class="kpi"><div class="kpi-l">Висновок</div>
+        <div class="kpi-v" style="font-size:15px;line-height:1.3">${esc(t.title)}</div><div class="kpi-s">суттєвих змін по клієнтах: ${(m.rows||[]).length}</div></div>
+    </div>
+    ${rows?`<div class="scroll"><table><thead><tr><th>Контрагент</th><th class="num">Маркетинг, ₴</th><th class="num">Зміна</th>
+      <th class="num">Валовий прибуток, ₴</th><th class="num">Зміна</th><th>Оцінка</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`
+      :'<div class="card empty">Суттєвих змін по окремих клієнтах немає.</div>'}
+    <div class="note">Порівнюємо два останні <b>завершені</b> місяці: ${mUA(m.m1)} до ${mUA(m.m0)}. Поточний місяць неповний, тому до порівняння не береться.
+      Суттєва зміна — від ${p0(m.pct)} і від ${nf(m.min_uah)} ₴ одночасно. Зведення приходить у Telegram раз на місяць, 3-го числа.</div>`;
+}
+
+// ── стан бази мереж (для блоку «Що потребує уваги» і вкладки) ─────────────
+function netFlags(n){
+  const s=ST(), f=[];
+  if(n.archived) return f;
+  if(n.stale_days!=null&&n.stale_days>=s.stale_red_days) f.push('stale_red');
+  else if(n.stale_days!=null&&n.stale_days>=s.stale_warn_days) f.push('stale_warn');
+  if(n.next_date&&n.next_date<today()&&n.stage!=='paused'&&n.stage!=='declined') f.push('due');
+  if(n.missing&&n.missing.length) f.push('incomplete');
+  return f;
+}
+function suggestions(){
+  if(!T) return [];
+  const taken=new Set(); liveNets().forEach(n=>n.cp_ids.forEach(x=>taken.add(x)));
+  if(D.payback_groups) return D.payback_groups.filter(g=>g.spend>0&&!g.ids.some(x=>taken.has(x)))
+    .map(g=>({name:g.name,combined_key:g.key[0]==='c'?g.key.slice(1):null,cp_ids:g.ids,spend:g.spend,share:g.share_gross}));
+  const by={};
+  (D.payback||[]).filter(r=>r.spend>0&&r.kind!=='vendor'&&!taken.has(r.id)).forEach(r=>{
+    const ck=T.cp_meta[r.id]&&T.cp_meta[r.id].combined_key, k=ck||r.id;
+    const g=by[k]||(by[k]={name:ck||r.name,combined_key:ck||null,cp_ids:[],spend:0,share:null}); g.cp_ids.push(r.id); g.spend+=r.spend;});
+  return Object.values(by);
+}
+function renderBaseAttention(){
+  if(!T) return '';
+  const ns=liveNets(), c={stale_red:0,stale_warn:0,due:0,incomplete:0};
+  ns.forEach(n=>netFlags(n).forEach(f=>c[f]++));
+  const sg=suggestions().length;
+  if(!ns.length&&!sg) return '';
+  const card=(sev,ic,title,detail,flag)=>`<div class="an ${sev} rowlink" data-act="goto-nets" data-v="${flag}" tabindex="0">
+      <div class="an-i">${ic}</div><div style="flex:1"><div class="an-t">${title}</div><div class="an-d">${detail}</div></div></div>`;
+  let h='';
+  if(c.stale_red) h+=card('red','🗂',`База мереж: ${c.stale_red} без оновлень понад ${ST().stale_red_days} днів`,'Інформація застаріла. Відкрийте мережу й зафіксуйте контакт або змініть статус.','stale');
+  if(c.stale_warn) h+=card('amber','🗂',`База мереж: ${c.stale_warn} без оновлень ${ST().stale_warn_days}+ днів`,'Скоро стане простроченою. Найкраще оновити зараз.','stale');
+  if(c.due) h+=card('amber','⏰',`Прострочені наступні кроки: ${c.due}`,'Дата кроку минула, а нового запису в журналі немає.','due');
+  if(c.incomplete) h+=card('info','📝',`Незаповнені дані: ${c.incomplete} мереж`,'Бракує контакту, відповідального, умов або наступного кроку.','incomplete');
+  if(sg) h+=card('info','➕',`Платимо, але в базі немає: ${sg}`,'Мережі з виплатами цього року, яких ще не додано до «Бази мереж». Можна додати всі одним кліком.','');
+  return h;
+}
+
+// ── вкладка «База мереж» ──────────────────────────────────────────────────
+function netPayback(n){
+  if(!n.cp_ids.length) return null;
+  const g=(D.payback_groups||[]).find(g=>g.ids.some(id=>n.cp_ids.includes(id)));
+  if(g) return {spend:g.spend,gross:g.gross,share:g.share_gross};
+  const rs=(D.payback||[]).filter(r=>n.cp_ids.includes(r.id)); if(!rs.length) return null;
+  const spend=rs.reduce((a,r)=>a+r.spend,0), gross=rs.reduce((a,r)=>a+r.gross,0);
+  return {spend,gross,share:gross>0?spend/gross:null};
+}
+function completeness(n){
+  const quiet=n.stage==='paused'||n.stage==='declined';
+  const total=3+(quiet?0:1)+((n.stage==='agreed'||n.stage==='active')?3:0)+(n.stage==='declined'?1:0);
+  return Math.max(0,Math.round((1-(n.missing||[]).length/total)*100));
+}
+function staleTag(n){
+  if(n.stale_days==null) return '<span class="hint">—</span>';
+  const s=ST(), cls=n.stale_days>=s.stale_red_days?'red':n.stale_days>=s.stale_warn_days?'amb':'grn';
+  return `<span class="tag t-${cls}">${n.stale_days===0?'сьогодні':n.stale_days+' дн'}</span>`;
+}
+function filteredNets(){
+  if(!T) return [];
+  const q=NETF.q.trim().toLowerCase();
+  return T.networks.filter(n=>{
+    if(!!n.archived!==NETF.arch) return false;
+    if(NETF.stage&&n.stage!==NETF.stage) return false;
+    if(NETF.flag){ const f=netFlags(n);
+      if(NETF.flag==='stale'&&!f.includes('stale_red')&&!f.includes('stale_warn')) return false;
+      if(NETF.flag==='due'&&!f.includes('due')) return false;
+      if(NETF.flag==='incomplete'&&!f.includes('incomplete')) return false; }
+    if(q){ const hay=[n.name,n.region,n.owner_email,n.next_step,SEG_UA[n.segment],...(n.contacts||[]).map(c=>c.full_name)].join(' ').toLowerCase();
+      if(!hay.includes(q)) return false; }
+    return true;
+  }).sort((a,b)=>{
+    // Спершу те, що горить: прострочені кроки, потім найдовше без оновлень.
+    const fa=netFlags(a),fb=netFlags(b), w=f=>(f.includes('due')?4:0)+(f.includes('stale_red')?2:0)+(f.includes('stale_warn')?1:0);
+    return w(fb)-w(fa)||(b.stale_days||0)-(a.stale_days||0)||a.name.localeCompare(b.name,'uk');
+  });
+}
+function renderNetRows(){
+  const rows=filteredNets();
+  if(!rows.length) return '<tr><td colspan="8" class="empty">Нічого не знайдено. Змініть фільтр або додайте мережу.</td></tr>';
+  return rows.map(n=>{
+    const pb=netPayback(n), cls=pb?pbClass(pb.spend,pb.gross,pb.share,'trade',n):'gry';
+    const pc=(n.contacts||[])[0], ns=T.notes_by_network[n.id], due=n.next_date&&n.next_date<today()&&n.stage!=='paused'&&n.stage!=='declined';
+    const cp=completeness(n);
+    return `<tr class="rowlink" data-act="net" data-id="${n.id}" tabindex="0">
+      <td><span class="netname">${esc(n.name)}</span>${n.priority?` <span class="tag t-gry">${n.priority}</span>`:''}
+        <br><span class="sub">${esc(SEG_UA[n.segment]||'формат не вказано')}${n.region?' · '+esc(n.region):''}${n.cp_ids.length?'':' · без контрагента в МойСкладі'}</span></td>
+      <td><span class="tag t-${STAGE_CLS[n.stage]}">${STAGE_UA[n.stage]}</span></td>
+      <td class="num">${pb?`<b class="tag t-${cls}">${pb.share==null?(cls==='red'?'мінус':'—'):pct(pb.share)}</b><br><span class="sub">${nf(pb.spend)} ₴</span>`:'<span class="hint">—</span>'}</td>
+      <td>${pc?`${esc(pc.full_name)}<br><span class="sub">${esc(pc.role||'')}${pc.phone?' · '+esc(pc.phone):''}</span>`:'<span class="tag t-amb">немає</span>'}</td>
+      <td>${ns?`<div class="cmt"><span class="d">${dUA(ns.last_date)}</span><br>${esc(ns.last_summary)}</div>`:'<span class="hint">записів немає</span>'}</td>
+      <td>${n.next_step?`<span class="${due?'tag t-red':'sub'}">${dUA(n.next_date)}${due?' · прострочено':''}</span><br>${esc(n.next_step)}`:(n.stage==='paused'||n.stage==='declined'?'<span class="hint">—</span>':'<span class="tag t-amb">не задано</span>')}</td>
+      <td>${staleTag(n)}</td>
+      <td title="${(n.missing||[]).map(k=>MISS_UA[k]).join(', ')||'усе заповнено'}"><span class="meter"><i class="${cp<50?'red':cp<100?'amb':''}" style="width:${cp}%"></i></span><span class="sub">${cp}%</span></td>
+    </tr>`;}).join('');
+}
+function tabNetworks(){
+  if(!T) return `<div class="card empty">База мереж недоступна: ${esc(T_ERR?T_ERR.message:'немає з’єднання')}<br>
+    <span class="hint">Окупність і сигнали працюють, як і раніше. <a href="javascript:location.reload()">Оновити сторінку</a></span></div>`;
+  const ns=liveNets(), sg=suggestions();
+  const cnt=k=>ns.filter(n=>n.stage===k).length;
+  const fl={stale:0,due:0,incomplete:0};
+  ns.forEach(n=>{const f=netFlags(n); if(f.includes('stale_red')||f.includes('stale_warn')) fl.stale++; if(f.includes('due')) fl.due++; if(f.includes('incomplete')) fl.incomplete++;});
+  const fchip=(k,l,n)=>`<button class="chip ${NETF.flag===k?'on':''}" data-act="netflag" data-v="${k}">${l}<span class="n">${n}</span></button>`;
+  const sgHtml=sg.length?`<div class="lead" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <div style="flex:1;min-width:240px"><b>Платимо, але в базі немає: ${sg.length}.</b>
+        ${sg.slice(0,6).map(s=>esc(s.name)).join(', ')}${sg.length>6?' і ще '+(sg.length-6):''}.
+        Це мережі з виплатами по статті «Маркетинг и реклама» за ${esc(D.payback_year||D.current_month.slice(0,4))} рік. Юрособи однієї мережі зводяться в одну картку.</div>
+      <button class="btn yel" data-act="import-all">Додати всі ${sg.length}</button></div>`:'';
+  return `${sgHtml}
+    <div class="pipe">
+      <button class="${NETF.stage===''?'on':''}" data-act="netstage" data-v=""><b>${ns.length}</b><span>усі мережі</span></button>
+      ${Object.keys(STAGE_UA).map(k=>`<button class="${NETF.stage===k?'on':''}" data-act="netstage" data-v="${k}" title="${STAGE_HINT[k]}"><b>${cnt(k)}</b><span>${STAGE_UA[k]}</span></button>`).join('')}
+    </div>
+    <div class="chips">
+      <input id="net-q" type="search" placeholder="Пошук: мережа, контакт, регіон…" value="${esc(NETF.q)}"
+        style="font:inherit;font-size:13px;padding:6px 10px;border:1.5px solid var(--line);border-radius:7px;min-width:230px">
+      ${fchip('','Усі',ns.length)}${fchip('stale','🗂 Давно не оновлювались',fl.stale)}${fchip('due','⏰ Прострочений крок',fl.due)}${fchip('incomplete','📝 Незаповнені',fl.incomplete)}
+      <span class="sp"></span>
+      <button class="chip ${NETF.arch?'on':''}" data-act="netarch">Архів</button>
+      <button class="btn pri" data-act="net-new">＋ Нова мережа</button>
+    </div>
+    <div class="scroll" style="max-height:none"><table>
+      <thead><tr><th>Мережа</th><th>Статус</th><th class="num" title="Частка маркетингу у валовому прибутку мережі за рік">Окупність</th>
+        <th>Основний контакт</th><th>Останній запис</th><th>Наступний крок</th>
+        <th title="Скільки днів картку не оновлювали: нагадування з ${ST().stale_warn_days} днів, прострочено з ${ST().stale_red_days}">Оновлено</th>
+        <th>Заповнено</th></tr></thead>
+      <tbody id="net-tbody">${renderNetRows()}</tbody></table></div>
+    <div class="note">Рядок відкриває картку мережі: статус і умови, контакти, журнал дзвінків і листів, прив’язка до контрагентів МойСкладу, історія змін.
+      Будь-який запис у журналі або зміна картки скидає лічильник «Оновлено». Мережі «На паузі» та «Відмова» нагадувань не отримують.</div>`;
+}
+
+// ── вкладка «Довідка» ─────────────────────────────────────────────────────
+function tabHelp(){
+  const s=ST();
+  return `<div class="card help">
+    <span class="hint">Версія ${EXP_VERSION} · оновлено ${EXP_UPDATED}</span>
+    <h3>Що тут є</h3>
+    <ul>
+      <li><b>Окупність і сигнали</b> — скільки з валового прибутку клієнта повертається йому назад маркетингом, динаміка до попереднього місяця, калькулятор акції.</li>
+      <li><b>База мереж</b> — мережі, з якими вже працюємо або плануємо працювати по трейд-маркетингу: статус, умови, контакти, журнал, наступний крок.</li>
+    </ul>
+    <h3>Коментарі по контрагенту</h3>
+    <p>У таблиці окупності кнопка 💬 відкриває історію записів і форму нового. Кожен запис має дату, тип (дзвінок, лист, зустріч, домовленість),
+      автора, а за потреби — наступний крок із датою. Журнал <b>спільний із Customer 360</b>: менеджер по клієнту бачить ваші записи, ви бачите його.
+      Запис також дописується в опис контрагента в МойСкладі (позначка «✓ МойСклад» біля запису). Змінити або видалити запис може автор чи адміністратор.</p>
+    <h3>Кольори окупності</h3>
+    <table><thead><tr><th>Колір</th><th>Умова</th><th>Що робити</th></tr></thead><tbody>
+      <tr><td><span class="tag t-grn">зелений</span></td><td>до ${p0(s.payback_amber)} валового прибутку</td><td>норма</td></tr>
+      <tr><td><span class="tag t-amb">жовтий</span></td><td>понад ${p0(s.payback_amber)}</td><td>перевірити умови, залишити коментар</td></tr>
+      <tr><td><span class="tag t-red">червоний</span></td><td>понад ${p0(s.payback_red)}, або виплати є, а валовий прибуток нульовий чи від’ємний</td><td>переглядати домовленість</td></tr>
+    </tbody></table>
+    <p>Пороги змінює адміністратор (кнопка «⚙ Пороги» над таблицею). Для окремої мережі можна задати власні пороги в її картці:
+      у мереж із ретро-бонусом за договором норма буває іншою. Частка рахується за поточний календарний рік.
+      Режим «По мережах» зводить юросіб однієї мережі: виплати й валовий прибуток беруться по всіх її контрагентах.</p>
+    <h3>Динаміка до попереднього місяця</h3>
+    <p>Порівнюються два останні завершені місяці. Суттєвою вважається зміна від ${p0(s.mom_pct)} і від ${nf(s.mom_min_uah)} ₴ одночасно.</p>
+    <table><thead><tr><th>Оцінка</th><th>Коли</th></tr></thead><tbody>
+      <tr><td><span class="tag t-red">ризик</span></td><td>маркетинг зріс, а валовий прибуток упав</td></tr>
+      <tr><td><span class="tag t-amb">увага</span></td><td>маркетинг зріс, прибуток за ним не пішов · прибуток упав при тих самих виплатах · скоротили виплати, і прибуток упав</td></tr>
+      <tr><td><span class="tag t-grn">добре</span></td><td>зросли і маркетинг, і прибуток · маркетинг скоротився, прибуток тримається · прибуток зріс без додаткових виплат</td></tr>
+    </tbody></table>
+    <h3>База мереж: статуси</h3>
+    <table><thead><tr><th>Статус</th><th>Значення</th></tr></thead><tbody>
+      ${Object.keys(STAGE_UA).map(k=>`<tr><td><span class="tag t-${STAGE_CLS[k]}">${STAGE_UA[k]}</span></td><td>${STAGE_HINT[k]}</td></tr>`).join('')}
+    </tbody></table>
+    <h3>Нагадування</h3>
+    <table><thead><tr><th>Нагадування</th><th>Коли спрацьовує</th><th>Куди</th></tr></thead><tbody>
+      <tr><td>Мережа давно не оновлювалась</td><td>${s.stale_warn_days} днів без змін — жовте, ${s.stale_red_days} днів — червоне. Лічильник скидає будь-який запис у журналі або зміна картки.</td><td>дашборд + Telegram (по одному разу на кожному порозі)</td></tr>
+      <tr><td>Прострочений наступний крок</td><td>дата кроку минула</td><td>дашборд + Telegram (раз на кожну дату)</td></tr>
+      <tr><td>Незаповнені дані</td><td>бракує контакту, формату, відповідального, наступного кроку; для «Домовленість» і «Діє» — ще видів трейд-маркетингу, умов і прив’язки до МойСкладу; для «Відмова» — причини</td><td>дашборд + Telegram (одним рядком, повторно лише коли набір змінився)</td></tr>
+      <tr><td>Окупність</td><td>частка маркетингу понад жовтий або червоний поріг</td><td>дашборд + Telegram (лише нові)</td></tr>
+      <tr><td>Динаміка</td><td>суттєва зміна маркетингу або валового прибутку до попереднього місяця</td><td>дашборд + Telegram (зведення раз на місяць, 3-го числа)</td></tr>
+    </tbody></table>
+    <p>Telegram надсилається щоранку о 07:00 за Києвом, разом з оновленням даних. Про те саме повторно не пишемо.
+      Мережі зі статусом «На паузі» та «Відмова» нагадувань про оновлення не отримують.</p>
+    <h3>Щоденна робота: 5 кроків</h3>
+    <ol>
+      <li>Відкрити «База мереж», натиснути фільтр «Прострочений крок», потім «Давно не оновлювались».</li>
+      <li>Після кожного дзвінка чи листа — запис у журналі мережі з наступним кроком і датою.</li>
+      <li>Змінилась стадія перемовин — змінити статус у картці.</li>
+      <li>Раз на тиждень переглянути червоні й жовті рядки окупності (фільтр «Без коментаря») і лишити пояснення.</li>
+      <li>На початку місяця переглянути блок «Динаміка» і прокоментувати рядки з оцінкою «ризик» та «увага».</li>
+    </ol>
+    <h3>Історія змін</h3>
+    <ul>
+      <li><b>1.1.0 · 02.10.2026</b> — коментарі по контрагентах з історією; вкладка «База мереж»; нагадування про застарілі й незаповнені картки;
+        пороги окупності 20% / 25% з можливістю змінити; динаміка до попереднього місяця; окупність на рівні мережі; сигнал «виплати при нульовому прибутку».</li>
+      <li><b>1.0 · 24.08.2026</b> — окупність трейд-маркетингу, сигнали аномалій, калькулятор акції.</li>
+    </ul>
+  </div>`;
+}
+
+// ── панель справа: журнал контрагента, картка мережі, пороги ──────────────
+function openDrawer(state){ Object.assign(DR,{kind:null,cpId:null,netId:null,tab:'card',scope:'cp',edit:null,ctEdit:null,notes:null,audit:null,draft:null},state);
+  $('drawer').classList.add('open'); $('drawerBack').classList.add('open'); renderDrawer(); }
+function closeDrawer(){ DR.kind=null; $('drawer').classList.remove('open'); $('drawerBack').classList.remove('open'); }
+
+function journalForm(){
+  const e=DR.edit;
+  return `<div class="box" id="jr-form">
+    <div class="fg">
+      <label class="f"><span>Дата</span><input type="date" id="jr-date" max="${today()}" value="${e?e.note_date:today()}"></label>
+      <label class="f"><span>Тип</span><select id="jr-type">${NOTE_TYPES.map(t=>`<option ${e&&e.note_type===t?'selected':''}>${t}</option>`).join('')}</select></label>
+      <label class="f full"><span>Що обговорили, про що домовились</span><textarea id="jr-sum" placeholder="Коротко і по суті: з ким говорили, що вирішили">${e?esc(e.summary):''}</textarea></label>
+      <label class="f"><span>Наступний крок</span><input id="jr-next" maxlength="500" value="${e?esc(e.next_step||''):''}" placeholder="Що зробити далі"></label>
+      <label class="f"><span>Коли</span><input type="date" id="jr-nextd" value="${e&&e.next_date?e.next_date:''}"></label>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+      <button class="btn pri" data-act="jr-save">${e?'Зберегти зміни':'Додати запис'}</button>
+      ${e?'<button class="btn" data-act="jr-cancel">Скасувати</button>':''}
+      <span class="hint">${DR.kind==='net'&&!e?'Наступний крок потрапить у картку мережі.':''}</span>
+    </div></div>`;
+}
+function journalList(){
+  const items=DR.notes;
+  if(items==null) return '<div class="empty">Завантажуємо…</div>';
+  if(!items.length) return '<div class="empty">Записів ще немає. Перший — у формі вище.</div>';
+  const me=T.me;
+  return '<div class="tl">'+items.map(n=>{
+    const mine=me.isAdmin||(n.author_email||'').toLowerCase()===me.email;
+    return `<div class="tl-i">
+      <div class="tl-m"><b>${dUA(n.note_date)}</b><span>${esc(n.note_type)}</span><span>${esc((n.author_email||'').split('@')[0])}</span>
+        ${n.topic==='trade'?'':'<span class="tag t-gry" title="Запис зроблено в Customer 360">Customer 360</span>'}
+        ${n.ms_synced?'<span title="Дописано в опис контрагента в МойСкладі">✓ МойСклад</span>':(n.ms_sync_error?'<span class="tag t-amb" title="'+esc(n.ms_sync_error)+'">не дійшло в МойСклад</span>':'')}
+        ${DR.scope==='net'&&n.customer_name?`<span class="sub">${esc(n.customer_name)}</span>`:''}</div>
+      <div class="tl-t">${esc(n.summary)}</div>
+      ${n.next_step||n.next_date?`<div class="tl-n">Далі${n.next_date?' до '+dUA(n.next_date):''}: ${esc(n.next_step||'—')}</div>`:''}
+      ${mine?`<div style="margin-top:4px;display:flex;gap:12px"><button class="linkbtn" data-act="jr-edit" data-id="${n.id}">змінити</button>
+        <button class="linkbtn danger" data-act="jr-del" data-id="${n.id}">видалити</button></div>`:''}
+    </div>`;}).join('')+'</div>';
+}
+async function loadNotes(){
+  const q=DR.kind==='net'?{network_id:DR.netId}:(DR.scope==='net'&&netOfCp(DR.cpId)?{network_id:netOfCp(DR.cpId).id}:{cp_id:DR.cpId});
+  try{ DR.notes=(await api('/api/trade/notes',q)).items; }catch(e){ DR.notes=[]; toast(e.message,true); }
+}
+
+function drawerCp(){
+  const r=(D.payback||[]).find(x=>x.id===DR.cpId)||{};
+  const name=r.name||(T.cp_meta[DR.cpId]&&T.cp_meta[DR.cpId].name)||((D.mom&&D.mom.rows||[]).find(x=>x.id===DR.cpId)||{}).name||'Контрагент';
+  const net=netOfCp(DR.cpId), cls=r.spend!=null?pbClass(r.spend,r.gross,r.share_gross,r.kind,net):'gry';
+  return `<div class="dr-h"><div><h3>${esc(name)}</h3>
+      <div class="sub" style="margin-top:4px">${r.spend!=null?`маркетинг ${nf(r.spend)} ₴ · валовий прибуток ${nf(r.gross)} ₴ · <b class="tag t-${cls}">${r.share_gross==null?'—':pct(r.share_gross)}</b>`:''}
+        ${net?` · <button class="linkbtn" data-act="net" data-id="${net.id}">картка мережі «${esc(net.name)}»</button>`:''}</div></div>
+      <button class="dr-x" data-act="close" aria-label="Закрити">×</button></div>
+    <div class="dr-b">
+      ${journalForm()}
+      ${net&&net.cp_ids.length>1?`<div class="chips"><button class="chip ${DR.scope==='cp'?'on':''}" data-act="jr-scope" data-v="cp">Лише цей контрагент</button>
+        <button class="chip ${DR.scope==='net'?'on':''}" data-act="jr-scope" data-v="net">Уся мережа</button></div>`:''}
+      <div class="sec">Історія записів</div>
+      ${journalList()}
+    </div>`;
+}
+
+function netDraft(n){
+  return DR.draft||(DR.draft=n?JSON.parse(JSON.stringify(n)):{id:null,name:'',stage:'prospect',segment:'',priority:'',region:'',stores_count:'',website:'',
+    owner_email:T.me.email,tm_types:[],tm_terms:'',tm_budget_month_kop:null,contract_until:'',next_step:'',next_date:'',decline_reason:'',notes:'',
+    payback_amber:null,payback_red:null,cp_ids:[],contacts:[],missing:[]});
+}
+function readNetForm(){
+  const d=DR.draft; if(!d||!$('nf-name')) return;
+  const v=id=>$(id)?$(id).value.trim():undefined;
+  d.name=v('nf-name'); d.stage=v('nf-stage'); d.segment=v('nf-seg'); d.priority=v('nf-pri'); d.region=v('nf-region');
+  d.stores_count=v('nf-stores'); d.website=v('nf-web'); d.owner_email=v('nf-owner'); d.tm_terms=v('nf-terms');
+  d.tm_budget_month_kop=v('nf-budget')===''?null:Math.round(parseFloat(v('nf-budget'))*100);
+  d.contract_until=v('nf-until'); d.next_step=v('nf-next'); d.next_date=v('nf-nextd'); d.decline_reason=v('nf-decl'); d.notes=v('nf-notes');
+  d.tm_types=[...document.querySelectorAll('#nf-types input:checked')].map(i=>i.value);
+  if($('nf-amb')){ d.payback_amber=v('nf-amb')===''?null:parseFloat(v('nf-amb'))/100; d.payback_red=v('nf-red')===''?null:parseFloat(v('nf-red'))/100; }
+}
+function netCardTab(d){
+  const opt=(m,cur,empty)=>(empty?`<option value="">${empty}</option>`:'')+Object.keys(m).map(k=>`<option value="${k}" ${cur===k?'selected':''}>${m[k]}</option>`).join('');
+  const pb=d.id?netPayback(d):null, t=thrOf(d);
+  return `${d.id&&d.missing&&d.missing.length?`<div class="miss"><b>Бракує даних:</b> ${d.missing.map(k=>MISS_UA[k]).join('; ')}.</div>`:''}
+    ${pb?`<div class="box"><b>Окупність за рік:</b> маркетинг ${nf(pb.spend)} ₴ при валовому прибутку ${nf(pb.gross)} ₴ —
+      <b class="tag t-${pbClass(pb.spend,pb.gross,pb.share,'trade',d)}">${pb.share==null?'—':pct(pb.share)}</b>
+      <span class="sub"> пороги ${p0(t.a)} / ${p0(t.r)}${t.own?' (власні)':''}</span></div>`:''}
+    <div class="sec">Мережа</div>
+    <div class="fg">
+      <label class="f full"><span>Назва мережі</span><input id="nf-name" maxlength="200" value="${esc(d.name)}" placeholder="Наприклад: Сільпо"></label>
+      <label class="f"><span>Статус</span><select id="nf-stage">${opt(STAGE_UA,d.stage)}</select></label>
+      <label class="f"><span>Формат</span><select id="nf-seg">${opt(SEG_UA,d.segment,'не вказано')}</select></label>
+      <label class="f"><span>Пріоритет</span><select id="nf-pri">${opt({A:'A — ключова',B:'B — важлива',C:'C — решта'},d.priority,'не вказано')}</select></label>
+      <label class="f"><span>Відповідальний (пошта)</span><input id="nf-owner" type="email" value="${esc(d.owner_email||'')}"></label>
+      <label class="f"><span>Регіон</span><input id="nf-region" maxlength="150" value="${esc(d.region||'')}" placeholder="Вся Україна, Захід…"></label>
+      <label class="f"><span>Кількість точок</span><input id="nf-stores" type="number" min="0" value="${d.stores_count??''}"></label>
+      <label class="f full"><span>Сайт</span><input id="nf-web" maxlength="200" value="${esc(d.website||'')}"></label>
+    </div>
+    <div class="sec">Трейд-маркетинг</div>
+    <div class="f" style="margin-bottom:10px"><span>Види</span><div class="checks" id="nf-types">${Object.keys(TMT_UA).map(k=>
+      `<label><input type="checkbox" value="${k}" ${(d.tm_types||[]).includes(k)?'checked':''}>${TMT_UA[k]}</label>`).join('')}</div></div>
+    <div class="fg">
+      <label class="f full"><span>Умови домовленості</span><textarea id="nf-terms" placeholder="Відсоток ретро-бонусу, база нарахування, періодичність, що мережа зобов’язується зробити">${esc(d.tm_terms||'')}</textarea></label>
+      <label class="f"><span>Бюджет на місяць, ₴</span><input id="nf-budget" type="number" min="0" step="100" value="${d.tm_budget_month_kop!=null?d.tm_budget_month_kop/100:''}"></label>
+      <label class="f"><span>Домовленість діє до</span><input id="nf-until" type="date" value="${d.contract_until||''}"></label>
+    </div>
+    <div class="sec">Наступний крок</div>
+    <div class="fg">
+      <label class="f"><span>Що зробити</span><input id="nf-next" maxlength="500" value="${esc(d.next_step||'')}"></label>
+      <label class="f"><span>Коли</span><input id="nf-nextd" type="date" value="${d.next_date||''}"></label>
+      <label class="f full"><span>Причина відмови (для статусу «Відмова»)</span><input id="nf-decl" maxlength="500" value="${esc(d.decline_reason||'')}"></label>
+      <label class="f full"><span>Нотатки</span><textarea id="nf-notes" placeholder="Усе, що не вмістилось у поля вище">${esc(d.notes||'')}</textarea></label>
+    </div>
+    ${T.me.isAdmin?`<div class="sec">Власні пороги окупності (лише адміністратор)</div>
+    <div class="fg">
+      <label class="f"><span>Жовтий, понад %</span><input id="nf-amb" type="number" min="1" max="500" step="1" value="${d.payback_amber?Math.round(d.payback_amber*100):''}" placeholder="${Math.round(ST().payback_amber*100)} (загальний)"></label>
+      <label class="f"><span>Червоний, понад %</span><input id="nf-red" type="number" min="1" max="500" step="1" value="${d.payback_red?Math.round(d.payback_red*100):''}" placeholder="${Math.round(ST().payback_red*100)} (загальний)"></label>
+    </div>`:''}`;
+}
+function netContactsTab(n){
+  const e=DR.ctEdit||{};
+  const list=(n.contacts||[]).map(c=>`<div class="crow"><div style="flex:1">
+      <b>${esc(c.full_name)}</b> ${c.is_primary?'<span class="tag t-grn">основний</span>':''}<br>
+      <span class="sub">${esc(c.role||'посада не вказана')}</span><br>
+      <span style="font-size:12.5px">${[c.phone&&`<a href="tel:${esc(c.phone)}">${esc(c.phone)}</a>`,c.email&&`<a href="mailto:${esc(c.email)}">${esc(c.email)}</a>`,c.messenger&&esc(c.messenger)].filter(Boolean).join(' · ')||'<span class="tag t-amb">немає телефону й пошти</span>'}</span>
+      ${c.notes?`<br><span class="sub">${esc(c.notes)}</span>`:''}</div>
+      <div style="display:flex;gap:10px"><button class="linkbtn" data-act="ct-edit" data-id="${c.id}">змінити</button>
+        <button class="linkbtn danger" data-act="ct-del" data-id="${c.id}">видалити</button></div></div>`).join('');
+  return `<div class="box"><div class="fg">
+      <label class="f"><span>Ім’я та прізвище</span><input id="ct-name" maxlength="200" value="${esc(e.full_name||'')}"></label>
+      <label class="f"><span>Посада</span><input id="ct-role" maxlength="150" value="${esc(e.role||'')}" placeholder="Категорійний менеджер, маркетинг…"></label>
+      <label class="f"><span>Телефон</span><input id="ct-phone" maxlength="60" value="${esc(e.phone||'')}"></label>
+      <label class="f"><span>Пошта</span><input id="ct-email" type="email" maxlength="200" value="${esc(e.email||'')}"></label>
+      <label class="f"><span>Месенджер</span><input id="ct-msg" maxlength="120" value="${esc(e.messenger||'')}" placeholder="Telegram @нік, Viber…"></label>
+      <label class="f"><span>Примітка</span><input id="ct-notes" maxlength="1000" value="${esc(e.notes||'')}" placeholder="Коли зручно дзвонити, за що відповідає"></label>
+      <label class="full" style="font-size:12.5px"><input type="checkbox" id="ct-prim" ${e.is_primary||!(n.contacts||[]).length?'checked':''}> основний контакт</label>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px"><button class="btn pri" data-act="ct-save">${e.id?'Зберегти контакт':'Додати контакт'}</button>
+      ${e.id?'<button class="btn" data-act="ct-cancel">Скасувати</button>':''}</div></div>
+    ${list||'<div class="empty">Контактів ще немає.</div>'}`;
+}
+function netLinksTab(n){
+  const rows=n.cp_ids.map(id=>{
+    const r=(D.payback||[]).find(x=>x.id===id), nm=(r&&r.name)||(DR.cpNames&&DR.cpNames[id])||(T.cp_meta[id]&&T.cp_meta[id].name)||id;
+    return `<div class="crow"><div style="flex:1"><b>${esc(nm)}</b>${r?`<br><span class="sub">маркетинг ${nf(r.spend)} ₴ · валовий прибуток ${nf(r.gross)} ₴</span>`:'<br><span class="sub">виплат цього року немає</span>'}</div>
+      <button class="linkbtn danger" data-act="cp-rm" data-id="${id}">відв’язати</button></div>`;}).join('');
+  return `<p class="hint" style="margin-top:0">Контрагенти з МойСкладу, що належать цій мережі. Від них залежать окупність мережі та місце, куди дописуються записи журналу.
+      У мережі буває кілька юросіб — додайте всі.</p>
+    ${rows||'<div class="miss">Жодного контрагента. Для потенційної мережі це нормально; для діючої окупність не порахується.</div>'}
+    <div class="sec">Додати контрагента</div>
+    <label class="f"><span>Пошук у МойСкладі за назвою</span><input id="cp-q" placeholder="Мінімум 2 літери" autocomplete="off"></label>
+    <div id="cp-res" style="margin-top:8px"></div>`;
+}
+function netAuditTab(){
+  if(DR.audit==null) return '<div class="empty">Завантажуємо…</div>';
+  if(!DR.audit.length) return '<div class="empty">Змін ще не було.</div>';
+  const A={create:'створено',update:'змінено',archive:'в архів',restore:'повернуто з архіву',import:'додано з окупності'};
+  const F={name:'назва',stage:'статус',segment:'формат',priority:'пріоритет',owner_email:'відповідальний',tm_terms:'умови',tm_types:'види',
+    next_step:'наступний крок',next_date:'дата кроку',cp_ids:'контрагенти',payback_amber:'жовтий поріг',payback_red:'червоний поріг',
+    tm_budget_month_kop:'бюджет',contract_until:'діє до',region:'регіон',stores_count:'точок',decline_reason:'причина відмови',notes:'нотатки',website:'сайт',relation:'тип',combined_key:'група'};
+  return '<div class="tl">'+DR.audit.map(a=>{
+    let d=''; try{const o=JSON.parse(a.diff||'null'); if(o&&a.action==='update') d=Object.keys(o).map(k=>{
+      const arr=x=>{try{const v=JSON.parse(x);return Array.isArray(v)?v:null;}catch(e){return null;}};
+      const f=x=>{
+        if(x==null||x===''||x==='[]') return '—';
+        if(k==='stage') return STAGE_UA[x]||x;
+        if(k==='segment') return SEG_UA[x]||x;
+        if(k==='cp_ids'){ const v=arr(x); return v?v.length+' шт.':x; }
+        if(k==='tm_types'){ const v=arr(x); return v?v.map(t=>TMT_UA[t]||t).join(', '):x; }
+        if(k==='payback_amber'||k==='payback_red') return Math.round(x*100)+'%';
+        if(k==='tm_budget_month_kop') return nf(x/100)+' ₴';
+        if(k==='next_date'||k==='contract_until') return dUA(x);
+        return String(x).slice(0,80);
+      };
+      return `${F[k]||k}: ${esc(f(o[k][0]))} → ${esc(f(o[k][1]))}`;}).join('<br>');}catch(e){}
+    const dt=new Intl.DateTimeFormat('uk-UA',{timeZone:'Europe/Kiev',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(a.at*1000));
+    return `<div class="tl-i"><div class="tl-m"><b>${dt}</b><span>${esc((a.actor_email||'').split('@')[0])}</span><span>${A[a.action]||esc(a.action)}</span></div>
+      ${d?`<div class="tl-t" style="font-size:12.5px">${d}</div>`:''}</div>`;}).join('')+'</div>';
+}
+function drawerNet(){
+  const n=DR.netId?netById(DR.netId):null, d=netDraft(n), isNew=!d.id;
+  const tabs=isNew?[['card','Картка']]:[['card','Картка'],['journal','Журнал'+(T.notes_by_network[d.id]?' · '+T.notes_by_network[d.id].n:'')],
+    ['contacts','Контакти · '+(n.contacts||[]).length],['links','МойСклад · '+n.cp_ids.length],['audit','Історія змін']];
+  let body='';
+  if(DR.tab==='card') body=netCardTab(d);
+  else if(DR.tab==='journal') body=journalForm()+'<div class="sec">Історія записів</div>'+journalList();
+  else if(DR.tab==='contacts') body=netContactsTab(n);
+  else if(DR.tab==='links') body=netLinksTab(n);
+  else body=netAuditTab();
+  return `<div class="dr-h"><div><h3>${isNew?'Нова мережа':esc(n.name)}</h3>
+      ${isNew?'':`<div class="sub" style="margin-top:4px"><span class="tag t-${STAGE_CLS[n.stage]}">${STAGE_UA[n.stage]}</span> оновлено ${staleTag(n)}${n.archived?' <span class="tag t-gry">архів</span>':''}</div>`}</div>
+      <button class="dr-x" data-act="close" aria-label="Закрити">×</button></div>
+    <div class="dr-tabs">${tabs.map(t=>`<button class="${DR.tab===t[0]?'on':''}" data-act="net-tab" data-v="${t[0]}">${t[1]}</button>`).join('')}</div>
+    <div class="dr-b">${body}</div>
+    ${DR.tab==='card'?`<div class="dr-f"><button class="btn pri" data-act="net-save">${isNew?'Створити мережу':'Зберегти'}</button>
+      <button class="btn" data-act="close">Закрити</button><span class="sp"></span>
+      ${isNew?'':`<button class="btn sm danger" data-act="net-arch">${n.archived?'Повернути з архіву':'В архів'}</button>`}</div>`:''}`;
+}
+function drawerSettings(){
+  const s=ST(), d=T.defaults;
+  const f=(id,l,v,hint,step)=>`<label class="f"><span>${l}</span><input id="${id}" type="number" step="${step||1}" min="0" value="${v}"><span class="sub" style="text-transform:none;letter-spacing:0;font-weight:400;margin-top:3px">${hint}</span></label>`;
+  return `<div class="dr-h"><div><h3>Пороги й нагадування</h3><div class="sub" style="margin-top:4px">Діють для всієї команди. Зміна записується в історію.</div></div>
+      <button class="dr-x" data-act="close" aria-label="Закрити">×</button></div>
+    <div class="dr-b">
+      <div class="sec">Окупність: частка маркетингу у валовому прибутку</div>
+      <div class="fg">${f('st-amb','Жовтий, понад %',Math.round(s.payback_amber*100),'типово '+Math.round(d.payback_amber*100))}
+        ${f('st-red','Червоний, понад %',Math.round(s.payback_red*100),'типово '+Math.round(d.payback_red*100))}</div>
+      <div class="sec">База мереж: скільки днів без оновлень</div>
+      <div class="fg">${f('st-warn','Нагадати через, днів',s.stale_warn_days,'типово '+d.stale_warn_days)}
+        ${f('st-stale','Прострочено через, днів',s.stale_red_days,'типово '+d.stale_red_days)}</div>
+      <div class="sec">Динаміка до попереднього місяця</div>
+      <div class="fg">${f('st-mom','Суттєва зміна, від %',Math.round(s.mom_pct*100),'типово '+Math.round(d.mom_pct*100))}
+        ${f('st-min','і не менше, ₴',s.mom_min_uah,'типово '+d.mom_min_uah,100)}</div>
+      <p class="hint">Кольори в таблицях змінюються одразу. Сигнали й Telegram перерахуються під час наступного оновлення даних (щодня о 07:00 за Києвом).
+        Власні пороги окремої мережі задаються в її картці.</p>
+    </div>
+    <div class="dr-f"><button class="btn pri" data-act="set-save">Зберегти</button><button class="btn" data-act="close">Закрити</button></div>`;
+}
+async function renderDrawer(){
+  if(!DR.kind||!T){ closeDrawer(); return; }
+  if(DR.kind==='net'&&DR.netId&&!netById(DR.netId)){ closeDrawer(); return; }
+  const needNotes=(DR.kind==='cp'||(DR.kind==='net'&&DR.tab==='journal'))&&DR.notes==null;
+  const needAudit=DR.kind==='net'&&DR.tab==='audit'&&DR.audit==null;
+  const paint=()=>{ $('drawer').innerHTML=DR.kind==='cp'?drawerCp():DR.kind==='net'?drawerNet():drawerSettings(); };
+  paint();
+  if(needNotes){ await loadNotes(); if(DR.kind) paint(); }
+  if(needAudit){ try{DR.audit=(await api('/api/trade/audit',{entity:'network',entity_id:String(DR.netId)})).log;}catch(e){DR.audit=[];} if(DR.kind) paint(); }
+}
+
+// ── дії ───────────────────────────────────────────────────────────────────
+async function busy(btn,fn){
+  if(btn){ if(btn.disabled) return; btn.disabled=true; }
+  try{ await fn(); }catch(e){ toast(e.code==='cp_already_linked'?`${e.message}: «${e.data.network}».`:e.message,true); }
+  finally{ if(btn&&btn.isConnected) btn.disabled=false; }
+}
+// Видалення у два кліки замість системного confirm(): перший клік «заряджає» кнопку на 3 секунди.
+function armed(btn,label){
+  if(btn.dataset.armed) return true;
+  btn.dataset.armed='1'; btn.dataset.old=btn.textContent; btn.textContent=label;
+  setTimeout(()=>{ if(btn.isConnected){ delete btn.dataset.armed; btn.textContent=btn.dataset.old; } },3000);
+  return false;
+}
+const ACT={
+  tab:b=>{ TAB=b.dataset.v; draw(); window.scrollTo(0,0); },
+  pbmode:b=>{ PB_MODE=b.dataset.v; draw(); },
+  pbfilter:b=>{ PB_FILTER=b.dataset.v; draw(); },
+  'goto-nets':b=>{ TAB='nets'; NETF.flag=b.dataset.v||''; NETF.stage=''; NETF.arch=false; draw(); window.scrollTo(0,0); },
+  netstage:b=>{ NETF.stage=b.dataset.v; draw(); },
+  netflag:b=>{ NETF.flag=b.dataset.v; draw(); },
+  netarch:()=>{ NETF.arch=!NETF.arch; draw(); },
+  close:()=>closeDrawer(),
+  settings:()=>openDrawer({kind:'settings'}),
+  cmt:b=>openDrawer({kind:'cp',cpId:b.dataset.id,scope:'cp'}),
+  net:b=>openDrawer({kind:'net',netId:+b.dataset.id,tab:'card'}),
+  'net-journal':b=>openDrawer({kind:'net',netId:+b.dataset.id,tab:'journal'}),
+  'net-new':()=>openDrawer({kind:'net',netId:null,tab:'card'}),
+  'net-tab':b=>{ readNetForm(); DR.tab=b.dataset.v; DR.edit=null; DR.ctEdit=null; if(DR.tab==='journal') DR.notes=null; if(DR.tab==='audit') DR.audit=null; renderDrawer(); },
+  'jr-scope':b=>{ DR.scope=b.dataset.v; DR.notes=null; renderDrawer(); },
+  'jr-edit':b=>{ DR.edit=(DR.notes||[]).find(n=>n.id===b.dataset.id)||null; renderDrawer().then(()=>{ const f=$('jr-form'); if(f) f.scrollIntoView({block:'nearest'}); }); },
+  'jr-cancel':()=>{ DR.edit=null; renderDrawer(); },
+  'jr-save':b=>busy(b,async()=>{
+    const body={note_date:$('jr-date').value,note_type:$('jr-type').value,summary:$('jr-sum').value.trim(),
+      next_step:$('jr-next').value.trim()||null,next_date:$('jr-nextd').value||null};
+    if(!body.summary){ toast('Напишіть текст запису.',true); $('jr-sum').focus(); return; }
+    if(body.next_step&&!body.next_date){ toast('Вкажіть дату наступного кроку.',true); $('jr-nextd').focus(); return; }
+    if(DR.edit) body.id=DR.edit.id; else if(DR.kind==='net') body.network_id=DR.netId; else body.cp_id=DR.cpId;
+    const r=await api('/api/trade/note-save',body);
+    DR.edit=null; DR.notes=null; toast(r.ms_sync_pending?'Запис збережено, дописуємо в МойСклад':'Запис збережено'); await refresh();
+  }),
+  'jr-del':b=>{ if(!armed(b,'точно видалити?')) return; busy(b,async()=>{ await api('/api/trade/note-delete',{id:b.dataset.id}); DR.notes=null; toast('Запис видалено'); await refresh(); }); },
+  'net-save':b=>busy(b,async()=>{
+    readNetForm(); const d=DR.draft;
+    if(!d.name){ toast('Вкажіть назву мережі.',true); $('nf-name').focus(); return; }
+    if(d.next_step&&!d.next_date){ toast('Вкажіть дату наступного кроку.',true); $('nf-nextd').focus(); return; }
+    const data={name:d.name,stage:d.stage,segment:d.segment,priority:d.priority,region:d.region,stores_count:d.stores_count,website:d.website,
+      owner_email:d.owner_email,tm_types:d.tm_types,tm_terms:d.tm_terms,tm_budget_month_kop:d.tm_budget_month_kop,contract_until:d.contract_until,
+      next_step:d.next_step,next_date:d.next_date,decline_reason:d.decline_reason,notes:d.notes};
+    if(T.me.isAdmin){ data.payback_amber=d.payback_amber; data.payback_red=d.payback_red; }
+    const r=await api('/api/trade/network-save',{id:d.id||undefined,data});
+    const wasNew=!d.id; DR.netId=r.id; DR.draft=null; if(wasNew) DR.tab='contacts';
+    toast(wasNew?'Мережу створено. Додайте контакт.':'Збережено'); await refresh();
+  }),
+  'net-arch':b=>{ const n=netById(DR.netId); if(!n.archived&&!armed(b,'Точно в архів?')) return;
+    busy(b,async()=>{ await api('/api/trade/network-archive',{id:DR.netId,archived:!n.archived}); DR.draft=null; toast(n.archived?'Повернуто з архіву':'Мережу перенесено в архів'); closeDrawer(); await refresh(); }); },
+  'ct-edit':b=>{ DR.ctEdit=(netById(DR.netId).contacts||[]).find(c=>c.id===+b.dataset.id)||null; renderDrawer(); },
+  'ct-cancel':()=>{ DR.ctEdit=null; renderDrawer(); },
+  'ct-save':b=>busy(b,async()=>{
+    const data={full_name:$('ct-name').value.trim(),role:$('ct-role').value.trim(),phone:$('ct-phone').value.trim(),email:$('ct-email').value.trim(),
+      messenger:$('ct-msg').value.trim(),notes:$('ct-notes').value.trim(),is_primary:$('ct-prim').checked};
+    if(!data.full_name){ toast('Вкажіть ім’я контакту.',true); $('ct-name').focus(); return; }
+    await api('/api/trade/contact-save',{id:DR.ctEdit?DR.ctEdit.id:undefined,network_id:DR.netId,data});
+    DR.ctEdit=null; DR.draft=null; toast('Контакт збережено'); await refresh();
+  }),
+  'ct-del':b=>{ if(!armed(b,'точно видалити?')) return; busy(b,async()=>{ await api('/api/trade/contact-delete',{id:+b.dataset.id}); DR.draft=null; toast('Контакт видалено'); await refresh(); }); },
+  'cp-add':b=>busy(b,async()=>{ const n=netById(DR.netId);
+    DR.cpNames=DR.cpNames||{}; DR.cpNames[b.dataset.id]=b.dataset.name;
+    await api('/api/trade/network-save',{id:n.id,data:{cp_ids:[...n.cp_ids,b.dataset.id]}}); DR.draft=null; toast('Контрагента прив’язано'); await refresh(); }),
+  'cp-rm':b=>{ if(!armed(b,'точно відв’язати?')) return; busy(b,async()=>{ const n=netById(DR.netId);
+    await api('/api/trade/network-save',{id:n.id,data:{cp_ids:n.cp_ids.filter(x=>x!==b.dataset.id)}}); DR.draft=null; toast('Контрагента відв’язано'); await refresh(); }); },
+  'import-all':b=>busy(b,async()=>{ const items=suggestions().map(s=>({name:s.name,combined_key:s.combined_key,cp_ids:s.cp_ids}));
+    const r=await api('/api/trade/network-import',{items}); toast(`Додано мереж: ${r.created}`); await refresh(); }),
+  'set-save':b=>busy(b,async()=>{
+    const n=id=>parseFloat($(id).value);
+    const settings={payback_amber:n('st-amb')/100,payback_red:n('st-red')/100,stale_warn_days:n('st-warn'),stale_red_days:n('st-stale'),mom_pct:n('st-mom')/100,mom_min_uah:n('st-min')};
+    if(Object.values(settings).some(x=>isNaN(x))){ toast('Заповніть усі поля числами.',true); return; }
+    if(settings.payback_red<=settings.payback_amber){ toast(ERR_UA.red_must_exceed_amber,true); return; }
+    if(settings.stale_red_days<settings.stale_warn_days){ toast(ERR_UA.stale_red_before_warn,true); return; }
+    await api('/api/trade/settings-save',{settings}); toast('Пороги збережено'); closeDrawer(); await refresh();
+  }),
+};
+document.addEventListener('click',e=>{
+  if(e.target.id==='drawerBack'){ closeDrawer(); return; }
+  const b=e.target.closest('[data-act]'); if(!b) return;
+  // Клік по кнопці чи посиланню всередині рядка-посилання не має відкривати сам рядок.
+  const inner=e.target.closest('button,a,input,select,textarea,label'); if(inner&&inner!==b&&b.contains(inner)) return;
+  const f=ACT[b.dataset.act]; if(f) f(b);
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&DR.kind){ closeDrawer(); return; }
+  if(e.key==='Enter'&&e.target.classList&&e.target.classList.contains('rowlink')){ const f=ACT[e.target.dataset.act]; if(f) f(e.target); }
+});
+let _cpT=null;
+document.addEventListener('input',e=>{
+  if(e.target.id==='net-q'){ NETF.q=e.target.value; const tb=$('net-tbody'); if(tb) tb.innerHTML=renderNetRows(); return; }
+  if(e.target.id==='cp-q'){
+    clearTimeout(_cpT); const q=e.target.value;
+    _cpT=setTimeout(async()=>{
+      const box=$('cp-res'); if(!box) return;
+      if(q.trim().length<2){ box.innerHTML=''; return; }
+      try{
+        const r=await api('/api/trade/cp-search',{q}); if(!$('cp-res')||$('cp-q').value!==q) return;
+        const n=netById(DR.netId);
+        box.innerHTML=r.items.length?r.items.map(c=>{
+          const other=liveNets().find(x=>x.id!==n.id&&x.cp_ids.includes(c.id)), mine=n.cp_ids.includes(c.id);
+          return `<div class="crow"><div style="flex:1"><b>${esc(c.name)}</b>${c.combined_key?`<br><span class="sub">група в МойСкладі: ${esc(c.combined_key)}</span>`:''}</div>
+            ${mine?'<span class="tag t-grn">уже тут</span>':other?`<span class="tag t-gry">у мережі «${esc(other.name)}»</span>`
+              :`<button class="btn sm" data-act="cp-add" data-id="${c.id}" data-name="${esc(c.name)}">Прив’язати</button>`}</div>`;}).join('')
+          :'<div class="empty">Нічого не знайдено.</div>';
+      }catch(err){ box.innerHTML='<div class="empty">'+esc(err.message)+'</div>'; }
+    },250);
+  }
+});
 
 window.__expInit=async function(){
   try{
@@ -565,6 +1370,8 @@ window.__expInit=async function(){
     D=await r.json();
     if(typeof D==='string') D=JSON.parse(D);
     PERIOD = D.months.length>12 ? 'last12' : 'all';
+    // База мереж і коментарі — окремим запитом. Якщо він не вдався, окупність усе одно показуємо.
+    await loadTrade();
     draw();
   }catch(e){
     document.getElementById('root').innerHTML=
