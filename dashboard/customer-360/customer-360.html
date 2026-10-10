@@ -2290,8 +2290,10 @@ window.bootCustomer360 = async function(token){
     // === Aggregate revenue per agent ID + name (v2.61 — використовуємо ID коли є) ===
     const now = new Date();
     const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const prevMonthYM = prevMonth.toISOString().slice(0, 7);
-    const currMonthYM = now.toISOString().slice(0, 7);
+    // DASH-05 (audit 10.10.2026): було prevMonth.toISOString() — локальна північ 1-го числа
+    // у Києві = попередня доба UTC → «минулий місяць» був позаминулим. Беремо ymLocal().
+    const prevMonthYM = ymLocal(prevMonth);
+    const currMonthYM = ymLocal(now);
     const ytdStart = now.getFullYear() + '-01-01';  // v2.66: для ТОП-10 з початку року
     const cutoff30 = new Date(now.getTime() - 30*86400000).toISOString().slice(0,10);
 
