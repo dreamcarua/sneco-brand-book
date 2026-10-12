@@ -1354,7 +1354,7 @@ window.deleteCrmEntry = async function(custKey, noteId){
 // v2.73.0 — DECISION-MAKERS parsing from legal_address_comment + tags
 // ============================================================================
 // Reality check (Епіцентр приклад): contact text часто має формат:
-//   "Алексей - [phone removed]\n[email removed]\nЕлена - [phone removed] (заказы)"
+//   "Алексей - [телефон прибрано]\n[email прибрано]\nЕлена - [телефон прибрано] (заказы)"
 // Парсимо лінії з phone/email + heuristic role detection.
 // v2.75.2: normalize legal_address_comment — МойСклад attribute іноді приходить
 // як Python dict-repr "{'comment': '...'}" замість plain text. Витягуємо comment field.
