@@ -283,6 +283,13 @@ body.kb-dragging{cursor:grabbing;user-select:none;-webkit-user-select:none}
 .fsec{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin:18px 0 9px;padding-bottom:5px;border-bottom:1px solid var(--border);grid-column:1/-1}
 .fsec:first-child{margin-top:0}
 .fsec.lock::after{content:' 🔒';font-size:10px}
+/* v2.81.0 · публікація на сайті */
+.fchk{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;cursor:pointer;padding:9px 11px;border:1px solid var(--border);border-radius:9px;background:#fff;min-height:42px}
+.fchk input{width:18px;height:18px;margin:0;flex:0 0 auto;accent-color:var(--green)}
+.fld label.fchk{display:flex;text-transform:none;letter-spacing:0;font-size:13px;font-weight:600;color:var(--d);margin:0}
+.pub-url{grid-column:1/-1;font-size:12px;line-height:1.5;padding:9px 11px;border-radius:9px;background:var(--bf);word-break:break-all}
+.pub-url a{font-weight:700}
+.pub-url.off{background:#f4f4f0;color:var(--muted)}
 
 /* ─── PROFILE VIEW ─── */
 .prof-hero{display:flex;gap:13px;align-items:center;margin-bottom:14px}
@@ -921,6 +928,7 @@ body{overflow-x:clip}
     <a href="#g-drag">Перетягування</a>
     <a href="#g-files">Файли</a>
     <a href="#g-pool">Talent pool</a>
+    <a href="#g-site">Вакансії на сайті</a>
     <a href="#g-metrics">Як рахуються показники</a>
     <a href="#g-rules">Правила ведення даних</a>
     <a href="#g-access">Доступи і безпека</a>
@@ -963,7 +971,7 @@ body{overflow-x:clip}
         <div class="doc-tab-card"><div class="t">📊 Огляд</div><div class="d">Головна панель: 8 показників (чисельність, найм, звільнення, плинність, відкриті вакансії, час найму, випробувальний) + графіки динаміки + воронка найму. Внизу — блок <b>«Потребує уваги»</b>: дні народження цього місяця, випробувальні строки, що спливають, прострочені вакансії, кандидати без руху 7+ днів. З нього варто починати робочий тиждень.</div></div>
         <div class="doc-tab-card"><div class="t">🎯 Кандидати</div><div class="d">Дошка-канбан: колонка = етап відбору. <b>Перетягніть картку</b> в наступну колонку — етап зміниться, а дата проставиться сама. Клік по картці відкриває повну картку з історією рухів. Помаранчева смужка зліва = кандидат «завис» на 7+ днів.<br>Згори перемикач <b>🎯 Воронка / 💎 Talent pool</b>: другий — резерв сильних людей на майбутні вакансії, з нагадуваннями, кому пора написати.</div></div>
         <div class="doc-tab-card"><div class="t">📡 Канали</div><div class="d">Звідки приходять люди і скільки це коштує. Таблиця: кандидати → співбесіди → офери → найнято, конверсія і <b>вартість найму</b>. Щоб зʼявилась вартість, внесіть витрати кнопкою «💵 Витрати на канали» (публікації вакансій, підписки, послуги агенцій).</div></div>
-        <div class="doc-tab-card"><div class="t">📌 Вакансії</div><div class="d">Усі відкриті й закриті позиції: скільки днів відкрита, чи прострочена планова дата, скільки кандидатів на кожному етапі. Клік по рядку — картка вакансії з її власною воронкою і списком кандидатів.</div></div>
+        <div class="doc-tab-card"><div class="t">📌 Вакансії</div><div class="d">Усі відкриті й закриті позиції: скільки днів відкрита, чи прострочена планова дата, скільки кандидатів на кожному етапі. Клік по рядку — картка вакансії з її власною воронкою і списком кандидатів. Позначка 🌐 на сайті: вакансія зараз видна на sneco.ua.</div></div>
         <div class="doc-tab-card"><div class="t">🧑‍💼 Співробітники</div><div class="d">Довідник команди — таблицею або картками (кнопка «▦ Картки»). Клік відкриває профіль: дані, компенсація (якщо є доступ) та <b>історія всіх змін</b> — хто, коли і що правив.</div></div>
         <div class="doc-tab-card"><div class="t">💰 Фонд оплати</div><div class="d">Тільки для тих, кому відкрито доступ до зарплат. Фонд по місяцях, план проти факту, середня й медіанна зарплата, розріз по підрозділах і посадах, вилки зарплат (min/середина/max) і хто з них випадає.</div></div>
         <div class="doc-tab-card"><div class="t">🚪 Плинність</div><div class="d">Скільки людей пішло, за власним бажанням чи ні, з яких підрозділів і посад, який стаж мали на момент виходу і з яких причин. Найцінніший розділ для розмови з керівниками: показує, де саме компанія втрачає людей.</div></div>
@@ -990,6 +998,17 @@ body{overflow-x:clip}
 
       <h3>Оформити кандидата у штат</h3>
       <p>Відкрийте картку кандидата → <span class="doc-kbd">✅ Оформити</span>. Заповніть дату виходу, кінець випробувального, посаду й підрозділ — картка співробітника створиться сама, а кандидат перейде на етап «Вийшов на роботу». Якщо це була остання позиція у вакансії, дашборд запропонує її закрити.</p>
+
+      <h3>Опублікувати вакансію на сайті sneco.ua</h3>
+      <ol class="doc-steps">
+        <li>Відкрийте вакансію → <span class="doc-kbd">✏️ Редагувати</span> → розділ <strong>«🌐 Публікація на сайті»</strong> унизу форми.</li>
+        <li>Поставте галочку <strong>«Опублікувати на sneco.ua»</strong> і оберіть мову тексту: українська зʼявиться на <code>sneco.ua/kariera/…</code>, English на <code>sneco.ua/en/careers/…</code>.</li>
+        <li>Заповніть регіон, місто, формат роботи й зайнятість, потім тексти: <strong>коротко про вакансію</strong>, <strong>обовʼязки</strong>, <strong>вимоги для сайту</strong>, <strong>що пропонуємо</strong>. У трьох останніх кожен пункт пишіть з нового рядка: на сайті це буде список.</li>
+        <li>Адресу (slug) можна не вписувати: під час збереження вона створиться з назви латиницею. Під галочкою видно, якою буде адреса.</li>
+        <li><span class="doc-kbd">💾 Зберегти</span>. У списку вакансій зʼявиться позначка <span class="chip chip-g">🌐 на сайті</span>, у картці вакансії посилання «Відкрити ↗». Сайт оновлює список до 5 хвилин.</li>
+        <li>Зняти з сайту: прибрати галочку або закрити вакансію (статус «Закрита»). Те саме робить дата «Показувати до», коли мине.</li>
+      </ol>
+      <div class="doc-note">Відгуки з сайту падають самі: кандидат зʼявляється в колонці «Новий» з джерелом <strong>«Сайт»</strong>, резюме вже в його файлах, а в Telegram HR приходить повідомлення. Загальна анкета без вакансії потрапляє в Talent pool з причиною «Анкета із сайту».</div>
 
       <h3>Зберегти сильного кандидата в Talent pool</h3>
       <p>Найпростіше — при відмові: у вікні з причиною відмітьте <strong>«💎 Додати в Talent pool»</strong> (для фіналістів і тих, хто відмовився від оферу, галочка вже стоїть). Або в картці кандидата → <span class="doc-kbd">💎 У Talent pool</span>. Людину, якої у воронці не було (рекомендація, знайшли на LinkedIn) — «Кандидати» → <span class="doc-kbd">💎 Talent pool</span> → <span class="doc-kbd">+ У пул</span>. Докладно — розділ <a href="#g-pool">Talent pool</a>.</p>
@@ -1053,6 +1072,7 @@ body{overflow-x:clip}
           <tr><td><strong>Хто бачить</strong></td><td>Ті самі люди, що мають доступ до HR-дашборда. Окремого рівня для файлів немає.</td></tr>
           <tr><td><strong>Чи можна переслати посилання</strong></td><td><strong>Ні, і це навмисно.</strong> Файл не має адреси в інтернеті — дашборд отримує його вмістом після вашого входу. Щоб поділитися резюме, завантажте його собі й надішліть вкладенням, свідомо.</td></tr>
           <tr><td><strong>Видалення</strong></td><td>Хрестик праворуч у рядку. Файл стирається остаточно, запис про видалення лишається в журналі змін.</td></tr>
+          <tr><td><strong>Резюме з сайту</strong></td><td>Відгук на вакансію з sneco.ua приходить уже з резюме у файлах кандидата (позначка «website»). У загальної анкети резюме лежить у картці запису Talent pool, блок «Файли».</td></tr>
           <tr><td><strong>А поле «Посилання на CV»?</strong></td><td>Лишається і працює як раніше — для зовнішніх посилань (LinkedIn, профіль на work.ua, тека в Google Drive). Використовуйте те, що зручніше.</td></tr>
         </tbody>
       </table>
@@ -1111,6 +1131,33 @@ body{overflow-x:clip}
         <li>Очікування по зарплаті в записах пулу видно лише з доступом <code>hr-payroll</code>, як і в кандидатів.</li>
         <li>Резюме та файли лишаються в картці відбору, з якого людину додали. У записі пулу є посилання на неї.</li>
         <li>Імпорт з Excel і вивантаження в CSV — кнопки над таблицею пулу, як в інших вкладках.</li>
+      </ul>
+    </section>
+
+    <section class="doc-sec" id="g-site">
+      <h2>🌐 Вакансії на сайті sneco.ua</h2>
+      <div class="lead">Вакансія ведеться в одному місці: тут. Сайт лише показує те, що ви дозволили показати.</div>
+      <table>
+        <thead><tr><th style="width:30%">Поле</th><th>Що це і де видно</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Опублікувати на sneco.ua</strong></td><td>Головний вимикач. Вакансія на сайті, лише поки стоїть галочка, статус «Відкрита» і не минула дата «Показувати до».</td></tr>
+          <tr><td><strong>Мова тексту</strong></td><td>Мова, якою ви написали тексти. Українська → <code>sneco.ua/kariera/&lt;адреса&gt;/</code>, English → <code>sneco.ua/en/careers/&lt;адреса&gt;/</code>. Перекладу автоматично немає: для іншої мови заведіть окрему вакансію.</td></tr>
+          <tr><td><strong>Регіон, місто, формат, зайнятість</strong></td><td>Фільтри й підписи на сайті. Регіон: Україна або Європа (завод у Гуменному).</td></tr>
+          <tr><td><strong>Назва для сайту</strong></td><td>Якщо внутрішня назва посади не годиться для кандидата. Порожньо = назва посади.</td></tr>
+          <tr><td><strong>Адреса (slug)</strong></td><td>Кінець посилання: латиниця, цифри й дефіс, 3–80 символів. Порожньо = створиться з назви. Дві вакансії не можуть мати однакову адресу: дашборд підсвітить поле.</td></tr>
+          <tr><td><strong>Коротко, обовʼязки, вимоги для сайту, що пропонуємо</strong></td><td>Тексти сторінки вакансії. Кожен рядок стає пунктом списку.</td></tr>
+          <tr><td><strong>Показувати зарплату на сайті</strong></td><td>Показує вилку «від / до» з розділу «Умови». Бачать і змінюють лише ті, хто має доступ до зарплат. Без галочки сума на сайт не йде ніколи, навіть якщо вилку заповнено.</td></tr>
+          <tr><td><strong>Показувати до</strong></td><td>Необовʼязково. Наступного дня після цієї дати вакансія зникає з сайту сама, а форма відгуку на неї закривається.</td></tr>
+        </tbody>
+      </table>
+      <div class="doc-note ok"><strong>Що ніколи не потрапляє на сайт:</strong> нотатки, керівник, пріоритет, канал пошуку, внутрішні «Вимоги / опис», кількість позицій, хто і коли створив вакансію, кандидати. Сервер віддає сайту лише поля з таблиці вище, за білим списком, тому нове поле в дашборді на сайт саме не потрапить.</div>
+      <h3>Відгуки з сайту</h3>
+      <ul>
+        <li><strong>На конкретну вакансію</strong> → новий кандидат у воронці, етап «Новий», джерело <strong>«Сайт»</strong>, дата першого контакту = день відгуку. Повідомлення кандидата лежить у нотатках, резюме у файлах картки.</li>
+        <li><strong>Загальна анкета</strong> (без вакансії) → запис у Talent pool з причиною «Анкета із сайту», наступний контакт = сьогодні, згода на зберігання на рік. Резюме у блоці «Файли» картки.</li>
+        <li>Про кожен відгук приходить повідомлення в Telegram HR (або лист на пошту HR, якщо чат не налаштовано).</li>
+        <li>Канал «Сайт» видно у вкладці «📡 Канали» поруч із Work.ua і LinkedIn: скільки кандидатів, співбесід і наймів дав сайт.</li>
+        <li>Захист від спаму працює на сервері: прихована пастка для ботів, перевірка часу заповнення, не більше 5 відгуків з однієї адреси за годину. Резюме приймаються лише PDF, Word, ODT і RTF до 10 МБ, тип перевіряється за вмістом файлу.</li>
       </ul>
     </section>
 
@@ -1189,8 +1236,9 @@ body{overflow-x:clip}
       <ul>
         <li><strong>Сторінка:</strong> <code>brand/dashboard/hr/hr.html</code> — один самодостатній файл із власним входом.</li>
         <li><strong>API:</strong> <code>sneco-auth/src/hr.js</code>, роути <code>/api/hr/*</code>. Дані — 12 таблиць <code>hr_*</code> у Cloudflare D1 (<code>sneco-bible</code>); Talent pool — <code>hr_talent_pool</code>, сутність <code>talent</code> (міграція <code>20260924_hr_talent_pool.sql</code>).</li>
-        <li><strong>Автоматичного наповнення немає</strong> — жодних cron-задач, усе вводиться людьми.</li>
-        <li><strong>Тести:</strong> <code>node sneco-auth/tests/hr_api_check.mjs</code> — перевіряє логіку й розмежування доступів без деплою. Запускати після кожної зміни <code>hr.js</code>.</li>
+        <li><strong>Автоматичного наповнення немає</strong>, жодних cron-задач. Єдиний автоматичний вхід: відгуки з sneco.ua.</li>
+        <li><strong>Сайт:</strong> <code>sneco-auth/src/careers.js</code>, публічні <code>GET /api/public/careers</code> і <code>POST /api/public/careers/apply</code> без входу, CORS лише для sneco.ua. Поля вакансії для сайту, згода й файли Talent pool: міграція <code>20261013_hr_careers.sql</code>. Сповіщення: Worker secret <code>HR_TELEGRAM_CHAT_ID</code>.</li>
+        <li><strong>Тести:</strong> <code>node sneco-auth/tests/hr_api_check.mjs</code> і <code>node sneco-auth/tests/careers_check.mjs</code> перевіряють логіку, доступи й публічний API без деплою; CI запускає обидва. Запускати після кожної зміни <code>hr.js</code> або <code>careers.js</code>.</li>
         <li><strong>Доступи:</strong> списки в KV (<code>wl:hr-dashboard</code>, <code>wl:hr-payroll</code>) редагуються через Maintenance; запасні списки — у <code>wrangler.toml</code>.</li>
       </ul>
       <div class="doc-note bad"><strong>Правило супроводу:</strong> будь-яка зміна дашборда — нова вкладка, поле, показник, зміна формули — <strong>обовʼязково супроводжується оновленням цього розділу</strong> й записом у «Історію змін» нижче. Інакше колеги працюватимуть за інструкцією, якої вже не існує.</div>
@@ -1200,6 +1248,17 @@ body{overflow-x:clip}
       <h2>🧾 Історія змін</h2>
       <div class="lead">Що і коли змінювалось у дашборді.</div>
       <div class="doc-ver">
+        <div class="v">
+          <div class="vh">v2.81.0 · Вакансії на сайті sneco.ua і відгуки з сайту</div>
+          <div class="vd">13.10.2026</div>
+          <ul>
+            <li>У формі вакансії новий розділ <strong>«🌐 Публікація на сайті»</strong>: галочка «Опублікувати на sneco.ua», мова тексту, регіон, місто, формат, зайнятість, назва для сайту, адреса, тексти (коротко, обовʼязки, вимоги, що пропонуємо) і дата «Показувати до». Під галочкою видно адресу сторінки.</li>
+            <li>Вилку зарплати на сайті показує окрема галочка, доступна лише з доступом до зарплат.</li>
+            <li>У списку вакансій позначка <span class="chip chip-g">🌐 на сайті</span> (або сіра «не показується» з причиною), у картці вакансії посилання на сторінку і кількість відгуків із сайту.</li>
+            <li>Відгуки з сайту падають у воронку з джерелом <strong>«Сайт»</strong>, загальна анкета в Talent pool з причиною «Анкета із сайту». У картці запису Talent pool зʼявився блок «Файли» з резюме.</li>
+            <li>Нова глава інструкції «🌐 Вакансії на сайті» і рецепт «Опублікувати вакансію на сайті».</li>
+          </ul>
+        </div>
         <div class="v">
           <div class="vh">v2.80.0 — Talent pool: резерв кандидатів</div>
           <div class="vd">24.09.2026</div>
@@ -1333,8 +1392,8 @@ body{overflow-x:clip}
 /* ═══════════════════════════════════════════════════════════════════════════
    snEco · HR Dashboard — core (v2.79.0)
    ═══════════════════════════════════════════════════════════════════════════ */
-const HR_VERSION = 'v2.80.0';
-const HR_UPDATED  = '24.09.2026';
+const HR_VERSION = 'v2.81.0';
+const HR_UPDATED  = '13.10.2026';
 const API = 'https://sneco-auth.vg-ab6.workers.dev';
 const BLOCK_HR = 'hr-dashboard';
 const STAGES = [
@@ -1357,7 +1416,7 @@ const PRIORITY_L  = { low:'Низький', normal:'Звичайний', high:'�
 const TERM_TYPE_L = { voluntary:'За власним бажанням', involuntary:'З ініціативи компанії' };
 const PROB_L      = { pending:'Триває', passed:'Пройдено', failed:'Не пройдено' };
 // Talent pool (v2.80.0). days — рекомендований інтервал «нагадати про себе»
-const TP_REASON_L = { finalist:'Фіналіст відбору', declined_offer:'Відмовився від оферу', no_vacancy:'Немає вакансії зараз', referral:'Рекомендація', sourced:'Знайшли самі', former_employee:'Колишній співробітник', other:'Інше' };
+const TP_REASON_L = { finalist:'Фіналіст відбору', declined_offer:'Відмовився від оферу', no_vacancy:'Немає вакансії зараз', referral:'Рекомендація', sourced:'Знайшли самі', former_employee:'Колишній співробітник', website:'Анкета із сайту', other:'Інше' };
 const TP_TEMP = {
   hot:  { l:'Гарячий',  i:'🔥', cls:'chip-r', days:30,  hint:'готовий говорити зараз' },
   warm: { l:'Теплий',   i:'🙂', cls:'chip-y', days:90,  hint:'відкритий, але не поспішає' },
@@ -1365,6 +1424,27 @@ const TP_TEMP = {
 };
 const TP_STATUS_L = { active:'У пулі', engaged:'Передано у вакансію', archived:'Архів' };
 const TP_SOURCE = 'Talent pool';   // джерело кандидата, повернутого з пулу — так канал видно у «Каналах»
+// v2.81.0 · Кар'єра на sneco.ua. Відгуки з сайту приходять з джерелом SITE_SOURCE
+const SITE_SOURCE = 'Сайт';
+const VAC_REGION_L = { ua:'Україна', eu:'Європа' };
+const VAC_FORMAT_L = { office:'Офіс', plant:'Виробництво', hybrid:'Гібрид', remote:'Віддалено' };
+const VAC_EMPLOY_L = { full:'Повна зайнятість', part:'Часткова зайнятість', contract:'Контракт / ФОП', internship:'Стажування' };
+const VAC_LANG_L   = { uk:'Українська', en:'English' };
+const RE_SLUG = /^[a-z0-9-]{3,80}$/;
+function vacPublicUrl(slug, lang){
+  if (!slug) return '';
+  return lang==='en' ? `https://sneco.ua/en/careers/${slug}/` : `https://sneco.ua/kariera/${slug}/`;
+}
+// Вакансія реально видна на сайті: так само рахує воркер (src/careers.js, isLive)
+function vacIsLive(v){
+  return !!v && v.status==='open' && +v.publish_site===1 && !!v.slug && (!v.valid_through || v.valid_through>=todayISO());
+}
+function vacSiteChip(v){
+  if (!v || +v.publish_site!==1) return '';
+  if (vacIsLive(v)) return ` <span class="chip chip-g" title="${esc(vacPublicUrl(v.slug, v.lang))}">🌐 на сайті</span>`;
+  const why = v.status!=='open' ? 'вакансія не відкрита' : (!v.slug ? 'немає адреси' : 'минув строк «Показувати до»');
+  return ` <span class="chip chip-gray" title="Позначено для сайту, але не показується: ${esc(why)}">🌐 не показується</span>`;
+}
 const PALETTE = ['#8DC63F','#FCC01B','#3B82F6','#7209B7','#F97316','#0D9488','#DB2777','#DC2626','#64748B','#84CC16','#0EA5E9','#A855F7'];
 
 const S = {
@@ -2062,12 +2142,39 @@ function openTalent(id){
       ${eng?`<dt>Повернуто у воронку</dt><dd><a href="#" onclick="openCandidate(${eng.id});return false">${esc(vacById(eng.vacancy_id)?.title||eng.position||'картка кандидата')} ↗</a> · ${esc(STAGE_MAP[eng.stage].l)}</dd>`:''}
     </dl>
     <div class="sec">Нотатки та історія контактів</div>
-    ${t.notes?`<div class="hint" style="margin-top:0">${esc(t.notes).replace(/\n/g,'<br>')}</div>`:ph('Поки порожньо. «✓ Записати контакт» додає сюди запис із датою.')}`;
+    ${t.notes?`<div class="hint" style="margin-top:0">${esc(t.notes).replace(/\n/g,'<br>')}</div>`:ph('Поки порожньо. «✓ Записати контакт» додає сюди запис із датою.')}
+    <div class="sec">Файли</div><div id="tpFiles"><div class="muted" style="font-size:12px">Завантажую…</div></div>`;
+  tfRenderList(id, $('#tpFiles'));
   $('#drFoot').innerHTML = `<button class="btn btn-danger" onclick="delEntity('talent',${id},'запис із Talent pool')" title="Видалити назавжди (напр. кандидат відкликав згоду)">🗑</button>
     <span class="sp"></span>
     <button class="btn btn-primary" onclick="openForm('talent',${id})">✏️ Редагувати</button>`;
   openDrawer();
 }
+/* v2.81.0 · Файли запису Talent pool. Сюди потрапляє резюме з загальної анкети
+   на sneco.ua (без вакансії). Додати файл вручну можна в картці кандидата
+   після «➜ У вакансію»; тут лише перегляд і видалення. */
+async function tfRenderList(talentId, box){
+  if (!box) return;
+  let rows = [];
+  try { rows = (await api('/api/hr/talent-files', { talent_id: talentId })).rows || []; }
+  catch(e){ box.innerHTML = '<div class="hint">Не вдалося завантажити список файлів</div>'; return; }
+  if (!rows.length){ box.innerHTML = ph('Файлів немає. Резюме з анкети на сайті зʼявляється тут автоматично.'); return; }
+  box.innerHTML = rows.map(f=>`<div class="cf-row">
+      <span class="cf-ico">${cfIcon(f.mime, f.filename)}</span>
+      <div class="cf-main">
+        <div class="cf-nm" onclick="cfOpen(${f.id}, ${esc(JSON.stringify(f.filename))}, '/api/hr/talent-file-get')" title="Відкрити">${esc(f.filename)}</div>
+        <div class="cf-meta">${cfSize(f.size_bytes)} · ${f.uploaded_by==='website'?'з сайту':esc(f.uploaded_by||'')} · ${f.uploaded_at?dmy(new Date(f.uploaded_at*1000).toISOString().slice(0,10)):''}</div>
+      </div>
+      <button class="cf-del" onclick="tfDelete(${f.id},${talentId})" title="Видалити">✕</button>
+    </div>`).join('');
+}
+async function tfDelete(id, talentId){
+  if (!confirm('Видалити файл? Дію не можна скасувати.')) return;
+  try { await api('/api/hr/talent-file-delete', { id }); toast('Файл видалено', 'ok'); }
+  catch(e){ toast(apiErr(e), 'err'); }
+  tfRenderList(talentId, $('#tpFiles'));
+}
+
 async function tpSetStatus(id, status){
   try {
     await api('/api/hr/save', { entity:'talent', id, data:{ status } });
@@ -2470,12 +2577,12 @@ async function cfUpload(files, candId, silent, targetId){
       таке вікно мовчки. Тому вікно відкриваємо одразу по кліку, а файл
       підставляємо в нього, коли приїде. Якщо вікно заблоковано — звичайне
       завантаження через <a download>. */
-async function cfOpen(id, name){
+async function cfOpen(id, name, endpoint){
   let w = null;
   try { w = window.open('', '_blank'); if (w) w.document.title = 'Відкриваю файл…'; } catch(e){ w = null; }
   try {
     loading(true);
-    const r = await fetch(`${API}/api/hr/file-get`, {
+    const r = await fetch(`${API}${endpoint || '/api/hr/file-get'}`, {
       method:'POST',
       headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + S.token },
       body: JSON.stringify({ id }),
@@ -2635,7 +2742,7 @@ function renderVacancies(){
   ].join('');
 
   renderTable('#tblVacancies', [
-    { k:'title', l:'Посада', fmt:v=>`<strong>${esc(v.title)}</strong>${v.headcount>1?` <span class="chip chip-gray">×${v.headcount}</span>`:''}` },
+    { k:'title', l:'Посада', fmt:v=>`<strong>${esc(v.title)}</strong>${v.headcount>1?` <span class="chip chip-gray">×${v.headcount}</span>`:''}${vacSiteChip(v)}` },
     { k:'department', l:'Підрозділ', fmt:v=>esc(v.department||'—') },
     { k:'company', l:'Компанія', fmt:v=>v.company?`<span class="chip chip-gray">${esc(v.company)}</span>`:'—' },
     { k:'manager', l:'Керівник', fmt:v=>esc(v.manager||'—') },
@@ -3189,9 +3296,26 @@ const F = {
     { k:'salary_from_kop', l:'Вилка від', t:'money', pay:1 },
     { k:'salary_to_kop', l:'Вилка до', t:'money', pay:1 },
     { k:'currency', l:'Валюта', t:'select', opts:[['UAH','UAH ₴'],['EUR','EUR €'],['USD','USD $'],['PLN','PLN zł']], pay:1 },
-    { s:'Опис' },
+    { s:'Опис (внутрішній, на сайт не йде)' },
     { k:'requirements', l:'Вимоги / опис', t:'textarea', full:1 },
     { k:'notes', l:'Нотатки', t:'textarea', full:1 },
+    { s:'🌐 Публікація на сайті' },
+    { note:'Усе в цьому розділі бачить будь-хто на sneco.ua. Нотатки, керівник, пріоритет, канал пошуку, внутрішні вимоги й кількість позицій на сайт не потрапляють ніколи.' },
+    { k:'publish_site', l:'Опублікувати на sneco.ua', t:'check', full:1, help:'Вакансія показується на сайті, поки її статус «Відкрита». Закрили вакансію або зняли галочку: зникає з сайту протягом 5 хвилин' },
+    { k:'pub_url', t:'puburl' },
+    { k:'lang', l:'Мова тексту', t:'select', opts:Object.entries(VAC_LANG_L), help:'Українська → sneco.ua/kariera/…, English → sneco.ua/en/careers/…' },
+    { k:'region', l:'Регіон', t:'select', opts:[['','—'], ...Object.entries(VAC_REGION_L)] },
+    { k:'city', l:'Місто', t:'text', ph:'Мукачево / Гуменне / Київ' },
+    { k:'work_format', l:'Формат роботи', t:'select', opts:[['','—'], ...Object.entries(VAC_FORMAT_L)] },
+    { k:'employment_type', l:'Зайнятість', t:'select', opts:[['','—'], ...Object.entries(VAC_EMPLOY_L)] },
+    { k:'valid_through', l:'Показувати до', t:'date', help:'Необовʼязково. Після цієї дати вакансія сама зникне з сайту' },
+    { k:'public_title', l:'Назва для сайту', t:'text', full:1, help:'Порожньо = назва посади з розділу «Основне»' },
+    { k:'slug', l:'Адреса (slug)', t:'text', full:1, ph:'напр. operator-linii', help:'Латиниця, цифри, дефіс, 3–80 символів. Порожньо = згенерується з назви при публікації' },
+    { k:'summary', l:'Коротко про вакансію', t:'textarea', full:1, ph:'1–3 речення: хто потрібен і чому в нас цікаво' },
+    { k:'responsibilities', l:'Обовʼязки', t:'textarea', full:1, help:'Кожен пункт з нового рядка' },
+    { k:'public_requirements', l:'Вимоги для сайту', t:'textarea', full:1, help:'Кожен пункт з нового рядка. Внутрішні «Вимоги / опис» вище на сайт не йдуть' },
+    { k:'offer', l:'Що пропонуємо', t:'textarea', full:1, help:'Кожен пункт з нового рядка' },
+    { k:'show_salary', l:'Показувати зарплату на сайті', t:'check', full:1, pay:1, help:'Вилку «від / до» з розділу «Умови» побачать усі відвідувачі сайту. Змінити може лише доступ до зарплат' },
   ]},
   talent: { title:'запис Talent pool', titleNew:'Новий запис у Talent pool', icon:'💎', fields:[
     { s:'Хто це' },
@@ -3252,7 +3376,11 @@ function dictSuggest(kind){
 
 function fieldHtml(f, val){
   if (f.s) return `<div class="fsec${f.lock?' lock':''}">${esc(f.s)}</div>`;
+  if (f.note) return `<div class="fld full"><div class="hint info" style="margin:0">${esc(f.note)}</div></div>`;
+  if (f.t==='puburl') return `<div class="pub-url off" id="f_pub_url"></div>`;
   const id = 'f_' + f.k;
+  if (f.t==='check') return `<div class="fld${f.full?' full':''}"><label class="fchk" for="${id}"><input type="checkbox" id="${id}"${+val===1?' checked':''}> ${esc(f.l)}</label>
+    ${f.help?`<div class="fhelp">${esc(f.help)}</div>`:''}<div class="ferr" id="e_${f.k}"></div></div>`;
   const v = val ?? '';
   const req = f.req ? ' <span class="req">*</span>' : '';
   let inp = '';
@@ -3283,7 +3411,9 @@ function readForm(entity){
   for (const f of cfg.fields){
     if (f.s) continue;
     if (f.pay && !S.me.canPayroll) continue;
+    if (f.note || f.t==='puburl') continue;
     const el = $('#f_'+f.k); if (!el) continue;
+    if (f.t==='check'){ out[f.k] = el.checked ? 1 : 0; continue; }
     let v = el.value;
     if (v==='' ) { out[f.k] = null; continue; }
     if (f.t==='money') v = Math.round(parseFloat(v)*100);
@@ -3299,6 +3429,32 @@ function openDrawer(){ $('#drawerBack').classList.add('open'); $('#drawer').clas
 function closeDrawer(){ $('#drawerBack').classList.remove('open'); $('#drawer').classList.remove('open'); DR={entity:null,id:null,tab:0}; }
 document.addEventListener('keydown', e=>{ if (e.key==='Escape'){ if ($('#modalBack').classList.contains('open')) closeModal(); else closeDrawer(); } });
 
+/* ── v2.81.0 · Публікація вакансії на sneco.ua: підказка з адресою у формі ── */
+function vacPubBind(src){
+  const upd = ()=>{
+    const box = $('#f_pub_url'); if (!box) return;
+    const on = $('#f_publish_site')?.checked;
+    const slugIn = ($('#f_slug')?.value||'').trim().toLowerCase();
+    const lang = $('#f_lang')?.value || 'uk';
+    const status = $('#f_status')?.value || 'open';
+    const until = $('#f_valid_through')?.value || '';
+    if (!on){ box.className='pub-url off'; box.innerHTML='Не опубліковано. Поставте галочку вище, щоб вакансія зʼявилась на сайті.'; return; }
+    if (slugIn && !RE_SLUG.test(slugIn)){ box.className='pub-url off'; box.innerHTML='⚠ Адреса може містити лише латиницю, цифри й дефіс, 3–80 символів.'; return; }
+    if (!slugIn){ box.className='pub-url'; box.innerHTML='Адресу буде створено з назви під час збереження (транслітерація).'; return; }
+    const url = vacPublicUrl(slugIn, lang);
+    const live = status==='open' && (!until || until>=todayISO());
+    const saved = src && +src.publish_site===1 && src.slug===slugIn;
+    box.className = 'pub-url' + (live ? '' : ' off');
+    box.innerHTML = `Адреса на сайті: <a href="${esc(url)}" target="_blank" rel="noopener">${esc(url)}</a>`
+      + (live && saved ? ' · <a href="'+esc(url)+'" target="_blank" rel="noopener">Відкрити ↗</a>' : '')
+      + (!live ? '<br>Зараз не показується: ' + (status!=='open' ? 'статус не «Відкрита»' : 'минув строк «Показувати до»') + '.' : (!saved ? '<br>Запрацює після збереження.' : ''));
+  };
+  ['#f_publish_site','#f_slug','#f_lang','#f_status','#f_valid_through'].forEach(sel=>{
+    const el = $(sel); if (el){ el.addEventListener('input', upd); el.addEventListener('change', upd); }
+  });
+  upd();
+}
+
 function openForm(entity, id, preset){
   const cfg = F[entity];
   if (cfg.payrollOnly && !S.me.canPayroll) return toast('Немає доступу до зарплатних даних','err');
@@ -3310,7 +3466,7 @@ function openForm(entity, id, preset){
   const defaults = id ? src : ({
     employee:{ status:'active', hire_date:todayISO(), currency:'UAH', probation_result:'pending', company:dictOf('company')[0]||'' },
     candidate:{ stage:'new', first_contact_date:todayISO(), currency:'UAH' },
-    vacancy:{ status:'open', open_date:todayISO(), priority:'normal', headcount:1, currency:'UAH' },
+    vacancy:{ status:'open', open_date:todayISO(), priority:'normal', headcount:1, currency:'UAH', lang:'uk', publish_site:0 },
     band:{ currency:'UAH' },
     talent:{ temperature:'warm', status:'active', currency:'UAH', last_contact_date:todayISO(), next_contact_date:isoAdd(todayISO(), TP_TEMP.warm.days) },
   })[entity];
@@ -3319,6 +3475,7 @@ function openForm(entity, id, preset){
     + (entity==='candidate' ? `<div class="sec" style="margin-top:22px">Файли · резюме, тестові, скани</div>
         <div id="cfFormBox"></div>` : '');
   if (entity==='candidate') cfFormBlock(id);
+  if (entity==='vacancy') vacPubBind(src);
   $('#drFoot').innerHTML = `
     ${id?`<button class="btn btn-danger" onclick="delEntity('${entity}',${id})">🗑 Видалити</button>`:''}
     <span class="sp"></span>
@@ -3375,7 +3532,8 @@ async function saveForm(entity, id){
     if (e.error==='validation_failed' && e.fields){
       const MSG = { required:'обовʼязкове поле', bad_date:'невірна дата', bad_period:'невірний місяць', bad_enum:'оберіть зі списку',
         not_a_number:'має бути число', negative:'не може бути відʼємним', before_hire_date:'раніше дати прийняття',
-        before_open_date:'раніше дати відкриття', less_than_min:'менше за мінімум', too_big:'завелике значення' };
+        before_open_date:'раніше дати відкриття', less_than_min:'менше за мінімум', too_big:'завелике значення',
+        slug_taken:'ця адреса вже зайнята іншою вакансією', bad_format:'лише латиниця, цифри й дефіс, 3–80 символів' };
       Object.entries(e.fields).forEach(([k,v])=>{
         const err = $('#e_'+k); if (err) err.textContent = MSG[v]||v;
         const inp = $('#f_'+k); if (inp) inp.classList.add('err');
@@ -3598,7 +3756,11 @@ function openVacancy(id){
       <dt>План закриття</dt><dd>${dmy(v.target_date)}${v.status==='open'&&v.target_date&&v.target_date<todayISO()?' <span class="chip chip-r">прострочено</span>':''}</dd>
       <dt>Закрито</dt><dd>${dmy(v.close_date)}</dd>
       <dt>Канал пошуку</dt><dd>${esc(v.source||'—')}</dd>
-      ${S.me.canPayroll&&(v.salary_from_kop||v.salary_to_kop)?`<dt>Вилка</dt><dd>${money(v.salary_from_kop,v.currency)} — ${money(v.salary_to_kop,v.currency)}</dd>`:''}
+      ${S.me.canPayroll&&(v.salary_from_kop||v.salary_to_kop)?`<dt>Вилка</dt><dd>${money(v.salary_from_kop,v.currency)} — ${money(v.salary_to_kop,v.currency)}${+v.show_salary===1?' <span class="chip chip-o" title="Вилку видно на sneco.ua">🌐 на сайті</span>':''}</dd>`:''}
+      <dt>На сайті</dt><dd>${+v.publish_site!==1 ? '<span class="muted">не опубліковано</span>'
+        : vacIsLive(v) ? `<a href="${esc(vacPublicUrl(v.slug,v.lang))}" target="_blank" rel="noopener">Відкрити ↗</a> <span class="muted">· ${esc(VAC_LANG_L[v.lang]||'Українська')}${v.published_at?' · з '+dmy(new Date(v.published_at*1000).toISOString().slice(0,10)):''}</span>`
+        : vacSiteChip(v)}</dd>
+      ${+v.publish_site===1?`<dt>Відгуки з сайту</dt><dd>${cs.filter(c=>c.source===SITE_SOURCE).length}</dd>`:''}
     </dl>
     <div class="sec">Воронка вакансії</div>
     <div class="funnel">${fd.map(x=>`<div class="fn-row"><div class="fn-lbl" style="width:120px">${esc(x.l)}</div>
