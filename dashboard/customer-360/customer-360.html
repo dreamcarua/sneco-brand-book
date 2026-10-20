@@ -1354,7 +1354,7 @@ window.deleteCrmEntry = async function(custKey, noteId){
 // v2.73.0 — DECISION-MAKERS parsing from legal_address_comment + tags
 // ============================================================================
 // Reality check (Епіцентр приклад): contact text часто має формат:
-//   "Алексей - [телефон прибрано]\n[email прибрано]\nЕлена - [телефон прибрано] (заказы)"
+//   "Алексей - 380952723013\no.kapusta@epicentrk.ua\nЕлена - 063 529 90 57 (заказы)"
 // Парсимо лінії з phone/email + heuristic role detection.
 // v2.75.2: normalize legal_address_comment — МойСклад attribute іноді приходить
 // як Python dict-repr "{'comment': '...'}" замість plain text. Витягуємо comment field.
@@ -2290,10 +2290,8 @@ window.bootCustomer360 = async function(token){
     // === Aggregate revenue per agent ID + name (v2.61 — використовуємо ID коли є) ===
     const now = new Date();
     const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    // DASH-05 (audit 10.10.2026): було prevMonth.toISOString() — локальна північ 1-го числа
-    // у Києві = попередня доба UTC → «минулий місяць» був позаминулим. Беремо ymLocal().
-    const prevMonthYM = ymLocal(prevMonth);
-    const currMonthYM = ymLocal(now);
+    const prevMonthYM = prevMonth.toISOString().slice(0, 7);
+    const currMonthYM = now.toISOString().slice(0, 7);
     const ytdStart = now.getFullYear() + '-01-01';  // v2.66: для ТОП-10 з початку року
     const cutoff30 = new Date(now.getTime() - 30*86400000).toISOString().slice(0,10);
 

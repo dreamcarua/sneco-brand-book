@@ -551,15 +551,8 @@ function resolvePeriod(p){
   return { from, to, prevFrom, prevTo, label, days };
 }
 
-// ISO date strings (YYYY-MM-DD) — з ЛОКАЛЬНИХ частин дати.
-// DASH-04 (audit 10.10.2026): було d.toISOString().slice(0,10) — локальна північ у Києві
-// (UTC+3) = 21:00 UTC попередньої доби → періоди, фільтри inRange і місячні кошики
-// зсувались на день назад (1-е число потрапляло в попередній місяць). Той самий підхід,
-// що в expenses.html: дати — лише рядками YYYY-MM-DD з getFullYear/getMonth/getDate.
-function isoDate(d){
-  const p = n => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
-}
+// ISO date strings (YYYY-MM-DD)
+function isoDate(d){ return d.toISOString().slice(0,10); }
 
 // Перевіряє чи дата (ISO або Date) попадає у [from,to] включно
 function inRange(dateStr, from, to){
@@ -816,7 +809,7 @@ function renderDashboard(){
   const matchCP = (item) => (item.agent_id && cpById[item.agent_id]) || (item.agent && cpByName[(item.agent||'').trim()]) || null;
 
   const now = new Date();
-  const today = isoDate(now);   // DASH-04: локальна дата, не UTC
+  const today = now.toISOString().slice(0,10);
   const todayMs = Date.now();
 
   // v3.0: period-driven windows (заміна жорстко вшитих 30/60/90)
@@ -831,10 +824,10 @@ function renderDashboard(){
   const periodDays  = range.days;
 
   // Legacy compat константи (для блоків, які ще використовують "90 днів" / "next 30 днів")
-  const c30 = isoDate(new Date(now.getTime() - 30*86400000));
-  const c60 = isoDate(new Date(now.getTime() - 60*86400000));
-  const c90 = isoDate(new Date(now.getTime() - 90*86400000));
-  const future30 = isoDate(new Date(now.getTime() + 30*86400000));
+  const c30 = new Date(now.getTime() - 30*86400000).toISOString().slice(0,10);
+  const c60 = new Date(now.getTime() - 60*86400000).toISOString().slice(0,10);
+  const c90 = new Date(now.getTime() - 90*86400000).toISOString().slice(0,10);
+  const future30 = new Date(now.getTime() + 30*86400000).toISOString().slice(0,10);
 
   // ─── FLAG: empty invoices? ───────────────────────────────────────────────
   const hasInvoices = allInvoices.length > 0;
