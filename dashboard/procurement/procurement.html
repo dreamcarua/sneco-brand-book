@@ -894,6 +894,9 @@ function renderDashboard(){
   // Рахунок 27895₴ оплачено 27894.26₴ → 0.74₴ "борг" = 0.003% → НЕ борг.
   const DEBT_THRESHOLD_PCT = 0.01;
   const isMaterialDebt = (i) => {
+    // 16.11.2026: непроведений рахунок у МойСкладі — не борг (так рахує сам МС).
+    // Без цього дашборд тягнув 118 непроведених «мертвих» рахунків 2016–2024 у прострочку.
+    if (i.applicable === 0 || i.applicable === false) return false;
     const sk = i.sum_kop || 0;
     if (sk <= 0) return false;
     const diff = sk - (i.payed_sum_kop || 0);

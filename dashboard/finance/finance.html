@@ -500,6 +500,7 @@ const PERIOD_STORAGE = 'snEco-finance-period-v3';
 
 let allCounterparties = [];
 let allInvoices = [];    // РАХУНКИ — invoices_out
+let arTrend = null;       // 16.11.2026: блоб ar-trend (ar_trend_sync.py) — тренд дебіторки по тижнях
 let allPayments = [];    // ГРОШІ — paymentin + paymentout
 
 let _token = null;
@@ -630,6 +631,13 @@ window.bootFinance = async function(token){
     allCounterparties = cp || [];
     allInvoices = inv || [];
     allPayments = pay || [];
+    // 16.11.2026: тренд дебіторки — окремий блоб, не блокує дашборд при помилці
+    try {
+      const rb = await fetch(WORKER + '/api/dashboard/blob', {method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer ' + _token},
+        body: JSON.stringify({name:'ar-trend'})});
+      arTrend = rb.ok ? await rb.json() : null;
+    } catch(e) { console.warn('[ar-trend]', e); arTrend = null; }
 
     console.log(`Loaded: ${allCounterparties.length} CPs, ${allInvoices.length} invoices_out, ${allPayments.length} payments`);
 
@@ -894,6 +902,9 @@ function renderDashboard(){
   // Рахунок 27895₴ оплачено 27894.26₴ → 0.74₴ "борг" = 0.003% → НЕ борг.
   const DEBT_THRESHOLD_PCT = 0.01;
   const isMaterialDebt = (i) => {
+    // 16.11.2026: непроведений рахунок у МойСкладі — не борг (так рахує сам МС).
+    // Без цього дашборд тягнув 118 непроведених «мертвих» рахунків 2016–2024 у прострочку.
+    if (i.applicable === 0 || i.applicable === false) return false;
     const sk = i.sum_kop || 0;
     if (sk <= 0) return false;
     const diff = sk - (i.payed_sum_kop || 0);
@@ -1357,6 +1368,18 @@ function renderDashboard(){
       </div>
     </div>
 
+    <!-- 16.11.2026: ТРЕНД ДЕБІТОРКИ ПО ТИЖНЯХ (запит Пилипа «зелене зменшується, червоне росте») -->
+    <div class="sec">📈 Дебіторка по тижнях — в межах терміну vs прострочено</div>
+    <div class="cc">
+      <div class="cc-head">
+        <div>
+          <div class="cc-title">Стан на кожен понеділок, останні ${arTrend && arTrend.points ? arTrend.points.length - 1 : 0} тижнів + зараз</div>
+          <div class="cc-sub">Зелена лінія — в межах терміну · стовпчики — прострочено за віком (1–30 / 31–60 / 61+ днів) · лише проведені рахунки, поріг 1 % · джерело: МойСклад API${arTrend && arTrend.generated_at ? ', оновлено ' + new Date(arTrend.generated_at).toLocaleString('uk-UA',{timeZone:'Europe/Kyiv',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : ''}</div>
+        </div>
+      </div>
+      ${arTrend && arTrend.points && arTrend.points.length ? `<div class="chart-h320"><canvas id="arTrendChart"></canvas></div>` : `<div style="padding:24px;color:var(--muted);font-size:13px">Історія ще не зібрана (блоб ar-trend порожній) — зʼявиться після нічного синку.</div>`}
+    </div>
+
     <!-- SECTION 2 — CASH FLOW CHART -->
     <div class="sec">💸 Грошовий потік — рахунки, надходження, витрати · ${periodLabel}</div>
     <div class="cc">
@@ -1781,6 +1804,35 @@ function renderDashboard(){
                 }
               }
             }
+          }
+        }
+      });
+    }
+
+    // 16.11.2026: тренд дебіторки
+    const trCtx = document.getElementById('arTrendChart');
+    if (trCtx && arTrend && arTrend.points) {
+      if (_charts.tr) _charts.tr.destroy();
+      const P = arTrend.points;
+      _charts.tr = new Chart(trCtx, {
+        data: {
+          labels: P.map(p => p.label),
+          datasets: [
+            { type:'line', label:'🟢 В межах терміну', data:P.map(p => p.fresh_uah), borderColor:'#8DC63F', backgroundColor:'#8DC63F', borderWidth:2.5, pointRadius:2.5, tension:0.25, order:0 },
+            { type:'bar', label:'🟡 Прострочено 1–30 дн', data:P.map(p => p.overdue_1_30_uah), backgroundColor:'#FCC01B', stack:'od', order:1 },
+            { type:'bar', label:'🟠 31–60 дн', data:P.map(p => p.overdue_31_60_uah), backgroundColor:'#F97316', stack:'od', order:1 },
+            { type:'bar', label:'🔴 61+ дн', data:P.map(p => p.overdue_61p_uah), backgroundColor:'#E84040', stack:'od', order:1 },
+          ]
+        },
+        options: {
+          responsive:true, maintainAspectRatio:false, interaction:{mode:'index', intersect:false},
+          scales: { x:{stacked:true, grid:{display:false}}, y:{stacked:true, beginAtZero:true, ticks:{callback:v => nfm(v)}} },
+          plugins: {
+            legend:{position:'bottom', labels:{font:{size:10.5}, boxWidth:14}},
+            tooltip:{ callbacks:{
+              label: ctx => `${ctx.dataset.label}: ${nf(ctx.parsed.y)} ₴`,
+              footer: items => { const p = P[items[0].dataIndex]; return `Прострочено разом: ${nf(p.overdue_uah)} ₴ (${p.overdue_n} рах.)\nВ межах терміну: ${p.fresh_n} рах.`; }
+            }}
           }
         }
       });
