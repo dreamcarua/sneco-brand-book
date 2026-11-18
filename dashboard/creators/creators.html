@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<!-- 18.11.2026: копія leads.html для заявок зі сторінки sneco.ua/blogeram/ (блок creators-dashboard, scope=creators). Оновлювати разом з leads.html. -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>snEco · Заявки блогерів / UGC</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD" crossorigin="anonymous"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --y:#FCC01B;--g:#8DC63F;--d:#1E1E1E;--bg:#F4F4EF;--card:#fff;
+  --muted:#6b6b6b;--border:#E5E5DC;--red:#dc2626;--blue:#3B82F6;
+  --orange:#F97316;--purple:#7209B7;
+  --yf:rgba(252,192,27,.13);--gf:rgba(141,198,63,.12);--rf:rgba(232,64,64,.10);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--d);font-size:14px;min-height:100vh}
+
+/* ─── TOPBAR ─── */
+.topbar{background:var(--d);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.3);gap:12px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-box{width:32px;height:32px;background:var(--y);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:var(--d);letter-spacing:-0.5px}
+.logo-img{height:24px;display:block;flex-shrink:0}
+@media(max-width:760px){.logo-text,.logo-sub{display:none}}
+@media(max-width:520px){.logo-img{height:20px}}
+.logo-text{color:#fff;font-size:15px;font-weight:700;letter-spacing:-.3px}
+.logo-sub{color:rgba(255,255,255,.4);font-size:11px;margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
+/* v2.76.0 — Unified nav menu across all dashboards */
+.nav-menu{display:flex;align-items:center;gap:2px;margin-left:18px;padding-left:18px;border-left:1px solid rgba(255,255,255,.12)}
+.nav-link{color:rgba(255,255,255,.65);text-decoration:none;font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:7px;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.nav-link:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-link.active{background:rgba(252,192,27,.18);color:#FCC01B}
+.nav-toggle{display:none;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:6px;margin-left:8px}
+@media(max-width:1280px){
+  .nav-menu{position:fixed;top:56px;left:0;right:0;background:#1E1E1E;flex-direction:column;align-items:stretch;padding:8px 16px;gap:0;margin:0;border-left:none;border-bottom:1px solid rgba(255,255,255,.1);transform:translateY(-110%);transition:transform .25s;z-index:180;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+  .nav-menu.open{transform:translateY(0)}
+  .nav-link{padding:11px 12px;border-radius:6px}
+  .nav-toggle{display:inline-block}
+}
+.badge{padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:600;white-space:nowrap}
+@media(max-width:900px){.badge{padding:2px 7px;font-size:10px}#lastBootBadge{display:none}}
+@media(max-width:520px){#lastUpdate{display:none}}
+.badge-green{background:rgba(141,198,63,.2);color:var(--g);border:1px solid rgba(141,198,63,.3)}
+.badge-gray{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1)}
+
+/* ─── LAYOUT ─── */
+.wrap{padding:20px 24px;max-width:1400px;margin:0 auto}
+/* аналітика: воронка, причини, сегменти, джерела */
+.an-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:16px 0 20px}
+.an-card{background:#fff;border:1px solid var(--line,#e5e5e5);border-radius:10px;padding:13px 15px}
+.an-card h3{margin:0 0 9px;font-size:13px;font-weight:700;letter-spacing:.02em}
+.an-card h3 .cnt{font-weight:500;color:#999;font-size:11px;margin-left:5px}
+.fn-row{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:12.5px}
+.fn-l{flex:1;min-width:0;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fn-bar{flex:0 0 66px;height:7px;background:#f0f0f0;border-radius:4px;overflow:hidden}
+.fn-bar i{display:block;height:100%;background:#2D6A00;border-radius:4px}
+.fn-n{flex:0 0 auto;font-variant-numeric:tabular-nums;min-width:22px;text-align:right}
+.fn-p{flex:0 0 34px;text-align:right;color:#999;font-size:11px}
+.rj-wrap{margin-top:5px}
+.rj-wrap select{font-size:11.5px;border-color:#d99}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+
+.empty-hero{padding:80px 20px;text-align:center;color:var(--muted)}
+.empty-hero .eh-icon{font-size:60px;margin-bottom:14px;opacity:.5}
+.empty-hero .eh-title{font-size:18px;font-weight:700;color:var(--d);margin-bottom:6px}
+.empty-hero .eh-sub{font-size:13px;line-height:1.5}
+.sec{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:24px 0 12px;display:flex;align-items:center;gap:8px}
+.sec::after{content:'';flex:1;height:1px;background:var(--border)}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media(max-width:960px){.g4{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}}
+@media(max-width:620px){.g4,.g3,.g2{grid-template-columns:1fr}.topbar{padding:0 12px;height:48px}.wrap{padding:12px 10px}}
+
+/* ─── HERO HEADER ─── */
+.fin-header{background:linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%);color:#fff;border-radius:14px;padding:24px 28px;margin-bottom:20px;position:relative;overflow:hidden}
+.fin-header::after{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle, rgba(141,198,63,0.18) 0%, transparent 70%);pointer-events:none}
+.fin-title{font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;line-height:1.2}
+.fin-sub{font-size:13px;color:rgba(255,255,255,.75)}
+
+/* ─── PERIOD SELECTOR + DIAGNOSTIC STRIP (v3.0) ─── */
+.period-bar{background:#fff;border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;position:sticky;top:56px;z-index:150;box-shadow:0 1px 0 rgba(0,0,0,.02)}
+.period-bar-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-right:2px}
+.period-chips{display:flex;gap:4px;background:#F1F1EB;padding:3px;border-radius:9px;flex-wrap:wrap}
+.period-chip{padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;color:#555;cursor:pointer;border:none;background:transparent;transition:all .15s ease;white-space:nowrap}
+.period-chip:hover{background:rgba(252,192,27,.18);color:var(--d)}
+.period-chip.active{background:var(--d);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.period-chip.active:hover{background:var(--d);color:#fff}
+.period-custom{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.period-custom input[type=date]{padding:5px 8px;border-radius:7px;border:1px solid var(--border);font-size:12px;font-family:inherit;color:var(--d);background:#fafafa}
+.period-custom input[type=date]:focus{outline:none;border-color:var(--y);background:#fff}
+.granularity-toggle{display:flex;gap:3px;background:#F1F1EB;padding:3px;border-radius:8px;margin-left:auto}
+.granularity-toggle .gt-btn{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;color:#555;cursor:pointer;border:none;background:transparent}
+.granularity-toggle .gt-btn.active{background:#fff;color:var(--d);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.period-range-info{font-size:11px;color:var(--muted);padding:4px 10px;background:rgba(141,198,63,.08);border-radius:7px;font-weight:500;white-space:nowrap}
+@media(max-width:760px){.period-bar{padding:10px 12px;gap:8px}.period-chips{flex:1;justify-content:flex-start;overflow-x:auto}.granularity-toggle{margin-left:0;width:100%;justify-content:flex-start;margin-top:4px}}
+
+.diag-strip{background:#FFF9E5;border-bottom:1px solid #F5E6B3;padding:8px 24px;display:flex;align-items:center;gap:16px;font-size:11.5px;flex-wrap:wrap}
+.diag-strip.ok{background:rgba(141,198,63,.08);border-color:rgba(141,198,63,.25)}
+.diag-strip.warn{background:#FFF9E5;border-color:#F5E6B3}
+.diag-strip.err{background:rgba(232,64,64,.05);border-color:rgba(232,64,64,.18)}
+.diag-item{display:flex;align-items:center;gap:5px;color:#555;font-weight:500}
+.diag-item strong{color:var(--d);font-weight:700}
+.diag-item.empty{color:var(--red)}
+.diag-item.empty strong{color:var(--red)}
+.diag-divider{color:#ccc;font-weight:300}
+.diag-action{margin-left:auto;font-size:11px;color:#1d5fa6;text-decoration:none;font-weight:600;padding:3px 9px;background:rgba(59,130,246,.08);border-radius:5px;cursor:pointer;border:none;font-family:inherit}
+.diag-action:hover{background:rgba(59,130,246,.16)}
+@media(max-width:760px){.diag-strip{padding:8px 12px}.diag-divider{display:none}.diag-action{margin-left:0}}
+
+/* ─── KPI CARDS ─── */
+.kpi{background:var(--card);border-radius:12px;padding:16px 18px;border:1px solid var(--border);position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px}
+.kpi.cy::after{background:var(--y)}
+.kpi.cg::after{background:var(--g)}
+.kpi.cr::after{background:var(--red)}
+.kpi.cb::after{background:var(--blue)}
+.kpi.co::after{background:var(--orange)}
+.kpi.cp::after{background:var(--purple)}
+.kpi-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:6px}
+.kpi-val{font-size:22px;font-weight:800;color:var(--d);line-height:1.1}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:6px}
+.kpi-delta{display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;margin-top:6px}
+.kpi-delta.up{background:rgba(141,198,63,.15);color:#4a7000}
+.kpi-delta.down{background:rgba(232,64,64,.12);color:#a00}
+.kpi-delta.flat{background:rgba(138,138,138,.13);color:#666}
+
+/* ─── CHART CARDS ─── */
+.cc{background:var(--card);border-radius:12px;padding:18px 20px;border:1px solid var(--border)}
+.cc-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.cc-title{font-size:14px;font-weight:700;color:var(--d)}
+.cc-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.chart-h220{height:220px;position:relative}
+.chart-h280{height:280px;position:relative}
+.chart-h320{height:320px;position:relative}
+
+/* ─── INSIGHTS ─── */
+.insight{padding:14px 18px;border-radius:10px;font-size:13px;line-height:1.55;display:flex;align-items:flex-start;gap:10px}
+.insight.green{background:rgba(141,198,63,.08);color:#4a7000;border-left:3px solid var(--g)}
+.insight.yellow{background:rgba(252,192,27,.08);color:#996600;border-left:3px solid var(--y)}
+.insight.red{background:rgba(232,64,64,.06);color:#a00;border-left:3px solid var(--red)}
+.insight.blue{background:rgba(59,130,246,.07);color:#1d5fa6;border-left:3px solid var(--blue)}
+.insight-icon{font-size:18px;flex-shrink:0;margin-top:-2px}
+.insights-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:620px){.insights-grid{grid-template-columns:1fr}}
+
+/* ─── DATA TABLE ─── */
+.dt{width:100%;border-collapse:collapse;font-size:13px}
+.dt th{text-align:left;padding:8px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:2px solid var(--border)}
+.dt td{padding:8px 12px;border-bottom:1px solid var(--border)}
+.dt tr:last-child td{border:none}
+.dt tr:hover td{background:#FAFAF5}
+.rank{font-weight:800;color:var(--red);font-size:13px;width:28px}
+.rank.green{color:#4a7000}
+
+/* ─── BUCKETS ─── */
+.bucket-pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700}
+.bucket-pill.b0{background:rgba(141,198,63,.18);color:#4a7000}
+.bucket-pill.b30{background:rgba(252,192,27,.18);color:#996600}
+.bucket-pill.b60{background:rgba(249,115,22,.18);color:#c2410c}
+.bucket-pill.b90{background:rgba(232,64,64,.15);color:#a00}
+
+/* ─── SPLIT SUMMARY (overdue vs within-term) ─── */
+.split-summary{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px}
+.split-summary .ss-item{display:flex;align-items:center;gap:8px;flex:1;min-width:160px}
+.split-summary .ss-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.split-summary .ss-dot.overdue{background:var(--red)}
+.split-summary .ss-dot.ok{background:var(--g)}
+.split-summary .ss-label{color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;font-size:10px}
+.split-summary .ss-val{font-weight:800;color:var(--d);font-size:14px;line-height:1.1}
+.split-summary .ss-pct{font-size:11px;color:var(--muted);margin-left:4px}
+
+/* ─── QUICK ACTIONS ─── */
+.act-btn{padding:6px 12px;border-radius:7px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:600;color:var(--d);cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .15s;text-decoration:none}
+.act-btn:hover{border-color:var(--y);background:var(--yf)}
+.act-btn.tel{border-color:rgba(141,198,63,.35);color:#4a7000}
+.act-btn.tel:hover{background:rgba(141,198,63,.12)}
+.act-btn.mail{border-color:rgba(59,130,246,.35);color:#1d5fa6}
+.act-btn.mail:hover{background:rgba(59,130,246,.08)}
+
+/* ─── CARD HEADERS WITH STATUS ─── */
+.cc.alert{border-left:3px solid var(--red)}
+.cc.ok{border-left:3px solid var(--g)}
+.cc-title-icon{display:inline-flex;align-items:center;gap:6px}
+.cc-title-tag{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-left:6px;vertical-align:middle}
+.cc-title-tag.red{background:rgba(232,64,64,.13);color:#a00}
+.cc-title-tag.green{background:rgba(141,198,63,.15);color:#4a7000}
+
+/* ─── PAYMENT TIMELINE ─── */
+.pay-tl{padding:6px 0}
+.pay-tl-item{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid var(--border);align-items:center}
+.pay-tl-item:last-child{border:none}
+.pay-tl-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.pay-tl-icon.inb{background:rgba(141,198,63,.18);color:#4a7000}
+.pay-tl-icon.outb{background:rgba(232,64,64,.13);color:var(--red)}
+.pay-tl-date{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:600;width:80px;flex-shrink:0;white-space:nowrap}
+.pay-tl-body{flex:1;min-width:0}
+.pay-tl-title{font-size:13px;font-weight:600;color:var(--d);line-height:1.35}
+.pay-tl-meta{font-size:11px;color:var(--muted);margin-top:1px}
+.pay-tl-amount{font-size:14px;font-weight:800;text-align:right;white-space:nowrap}
+.pay-tl-amount.pos{color:#4a7000}
+.pay-tl-amount.neg{color:var(--red)}
+
+/* ─── EMPTY STATE ─── */
+.empty-state{padding:36px 20px;text-align:center;color:var(--muted)}
+.empty-state .es-icon{font-size:30px;margin-bottom:8px}
+.empty-state .es-title{font-weight:600;color:#666;margin-bottom:5px;font-size:13px}
+.empty-state .es-sub{font-size:12px}
+.empty-state.hero{padding:48px 20px}
+.empty-state.hero .es-icon{font-size:42px;margin-bottom:10px}
+.empty-state.hero .es-title{font-size:15px;color:#4a7000}
+.empty-state.dashed{border:1px dashed var(--border);border-radius:10px;background:#FAFAF5}
+
+/* ─── LOADER ─── */
+.loader{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--y);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* v3.0.3: animated loader для empty-hero */
+.loader-big{width:64px;height:64px;border:5px solid #eee;border-top-color:var(--y);border-right-color:var(--g);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
+.loader-dots{display:inline-flex;gap:6px;justify-content:center;margin-top:10px}
+.loader-dots span{width:8px;height:8px;border-radius:50%;background:var(--y);animation:bounce 1.2s ease-in-out infinite}
+.loader-dots span:nth-child(2){background:var(--g);animation-delay:.15s}
+.loader-dots span:nth-child(3){background:var(--blue);animation-delay:.30s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-8px);opacity:1}}
+
+/* ─── FOOTER ─── */
+.footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:20px}
+
+/* === OTP gate === */
+#dashauth-overlay{position:fixed;inset:0;background:#1E1E1E;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+#dashauth-overlay.is-hidden{display:none}
+.dashauth-card{background:#fff;width:100%;max-width:440px;border-radius:14px;padding:36px 30px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.dashauth-logo{font-size:24px;font-weight:900;color:#FCC01B;margin-bottom:6px;letter-spacing:-0.5px;text-align:center}
+.dashauth-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#888;text-align:center;margin-bottom:24px}
+.dashauth-icon{font-size:36px;text-align:center;margin-bottom:16px}
+.dashauth-h1{font-size:18px;font-weight:800;text-align:center;color:#1E1E1E;margin-bottom:6px}
+.dashauth-desc{font-size:13px;color:#666;text-align:center;line-height:1.55;margin-bottom:20px}
+.dashauth-input{width:100%;padding:12px 14px;border:2px solid #E5E5DC;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
+.dashauth-input:focus{border-color:#FCC01B}
+.dashauth-input.code{font-family:'SF Mono',Menlo,Consolas,monospace;letter-spacing:.4em;text-align:center;font-size:18px}
+.dashauth-btn{width:100%;padding:13px;background:#1E1E1E;color:#fff;border:0;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;margin-top:14px;font-family:inherit;transition:background .15s}
+.dashauth-btn:hover{background:#000}
+.dashauth-btn:disabled{opacity:.5;cursor:not-allowed}
+.dashauth-msg{font-size:12.5px;line-height:1.5;margin-top:12px;text-align:center;min-height:18px}
+.dashauth-msg.is-error{color:#DC2626}
+.dashauth-msg a{color:#FCC01B;font-weight:600;text-decoration:underline}
+.dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
+.dashauth-back:hover{color:#FCC01B}
+/* v2.77.1: top:115px — нижче period-bar (sticky top:56px, висота ~55px) щоб не overlap'ило granularity toggle */
+.dashauth-session{position:fixed;top:115px;right:12px;z-index:10000;background:rgba(141,198,63,.18);color:#8DC63F;border:1px solid rgba(141,198,63,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-family:-apple-system,sans-serif;font-weight:600;display:flex;align-items:center;gap:8px}
+@media(max-width:760px){.dashauth-session{top:auto;bottom:12px;right:12px;left:12px;justify-content:center}}
+.dashauth-session button{background:none;border:0;color:#8DC63F;cursor:pointer;font-size:14px;padding:0;line-height:1}
+body.dash-locked{overflow:hidden}
+</style>
+<script>
+// v2.78.91 UX: global 401 handler — JWT expired → friendly redirect screen
+(function(){
+  const _origFetch = window.fetch;
+  window.fetch = async function(...args) {
+    const r = await _origFetch.apply(this, args);
+    if (r.status === 401 && args[0] && typeof args[0] === 'string' && args[0].includes('sneco-auth')) {
+      // Show session expired overlay
+      // v2.78.116: ONLY show overlay коли native login form НЕ показано
+      // Native form має body.dash-locked + #dashauth-overlay visible
+      // Якщо вони уже showing — skip (native form handles login)
+      const _nativeLogin = document.body?.classList?.contains('dash-locked') ||
+                            document.getElementById('dashauth-overlay');
+      if (!_nativeLogin) {
+        window._snAuthBlock = 'creators-dashboard';
+        if (window.snEco?.handle401) {
+          window.snEco.handle401('creators-dashboard');
+        }
+      }
+    }
+    return r;
+  };
+})();
+</script>
+  <script src="../_shared/helpers.js"></script>
+</head>
+<body class="dash-locked">
+
+<!-- ===== OTP GATE OVERLAY ===== -->
+<script src="../auth-google.js"></script>
+<div id="dashauth-overlay">
+  <div class="dashauth-card">
+    <div class="dashauth-logo">snEco</div>
+    <div class="dashauth-sub">Ліди з сайту · Confidential</div>
+    <div id="dashauth-stage"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const WORKER = 'https://sneco-auth.vg-ab6.workers.dev';
+  const BLOCK = 'creators-dashboard';
+  const STORAGE_KEY = 'snEco-jwt-' + BLOCK;
+  const overlay = document.getElementById('dashauth-overlay');
+  const stage = document.getElementById('dashauth-stage');
+  let email = '';
+
+  function unlock(token, em, exp){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({token, email:em, exp})); } catch(e){}
+    document.body.classList.remove('dash-locked');
+    overlay.classList.add('is-hidden');
+    showSessionBadge(em, exp);
+    if (typeof window.bootLeads === 'function') window.bootLeads(token);
+  }
+  function showSessionBadge(em, exp){
+    const b = document.createElement('div');
+    b.className = 'dashauth-session';
+    const totalMins = Math.max(0, Math.floor((exp*1000 - Date.now())/60000));
+    const timeLabel = totalMins >= 60
+      ? Math.floor(totalMins/60) + 'h ' + (totalMins%60 ? (totalMins%60) + 'm' : '')
+      : totalMins + 'min';
+    b.innerHTML = '✓ ' + em + ' · ' + timeLabel.trim() + ' <button title="Lock">🔒</button>';
+    b.querySelector('button').onclick = () => { localStorage.removeItem(STORAGE_KEY); location.reload(); };
+    document.body.appendChild(b);
+  }
+  async function verifyExisting(){
+    let s; try { s = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null'); } catch(e){}
+    if (!s || !s.token || !s.exp || s.exp*1000 < Date.now()) return null;
+    try {
+      const r = await fetch(WORKER+'/api/session/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({token: s.token, block: BLOCK})});
+      const j = await r.json();
+      return j.ok ? s : null;
+    } catch(e) { return null; }
+  }
+  function renderEmail(){
+    stage.innerHTML = `
+      <div class="dashauth-icon">🛒</div>
+      <div class="dashauth-h1">Введіть email</div>
+      <div class="dashauth-desc">Ліди з сайту — заявки дистриб’юторів, статуси, UTM-джерела. Якщо ваш email у whitelist — на нього надійде 6-значний код. Авторизація через Google (швидко) або OTP-код. Сесія діє 30 днів.</div>
+      <div id="google-signin-btn" style="display:flex;justify-content:center;margin:18px 0 8px"></div>
+      <div style="font-size:11px;color:#777;text-align:center;margin:8px 0 4px">— або через email-код —</div>
+      <input class="dashauth-input" type="email" id="auth-em" placeholder="ім'я@sneco.ua" autocomplete="email" autofocus>
+      <button class="dashauth-btn" id="auth-send">Надіслати код</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="../" class="dashauth-back">← Каталог дашбордів</a>
+    `;
+    // v2.78.35 (Богдан): Google Sign-In primary, OTP fallback
+    if (window.SnecoAuth) {
+      const gBtn = document.getElementById('google-signin-btn');
+      window.SnecoAuth.signInWithGoogle(BLOCK, gBtn,
+        (j) => unlock(j.token, j.email, j.exp),
+        (errMsg) => {
+          const msgEl = document.getElementById('auth-msg');
+          if (msgEl) { msgEl.textContent = errMsg; msgEl.className = 'dashauth-msg is-error'; }
+        }
+      );
+    }
+
+    const em = document.getElementById('auth-em');
+    const send = document.getElementById('auth-send');
+    const msg = document.getElementById('auth-msg');
+    em.addEventListener('keydown', e=>{ if(e.key==='Enter') send.click(); });
+    send.onclick = async () => {
+      const v = em.value.trim();
+      if (!v || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { msg.textContent='Введіть правильний email.'; msg.className='dashauth-msg is-error'; return; }
+      send.disabled = true; send.textContent = 'Надсилаємо...'; msg.textContent='';
+      try {
+        const r = await fetch(WORKER+'/api/otp/request', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email:v, block: BLOCK})});
+        if (!r.ok) {
+          const j = await r.json().catch(()=>({}));
+          if (j.error === 'not_in_whitelist') {
+            msg.innerHTML = `❌ Цього email немає у whitelist. <a href="mailto:vg@sneco.ua?subject=Leads%20Dashboard%20whitelist">✉ Запит до vg@sneco.ua</a>`;
+          } else {
+            msg.textContent = 'Помилка: ' + (j.error || r.status);
+          }
+          msg.className='dashauth-msg is-error';
+          send.disabled=false; send.textContent='Надіслати код'; return;
+        }
+        email = v;
+        renderCode();
+      } catch(e) {
+        msg.textContent = 'Помилка мережі: ' + e.message;
+        msg.className='dashauth-msg is-error';
+        send.disabled=false; send.textContent='Надіслати код';
+      }
+    };
+  }
+  function renderCode(){
+    stage.innerHTML = `
+      <div class="dashauth-icon">🔢</div>
+      <div class="dashauth-h1">Введіть код з листа</div>
+      <div class="dashauth-desc">${email}<br>Код надіслано — перевірте пошту (включно зі спамом).</div>
+      <input class="dashauth-input code" type="text" id="auth-code" inputmode="numeric" maxlength="6" placeholder="••••••" autofocus>
+      <button class="dashauth-btn" id="auth-verify">Підтвердити</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="#" class="dashauth-back" id="auth-back">← Інший email</a>
+    `;
+    const code = document.getElementById('auth-code');
+    const verify = document.getElementById('auth-verify');
+    const msg = document.getElementById('auth-msg');
+    code.addEventListener('keydown', e=>{ if(e.key==='Enter') verify.click(); });
+    document.getElementById('auth-back').onclick = e=>{ e.preventDefault(); renderEmail(); };
+    verify.onclick = async () => {
+      const c = code.value.trim();
+      if (!/^\d{6}$/.test(c)) { msg.textContent='Код — 6 цифр.'; msg.className='dashauth-msg is-error'; return; }
+      verify.disabled=true; verify.textContent='Перевіряємо...'; msg.textContent='';
+      try {
+        const r = await fetch(WORKER+'/api/otp/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, block: BLOCK, code: c})});
+        const j = await r.json();
+        if (!r.ok) { msg.textContent = 'Невірний або застарілий код.'; msg.className='dashauth-msg is-error'; verify.disabled=false; verify.textContent='Підтвердити'; return; }
+        unlock(j.token, j.email, j.exp);
+      } catch(e) {
+        msg.textContent = 'Помилка: ' + e.message; msg.className='dashauth-msg is-error';
+        verify.disabled=false; verify.textContent='Підтвердити';
+      }
+    };
+  }
+
+  (async()=>{
+    const sess = await verifyExisting();
+    if (sess) { unlock(sess.token, sess.email, sess.exp); return; }
+    renderEmail();
+  })();
+})();
+</script>
+<!-- ===== END OTP GATE ===== -->
+<style>
+:root{--y:#FCC01B;--d:#1F1C1C;--d2:#272422;--ln:rgba(30,30,30,.12);--mut:rgba(30,30,30,.62);--green:#8DC63F;--red:#D64545}
+body{margin:0;background:#F7F5F0;color:#1E1E1E;font-family:'Qanelas',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.5}
+.wrap{max-width:1440px;margin:0 auto;padding:0 24px}
+.top{background:var(--d);color:#fff;padding:16px 0}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.top h1{font-size:20px;font-weight:800;margin:0}
+.top .sub{font-size:12px;color:rgba(255,255,255,.6)}
+.nav a{color:rgba(255,255,255,.72);text-decoration:none;font-size:13px;margin-left:16px}
+.nav a:hover{color:var(--y)}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:22px 0}
+.k{background:#fff;border:1px solid var(--ln);border-radius:10px;padding:16px}
+.k .n{font-size:30px;font-weight:800;line-height:1}
+.k .l{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);margin-top:5px}
+.k.acc{background:var(--y);border-color:var(--y)}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.bar select,.bar input{border:1.5px solid var(--ln);border-radius:8px;padding:9px 12px;font:inherit;font-size:14px;background:#fff}
+.bar .sp{flex:1}
+.btn{background:var(--y);border:0;border-radius:8px;padding:9px 16px;font:inherit;font-weight:700;font-size:14px;cursor:pointer}
+.btn:hover{background:#ffc94f}
+.btn.gh{background:#fff;border:1.5px solid var(--ln)}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--ln);border-radius:10px;overflow:hidden;font-size:14px}
+th{background:#FAF8F3;text-align:left;padding:11px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);font-weight:700;white-space:nowrap}
+td{padding:11px 12px;border-top:1px solid var(--ln);vertical-align:top}
+tr:hover td{background:#FEFCF7}
+.who{font-weight:700}
+.mail{color:#0a58ca;text-decoration:none;font-size:13px}
+.meta{font-size:12px;color:var(--mut);margin-top:3px}
+.st{border:1.5px solid var(--ln);border-radius:7px;padding:6px 8px;font:inherit;font-size:13px;background:#fff;cursor:pointer}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:rgba(30,30,30,.07);color:var(--mut);white-space:nowrap}
+.tag.src{background:rgba(252,192,27,.22);color:#7a5a00}
+.ms{font-size:11.5px;font-weight:700;color:var(--green)}
+.ms.no{color:var(--mut);font-weight:400}
+.empty{text-align:center;padding:56px 20px;color:var(--mut)}
+.msg{font-size:13px;color:#333;max-width:340px;white-space:pre-wrap;word-break:break-word;line-height:1.45}
+.nt{width:210px;min-width:180px;border:1.5px solid var(--ln);border-radius:7px;padding:7px 9px;font:inherit;font-size:13px;background:#fff;resize:vertical}
+.nt:focus{outline:none;border-color:var(--y);background:#FFFEF9}
+.ntst{font-size:11px;color:var(--green);height:13px;margin-top:2px}
+.del{background:none;border:1.5px solid var(--ln);border-radius:6px;color:var(--mut);cursor:pointer;font-size:13px;padding:5px 9px;line-height:1}
+.del:hover{border-color:var(--red);color:var(--red);background:#FFF5F5}
+.del:disabled{opacity:.4;cursor:wait}
+@media(max-width:1100px){.kpis{grid-template-columns:repeat(2,1fr)}.hide-m{display:none}}
+</style>
+
+<div class="top"><div class="wrap">
+  <div><h1>🎬 Заявки блогерів / UGC</h1><div class="sub" id="upd">завантаження…</div></div>
+  <div class="nav">
+    <!-- Довідка першою і виділена: питання «а що тут заповнювати» виникає
+         частіше, ніж потреба перейти в інший дашборд. -->
+    <a href="https://brand.sneco.ua/documents/guides/snEco_Dashboard_Lidiv_Dovidka.pdf"
+       target="_blank" rel="noopener"
+       style="background:#FCC01B;color:#1E1E1E;font-weight:700"
+       title="Як вести заявки + як влаштовано (PDF, 3 стор.)">📄 Довідка</a>
+    <a href="../customer-360/customer-360.html">Customer 360</a>
+    <a href="../finance/finance.html">Finance</a>
+    <a href="../dashboard.html">Sales</a>
+    <a href="https://brand.sneco.ua/">Brand Bible</a>
+  </div>
+</div></div>
+
+<div class="wrap">
+  <!-- Період керує всім на сторінці: KPI, воронкою, причинами, таблицями. -->
+  <div class="bar" style="margin-bottom:14px">
+    <label style="font-size:12px;color:#666">Період</label>
+    <select id="f-period">
+      <option value="7">Останні 7 днів</option>
+      <option value="30" selected>Останні 30 днів</option>
+      <option value="90">Останні 90 днів</option>
+      <option value="mtd">Цей місяць</option>
+      <option value="prev">Минулий місяць</option>
+      <option value="ytd">Цей рік</option>
+      <option value="all">Весь час</option>
+      <option value="custom">Довільний…</option>
+    </select>
+    <input type="date" id="f-from" style="display:none">
+    <input type="date" id="f-to" style="display:none">
+    <span class="sub" id="perHint" style="font-size:12px;color:#888"></span>
+    <div class="sp"></div>
+    <span class="sub" id="upd2" style="font-size:12px;color:#888"></span>
+  </div>
+
+  <style>
+/* Контроль актуальності контакту (розділ 6 ТЗ). Підсвічуємо рядок, а не
+   комірку: менеджер сканує таблицю очима згори вниз, і смуга помітніша. */
+tr.stale-yellow td{background:#fff8e1}
+tr.stale-red td{background:#ffebee}
+.age{font-size:12px;white-space:nowrap}
+.age b{font-size:14px}
+.age.y{color:#a06800}
+.age.r{color:#c62828;font-weight:700}
+.cmt{max-width:320px}
+.cmt .last{font-size:12px;color:#444;line-height:1.4;margin-bottom:4px}
+.cmt .last .who{color:#888;font-size:11px}
+.cmt textarea{width:100%;box-sizing:border-box;font:inherit;font-size:12px;padding:5px;border:1px solid #ddd;border-radius:5px}
+.cmt .row2{display:flex;gap:5px;align-items:center;margin-top:4px}
+.cmt input[type=date]{font-size:12px;padding:3px 5px;border:1px solid #ddd;border-radius:5px}
+.cmt button{font-size:12px;padding:4px 9px;border:0;border-radius:5px;background:#111;color:#fff;cursor:pointer}
+.cmt button:disabled{opacity:.5;cursor:default}
+.cmt .st2{font-size:11px;color:#888;min-height:13px}
+.mny{white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
+.mny .sub2{font-size:11px;color:#888}
+.nolink{color:#c62828;font-size:11px}
+/* Лід у статусі «Замовили», але відвантажень у МійСклад немає. Саме через
+   цю розбіжність 09.09.2026 прийшло питання «чому прибуток такий малий»:
+   у плитці «Замовили» пʼять, а грошей — по одному клієнту. Тепер видно, де
+   статус поставили авансом. */
+.no-deal{display:inline-block;margin-top:3px;padding:1px 6px;border-radius:4px;
+  background:#ffebee;color:#c62828;font-size:11px;font-weight:600;white-space:nowrap}
+.hint-src{font-size:11px;color:#888;margin:6px 0 0}
+</style>
+<div class="kpis">
+    <div class="k acc"><div class="n" id="k-total">0</div><div class="l">Заявок за період</div></div>
+    <div class="k"><div class="n" id="k-new">0</div><div class="l">Не оброблені</div></div>
+    <div class="k"><div class="n" id="k-work">0</div><div class="l">В роботі</div></div>
+    <div class="k"><div class="n" id="k-won">0</div><div class="l">Замовили</div></div>
+    <div class="k"><div class="n" id="k-conv">—</div><div class="l">Конверсія в замовлення</div></div>
+    <div class="k"><div class="n" id="k-rep">0</div><div class="l">З повторними</div></div>
+    <div class="k"><div class="n" id="k-ltv">0 ₴</div><div class="l">Оборот з лідів</div></div>
+    <div class="k"><div class="n" id="k-prof">0 ₴</div><div class="l">Прибуток з лідів</div></div>
+    <div class="k"><div class="n" id="k-o7">0</div><div class="l">Без контакту 7+ днів</div></div>
+    <div class="k"><div class="n" id="k-o14">0</div><div class="l">Без контакту 14+ днів</div></div>
+    <div class="k"><div class="n" id="k-nodeal">0</div><div class="l">«Замовили» без відвантаження</div></div>
+  </div>
+
+  <p class="hint-src">Оборот і прибуток — з МійСклад: відвантаження мінус повернення, прибуток за звітом собівартості (FIFO, рахує сам МійСклад). Клієнт визначається за поштою або телефоном, тому кілька карток одного клієнта рахуються разом. Дублікати й спам у підсумки не входять.</p>
+
+  <div id="analytics"></div>
+
+  <div class="bar">
+    <select id="f-status">
+      <option value="">Усі статуси</option>
+      <option value="new">Нові</option><option value="contacted">В роботі</option>
+      <option value="pending">В очікуванні рішення</option>
+      <option value="sample-sent">Зразки надіслані</option><option value="won">Замовили</option>
+      <option value="lost">Втрата / відмова</option><option value="duplicate">Дублікат</option><option value="spam">Спам</option>
+    </select>
+    <select id="f-age">
+      <option value="">Будь-який контакт</option>
+      <option value="7">Без контакту 7+ днів</option>
+      <option value="14">Без контакту 14+ днів</option>
+      <option value="due">Контакт на сьогодні або прострочено</option>
+    </select>
+    <select id="f-deal">
+      <option value="">Замовлення: будь-які</option>
+      <option value="yes">Є замовлення</option>
+      <option value="repeat">Є повторне</option>
+      <option value="no">Без замовлень</option>
+    </select>
+    <select id="f-source"><option value="">Усі джерела</option></select>
+    <select id="f-segment">
+      <option value="">Усі сегменти</option>
+      <option value="distributor">Дистриб'ютор</option><option value="horeca">HoReCa</option>
+      <option value="retail-chain">Мережа</option><option value="retail-single">Окремий магазин</option>
+      <option value="online">Онлайн / маркетплейс</option><option value="other">Інше</option>
+      <option value="__none">Без сегмента</option>
+    </select>
+    <input id="f-q" placeholder="Пошук: імʼя, компанія, email, телефон…" style="min-width:220px">
+    <div class="sp"></div>
+    <button class="btn gh" id="purge" title="Видалити тестові записи (example.com, smoke-*)">🧹 Тестові</button>
+    <button class="btn gh" id="csv">↓ CSV</button>
+    <button class="btn" id="reload">Оновити</button>
+  </div>
+
+  <div id="tablebox"></div>
+
+  <h2 style="margin:34px 0 6px;font-size:17px">🛒 Клієнти, що зробили замовлення</h2>
+  <div class="sub" style="margin-bottom:10px;font-size:13px;color:#666">Ліди, які дійшли до угоди. Історія замовлень підтягується з МойСкладу через картку контрагента.</div>
+  <div id="ordersbox"></div>
+  <div style="height:40px"></div>
+</div>
+
+<script>
+var WORKER='https://sneco-auth.vg-ab6.workers.dev', TOKEN=null, LEADS=[], ORDERS=[];
+var ST={'new':'Новий','contacted':'В роботі','pending':'В очікуванні рішення','sample-sent':'Зразки надіслані','won':'Замовили','lost':'Втрата / відмова','duplicate':'Дублікат','spam':'Спам'};
+// Фінальні статуси не контролюємо на прострочення: там уже нічого не чекаємо.
+var FINAL=['won','lost','duplicate','spam'];
+// Для цих статусів дата наступного контакту обовʼязкова — інакше лід зависає.
+var NEED_NEXT=['pending','sample-sent'];
+var MONEY={},COMMENTS={};
+function money(id){return MONEY[id]||{orders:0,ltv:0,profit:0,repeat_orders:0,first_at:null,last_at:null,cp_count:0};}
+function uah(v){return (Math.round(v||0)).toLocaleString('uk-UA')+' ₴';}
+/** Днів без нового коментаря. null — коментарів ще не було. */
+function staleDays(l){
+  var t=l.last_comment_at||l.updated_at||l.created_at;
+  if(!t) return null;
+  return Math.floor((Date.now()/1000-t)/86400);
+}
+function staleClass(l){
+  if(FINAL.indexOf(l.status)>=0) return '';
+  var d=staleDays(l);
+  if(d===null) return '';
+  if(d>=14) return 'stale-red';
+  if(d>=7) return 'stale-yellow';
+  return '';
+}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function dt(v){if(!v)return '';var d=new Date(typeof v==='number'?v*1000:v);if(isNaN(d))return esc(v);
+ return d.toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+d.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});}
+function ts(v){if(!v)return 0;var d=new Date(typeof v==='number'?v*1000:v);return isNaN(d)?0:d.getTime();}
+
+async function api(path,body){
+  var r=await fetch(WORKER+path,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},body:JSON.stringify(body||{})});
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  return r.json();
+}
+
+// ── довідники ─────────────────────────────────────────────────────────────
+// Причини відмови — фіксований список. З вільного тексту неможливо зібрати
+// зведення «скільки втратили через ціну», а саме воно й потрібне.
+var REASON={price:'Дорого / ціна',assortment:'Не підійшов асортимент',
+  'not-relevant':'Неактуально',thinking:'Думає',
+  'no-response':'Не виходить на звʼязок',other:'Інше'};
+var SEGMENT={distributor:'Дистрибʼютор',horeca:'HoReCa','retail-chain':'Мережа',
+  'retail-single':'Окремий магазин',online:'Онлайн / маркетплейс',other:'Інше'};
+// Порядок = рух воронкою. Duplicate/spam сюди не входять — це не етапи.
+var FUNNEL=['new','contacted','pending','sample-sent','won'];
+var WORK=['contacted','pending','sample-sent'];
+
+// ── період ────────────────────────────────────────────────────────────────
+function periodRange(){
+  var v=document.getElementById('f-period').value, now=new Date(), from, to=now;
+  if(v==='custom'){
+    var a=document.getElementById('f-from').value, b=document.getElementById('f-to').value;
+    from=a?new Date(a+'T00:00:00'):new Date(0);
+    to=b?new Date(b+'T23:59:59'):now;
+  } else if(v==='all'){ from=new Date(0); }
+  else if(v==='mtd'){ from=new Date(now.getFullYear(),now.getMonth(),1); }
+  else if(v==='prev'){ from=new Date(now.getFullYear(),now.getMonth()-1,1);
+                       to=new Date(now.getFullYear(),now.getMonth(),0,23,59,59); }
+  else if(v==='ytd'){ from=new Date(now.getFullYear(),0,1); }
+  else { from=new Date(now.getTime()-parseInt(v)*864e5); }
+  return {from:from.getTime(), to:to.getTime(), label:v};
+}
+function inPeriod(l,R){ var t=ts(l.created_at); return t>=R.from && t<=R.to; }
+
+function kpis(rows){
+  var f=function(fn){return rows.filter(fn).length;};
+  var won=f(function(l){return l.status==='won';});
+  // Знаменник — усе, крім сміття: дублікати й спам не були реальними заявками.
+  var real=rows.filter(function(l){return ['duplicate','spam'].indexOf(l.status)<0;}).length;
+  document.getElementById('k-total').textContent=rows.length;
+  document.getElementById('k-new').textContent=f(function(l){return (l.status||'new')==='new';});
+  document.getElementById('k-work').textContent=f(function(l){return WORK.indexOf(l.status)>=0;});
+  document.getElementById('k-won').textContent=won;
+  document.getElementById('k-conv').textContent=real?(won/real*100).toFixed(0)+'%':'—';
+
+  // Гроші рахуємо по тих самих рядках, що й решта плиток, — щоб цифри
+  // згори завжди пояснювались таблицею знизу, а не жили окремим життям.
+  // 🔴 ДЕДУПЛІКАЦІЯ. Заміряно 08.09.2026: ліди 47 і 48 — та сама людина
+  // (lyukovaolga@gmail.com, той самий телефон), одна заявка вже позначена
+  // «Дублікат». Гроші в них однакові, бо клієнт один. Без цієї перевірки
+  // оборот у плитках подвоївся б. Розділ 10 ТЗ вимагає рівно цього:
+  // дублікат не створює повторного клієнта у статистиці.
+  var ltv=0, prof=0, rep=0, o7=0, o14=0, seen={};
+  rows.forEach(function(l){
+    var m=money(l.id);
+    var key=(l.email||('#'+l.id)).toLowerCase().trim();
+    var countMoney = ['duplicate','spam'].indexOf(l.status)<0 && !seen[key];
+    if(countMoney){
+      seen[key]=1;
+      ltv+=m.ltv||0; prof+=m.profit||0;
+      if((m.repeat_orders||0)>0) rep++;
+    }
+    if(FINAL.indexOf(l.status)<0){
+      var d=staleDays(l);
+      if(d!==null&&d>=7) o7++;
+      if(d!==null&&d>=14) o14++;
+    }
+  });
+  document.getElementById('k-rep').textContent=rep;
+  document.getElementById('k-ltv').textContent=uah(ltv);
+  document.getElementById('k-prof').textContent=uah(prof);
+  document.getElementById('k-o7').textContent=o7;
+  document.getElementById('k-o14').textContent=o14;
+  document.getElementById('k-nodeal').textContent=
+    rows.filter(function(l){return l.status==='won'&&!money(l.id).orders;}).length;
+}
+
+// ── аналітика: воронка, причини відмов, сегменти, джерела ──────────────────
+function renderAnalytics(rows){
+  var box=document.getElementById('analytics');
+  if(!rows.length){box.innerHTML='';return;}
+  var cnt=function(arr,key){var m={};arr.forEach(function(l){var k=l[key]||'__none';m[k]=(m[k]||0)+1;});return m;};
+
+  // Воронка: скільки лідів дійшли ЩОНАЙМЕНШЕ до кожного етапу.
+  // Через це вона монотонна — «відкотів» назад не показує навіть для відмов.
+  var byStatus=cnt(rows,'status');
+  var reached=FUNNEL.map(function(st,i){
+    var n=0;
+    rows.forEach(function(l){
+      var idx=FUNNEL.indexOf(l.status||'new');
+      if(idx>=i) n++;
+      else if(l.status==='lost'&&i===0) n++;
+    });
+    return {st:st,n:n};
+  });
+  var top=reached[0].n||1;
+  var ST_L={new:'Нові',contacted:'В роботі',pending:'В очікуванні рішення',
+            'sample-sent':'Зразки надіслані',won:'Замовили'};
+  var funnel=reached.map(function(r){
+    var w=Math.round(r.n/top*100);
+    return '<div class="fn-row"><span class="fn-l">'+ST_L[r.st]+'</span>'
+      +'<span class="fn-bar"><i style="width:'+w+'%"></i></span>'
+      +'<b class="fn-n">'+r.n+'</b><span class="fn-p">'+w+'%</span></div>';
+  }).join('');
+
+  var lost=rows.filter(function(l){return l.status==='lost';});
+  var byReason=cnt(lost,'reject_reason');
+  var reasons=Object.keys(byReason).sort(function(a,b){return byReason[b]-byReason[a];}).map(function(k){
+    return '<div class="fn-row"><span class="fn-l">'+(k==='__none'?'<i style="color:#bbb">не вказано</i>':esc(REASON[k]||k))+'</span>'
+      +'<b class="fn-n">'+byReason[k]+'</b></div>';
+  }).join('') || '<div class="sub" style="color:#999;font-size:13px">Відмов за період немає.</div>';
+
+  var bySeg=cnt(rows,'segment');
+  var segs=Object.keys(bySeg).sort(function(a,b){return bySeg[b]-bySeg[a];}).map(function(k){
+    return '<div class="fn-row"><span class="fn-l">'+(k==='__none'?'<i style="color:#bbb">не вказано</i>':esc(SEGMENT[k]||k))+'</span>'
+      +'<b class="fn-n">'+bySeg[k]+'</b></div>';
+  }).join('');
+
+  var bySrc=cnt(rows,'source');
+  var srcs=Object.keys(bySrc).sort(function(a,b){return bySrc[b]-bySrc[a];}).slice(0,8).map(function(k){
+    var w=rows.filter(function(l){return (l.source||'__none')===k&&l.status==='won';}).length;
+    return '<div class="fn-row"><span class="fn-l">'+(k==='__none'?'—':esc(k))+'</span>'
+      +'<b class="fn-n">'+bySrc[k]+'</b><span class="fn-p">'+(w?'→ '+w+' 🛒':'')+'</span></div>';
+  }).join('');
+
+  box.innerHTML='<div class="an-grid">'
+    +'<div class="an-card"><h3>Воронка</h3>'+funnel+'</div>'
+    +'<div class="an-card"><h3>Причини відмов <span class="cnt">'+lost.length+'</span></h3>'+reasons+'</div>'
+    +'<div class="an-card"><h3>Сегменти</h3>'+segs+'</div>'
+    +'<div class="an-card"><h3>Джерела <span class="cnt">топ-8</span></h3>'+srcs+'</div>'
+    +'</div>';
+}
+
+// ── клієнти із замовленнями ───────────────────────────────────────────────
+function renderOrders(rows){
+  var box=document.getElementById('ordersbox');
+  var byAgent={};
+  (ORDERS||[]).forEach(function(o){ (byAgent[o.agent_id]=byAgent[o.agent_id]||[]).push(o); });
+  var withOrders=rows.filter(function(l){return l.ms_counterparty_id&&byAgent[l.ms_counterparty_id];});
+  if(!withOrders.length){
+    box.innerHTML='<div class="empty">Замовлень від лідів за цей період ще немає.<br>'
+      +'<span style="font-size:13px">Щойно клієнт із заявки оформить замовлення в МойСкладі, воно зʼявиться тут автоматично.</span></div>';
+    return;
+  }
+  var h='<table><thead><tr><th>Клієнт</th><th>Сегмент</th><th>Джерело</th>'
+    +'<th class="num">Замовлень</th><th>Перше</th><th>Останнє</th><th class="num">Сума, ₴</th></tr></thead><tbody>';
+  withOrders.map(function(l){
+    var os=byAgent[l.ms_counterparty_id].slice().sort(function(a,b){return String(a.moment).localeCompare(String(b.moment));});
+    var sum=os.reduce(function(s,o){return s+(+o.sum_kop||0);},0)/100;
+    return {l:l,os:os,sum:sum};
+  }).sort(function(a,b){return b.sum-a.sum;}).forEach(function(x){
+    var l=x.l, os=x.os;
+    h+='<tr><td><div class="who">'+esc(l.company||l.name||l.email)+'</div>'
+      +'<div class="meta">'+esc(l.email||'')+'</div></td>'
+      +'<td>'+(l.segment?esc(SEGMENT[l.segment]||l.segment):'<span style="color:#bbb">—</span>')+'</td>'
+      +'<td><span class="tag src">'+esc(l.source||'—')+'</span></td>'
+      +'<td class="num"><b>'+os.length+'</b>'+(os.length>1?' <span title="повторні">🔁</span>':'')+'</td>'
+      +'<td style="white-space:nowrap;font-size:13px">'+esc(String(os[0].moment||'').slice(0,10))+'</td>'
+      +'<td style="white-space:nowrap;font-size:13px">'+esc(String(os[os.length-1].moment||'').slice(0,10))+'</td>'
+      +'<td class="num">'+x.sum.toLocaleString('uk-UA',{maximumFractionDigits:0})+'</td></tr>';
+  });
+  box.innerHTML=h+'</tbody></table>';
+}
+
+function render(){
+  var R=periodRange();
+  var inPer=LEADS.filter(function(l){return inPeriod(l,R);});
+  // KPI, воронка й таблиця замовлень дивляться на період, а не на фільтри
+  // нижче — інакше «конверсія» стрибала б від кожного клацання по статусу.
+  kpis(inPer); renderAnalytics(inPer); renderOrders(inPer);
+  var hint=document.getElementById('perHint');
+  if(hint) hint.textContent=R.label==='all'?'за весь час'
+    :new Date(R.from).toLocaleDateString('uk-UA')+' — '+new Date(R.to).toLocaleDateString('uk-UA');
+
+  var q=(document.getElementById('f-q').value||'').toLowerCase().trim();
+  var st=document.getElementById('f-status').value, sr=document.getElementById('f-source').value;
+  var sg=document.getElementById('f-segment').value;
+  var agEl=document.getElementById('f-age'), dlEl=document.getElementById('f-deal');
+  var ag=agEl?agEl.value:'', dl=dlEl?dlEl.value:'';
+  var rows=inPer.filter(function(l){
+    if(st && (l.status||'new')!==st) return false;
+    if(sr && l.source!==sr) return false;
+    if(sg==='__none'){ if(l.segment) return false; }
+    else if(sg && l.segment!==sg) return false;
+    if(q){var hay=[l.name,l.company,l.email,l.phone,l.message].join(' ').toLowerCase();if(hay.indexOf(q)<0)return false;}
+    if(ag){
+      if(ag==='due'){
+        if(!l.next_contact_at||l.next_contact_at>Date.now()/1000) return false;
+        if(FINAL.indexOf(l.status)>=0) return false;
+      }else{
+        if(FINAL.indexOf(l.status)>=0) return false;
+        var dd=staleDays(l); if(dd===null||dd<parseInt(ag)) return false;
+      }
+    }
+    if(dl){
+      var mm=money(l.id);
+      if(dl==='yes'&&mm.orders<1) return false;
+      if(dl==='repeat'&&mm.repeat_orders<1) return false;
+      if(dl==='no'&&mm.orders>0) return false;
+    }
+    return true;
+  });
+  var box=document.getElementById('tablebox');
+  if(!rows.length){box.innerHTML='<div class="empty">Лідів не знайдено.<br><span style="font-size:13px">Заявки з лендингу <b>/dystrybyutor/</b> зʼявляться тут автоматично.</span></div>';return;}
+  var h='<table><thead><tr><th>Дата</th><th>Хто</th><th>Контакти</th><th>Контакт</th><th class="hide-m">Джерело / UTM</th><th class="num">Замовл.</th><th class="num">Оборот</th><th class="num">Прибуток</th><th>Сегмент</th><th>Статус</th><th>Коментарі менеджера</th><th></th></tr></thead><tbody>';
+  rows.forEach(function(l){
+    var nm=l.company||l.name||'—';
+    var M=money(l.id), D=staleDays(l), cls=staleClass(l);
+    var ageTxt;
+    if(FINAL.indexOf(l.status)>=0) ageTxt='<span style="color:#bbb">—</span>';
+    else if(D===null) ageTxt='<span class="age r"><b>немає</b><br>коментарів</span>';
+    else ageTxt='<span class="age '+(D>=14?'r':(D>=7?'y':''))+'"><b>'+D+'</b> дн.</span>';
+    if(l.next_contact_at){
+      var nd=new Date(l.next_contact_at*1000), over=l.next_contact_at<=Date.now()/1000;
+      ageTxt+='<div class="meta" style="'+(over?'color:#c62828;font-weight:600':'')+'">→ '
+             +nd.toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit'})+(over?' (!)':'')+'</div>';
+    }
+    var cl=COMMENTS[l.id]||[], last=cl[0];
+    h+='<tr class="'+cls+'">'
+     +'<td style="white-space:nowrap;font-size:13px">'+dt(l.created_at)+'</td>'
+     +'<td><div class="who">'+esc(nm)+'</div>'+(l.company&&l.name?'<div class="meta">'+esc(l.name)+'</div>':'')
+        +(l.message?'<div class="meta" title="'+esc(l.message)+'">'+esc(l.message.slice(0,60))+(l.message.length>60?'…':'')+'</div>':'')+'</td>'
+     +'<td><a class="mail" href="mailto:'+esc(l.email)+'">'+esc(l.email)+'</a>'+(l.phone?'<div class="meta"><a class="mail" href="tel:'+esc(l.phone)+'">'+esc(l.phone)+'</a></div>':'')+'</td>'
+     +'<td>'+ageTxt+'</td>'
+     +'<td class="hide-m"><span class="tag src">'+esc(l.source||'—')+'</span>'+(l.utm_source?'<div class="meta">'+esc(l.utm_source)+' / '+esc(l.utm_medium||'-')+' / '+esc(l.utm_campaign||'-')+'</div>':'')+'</td>'
+     +'<td class="mny">'+(M.orders||'—')+(M.repeat_orders?'<div class="sub2">+'+M.repeat_orders+' повт.</div>':'')+'</td>'
+     +'<td class="mny">'+(M.orders?uah(M.ltv):'—')+(M.first_at?'<div class="sub2">з '+String(M.first_at).slice(0,10)+'</div>':'')+'</td>'
+     +'<td class="mny">'+(M.orders?uah(M.profit):'—')+'</td>'
+     +'<td><select class="sg" data-id="'+l.id+'"><option value="">— сегмент —</option>'
+        +Object.keys(SEGMENT).map(function(k){return '<option value="'+k+'"'+(l.segment===k?' selected':'')+'>'+SEGMENT[k]+'</option>';}).join('')+'</select></td>'
+     +'<td><select class="st" data-id="'+l.id+'">'+Object.keys(ST).map(function(k){return '<option value="'+k+'"'+((l.status||'new')===k?' selected':'')+'>'+ST[k]+'</option>';}).join('')+'</select>'
+        // Причина показується лише для втрачених — інакше поле збиває з пантелику.
+        +'<div class="rj-wrap" data-for="'+l.id+'" style="'+(l.status==='lost'?'':'display:none')+'">'
+        +'<select class="rj" data-id="'+l.id+'"><option value="">— причина —</option>'
+        +Object.keys(REASON).map(function(k){return '<option value="'+k+'"'+(l.reject_reason===k?' selected':'')+'>'+REASON[k]+'</option>';}).join('')+'</select></div>'
+        +(l.status==='won'&&!M.orders?'<div class="no-deal" title="Статус «Замовили», але в МійСклад немає жодного відвантаження цього клієнта">без відвантаження</div>':'')+'</td>'
+     +'<td class="cmt">'
+        +(last?'<div class="last">'+esc(last.body).replace(/\n/g,'<br>')
+             +'<div class="who">'+esc((last.author_email||'').split('@')[0])+' · '+dt(last.created_at)
+             +(cl.length>1?' · <a href="#" class="more" data-id="'+l.id+'">ще '+(cl.length-1)+'</a>':'')+'</div></div>'
+            :'<div class="last" style="color:#bbb">коментарів ще немає</div>')
+        +'<textarea class="cm" data-id="'+l.id+'" rows="2" placeholder="Що зробили, про що домовились…"></textarea>'
+        +'<div class="row2"><input type="date" class="nx" data-id="'+l.id+'" value="'+(l.next_contact_at?new Date(l.next_contact_at*1000).toISOString().slice(0,10):'')+'" title="Наступний контакт">'
+        +'<button class="cmsave" data-id="'+l.id+'">Додати</button><span class="st2" data-for="'+l.id+'"></span></div></td>'
+     +'<td><button class="del" data-id="'+l.id+'" title="Видалити лід">✕</button></td>'
+     +'</tr>';
+  });
+  box.innerHTML=h+'</tbody></table>';
+  // Коментар — окремий запис з автором і часом, а не перезапис одного поля.
+  // Ctrl+Enter зберігає: менеджер пише багато і не тягнеться до миші.
+  box.querySelectorAll('.cmsave').forEach(function(b){
+    b.addEventListener('click',async function(){
+      var id=this.dataset.id;
+      var ta=box.querySelector('.cm[data-id="'+id+'"]');
+      var nx=box.querySelector('.nx[data-id="'+id+'"]');
+      var st=box.querySelector('.st2[data-for="'+id+'"]');
+      var txt=(ta.value||'').trim();
+      if(!txt){ ta.focus(); return; }
+      var L=LEADS.find(function(x){return String(x.id)===String(id);});
+      // Розділ 7 ТЗ: для «В очікуванні рішення» і «Зразки надіслані» дата
+      // наступного контакту обовʼязкова — інакше лід нікуди не потрапляє.
+      if(L&&NEED_NEXT.indexOf(L.status)>=0&&!nx.value&&!L.next_contact_at){
+        st.textContent='вкажіть дату наступного контакту'; nx.focus(); return;
+      }
+      this.disabled=true; st.textContent='збереження…';
+      var payload={lead_id:parseInt(id),body:txt};
+      if(nx.value) payload.next_contact_at=Math.floor(new Date(nx.value+'T12:00:00').getTime()/1000);
+      try{
+        var r=await api('/api/leads/comment',payload);
+        if(r&&r.lead&&L){ L.last_comment_at=r.lead.last_comment_at; L.next_contact_at=r.lead.next_contact_at; }
+        if(!COMMENTS[id]) COMMENTS[id]=[];
+        COMMENTS[id].unshift({body:txt,author_email:(window.ME||''),created_at:Math.floor(Date.now()/1000)});
+        st.textContent='✓ додано';
+        kpis(LEADS); render();
+      }catch(e){ st.textContent='✕ помилка'; this.disabled=false; }
+    });
+  });
+  box.querySelectorAll('.cm').forEach(function(ta){
+    ta.addEventListener('keydown',function(e){
+      if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){
+        var b=box.querySelector('.cmsave[data-id="'+ta.dataset.id+'"]'); if(b) b.click();
+      }
+    });
+  });
+  box.querySelectorAll('.more').forEach(function(a){
+    a.addEventListener('click',function(e){
+      e.preventDefault();
+      var cl=COMMENTS[this.dataset.id]||[];
+      alert(cl.map(function(c){
+        return dt(c.created_at)+' · '+((c.author_email||'').split('@')[0])+'\n'+c.body;
+      }).join('\n\n──────────\n\n'));
+    });
+  });
+  // видалення
+  box.querySelectorAll('.del').forEach(function(b){
+    b.addEventListener('click',async function(){
+      var id=this.dataset.id;
+      var L=LEADS.find(function(x){return String(x.id)===String(id);});
+      if(!confirm('Видалити лід'+(L?' «'+(L.company||L.name||L.email)+'»':'')+'?\n\nДію не можна скасувати.')) return;
+      this.disabled=true;
+      try{
+        await api('/api/leads/delete',{id:parseInt(id)});
+        LEADS=LEADS.filter(function(x){return String(x.id)!==String(id);});
+        kpis();render();
+      }catch(e){alert('Не вдалося видалити: '+e.message);this.disabled=false;}
+    });
+  });
+  box.querySelectorAll('.st').forEach(function(sel){
+    sel.addEventListener('change',async function(){
+      var id=this.dataset.id,v=this.value,el=this;el.disabled=true;
+      try{await api('/api/leads/update',{id:parseInt(id),status:v});
+        var L=LEADS.find(function(x){return String(x.id)===String(id);});if(L)L.status=v;
+        // Поле причини зʼявляється/зникає одразу, без перезавантаження таблиці —
+        // інакше менеджер втратив би фокус і місце в довгому списку.
+        var w=box.querySelector('.rj-wrap[data-for="'+id+'"]');
+        if(w) w.style.display = (v==='lost') ? '' : 'none';
+        refreshTop();
+      }catch(e){alert('Не вдалося оновити статус: '+e.message);}
+      el.disabled=false;
+    });
+  });
+  box.querySelectorAll('.sg').forEach(function(sel){
+    sel.addEventListener('change',async function(){
+      var id=this.dataset.id,v=this.value,el=this;el.disabled=true;
+      try{await api('/api/leads/update',{id:parseInt(id),segment:v||null});
+        var L=LEADS.find(function(x){return String(x.id)===String(id);});if(L)L.segment=v||null;
+        refreshTop();
+      }catch(e){alert('Не вдалося оновити сегмент: '+e.message);}
+      el.disabled=false;
+    });
+  });
+  box.querySelectorAll('.rj').forEach(function(sel){
+    sel.addEventListener('change',async function(){
+      var id=this.dataset.id,v=this.value,el=this;el.disabled=true;
+      try{await api('/api/leads/update',{id:parseInt(id),reject_reason:v||null});
+        var L=LEADS.find(function(x){return String(x.id)===String(id);});if(L)L.reject_reason=v||null;
+        refreshTop();
+      }catch(e){alert('Не вдалося зберегти причину: '+e.message);}
+      el.disabled=false;
+    });
+  });
+}
+
+// Перерахунок верхньої частини без перемальовування таблиці.
+function refreshTop(){
+  var R=periodRange();
+  var inPer=LEADS.filter(function(l){return inPeriod(l,R);});
+  kpis(inPer); renderAnalytics(inPer); renderOrders(inPer);
+}
+
+async function load(){
+  try{
+    // Тягнемо все, ріжемо періодом на клієнті: лідів сотні, не сотні тисяч,
+    // і так перемикання періоду миттєве, без запиту до сервера.
+    var d=await api('/api/leads/list',{limit:2000,scope:'creators'});
+    LEADS=d.leads||[];
+    ORDERS=d.orders||[];
+    MONEY=d.money||{}; COMMENTS=d.comments||{};
+    var srcs=[...new Set(LEADS.map(function(l){return l.source;}).filter(Boolean))].sort();
+    var sel=document.getElementById('f-source'),cur=sel.value;
+    sel.innerHTML='<option value="">Усі джерела</option>'+srcs.map(function(s){return '<option value="'+esc(s)+'">'+esc(s)+'</option>';}).join('');
+    sel.value=cur;
+    var stamp='Усього '+LEADS.length+' · оновлено '+new Date().toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('upd').textContent=stamp;
+    var u2=document.getElementById('upd2'); if(u2) u2.textContent=stamp;
+    render();
+  }catch(e){
+    document.getElementById('tablebox').innerHTML='<div class="empty">Помилка завантаження: '+esc(e.message)+'</div>';
+  }
+}
+
+['f-status','f-source','f-segment','f-from','f-to','f-age','f-deal'].forEach(function(id){
+  var el=document.getElementById(id); if(el) el.addEventListener('change',render);
+});
+document.getElementById('f-period').addEventListener('change',function(){
+  var custom=this.value==='custom';
+  ['f-from','f-to'].forEach(function(id){document.getElementById(id).style.display=custom?'':'none';});
+  if(custom&&!document.getElementById('f-from').value){
+    var d=new Date(); d.setDate(d.getDate()-30);
+    document.getElementById('f-from').value=d.toISOString().slice(0,10);
+    document.getElementById('f-to').value=new Date().toISOString().slice(0,10);
+  }
+  render();
+});
+document.getElementById('f-q').addEventListener('input',render);
+document.getElementById('reload').addEventListener('click',load);
+document.getElementById('purge').addEventListener('click',async function(){
+  if(!confirm('Видалити всі ТЕСТОВІ ліди?\n\n(email на @example.com, @test.*, smoke-*, джерела test/unittest)\nСправжні заявки не зачіпаються.')) return;
+  this.disabled=true;
+  try{
+    var r=await api('/api/leads/delete',{purge_test:true});
+    alert('Видалено тестових: '+(r.deleted!=null?r.deleted:'?'));
+    await load();
+  }catch(e){alert('Помилка: '+e.message);}
+  this.disabled=false;
+});
+document.getElementById('csv').addEventListener('click',function(){
+  var cols=['created_at','status','source','name','company','email','phone','message','utm_source','utm_medium','utm_campaign','ms_counterparty_id'];
+  var csv=[cols.join(',')].concat(LEADS.map(function(l){return cols.map(function(c){return '"'+String(l[c]==null?'':l[c]).replace(/"/g,'""')+'"';}).join(',');})).join('\n');
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(["﻿"+csv],{type:'text/csv;charset=utf-8'}));
+  a.download='sneco-leads-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+});
+
+window.bootLeads=function(token){TOKEN=token;load();};
+</script>
+</body>
+</html>
