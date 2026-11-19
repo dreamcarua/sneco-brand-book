@@ -4749,6 +4749,32 @@ body.is-admin section.admin-only { display: block !important; }
 </div>
 </div>
 </div>
+<h3 class="block-title" id="visual-druk-rozmir"><span data-lang="uk">Шрифт сайту DrukCyr: правило розміру</span><span data-lang="en">Website font DrukCyr: size rule</span><span data-lang="sk">Písmo webu DrukCyr: pravidlo veľkosti</span></h3>
+<div class="card">
+<p style="margin:0 0 12px;line-height:1.6">
+<span data-lang="uk">На sneco.ua, партнерських сторінках і сторінці «Блогерам / UGC» заголовки набрані <strong>DrukCyr-Bold</strong>. Це дуже вузький шрифт: дрібним його не прочитати, особливо на телефоні. Тому дрібний текст завжди набираємо <strong>Qanelas Bold 700</strong>.</span>
+<span data-lang="en">On sneco.ua, the partner pages and the “Creators / UGC” page, headlines are set in <strong>DrukCyr-Bold</strong>. It is a very condensed face and is unreadable when small, especially on phones. Small text is therefore always set in <strong>Qanelas Bold 700</strong>.</span>
+<span data-lang="sk">Na sneco.ua, partnerských stránkach a stránke „Tvorcovia / UGC“ sú nadpisy v <strong>DrukCyr-Bold</strong>. Je to veľmi úzke písmo a v malej veľkosti je nečitateľné, najmä na telefóne. Malý text preto vždy sadzáme v <strong>Qanelas Bold 700</strong>.</span>
+</p>
+<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px">
+<thead><tr style="text-align:left;border-bottom:2px solid var(--border)">
+<th style="padding:8px"><span data-lang="uk">Що</span><span data-lang="en">What</span><span data-lang="sk">Čo</span></th>
+<th style="padding:8px"><span data-lang="uk">Шрифт</span><span data-lang="en">Font</span><span data-lang="sk">Písmo</span></th>
+<th style="padding:8px"><span data-lang="uk">Мінімум</span><span data-lang="en">Minimum</span><span data-lang="sk">Minimum</span></th>
+</tr></thead>
+<tbody>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px"><span data-lang="uk">Заголовки, великі цифри (KPI, ціна)</span><span data-lang="en">Headlines, big numbers (KPI, price)</span><span data-lang="sk">Nadpisy, veľké čísla (KPI, cena)</span></td><td style="padding:8px">DrukCyr-Bold</td><td style="padding:8px">22 px</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px"><span data-lang="uk">Кнопки з 1–3 слів</span><span data-lang="en">Buttons of 1–3 words</span><span data-lang="sk">Tlačidlá s 1–3 slovami</span></td><td style="padding:8px">DrukCyr-Bold</td><td style="padding:8px">18 px</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px"><span data-lang="uk">Великими літерами: якорі-навігація, чіпи, підписи, заголовки таблиць, кнопки в картках каталогу на телефоні</span><span data-lang="en">Uppercase: jump links, chips, captions, table headers, catalogue card buttons on phones</span><span data-lang="sk">Veľkými písmenami: kotvy, čipy, popisky, hlavičky tabuliek, tlačidlá kariet katalógu na telefóne</span></td><td style="padding:8px">Qanelas Bold 700, <span data-lang="uk">розрядка</span><span data-lang="en">tracking</span><span data-lang="sk">preklad</span> 0.03–0.05em</td><td style="padding:8px">12–13 px</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px"><span data-lang="uk">Звичайним регістром: заголовки карток, питання FAQ, кроки, e-mail</span><span data-lang="en">Sentence case: card titles, FAQ questions, steps, e-mail</span><span data-lang="sk">Bežné písmená: nadpisy kariet, otázky FAQ, kroky, e-mail</span></td><td style="padding:8px">Qanelas Bold 700</td><td style="padding:8px">15 px</td></tr>
+<tr><td style="padding:8px"><span data-lang="uk">Основний текст</span><span data-lang="en">Body copy</span><span data-lang="sk">Hlavný text</span></td><td style="padding:8px">Qanelas Regular 400</td><td style="padding:8px">15 px</td></tr>
+</tbody></table></div>
+<p style="margin:14px 0 0;line-height:1.6;font-size:13px;color:var(--text-muted)">
+<span data-lang="uk"><strong>Заборонено:</strong> DrukCyr менше 18 px на будь-якому екрані; DrukCyr менше 22 px для тексту з 4+ слів. Правило введено 19.11.2026 після відгуку SMM про нечитабельні кнопки на телефоні. У коді: <code>brand/landing-creators/type_rules.py</code> (статичні сторінки) і <code>wp-fix/sneco-type-rules.php</code> (WordPress). Перевірка: <code>brand/landing-creators/druk-audit.js</code> показує весь дрібний DrukCyr на сторінці.</span>
+<span data-lang="en"><strong>Not allowed:</strong> DrukCyr below 18 px on any screen; DrukCyr below 22 px for text of 4+ words. Rule introduced on 19.11.2026 after SMM feedback about unreadable buttons on phones. In code: <code>brand/landing-creators/type_rules.py</code> (static pages) and <code>wp-fix/sneco-type-rules.php</code> (WordPress). Check: <code>brand/landing-creators/druk-audit.js</code> lists all small DrukCyr on a page.</span>
+<span data-lang="sk"><strong>Zakázané:</strong> DrukCyr pod 18 px na akejkoľvek obrazovke; DrukCyr pod 22 px pre text so 4+ slovami. Pravidlo platí od 19.11.2026 po spätnej väzbe SMM o nečitateľných tlačidlách na telefóne. V kóde: <code>brand/landing-creators/type_rules.py</code> (statické stránky) a <code>wp-fix/sneco-type-rules.php</code> (WordPress). Kontrola: <code>brand/landing-creators/druk-audit.js</code> vypíše všetok malý DrukCyr na stránke.</span>
+</p>
+</div>
 <h3 class="block-title" id="visual-iierarkhiia-tekstu"><span data-lang="uk">Ієрархія тексту</span><span data-lang="en">Text hierarchy</span><span data-lang="sk">Hierarchia textu</span></h3>
 <div class="card">
 <div style="display:flex;flex-direction:column;gap:16px;padding:8px 0">
