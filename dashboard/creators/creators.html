@@ -277,7 +277,7 @@ body.dash-locked{overflow:hidden}
 })();
 </script>
   <script src="../_shared/helpers.js"></script>
-<style id="creators-relabel">/* 21.11.2026: для блогерів немає замовлень у МійСклад */#k-nodeal{display:none}.k:has(#k-nodeal){display:none}.no-deal{display:none!important}select:has(option[value="repeat"]){display:none}</style></head>
+<style id="creators-hide-b2b">#tablebox th:nth-child(9),#tablebox td:nth-child(9),#f-segment{display:none!important}.hint-src,#ordersbox,h2:has(+.sub+#ordersbox),.sub:has(+#ordersbox){display:none!important}</style><style id="creators-score">.sc{display:inline-block;min-width:34px;padding:3px 6px;border-radius:8px;font-weight:700;text-align:center}.sc-hi{background:#e3f4d0;color:#2f6b0f}.sc-mid{background:#fff1cc;color:#7a5a00}.sc-lo{background:#fde2e2;color:#9b1c1c}.cpn,.cpnew{font:inherit;font-size:13px;font-weight:700;border-radius:8px;padding:5px 9px;cursor:pointer;white-space:nowrap}.cpn{background:#1F1C1C;color:#FEBB30;border:0;letter-spacing:.04em}.cpnew{background:#fff;border:1px dashed #bbb;color:#444}.cpnew:disabled{opacity:.5}</style><style id="creators-relabel">/* 21.11.2026: для блогерів немає замовлень у МійСклад */#k-nodeal{display:none}.k:has(#k-nodeal){display:none}.no-deal{display:none!important}select:has(option[value="repeat"]){display:none}</style></head>
 <body class="dash-locked">
 
 <!-- ===== OTP GATE OVERLAY ===== -->
@@ -533,10 +533,10 @@ tr.stale-red td{background:#ffebee}
     <div class="k"><div class="n" id="k-new">0</div><div class="l">Не оброблені</div></div>
     <div class="k"><div class="n" id="k-work">0</div><div class="l">В роботі</div></div>
     <div class="k"><div class="n" id="k-won">0</div><div class="l">Контент вийшов</div></div>
-    <div class="k"><div class="n" id="k-conv">—</div><div class="l">Конверсія в замовлення</div></div>
-    <div class="k"><div class="n" id="k-rep">0</div><div class="l">З повторними</div></div>
-    <div class="k"><div class="n" id="k-ltv">0 ₴</div><div class="l">Оборот з лідів</div></div>
-    <div class="k"><div class="n" id="k-prof">0 ₴</div><div class="l">Прибуток з лідів</div></div>
+    <div class="k"><div class="n" id="k-conv">—</div><div class="l">Заявка → контент</div></div>
+    <div class="k"><div class="n" id="k-rep">0</div><div class="l">Промокодів видано</div></div>
+    <div class="k"><div class="n" id="k-ltv">0 ₴</div><div class="l">Замовлень за кодами</div></div>
+    <div class="k"><div class="n" id="k-prof">0 ₴</div><div class="l">Продажі за кодами</div></div>
     <div class="k"><div class="n" id="k-o7">0</div><div class="l">Без контакту 7+ днів</div></div>
     <div class="k"><div class="n" id="k-o14">0</div><div class="l">Без контакту 14+ днів</div></div>
     <div class="k"><div class="n" id="k-nodeal">0</div><div class="l">«Замовили» без відвантаження</div></div>
@@ -590,7 +590,25 @@ tr.stale-red td{background:#ffebee}
 </div>
 
 <script>
-var WORKER='https://sneco-auth.vg-ab6.workers.dev', TOKEN=null, LEADS=[], ORDERS=[];
+var WORKER='https://sneco-auth.vg-ab6.workers.dev', TOKEN=null, LEADS=[], ORDERS=[], COUPONS={};
+// 21.11.2026 influencer-director: той самий бал, що у сповіщенні Worker (creatorScore у sneco-auth). Підказка, кому відповісти першим.
+function cField(msg,label){var m=String(msg||'').match(new RegExp('^'+label+':\\s*(.+)$','m'));return m?m[1].trim():'';}
+function creatorScore(r){var msg=r.message||'',why=[],flags=[],s=0,host='';
+  var H={'instagram.com':'Instagram','tiktok.com':'TikTok','youtube.com':'YouTube','youtu.be':'YouTube','threads.net':'Threads','threads.com':'Threads','facebook.com':'Facebook','t.me':'Telegram','pinterest.com':'Pinterest','twitch.tv':'Twitch'};
+  var prof=(cField(msg,'Профіль')||r.company||'').trim(),plat=cField(msg,'Платформа');
+  try{host=new URL(prof).hostname.replace(/^(www|m|vm|vt)\./,'');}catch(e){}
+  var known=Object.keys(H).find(function(h){return host===h||host.endsWith('.'+h);});
+  if(known){s+=25;why.push('профіль '+H[known]);if(plat&&H[known]===plat)s+=5;}
+  else if(host){s+=12;why.push('сайт '+host);if(/^(bit\.ly|tinyurl\.com|linktr\.ee|taplink\.cc)$/.test(host))flags.push('коротке посилання');}
+  else flags.push('немає посилання на профіль');
+  if(cField(msg,'Приклад відео')){s+=15;why.push('є приклад відео');}
+  s+=({'lt5k':10,'5-20k':15,'20-100k':20,'100-500k':20,'500k+':15,'ugc':15})[r.monthly_volume_est]||5;
+  var c=String(r.country||'').toUpperCase(); if(['UA','PL','SK','CZ','DE'].indexOf(c)>=0)s+=10; else if(c&&c!=='ZZ')s+=5;
+  if((cField(msg,'Коментар')||'').length>=40){s+=10;why.push('є ідея');}
+  if(cField(msg,'Тематика')||cField(msg,'Формати'))s+=5; if(r.phone)s+=5;
+  if(/(mailinator|10minutemail|guerrillamail|tempmail|temp-mail|yopmail|trashmail|sharklasers|getnada|dispostable)\./i.test(r.email||'')){s-=30;flags.push('тимчасова пошта');}
+  if(/https?:|www\./i.test(r.name||'')){s-=30;flags.push('посилання в імені');}
+  s=Math.max(0,Math.min(100,s)); return {score:s,why:why,flags:flags,cls:s>=70?'hi':s>=45?'mid':'lo'};}
 var ST={'new':'Новий','contacted':'В роботі','pending':'Чекаємо відповіді автора','sample-sent':'Продукт надіслано','won':'Контент вийшов','lost':'Втрата / відмова','duplicate':'Дублікат','spam':'Спам'};
 // Фінальні статуси не контролюємо на прострочення: там уже нічого не чекаємо.
 var FINAL=['won','lost','duplicate','spam'];
@@ -653,6 +671,9 @@ function periodRange(){
 }
 function inPeriod(l,R){ var t=ts(l.created_at); return t>=R.from && t<=R.to; }
 
+// 21.11.2026: для блогерів гроші — це продажі за їхніми промокодами (WooCommerce), а не відвантаження МійСклад.
+function creatorsKpis(rows){var n=0,o=0,rev=0;rows.forEach(function(l){var c=COUPONS[l.id];if(c){n++;o+=c.orders||0;rev+=c.revenue||0;}});
+  document.getElementById('k-rep').textContent=n;document.getElementById('k-ltv').textContent=o;document.getElementById('k-prof').textContent=uah(rev);}
 function kpis(rows){
   var f=function(fn){return rows.filter(fn).length;};
   var won=f(function(l){return l.status==='won';});
@@ -788,7 +809,7 @@ function render(){
   var inPer=LEADS.filter(function(l){return inPeriod(l,R);});
   // KPI, воронка й таблиця замовлень дивляться на період, а не на фільтри
   // нижче — інакше «конверсія» стрибала б від кожного клацання по статусу.
-  kpis(inPer); renderAnalytics(inPer); renderOrders(inPer);
+  kpis(inPer); renderAnalytics(inPer); renderOrders(inPer); creatorsKpis(inPer);
   var hint=document.getElementById('perHint');
   if(hint) hint.textContent=R.label==='all'?'за весь час'
     :new Date(R.from).toLocaleDateString('uk-UA')+' — '+new Date(R.to).toLocaleDateString('uk-UA');
@@ -822,8 +843,8 @@ function render(){
     return true;
   });
   var box=document.getElementById('tablebox');
-  if(!rows.length){box.innerHTML='<div class="empty">Лідів не знайдено.<br><span style="font-size:13px">Заявки з лендингу <b>/dystrybyutor/</b> зʼявляться тут автоматично.</span></div>';return;}
-  var h='<table><thead><tr><th>Дата</th><th>Хто</th><th>Контакти</th><th>Контакт</th><th class="hide-m">Джерело / UTM</th><th class="num">Замовл.</th><th class="num">Оборот</th><th class="num">Прибуток</th><th>Сегмент</th><th>Статус</th><th>Коментарі менеджера</th><th></th></tr></thead><tbody>';
+  if(!rows.length){box.innerHTML='<div class="empty">Лідів не знайдено.<br><span style="font-size:13px">Заявки зі сторінки <b>/blogeram/</b> зʼявляться тут автоматично.</span></div>';return;}
+  var h='<table><thead><tr><th>Дата</th><th>Хто</th><th>Контакти</th><th>Контакт</th><th class="hide-m">Джерело / UTM</th><th class="num" title="Попередній бал 0-100 за полями заявки: профіль, приклад відео, аудиторія, країна, ідея">Бал</th><th>Промокод</th><th class="num" title="Оплачені замовлення за промокодом на sneco.ua">Продажі</th><th>Сегмент</th><th>Статус</th><th>Коментарі менеджера</th><th></th></tr></thead><tbody>';
   rows.forEach(function(l){
     var nm=l.company||l.name||'—';
     var M=money(l.id), D=staleDays(l), cls=staleClass(l);
@@ -844,9 +865,7 @@ function render(){
      +'<td><a class="mail" href="mailto:'+esc(l.email)+'">'+esc(l.email)+'</a>'+(l.phone?'<div class="meta"><a class="mail" href="tel:'+esc(l.phone)+'">'+esc(l.phone)+'</a></div>':'')+'</td>'
      +'<td>'+ageTxt+'</td>'
      +'<td class="hide-m"><span class="tag src">'+esc(l.source||'—')+'</span>'+(l.utm_source?'<div class="meta">'+esc(l.utm_source)+' / '+esc(l.utm_medium||'-')+' / '+esc(l.utm_campaign||'-')+'</div>':'')+'</td>'
-     +'<td class="mny">'+(M.orders||'—')+(M.repeat_orders?'<div class="sub2">+'+M.repeat_orders+' повт.</div>':'')+'</td>'
-     +'<td class="mny">'+(M.orders?uah(M.ltv):'—')+(M.first_at?'<div class="sub2">з '+String(M.first_at).slice(0,10)+'</div>':'')+'</td>'
-     +'<td class="mny">'+(M.orders?uah(M.profit):'—')+'</td>'
+     +(function(){var S=creatorScore(l),C=COUPONS[l.id];return '<td class="mny" title="'+esc(S.why.concat(S.flags.map(function(x){return '⚠ '+x;})).join(', '))+'"><b class="sc sc-'+S.cls+'">'+S.score+'</b>'+(S.flags.length?'<div class="sub2">⚠ '+esc(S.flags[0])+'</div>':'')+'</td>'+'<td>'+(C?'<button class="cpn" data-code="'+esc(C.code)+'" title="Скопіювати">'+esc(C.code)+'</button>':'<button class="cpnew" data-id="'+l.id+'" title="Створити персональний промокод 10% на sneco.ua">+ код 10%</button>')+'</td>'+'<td class="mny">'+(C&&C.orders?C.orders+' зам.<div class="sub2">'+uah(C.revenue)+'</div>':'—')+'</td>';})()
      +'<td><select class="sg" data-id="'+l.id+'"><option value="">— сегмент —</option>'
         +Object.keys(SEGMENT).map(function(k){return '<option value="'+k+'"'+(l.segment===k?' selected':'')+'>'+SEGMENT[k]+'</option>';}).join('')+'</select></td>'
      +'<td><select class="st" data-id="'+l.id+'">'+Object.keys(ST).map(function(k){return '<option value="'+k+'"'+((l.status||'new')===k?' selected':'')+'>'+ST[k]+'</option>';}).join('')+'</select>'
@@ -869,6 +888,14 @@ function render(){
   box.innerHTML=h+'</tbody></table>';
   // Коментар — окремий запис з автором і часом, а не перезапис одного поля.
   // Ctrl+Enter зберігає: менеджер пише багато і не тягнеться до миші.
+  // 21.11.2026: промокод блогера. Клік по коду копіює його; «+ код 10%» створює купон у WooCommerce (Worker → mu-plugin).
+  box.querySelectorAll('.cpn').forEach(function(b){b.addEventListener('click',function(){var c=this.dataset.code,el=this;
+    try{navigator.clipboard.writeText(c);el.textContent='Скопійовано';setTimeout(function(){el.textContent=c;},1200);}catch(e){}});});
+  box.querySelectorAll('.cpnew').forEach(function(b){b.addEventListener('click',async function(){var id=parseInt(this.dataset.id),el=this;
+    el.disabled=true;el.textContent='Створюю…';
+    try{var r=await api('/api/creators/coupon',{id:id});if(!r.code)throw new Error(r.error||'помилка');
+      COUPONS[id]={lead_id:id,code:r.code,orders:0,revenue:0};render();}
+    catch(e){el.disabled=false;el.textContent='Не вдалося, ще раз';console.error(e);}});});
   box.querySelectorAll('.cmsave').forEach(function(b){
     b.addEventListener('click',async function(){
       var id=this.dataset.id;
@@ -966,7 +993,7 @@ function render(){
 function refreshTop(){
   var R=periodRange();
   var inPer=LEADS.filter(function(l){return inPeriod(l,R);});
-  kpis(inPer); renderAnalytics(inPer); renderOrders(inPer);
+  kpis(inPer); renderAnalytics(inPer); renderOrders(inPer); creatorsKpis(inPer);
 }
 
 async function load(){
@@ -977,6 +1004,7 @@ async function load(){
     LEADS=d.leads||[];
     ORDERS=d.orders||[];
     MONEY=d.money||{}; COMMENTS=d.comments||{};
+    try{var cp=await api('/api/creators/coupons',{});COUPONS={};(cp.coupons||[]).forEach(function(c){COUPONS[c.lead_id]=c;});}catch(e){console.warn('coupons',e);}
     var srcs=[...new Set(LEADS.map(function(l){return l.source;}).filter(Boolean))].sort();
     var sel=document.getElementById('f-source'),cur=sel.value;
     sel.innerHTML='<option value="">Усі джерела</option>'+srcs.map(function(s){return '<option value="'+esc(s)+'">'+esc(s)+'</option>';}).join('');
