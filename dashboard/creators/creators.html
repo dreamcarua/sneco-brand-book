@@ -277,7 +277,7 @@ body.dash-locked{overflow:hidden}
 })();
 </script>
   <script src="../_shared/helpers.js"></script>
-</head>
+<style id="creators-relabel">/* 21.11.2026: для блогерів немає замовлень у МійСклад */#k-nodeal{display:none}.k:has(#k-nodeal){display:none}.no-deal{display:none!important}select:has(option[value="repeat"]){display:none}</style></head>
 <body class="dash-locked">
 
 <!-- ===== OTP GATE OVERLAY ===== -->
@@ -532,7 +532,7 @@ tr.stale-red td{background:#ffebee}
     <div class="k acc"><div class="n" id="k-total">0</div><div class="l">Заявок за період</div></div>
     <div class="k"><div class="n" id="k-new">0</div><div class="l">Не оброблені</div></div>
     <div class="k"><div class="n" id="k-work">0</div><div class="l">В роботі</div></div>
-    <div class="k"><div class="n" id="k-won">0</div><div class="l">Замовили</div></div>
+    <div class="k"><div class="n" id="k-won">0</div><div class="l">Контент вийшов</div></div>
     <div class="k"><div class="n" id="k-conv">—</div><div class="l">Конверсія в замовлення</div></div>
     <div class="k"><div class="n" id="k-rep">0</div><div class="l">З повторними</div></div>
     <div class="k"><div class="n" id="k-ltv">0 ₴</div><div class="l">Оборот з лідів</div></div>
@@ -550,8 +550,8 @@ tr.stale-red td{background:#ffebee}
     <select id="f-status">
       <option value="">Усі статуси</option>
       <option value="new">Нові</option><option value="contacted">В роботі</option>
-      <option value="pending">В очікуванні рішення</option>
-      <option value="sample-sent">Зразки надіслані</option><option value="won">Замовили</option>
+      <option value="pending">Чекаємо відповіді автора</option>
+      <option value="sample-sent">Продукт надіслано</option><option value="won">Контент вийшов</option>
       <option value="lost">Втрата / відмова</option><option value="duplicate">Дублікат</option><option value="spam">Спам</option>
     </select>
     <select id="f-age">
@@ -591,7 +591,7 @@ tr.stale-red td{background:#ffebee}
 
 <script>
 var WORKER='https://sneco-auth.vg-ab6.workers.dev', TOKEN=null, LEADS=[], ORDERS=[];
-var ST={'new':'Новий','contacted':'В роботі','pending':'В очікуванні рішення','sample-sent':'Зразки надіслані','won':'Замовили','lost':'Втрата / відмова','duplicate':'Дублікат','spam':'Спам'};
+var ST={'new':'Новий','contacted':'В роботі','pending':'Чекаємо відповіді автора','sample-sent':'Продукт надіслано','won':'Контент вийшов','lost':'Втрата / відмова','duplicate':'Дублікат','spam':'Спам'};
 // Фінальні статуси не контролюємо на прострочення: там уже нічого не чекаємо.
 var FINAL=['won','lost','duplicate','spam'];
 // Для цих статусів дата наступного контакту обовʼязкова — інакше лід зависає.
@@ -715,8 +715,8 @@ function renderAnalytics(rows){
     return {st:st,n:n};
   });
   var top=reached[0].n||1;
-  var ST_L={new:'Нові',contacted:'В роботі',pending:'В очікуванні рішення',
-            'sample-sent':'Зразки надіслані',won:'Замовили'};
+  var ST_L={new:'Нові',contacted:'В роботі',pending:'Чекаємо відповіді автора',
+            'sample-sent':'Продукт надіслано',won:'Контент вийшов'};
   var funnel=reached.map(function(r){
     var w=Math.round(r.n/top*100);
     return '<div class="fn-row"><span class="fn-l">'+ST_L[r.st]+'</span>'
