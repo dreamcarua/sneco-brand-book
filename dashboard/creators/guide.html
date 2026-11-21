@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<!-- 18.11.2026: копія leads.html для заявок зі сторінки sneco.ua/blogeram/ (блок creators-dashboard, scope=creators). Оновлювати разом з leads.html. -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Інструкція · Програма блогерів snEco</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --y:#FCC01B;--g:#8DC63F;--d:#1E1E1E;--bg:#F4F4EF;--card:#fff;
+  --muted:#6b6b6b;--border:#E5E5DC;--red:#dc2626;--blue:#3B82F6;
+  --orange:#F97316;--purple:#7209B7;
+  --yf:rgba(252,192,27,.13);--gf:rgba(141,198,63,.12);--rf:rgba(232,64,64,.10);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--d);font-size:14px;min-height:100vh}
+
+/* ─── TOPBAR ─── */
+.topbar{background:var(--d);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.3);gap:12px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-box{width:32px;height:32px;background:var(--y);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:var(--d);letter-spacing:-0.5px}
+.logo-img{height:24px;display:block;flex-shrink:0}
+@media(max-width:760px){.logo-text,.logo-sub{display:none}}
+@media(max-width:520px){.logo-img{height:20px}}
+.logo-text{color:#fff;font-size:15px;font-weight:700;letter-spacing:-.3px}
+.logo-sub{color:rgba(255,255,255,.4);font-size:11px;margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
+/* v2.76.0 — Unified nav menu across all dashboards */
+.nav-menu{display:flex;align-items:center;gap:2px;margin-left:18px;padding-left:18px;border-left:1px solid rgba(255,255,255,.12)}
+.nav-link{color:rgba(255,255,255,.65);text-decoration:none;font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:7px;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.nav-link:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-link.active{background:rgba(252,192,27,.18);color:#FCC01B}
+.nav-toggle{display:none;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:6px;margin-left:8px}
+@media(max-width:1280px){
+  .nav-menu{position:fixed;top:56px;left:0;right:0;background:#1E1E1E;flex-direction:column;align-items:stretch;padding:8px 16px;gap:0;margin:0;border-left:none;border-bottom:1px solid rgba(255,255,255,.1);transform:translateY(-110%);transition:transform .25s;z-index:180;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+  .nav-menu.open{transform:translateY(0)}
+  .nav-link{padding:11px 12px;border-radius:6px}
+  .nav-toggle{display:inline-block}
+}
+.badge{padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:600;white-space:nowrap}
+@media(max-width:900px){.badge{padding:2px 7px;font-size:10px}#lastBootBadge{display:none}}
+@media(max-width:520px){#lastUpdate{display:none}}
+.badge-green{background:rgba(141,198,63,.2);color:var(--g);border:1px solid rgba(141,198,63,.3)}
+.badge-gray{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1)}
+
+/* ─── LAYOUT ─── */
+.wrap{padding:20px 24px;max-width:1400px;margin:0 auto}
+/* аналітика: воронка, причини, сегменти, джерела */
+.an-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:16px 0 20px}
+.an-card{background:#fff;border:1px solid var(--line,#e5e5e5);border-radius:10px;padding:13px 15px}
+.an-card h3{margin:0 0 9px;font-size:13px;font-weight:700;letter-spacing:.02em}
+.an-card h3 .cnt{font-weight:500;color:#999;font-size:11px;margin-left:5px}
+.fn-row{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:12.5px}
+.fn-l{flex:1;min-width:0;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fn-bar{flex:0 0 66px;height:7px;background:#f0f0f0;border-radius:4px;overflow:hidden}
+.fn-bar i{display:block;height:100%;background:#2D6A00;border-radius:4px}
+.fn-n{flex:0 0 auto;font-variant-numeric:tabular-nums;min-width:22px;text-align:right}
+.fn-p{flex:0 0 34px;text-align:right;color:#999;font-size:11px}
+.rj-wrap{margin-top:5px}
+.rj-wrap select{font-size:11.5px;border-color:#d99}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+
+.empty-hero{padding:80px 20px;text-align:center;color:var(--muted)}
+.empty-hero .eh-icon{font-size:60px;margin-bottom:14px;opacity:.5}
+.empty-hero .eh-title{font-size:18px;font-weight:700;color:var(--d);margin-bottom:6px}
+.empty-hero .eh-sub{font-size:13px;line-height:1.5}
+.sec{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:24px 0 12px;display:flex;align-items:center;gap:8px}
+.sec::after{content:'';flex:1;height:1px;background:var(--border)}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media(max-width:960px){.g4{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}}
+@media(max-width:620px){.g4,.g3,.g2{grid-template-columns:1fr}.topbar{padding:0 12px;height:48px}.wrap{padding:12px 10px}}
+
+/* ─── HERO HEADER ─── */
+.fin-header{background:linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%);color:#fff;border-radius:14px;padding:24px 28px;margin-bottom:20px;position:relative;overflow:hidden}
+.fin-header::after{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle, rgba(141,198,63,0.18) 0%, transparent 70%);pointer-events:none}
+.fin-title{font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;line-height:1.2}
+.fin-sub{font-size:13px;color:rgba(255,255,255,.75)}
+
+/* ─── PERIOD SELECTOR + DIAGNOSTIC STRIP (v3.0) ─── */
+.period-bar{background:#fff;border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;position:sticky;top:56px;z-index:150;box-shadow:0 1px 0 rgba(0,0,0,.02)}
+.period-bar-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-right:2px}
+.period-chips{display:flex;gap:4px;background:#F1F1EB;padding:3px;border-radius:9px;flex-wrap:wrap}
+.period-chip{padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;color:#555;cursor:pointer;border:none;background:transparent;transition:all .15s ease;white-space:nowrap}
+.period-chip:hover{background:rgba(252,192,27,.18);color:var(--d)}
+.period-chip.active{background:var(--d);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.period-chip.active:hover{background:var(--d);color:#fff}
+.period-custom{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.period-custom input[type=date]{padding:5px 8px;border-radius:7px;border:1px solid var(--border);font-size:12px;font-family:inherit;color:var(--d);background:#fafafa}
+.period-custom input[type=date]:focus{outline:none;border-color:var(--y);background:#fff}
+.granularity-toggle{display:flex;gap:3px;background:#F1F1EB;padding:3px;border-radius:8px;margin-left:auto}
+.granularity-toggle .gt-btn{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;color:#555;cursor:pointer;border:none;background:transparent}
+.granularity-toggle .gt-btn.active{background:#fff;color:var(--d);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.period-range-info{font-size:11px;color:var(--muted);padding:4px 10px;background:rgba(141,198,63,.08);border-radius:7px;font-weight:500;white-space:nowrap}
+@media(max-width:760px){.period-bar{padding:10px 12px;gap:8px}.period-chips{flex:1;justify-content:flex-start;overflow-x:auto}.granularity-toggle{margin-left:0;width:100%;justify-content:flex-start;margin-top:4px}}
+
+.diag-strip{background:#FFF9E5;border-bottom:1px solid #F5E6B3;padding:8px 24px;display:flex;align-items:center;gap:16px;font-size:11.5px;flex-wrap:wrap}
+.diag-strip.ok{background:rgba(141,198,63,.08);border-color:rgba(141,198,63,.25)}
+.diag-strip.warn{background:#FFF9E5;border-color:#F5E6B3}
+.diag-strip.err{background:rgba(232,64,64,.05);border-color:rgba(232,64,64,.18)}
+.diag-item{display:flex;align-items:center;gap:5px;color:#555;font-weight:500}
+.diag-item strong{color:var(--d);font-weight:700}
+.diag-item.empty{color:var(--red)}
+.diag-item.empty strong{color:var(--red)}
+.diag-divider{color:#ccc;font-weight:300}
+.diag-action{margin-left:auto;font-size:11px;color:#1d5fa6;text-decoration:none;font-weight:600;padding:3px 9px;background:rgba(59,130,246,.08);border-radius:5px;cursor:pointer;border:none;font-family:inherit}
+.diag-action:hover{background:rgba(59,130,246,.16)}
+@media(max-width:760px){.diag-strip{padding:8px 12px}.diag-divider{display:none}.diag-action{margin-left:0}}
+
+/* ─── KPI CARDS ─── */
+.kpi{background:var(--card);border-radius:12px;padding:16px 18px;border:1px solid var(--border);position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px}
+.kpi.cy::after{background:var(--y)}
+.kpi.cg::after{background:var(--g)}
+.kpi.cr::after{background:var(--red)}
+.kpi.cb::after{background:var(--blue)}
+.kpi.co::after{background:var(--orange)}
+.kpi.cp::after{background:var(--purple)}
+.kpi-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:6px}
+.kpi-val{font-size:22px;font-weight:800;color:var(--d);line-height:1.1}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:6px}
+.kpi-delta{display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;margin-top:6px}
+.kpi-delta.up{background:rgba(141,198,63,.15);color:#4a7000}
+.kpi-delta.down{background:rgba(232,64,64,.12);color:#a00}
+.kpi-delta.flat{background:rgba(138,138,138,.13);color:#666}
+
+/* ─── CHART CARDS ─── */
+.cc{background:var(--card);border-radius:12px;padding:18px 20px;border:1px solid var(--border)}
+.cc-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.cc-title{font-size:14px;font-weight:700;color:var(--d)}
+.cc-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.chart-h220{height:220px;position:relative}
+.chart-h280{height:280px;position:relative}
+.chart-h320{height:320px;position:relative}
+
+/* ─── INSIGHTS ─── */
+.insight{padding:14px 18px;border-radius:10px;font-size:13px;line-height:1.55;display:flex;align-items:flex-start;gap:10px}
+.insight.green{background:rgba(141,198,63,.08);color:#4a7000;border-left:3px solid var(--g)}
+.insight.yellow{background:rgba(252,192,27,.08);color:#996600;border-left:3px solid var(--y)}
+.insight.red{background:rgba(232,64,64,.06);color:#a00;border-left:3px solid var(--red)}
+.insight.blue{background:rgba(59,130,246,.07);color:#1d5fa6;border-left:3px solid var(--blue)}
+.insight-icon{font-size:18px;flex-shrink:0;margin-top:-2px}
+.insights-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:620px){.insights-grid{grid-template-columns:1fr}}
+
+/* ─── DATA TABLE ─── */
+.dt{width:100%;border-collapse:collapse;font-size:13px}
+.dt th{text-align:left;padding:8px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:2px solid var(--border)}
+.dt td{padding:8px 12px;border-bottom:1px solid var(--border)}
+.dt tr:last-child td{border:none}
+.dt tr:hover td{background:#FAFAF5}
+.rank{font-weight:800;color:var(--red);font-size:13px;width:28px}
+.rank.green{color:#4a7000}
+
+/* ─── BUCKETS ─── */
+.bucket-pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700}
+.bucket-pill.b0{background:rgba(141,198,63,.18);color:#4a7000}
+.bucket-pill.b30{background:rgba(252,192,27,.18);color:#996600}
+.bucket-pill.b60{background:rgba(249,115,22,.18);color:#c2410c}
+.bucket-pill.b90{background:rgba(232,64,64,.15);color:#a00}
+
+/* ─── SPLIT SUMMARY (overdue vs within-term) ─── */
+.split-summary{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px}
+.split-summary .ss-item{display:flex;align-items:center;gap:8px;flex:1;min-width:160px}
+.split-summary .ss-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.split-summary .ss-dot.overdue{background:var(--red)}
+.split-summary .ss-dot.ok{background:var(--g)}
+.split-summary .ss-label{color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;font-size:10px}
+.split-summary .ss-val{font-weight:800;color:var(--d);font-size:14px;line-height:1.1}
+.split-summary .ss-pct{font-size:11px;color:var(--muted);margin-left:4px}
+
+/* ─── QUICK ACTIONS ─── */
+.act-btn{padding:6px 12px;border-radius:7px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:600;color:var(--d);cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .15s;text-decoration:none}
+.act-btn:hover{border-color:var(--y);background:var(--yf)}
+.act-btn.tel{border-color:rgba(141,198,63,.35);color:#4a7000}
+.act-btn.tel:hover{background:rgba(141,198,63,.12)}
+.act-btn.mail{border-color:rgba(59,130,246,.35);color:#1d5fa6}
+.act-btn.mail:hover{background:rgba(59,130,246,.08)}
+
+/* ─── CARD HEADERS WITH STATUS ─── */
+.cc.alert{border-left:3px solid var(--red)}
+.cc.ok{border-left:3px solid var(--g)}
+.cc-title-icon{display:inline-flex;align-items:center;gap:6px}
+.cc-title-tag{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-left:6px;vertical-align:middle}
+.cc-title-tag.red{background:rgba(232,64,64,.13);color:#a00}
+.cc-title-tag.green{background:rgba(141,198,63,.15);color:#4a7000}
+
+/* ─── PAYMENT TIMELINE ─── */
+.pay-tl{padding:6px 0}
+.pay-tl-item{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid var(--border);align-items:center}
+.pay-tl-item:last-child{border:none}
+.pay-tl-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.pay-tl-icon.inb{background:rgba(141,198,63,.18);color:#4a7000}
+.pay-tl-icon.outb{background:rgba(232,64,64,.13);color:var(--red)}
+.pay-tl-date{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:600;width:80px;flex-shrink:0;white-space:nowrap}
+.pay-tl-body{flex:1;min-width:0}
+.pay-tl-title{font-size:13px;font-weight:600;color:var(--d);line-height:1.35}
+.pay-tl-meta{font-size:11px;color:var(--muted);margin-top:1px}
+.pay-tl-amount{font-size:14px;font-weight:800;text-align:right;white-space:nowrap}
+.pay-tl-amount.pos{color:#4a7000}
+.pay-tl-amount.neg{color:var(--red)}
+
+/* ─── EMPTY STATE ─── */
+.empty-state{padding:36px 20px;text-align:center;color:var(--muted)}
+.empty-state .es-icon{font-size:30px;margin-bottom:8px}
+.empty-state .es-title{font-weight:600;color:#666;margin-bottom:5px;font-size:13px}
+.empty-state .es-sub{font-size:12px}
+.empty-state.hero{padding:48px 20px}
+.empty-state.hero .es-icon{font-size:42px;margin-bottom:10px}
+.empty-state.hero .es-title{font-size:15px;color:#4a7000}
+.empty-state.dashed{border:1px dashed var(--border);border-radius:10px;background:#FAFAF5}
+
+/* ─── LOADER ─── */
+.loader{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--y);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* v3.0.3: animated loader для empty-hero */
+.loader-big{width:64px;height:64px;border:5px solid #eee;border-top-color:var(--y);border-right-color:var(--g);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
+.loader-dots{display:inline-flex;gap:6px;justify-content:center;margin-top:10px}
+.loader-dots span{width:8px;height:8px;border-radius:50%;background:var(--y);animation:bounce 1.2s ease-in-out infinite}
+.loader-dots span:nth-child(2){background:var(--g);animation-delay:.15s}
+.loader-dots span:nth-child(3){background:var(--blue);animation-delay:.30s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-8px);opacity:1}}
+
+/* ─── FOOTER ─── */
+.footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:20px}
+
+/* === OTP gate === */
+#dashauth-overlay{position:fixed;inset:0;background:#1E1E1E;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+#dashauth-overlay.is-hidden{display:none}
+.dashauth-card{background:#fff;width:100%;max-width:440px;border-radius:14px;padding:36px 30px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.dashauth-logo{font-size:24px;font-weight:900;color:#FCC01B;margin-bottom:6px;letter-spacing:-0.5px;text-align:center}
+.dashauth-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#888;text-align:center;margin-bottom:24px}
+.dashauth-icon{font-size:36px;text-align:center;margin-bottom:16px}
+.dashauth-h1{font-size:18px;font-weight:800;text-align:center;color:#1E1E1E;margin-bottom:6px}
+.dashauth-desc{font-size:13px;color:#666;text-align:center;line-height:1.55;margin-bottom:20px}
+.dashauth-input{width:100%;padding:12px 14px;border:2px solid #E5E5DC;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
+.dashauth-input:focus{border-color:#FCC01B}
+.dashauth-input.code{font-family:'SF Mono',Menlo,Consolas,monospace;letter-spacing:.4em;text-align:center;font-size:18px}
+.dashauth-btn{width:100%;padding:13px;background:#1E1E1E;color:#fff;border:0;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;margin-top:14px;font-family:inherit;transition:background .15s}
+.dashauth-btn:hover{background:#000}
+.dashauth-btn:disabled{opacity:.5;cursor:not-allowed}
+.dashauth-msg{font-size:12.5px;line-height:1.5;margin-top:12px;text-align:center;min-height:18px}
+.dashauth-msg.is-error{color:#DC2626}
+.dashauth-msg a{color:#FCC01B;font-weight:600;text-decoration:underline}
+.dashauth-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#888;text-decoration:none}
+.dashauth-back:hover{color:#FCC01B}
+/* v2.77.1: top:115px — нижче period-bar (sticky top:56px, висота ~55px) щоб не overlap'ило granularity toggle */
+.dashauth-session{position:fixed;top:115px;right:12px;z-index:10000;background:rgba(141,198,63,.18);color:#8DC63F;border:1px solid rgba(141,198,63,.35);padding:5px 12px;border-radius:14px;font-size:11px;font-family:-apple-system,sans-serif;font-weight:600;display:flex;align-items:center;gap:8px}
+@media(max-width:760px){.dashauth-session{top:auto;bottom:12px;right:12px;left:12px;justify-content:center}}
+.dashauth-session button{background:none;border:0;color:#8DC63F;cursor:pointer;font-size:14px;padding:0;line-height:1}
+body.dash-locked{overflow:hidden}
+</style>
+<script>
+// v2.78.91 UX: global 401 handler — JWT expired → friendly redirect screen
+(function(){
+  const _origFetch = window.fetch;
+  window.fetch = async function(...args) {
+    const r = await _origFetch.apply(this, args);
+    if (r.status === 401 && args[0] && typeof args[0] === 'string' && args[0].includes('sneco-auth')) {
+      // Show session expired overlay
+      // v2.78.116: ONLY show overlay коли native login form НЕ показано
+      // Native form має body.dash-locked + #dashauth-overlay visible
+      // Якщо вони уже showing — skip (native form handles login)
+      const _nativeLogin = document.body?.classList?.contains('dash-locked') ||
+                            document.getElementById('dashauth-overlay');
+      if (!_nativeLogin) {
+        window._snAuthBlock = 'creators-dashboard';
+        if (window.snEco?.handle401) {
+          window.snEco.handle401('creators-dashboard');
+        }
+      }
+    }
+    return r;
+  };
+})();
+</script>
+  <script src="../_shared/helpers.js"></script>
+<style id="creators-hide-b2b">#tablebox th:nth-child(9),#tablebox td:nth-child(9),#f-segment{display:none!important}.hint-src,#ordersbox,h2:has(+.sub+#ordersbox),.sub:has(+#ordersbox){display:none!important}</style><style id="creators-score">.sc{display:inline-block;min-width:34px;padding:3px 6px;border-radius:8px;font-weight:700;text-align:center}.sc-hi{background:#e3f4d0;color:#2f6b0f}.sc-mid{background:#fff1cc;color:#7a5a00}.sc-lo{background:#fde2e2;color:#9b1c1c}.cpn,.cpnew{font:inherit;font-size:13px;font-weight:700;border-radius:8px;padding:5px 9px;cursor:pointer;white-space:nowrap}.cpn{background:#1F1C1C;color:#FEBB30;border:0;letter-spacing:.04em}.cpnew{background:#fff;border:1px dashed #bbb;color:#444}.cpnew:disabled{opacity:.5}</style><style id="creators-relabel">/* 21.11.2026: для блогерів немає замовлень у МійСклад */#k-nodeal{display:none}.k:has(#k-nodeal){display:none}.no-deal{display:none!important}select:has(option[value="repeat"]){display:none}</style></head>
+<body class="dash-locked">
+
+<!-- ===== OTP GATE OVERLAY ===== -->
+<script src="../auth-google.js"></script>
+<div id="dashauth-overlay">
+  <div class="dashauth-card">
+    <div class="dashauth-logo">snEco</div>
+    <div class="dashauth-sub">Інструкція програми блогерів · Confidential</div>
+    <div id="dashauth-stage"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const WORKER = 'https://sneco-auth.vg-ab6.workers.dev';
+  const BLOCK = 'creators-dashboard';
+  const STORAGE_KEY = 'snEco-jwt-' + BLOCK;
+  const overlay = document.getElementById('dashauth-overlay');
+  const stage = document.getElementById('dashauth-stage');
+  let email = '';
+
+  function unlock(token, em, exp){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({token, email:em, exp})); } catch(e){}
+    document.body.classList.remove('dash-locked');
+    overlay.classList.add('is-hidden');
+    showSessionBadge(em, exp);
+    if (typeof window.bootLeads === 'function') window.bootLeads(token);
+  }
+  function showSessionBadge(em, exp){
+    const b = document.createElement('div');
+    b.className = 'dashauth-session';
+    const totalMins = Math.max(0, Math.floor((exp*1000 - Date.now())/60000));
+    const timeLabel = totalMins >= 60
+      ? Math.floor(totalMins/60) + 'h ' + (totalMins%60 ? (totalMins%60) + 'm' : '')
+      : totalMins + 'min';
+    b.innerHTML = '✓ ' + em + ' · ' + timeLabel.trim() + ' <button title="Lock">🔒</button>';
+    b.querySelector('button').onclick = () => { localStorage.removeItem(STORAGE_KEY); location.reload(); };
+    document.body.appendChild(b);
+  }
+  async function verifyExisting(){
+    let s; try { s = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null'); } catch(e){}
+    if (!s || !s.token || !s.exp || s.exp*1000 < Date.now()) return null;
+    try {
+      const r = await fetch(WORKER+'/api/session/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({token: s.token, block: BLOCK})});
+      const j = await r.json();
+      return j.ok ? s : null;
+    } catch(e) { return null; }
+  }
+  function renderEmail(){
+    stage.innerHTML = `
+      <div class="dashauth-icon">🛒</div>
+      <div class="dashauth-h1">Введіть email</div>
+      <div class="dashauth-desc">Ліди з сайту — заявки дистриб’юторів, статуси, UTM-джерела. Якщо ваш email у whitelist — на нього надійде 6-значний код. Авторизація через Google (швидко) або OTP-код. Сесія діє 30 днів.</div>
+      <div id="google-signin-btn" style="display:flex;justify-content:center;margin:18px 0 8px"></div>
+      <div style="font-size:11px;color:#777;text-align:center;margin:8px 0 4px">— або через email-код —</div>
+      <input class="dashauth-input" type="email" id="auth-em" placeholder="ім'я@sneco.ua" autocomplete="email" autofocus>
+      <button class="dashauth-btn" id="auth-send">Надіслати код</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="../" class="dashauth-back">← Каталог дашбордів</a>
+    `;
+    // v2.78.35 (Богдан): Google Sign-In primary, OTP fallback
+    if (window.SnecoAuth) {
+      const gBtn = document.getElementById('google-signin-btn');
+      window.SnecoAuth.signInWithGoogle(BLOCK, gBtn,
+        (j) => unlock(j.token, j.email, j.exp),
+        (errMsg) => {
+          const msgEl = document.getElementById('auth-msg');
+          if (msgEl) { msgEl.textContent = errMsg; msgEl.className = 'dashauth-msg is-error'; }
+        }
+      );
+    }
+
+    const em = document.getElementById('auth-em');
+    const send = document.getElementById('auth-send');
+    const msg = document.getElementById('auth-msg');
+    em.addEventListener('keydown', e=>{ if(e.key==='Enter') send.click(); });
+    send.onclick = async () => {
+      const v = em.value.trim();
+      if (!v || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { msg.textContent='Введіть правильний email.'; msg.className='dashauth-msg is-error'; return; }
+      send.disabled = true; send.textContent = 'Надсилаємо...'; msg.textContent='';
+      try {
+        const r = await fetch(WORKER+'/api/otp/request', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email:v, block: BLOCK})});
+        if (!r.ok) {
+          const j = await r.json().catch(()=>({}));
+          if (j.error === 'not_in_whitelist') {
+            msg.innerHTML = `❌ Цього email немає у whitelist. <a href="mailto:vg@sneco.ua?subject=Leads%20Dashboard%20whitelist">✉ Запит до vg@sneco.ua</a>`;
+          } else {
+            msg.textContent = 'Помилка: ' + (j.error || r.status);
+          }
+          msg.className='dashauth-msg is-error';
+          send.disabled=false; send.textContent='Надіслати код'; return;
+        }
+        email = v;
+        renderCode();
+      } catch(e) {
+        msg.textContent = 'Помилка мережі: ' + e.message;
+        msg.className='dashauth-msg is-error';
+        send.disabled=false; send.textContent='Надіслати код';
+      }
+    };
+  }
+  function renderCode(){
+    stage.innerHTML = `
+      <div class="dashauth-icon">🔢</div>
+      <div class="dashauth-h1">Введіть код з листа</div>
+      <div class="dashauth-desc">${email}<br>Код надіслано — перевірте пошту (включно зі спамом).</div>
+      <input class="dashauth-input code" type="text" id="auth-code" inputmode="numeric" maxlength="6" placeholder="••••••" autofocus>
+      <button class="dashauth-btn" id="auth-verify">Підтвердити</button>
+      <div class="dashauth-msg" id="auth-msg"></div>
+      <a href="#" class="dashauth-back" id="auth-back">← Інший email</a>
+    `;
+    const code = document.getElementById('auth-code');
+    const verify = document.getElementById('auth-verify');
+    const msg = document.getElementById('auth-msg');
+    code.addEventListener('keydown', e=>{ if(e.key==='Enter') verify.click(); });
+    document.getElementById('auth-back').onclick = e=>{ e.preventDefault(); renderEmail(); };
+    verify.onclick = async () => {
+      const c = code.value.trim();
+      if (!/^\d{6}$/.test(c)) { msg.textContent='Код — 6 цифр.'; msg.className='dashauth-msg is-error'; return; }
+      verify.disabled=true; verify.textContent='Перевіряємо...'; msg.textContent='';
+      try {
+        const r = await fetch(WORKER+'/api/otp/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, block: BLOCK, code: c})});
+        const j = await r.json();
+        if (!r.ok) { msg.textContent = 'Невірний або застарілий код.'; msg.className='dashauth-msg is-error'; verify.disabled=false; verify.textContent='Підтвердити'; return; }
+        unlock(j.token, j.email, j.exp);
+      } catch(e) {
+        msg.textContent = 'Помилка: ' + e.message; msg.className='dashauth-msg is-error';
+        verify.disabled=false; verify.textContent='Підтвердити';
+      }
+    };
+  }
+
+  (async()=>{
+    const sess = await verifyExisting();
+    if (sess) { unlock(sess.token, sess.email, sess.exp); return; }
+    renderEmail();
+  })();
+})();
+</script>
+<!-- ===== END OTP GATE ===== -->
+<!-- ===== GUIDE (21.11.2026 influencer-director; оновлює щотижневий режим системи) ===== -->
+<style>
+@font-face{font-family:'DrukCyr-Bold';font-weight:700;font-display:swap;src:url('https://sneco.ua/wp-content/uploads/2025/01/DrukCyr-Bold.woff2') format('woff2')}
+:root{--y:#FEBB30;--d:#1F1C1C;--d2:#2a2626;--g:#8DC63F;--r:#E5484D;--ln:rgba(30,30,30,.1);--mut:rgba(30,30,30,.62);--disp:'DrukCyr-Bold',Impact,sans-serif;--out:cubic-bezier(.23,1,.32,1)}
+body{margin:0;background:#F7F5F0;color:#1E1E1E;font-family:'Qanelas',system-ui,sans-serif;line-height:1.5;font-synthesis:none}
+.g-top{background:var(--d);color:#fff;position:sticky;top:0;z-index:5}
+.g-top .w{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 24px;max-width:1180px;margin:0 auto;flex-wrap:wrap}
+.g-top b{font-size:17px}
+.g-top nav a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;font-weight:700;margin-left:14px}
+.g-top nav a.on{color:var(--y)}
+.w{max-width:1180px;margin:0 auto;padding:0 24px}
+.toc{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 0}
+.toc a{font-size:13px;font-weight:700;text-decoration:none;color:#1E1E1E;background:#fff;border:1px solid var(--ln);padding:7px 12px;border-radius:99px;transition:background 160ms ease}
+.toc a:hover{background:#FFF3D6}
+.hero{background:var(--d);color:#fff;border-radius:28px;padding:42px;margin:22px 0 0;position:relative;overflow:hidden}
+.eb{font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--y)}
+h1,h2{font-family:var(--disp);font-weight:700;text-transform:uppercase;letter-spacing:.005em}
+.hero h1{font-size:clamp(40px,6vw,72px);line-height:.9;margin:10px 0 14px}
+.hero p{max-width:620px;color:rgba(255,255,255,.75);font-size:17px;margin:0}
+section.s{margin:56px 0}
+h2{font-size:clamp(32px,4vw,48px);line-height:.92;margin:8px 0 10px}
+.lead{max-width:720px;color:var(--mut);font-size:16px;margin:0 0 22px}
+.card{background:#fff;border:1px solid var(--ln);border-radius:22px;padding:24px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+/* pipeline */
+.pipe{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:8px}
+.pipe button{all:unset;cursor:pointer;background:#fff;border:1px solid var(--ln);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:6px;position:relative;transition:transform 160ms var(--out),background 160ms ease}
+.pipe button:active{transform:scale(.97)}
+.pipe button[aria-selected=true]{background:var(--d);color:#fff;border-color:var(--d)}
+.pipe .n{font-family:var(--disp);font-size:30px;line-height:.9;color:var(--y)}
+.pipe .t{font-weight:700;font-size:14px;line-height:1.25}
+.pipe .tag{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;opacity:.6}
+.pdet{margin-top:12px;display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+.pdet ul{margin:8px 0 0;padding-left:18px}
+.pdet li{margin:5px 0}
+.pill{display:inline-block;font-weight:700;font-size:12px;padding:4px 10px;border-radius:99px;background:#FFF3D6;color:#7a5a00;margin:2px 4px 2px 0}
+/* checklist */
+.chk{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.chk label{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--ln);border-radius:14px;padding:13px 16px;cursor:pointer;transition:background 160ms ease}
+.chk input{width:20px;height:20px;accent-color:#1F1C1C;margin-top:2px;flex:0 0 20px}
+.chk input:checked+span{text-decoration:line-through;opacity:.5}
+.chk b{display:block}
+.prog{height:10px;border-radius:99px;background:#ECE6D8;overflow:hidden;margin:12px 0 4px}
+.prog i{display:block;height:100%;width:0;background:var(--y);border-radius:99px;transition:width 300ms var(--out)}
+/* score calc */
+.calc{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;align-items:stretch}
+.opts{display:grid;gap:10px}
+.opt{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#fff;border:1px solid var(--ln);border-radius:14px;padding:12px 14px;font-weight:700;font-size:14px}
+.opt select{font:inherit;font-weight:700;border:1.5px solid var(--ln);border-radius:9px;padding:6px 8px;background:#fff}
+.opt input[type=checkbox]{width:20px;height:20px;accent-color:#1F1C1C}
+.opt small{display:block;font-weight:500;color:var(--mut)}
+.gauge{background:var(--d);color:#fff;border-radius:22px;padding:26px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px}
+.gauge svg{width:220px;height:130px}
+.gauge .val{font-family:var(--disp);font-size:72px;line-height:.85}
+.gauge .lab{font-weight:700;font-size:14px;letter-spacing:.1em;text-transform:uppercase}
+.gauge .why{font-size:13px;color:rgba(255,255,255,.65);max-width:280px}
+/* code demo */
+.code{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;align-items:center}
+.code .box{background:#fff;border:1px solid var(--ln);border-radius:16px;padding:16px;text-align:center;min-height:118px;display:flex;flex-direction:column;justify-content:center}
+.code .arrow{font-family:var(--disp);font-size:34px;color:var(--y)}
+.code input{font:inherit;font-weight:700;border:1.5px solid var(--ln);border-radius:9px;padding:8px 10px;width:100%;box-sizing:border-box;text-align:center}
+.code .cp{font-family:var(--disp);font-size:34px;background:var(--d);color:var(--y);border-radius:10px;padding:6px 10px;display:inline-block;margin:6px auto 0;letter-spacing:.04em}
+.code small{font-size:12px;color:var(--mut);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.code .big{font-family:var(--disp);font-size:44px;line-height:.9}
+/* clock */
+.clock{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.clock .card b{font-family:var(--disp);font-size:46px;line-height:.9;color:#1E1E1E}
+.clock .card .when{font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#7a5a00}
+.clock .card p{margin:8px 0 0;font-size:14px;color:var(--mut)}
+/* letter */
+.mail{background:#fff;border:1px solid var(--ln);border-radius:18px;overflow:hidden}
+.mail .hd{background:#FAF8F3;padding:12px 16px;font-size:13px;color:var(--mut);display:flex;justify-content:space-between}
+.mail .bd{padding:18px 20px;font-size:15px}
+.mail .bd ol{padding-left:20px}
+.mail .code10{background:var(--y);border-radius:10px;padding:10px 12px;font-weight:700}
+.state{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:12px;padding:4px 10px;border-radius:99px}
+.state.off{background:#FDE2E2;color:#9b1c1c}.state.on{background:#E3F4D0;color:#2f6b0f}.state.dev{background:#FFF1CC;color:#7a5a00}
+/* never */
+.never{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.never .card{border-color:#F3C9C9}
+.never b{display:block;font-size:15px}
+.never span{font-size:13px;color:var(--mut)}
+/* faq */
+details{background:#fff;border:1px solid var(--ln);border-radius:14px;padding:14px 18px;margin-bottom:8px}
+summary{cursor:pointer;font-weight:700;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";float:right;font-weight:700;transition:transform 200ms var(--out)}
+details[open] summary::after{transform:rotate(45deg)}
+details p{margin:10px 0 0;color:#333}
+table.mt{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--ln);border-radius:14px;overflow:hidden;font-size:14px}
+.mt td,.mt th{padding:11px 14px;border-top:1px solid var(--ln);text-align:left;vertical-align:top}
+.mt th{background:#FAF8F3;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}
+.mt a{color:#0a58ca}
+.rv{opacity:0;transform:translateY(12px);transition:opacity 500ms var(--out),transform 500ms var(--out)}
+.rv.in{opacity:1;transform:none}
+.upd{font-size:12px;color:var(--mut);margin:40px 0 60px}
+@media(max-width:980px){.grid2,.grid3,.calc,.pdet{grid-template-columns:1fr}.pipe{grid-template-columns:repeat(3,1fr)}.clock,.never{grid-template-columns:1fr 1fr}.code{grid-template-columns:1fr}.code .arrow{transform:rotate(90deg);justify-self:center}.hero{padding:28px}}
+@media(prefers-reduced-motion:reduce){.rv{transform:none;transition:opacity 200ms ease}}
+</style>
+
+<div class="g-top"><div class="w"><b>🎬 Програма блогерів · Інструкція</b>
+ <nav><a href="creators.html">← Заявки</a><a class="on" href="guide.html">Інструкція</a><a href="https://sneco.ua/blogeram/pamyatka/" target="_blank" rel="noopener">Пам'ятка блогеру ↗</a><a href="https://sneco.ua/blogeram/" target="_blank" rel="noopener">Сторінка ↗</a></nav></div></div>
+
+<div class="w">
+ <div class="hero rv">
+  <div class="eb">Для команди snEco</div>
+  <h1>Як працює програма блогерів</h1>
+  <p>Від заявки до посту і продажів за промокодом. Рутину робить система influencer-director, рішення приймають люди. Інструкцію система оновлює щонеділі.</p>
+ </div>
+ <nav class="toc" aria-label="Зміст">
+  <a href="#path">Шлях заявки</a><a href="#day">Мої 5 хвилин на день</a><a href="#score">Бал заявки</a><a href="#code">Промокод</a><a href="#auto">Що робить система</a><a href="#letter">Листи</a><a href="#ship">Відправка</a><a href="#never">Чого система не робить</a><a href="#where">Де що лежить</a><a href="#faq">Питання</a>
+ </nav>
+
+ <section class="s" id="path">
+  <div class="eb rv">1 · Шлях заявки</div>
+  <h2 class="rv">Шість статусів</h2>
+  <p class="lead rv">Натисни на статус: що він означає і що зробити.</p>
+  <div class="pipe rv" role="tablist" id="pipe"></div>
+  <div class="pdet rv"><div class="card" id="pd"></div><div class="card" id="pd2"></div></div>
+ </section>
+
+ <section class="s" id="day">
+  <div class="eb rv">2 · Щодня</div>
+  <h2 class="rv">Мої 5 хвилин на день</h2>
+  <p class="lead rv">Чекліст для Богдани. Галочки зберігаються в цьому браузері до кінця дня.</p>
+  <div class="card rv"><div class="prog"><i id="dp"></i></div><div class="lead" id="dpt" style="margin:0 0 12px">0 з 5</div>
+   <ul class="chk" id="chk">
+    <li><label><input type="checkbox"><span><b>Прочитати ранкове нагадування в «СММ snEco»</b>о 10:00 бот пише, хто чекає понад 24 год, спершу з вищим балом</span></label></li>
+    <li><label><input type="checkbox"><span><b>Відповісти новим авторам на email</b>і поставити статус «В роботі»</span></label></li>
+    <li><label><input type="checkbox"><span><b>Поставити дату наступного контакту</b>для всіх у «Чекаємо відповіді автора» і «Продукт надіслано»</span></label></li>
+    <li><label><input type="checkbox"><span><b>Додати посилання на нові пости</b>у коментар заявки, статус «Контент вийшов»</span></label></li>
+    <li><label><input type="checkbox"><span><b>Перевірити фільтр «Контакт на сьогодні або прострочено»</b>і закрити його</span></label></li>
+   </ul></div>
+ </section>
+
+ <section class="s" id="score">
+  <div class="eb rv">3 · Бал заявки</div>
+  <h2 class="rv">Кому відповісти першим</h2>
+  <p class="lead rv">Бал 0–100 рахується з полів форми. Пограйся з параметрами, щоб побачити, як він складається. Реальну аудиторію бал не перевіряє: профіль дивимось самі.</p>
+  <div class="calc rv">
+   <div class="opts">
+    <div class="opt"><span>Профіль<small>посилання на платформу</small></span><select id="c-prof"><option value="30">Instagram, TikTok, YouTube… (збігається з обраною)</option><option value="25">відома платформа, інша за обрану</option><option value="12">власний сайт</option><option value="0">немає посилання</option></select></div>
+    <div class="opt"><span>Приклад відео</span><input type="checkbox" id="c-vid" checked></div>
+    <div class="opt"><span>Аудиторія</span><select id="c-aud"><option value="10">до 5 тис.</option><option value="15">5–20 тис.</option><option value="20" selected>20–100 тис.</option><option value="20">100–500 тис.</option><option value="15">понад 500 тис.</option><option value="15">UGC без аудиторії</option></select></div>
+    <div class="opt"><span>Країна</span><select id="c-cty"><option value="10">UA, PL, SK, CZ, DE</option><option value="5">інша</option><option value="0">не вказана</option></select></div>
+    <div class="opt"><span>Ідея в коментарі<small>від 40 символів</small></span><input type="checkbox" id="c-idea"></div>
+    <div class="opt"><span>Тематика або формати</span><input type="checkbox" id="c-top" checked></div>
+    <div class="opt"><span>Телефон</span><input type="checkbox" id="c-tel"></div>
+    <div class="opt"><span>⚠ Тимчасова пошта<small>мінус 30</small></span><input type="checkbox" id="c-tmp"></div>
+   </div>
+   <div class="gauge"><svg viewBox="0 0 220 130" aria-hidden="true"><path d="M20 115 A90 90 0 0 1 200 115" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="18" stroke-linecap="round"/><path id="arc" d="M20 115 A90 90 0 0 1 200 115" fill="none" stroke="#FEBB30" stroke-width="18" stroke-linecap="round" pathLength="100" stroke-dasharray="0 100" style="transition:stroke-dasharray 400ms cubic-bezier(.23,1,.32,1),stroke 300ms ease"/></svg>
+    <div class="val" id="sv">0</div><div class="lab" id="sl">—</div><div class="why">Зелений від 70: відповідаємо першими. Жовтий 45–69. Червоний: дивимось профіль уважно, можливо спам.</div></div>
+  </div>
+ </section>
+
+ <section class="s" id="code">
+  <div class="eb rv">4 · Промокод</div>
+  <h2 class="rv">Персональний код −10%</h2>
+  <p class="lead rv">Кнопка «+ код 10%» у рядку заявки створює купон на sneco.ua. Код створюється й сам, коли заявка переходить у «Продукт надіслано». Спробуй: введи посилання на профіль.</p>
+  <div class="code rv">
+   <div class="box"><small>Профіль автора</small><input id="h-in" value="https://instagram.com/miss.m.25" aria-label="Посилання на профіль"></div>
+   <div class="arrow">→</div>
+   <div class="box"><small>Код</small><div><span class="cp" id="h-out">MISSM2510</span></div></div>
+   <div class="arrow">→</div>
+   <div class="box"><small>Дашборд, колонка «Продажі»</small><div class="big">2 зам.</div><div style="font-weight:700">1 350 ₴</div></div>
+  </div>
+  <div class="grid3" style="margin-top:16px">
+   <div class="card rv"><b>Правила</b><p class="lead" style="margin:6px 0 0">−10% на все замовлення, без строку й ліміту. Не поєднується з іншими купонами (DYAKUEMO10). Подарунки за сумою працюють.</p></div>
+   <div class="card rv"><b>Прив'язка</b><p class="lead" style="margin:6px 0 0">Купон пам'ятає номер заявки: «Блогер UGC, заявка #158». Один автор, один код.</p></div>
+   <div class="card rv"><b>Де дивитись</b><p class="lead" style="margin:6px 0 0">Рядок заявки, плитки «Промокодів видано», «Замовлень за кодами», «Продажі за кодами»; WooCommerce → Маркетинг → Купони. Рахуємо лише оплачені.</p></div>
+  </div>
+ </section>
+
+ <section class="s" id="auto">
+  <div class="eb rv">5 · Автоматично</div>
+  <h2 class="rv">Що робить система і коли</h2>
+  <div class="clock">
+   <div class="card rv"><div class="when">одразу</div><b>Заявка</b><p>Сповіщення в «СММ snEco» з балом; автору лист «ми отримали заявку».</p></div>
+   <div class="card rv"><div class="when">щодня 10:00 Київ</div><b>Нагадування</b><p>Заявки без відповіді понад 24 год.</p></div>
+   <div class="card rv"><div class="when">щодня 11:23</div><b>Просування</b><p>3–5 публікацій там, де блогери шукають бренди; нові майданчики; SEO і GEO.</p></div>
+   <div class="card rv"><div class="when">неділя 19:37</div><b>Розвиток</b><p>Метрики тижня, нові практики, правки системи, оновлення цієї інструкції.</p></div>
+  </div>
+ </section>
+
+ <section class="s" id="letter">
+  <div class="eb rv">6 · Листи авторам</div>
+  <h2 class="rv">Лист «Продукт надіслано» <span class="state off" id="lstate">вимкнено</span></h2>
+  <p class="lead rv">Йде автоматично, коли ставиш статус «Продукт надіслано», мовою сторінки автора. Увімкнеться після погодження Вадима.</p>
+  <div class="mail rv"><div class="hd"><span>Твій набір snEco вже в дорозі</span><span>від snEco</span></div><div class="bd">
+   <p>Ми надіслали тобі набір snEco. Номер відправлення прийде окремо від перевізника.</p>
+   <ol><li>Знімай чесно і як тобі зручно: огляд, рецепт, UGC, розіграш.</li><li>Якщо публікуєш в Instagram, зроби спільний пост (співавторство) з @sneco.ua: додай нас як співавтора, ми підтвердимо.</li><li>Якщо хочеш згадати нагороду: snEco першими серед українських компаній отримали SIAL INNOVATIONS 2024.</li><li>Надішли посилання на публікацію на bohdanaprystypa@gmail.com.</li></ol>
+   <div class="code10">Твій промокод для аудиторії: MISSM2510 (−10% на sneco.ua).</div></div></div>
+ </section>
+
+ <section class="s" id="ship">
+  <div class="eb rv">7 · Відправка продукту</div>
+  <h2 class="rv">Як відправити набір <span class="state dev">у розробці</span></h2>
+  <div class="grid2">
+   <div class="card rv"><b>Зараз</b><p class="lead" style="margin:6px 0 0">Відправка вручну, як звичайне замовлення. Після відправки постав статус «Продукт надіслано» і дату наступного контакту.</p></div>
+   <div class="card rv"><b>Скоро</b><p class="lead" style="margin:6px 0 0">У картці заявки обираєш будь-які товари й набори, тиснеш «Відправити». Система створює документ у МойСклад від ФОП Макарової з тегом «Блогер UGC», ТТН Нової Пошти, а собівартість набору з'являється в картці. Без натискання Вадима або Богдани нічого не їде; за кордон лише після погодження.</p></div>
+  </div>
+ </section>
+
+ <section class="s" id="never">
+  <div class="eb rv">8 · Межі</div>
+  <h2 class="rv">Чого система не робить</h2>
+  <div class="never">
+   <div class="card rv"><b>Не платить</b><span>за розміщення і рекламу</span></div>
+   <div class="card rv"><b>Не вводить паролі</b><span>реєстрації завершує Вадим</span></div>
+   <div class="card rv"><b>Не відправляє продукт</b><span>без згоди Вадима або Богдани</span></div>
+   <div class="card rv"><b>Не пише холодні листи</b><span>без погодження пачки Вадимом</span></div>
+  </div>
+ </section>
+
+ <section class="s" id="where">
+  <div class="eb rv">9 · Де що лежить</div>
+  <h2 class="rv">Матеріали</h2>
+  <table class="mt rv"><tr><th>Що</th><th>Де</th></tr>
+   <tr><td>Сторінка для авторів (5 мов)</td><td><a href="https://sneco.ua/blogeram/" target="_blank" rel="noopener">sneco.ua/blogeram</a></td></tr>
+   <tr><td>Пам'ятка блогеру (лише за посиланням)</td><td><a href="https://sneco.ua/blogeram/pamyatka/" target="_blank" rel="noopener">sneco.ua/blogeram/pamyatka</a></td></tr>
+   <tr><td>Заявки</td><td><a href="creators.html">дашборд блогерів</a></td></tr>
+   <tr><td>Картка в посилку з QR (A6, UA і EN)</td><td>iCloud: Projects/snEco/07_Marketing/creators</td></tr>
+   <tr><td>Онбординг</td><td>Brand Bible → Онбординг → «Блогери й UGC»</td></tr>
+   <tr><td>Система: правила, задачі, журнал публікацій</td><td>GitHub: dreamcarua/influencer-director → projects/sneco</td></tr>
+  </table>
+ </section>
+
+ <section class="s" id="faq">
+  <div class="eb rv">10 · Питання</div>
+  <h2 class="rv">Часті питання команди</h2>
+  <details class="rv"><summary>Автор пише з маленьким блогом. Брати?</summary><p>Так, працюємо з будь-яким розміром аудиторії. Подивись живість профілю і приклад відео; для UGC власна аудиторія не потрібна.</p></details>
+  <details class="rv"><summary>Бал червоний. Це спам?</summary><p>Не обов'язково. Червоний означає, що форма заповнена бідно. Відкрий профіль: якщо живий, відповідай; якщо ні, статус «Спам».</p></details>
+  <details class="rv"><summary>Автор хоче оплату за UGC</summary><p>Попроси приклади і ціну, передай Вадиму. Суму погоджує лише він.</p></details>
+  <details class="rv"><summary>Автор з Польщі чи Словаччини</summary><p>Відправка за кордон лише після погодження з Вадимом. Відповідай мовою автора.</p></details>
+  <details class="rv"><summary>Пост вийшов, що далі?</summary><p>Встав посилання в коментар, статус «Контент вийшов». Перевір, чи є спільний пост з @sneco.ua, і запропонуй наступний крок: нові смаки, розіграш, UGC.</p></details>
+ </section>
+ <div class="upd">Оновлено 21.11.2026 · система influencer-director</div>
+</div>
+
+<script>
+(function(){
+var P=[
+ ['Новий','new','Автор заповнив форму. Бот уже написав у чат, автор отримав лист.',['Відкрий профіль і приклад відео','Подивись бал і причини','Напиши автору на email протягом доби'],'Наступний статус: «В роботі»'],
+ ['В роботі','contacted','Ти написала автору і погоджуєте формат і смаки.',['Запитай адресу і улюблені смаки','Дай пам’ятку блогеру','Поясни про спільний пост з @sneco.ua'],'Заявка зникає з ранкового нагадування'],
+ ['Чекаємо відповіді','pending','Автор ще не відповів або думає.',['Обов’язково дата наступного контакту','Одне нагадування через 5 днів','Немає відповіді: «Відмова» з причиною'],'Фільтр «Контакт на сьогодні» підкаже'],
+ ['Продукт надіслано','sample-sent','Набір у дорозі.',['Постав дату контакту через 7–14 днів','Автор отримає лист з промокодом (коли увімкнено)','Код з’явиться в колонці «Промокод»'],'Через 48 год після доставки: коротке «як смакує?»'],
+ ['Контент вийшов','won','Публікація є.',['Встав посилання на пост у коментар','Перевір спільний пост з @sneco.ua','Запропонуй наступну співпрацю'],'Продажі за кодом видно в рядку'],
+ ['Відмова · Дубль · Спам','lost','Закриті заявки.',['Для відмови обери причину','Дубль: якщо людина вже є','Спам: фейкові профілі'],'Не потрапляють у нагадування']];
+var pipe=document.getElementById('pipe'),pd=document.getElementById('pd'),pd2=document.getElementById('pd2');
+P.forEach(function(p,i){var b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.innerHTML='<span class="n">'+(i+1)+'</span><span class="t">'+p[0]+'</span><span class="tag">'+p[1]+'</span>';b.onclick=function(){sel(i)};pipe.appendChild(b)});
+function sel(i){[].forEach.call(pipe.children,function(b,k){b.setAttribute('aria-selected',k===i)});var p=P[i];
+ pd.innerHTML='<b style="font-size:18px">'+p[0]+'</b><p class="lead" style="margin:6px 0 0">'+p[2]+'</p><ul>'+p[3].map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul>';
+ pd2.innerHTML='<div class="eb" style="color:#7a5a00">Далі</div><p style="font-weight:700;font-size:17px;margin:6px 0 0">'+p[4]+'</p>'}
+sel(0);
+/* checklist with daily reset */
+var key='sneco-creators-daily-'+new Date().toISOString().slice(0,10),st={};try{st=JSON.parse(localStorage.getItem(key)||'{}')}catch(e){}
+var boxes=document.querySelectorAll('#chk input');
+function upd(){var n=[].filter.call(boxes,function(b){return b.checked}).length;document.getElementById('dp').style.width=(n/boxes.length*100)+'%';document.getElementById('dpt').textContent=n+' з '+boxes.length+(n===boxes.length?' · готово, дякуємо!':'')}
+boxes.forEach(function(b,i){b.checked=!!st[i];b.onchange=function(){st[i]=b.checked;try{localStorage.setItem(key,JSON.stringify(st))}catch(e){}upd()}});upd();
+/* score calculator: same weights as creatorScore() in Worker sneco-auth */
+function v(id){var e=document.getElementById(id);return e.type==='checkbox'?e.checked:+e.value}
+function calc(){var s=v('c-prof')+(v('c-vid')?15:0)+v('c-aud')+v('c-cty')+(v('c-idea')?10:0)+(v('c-top')?5:0)+(v('c-tel')?5:0)-(v('c-tmp')?30:0);
+ s=Math.max(0,Math.min(100,s));var c=s>=70?'#8DC63F':s>=45?'#FEBB30':'#E5484D',l=s>=70?'сильна':s>=45?'середня':'перевірити';
+ var a=document.getElementById('arc');a.setAttribute('stroke-dasharray',s+' 100');a.style.stroke=c;document.getElementById('sv').textContent=s;document.getElementById('sv').style.color=c;document.getElementById('sl').textContent=l}
+document.querySelectorAll('.opts select,.opts input').forEach(function(e){e.addEventListener('input',calc);e.addEventListener('change',calc)});calc();
+/* code demo: same rule as mu-plugin 77-sneco-creator-coupons.php */
+function mk(u){var h='';try{h=(new URL(u).pathname.split('/').filter(Boolean).filter(function(x){return !/^(channel|c|user|in)$/i.test(x)})[0]||'').replace(/^@/,'')}catch(e){}
+ var b=h.replace(/[^A-Za-z0-9]/g,'').toUpperCase();if(b.length<3)b='SNECO';return b.slice(0,10)+'10'}
+var hi=document.getElementById('h-in');hi.addEventListener('input',function(){document.getElementById('h-out').textContent=mk(hi.value)});
+/* reveal */
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{rootMargin:'0px 0px -8% 0px'});
+document.querySelectorAll('.rv').forEach(function(e){io.observe(e)});
+})();
+window.bootLeads=function(){};
+</script>
+</body>
+</html>
